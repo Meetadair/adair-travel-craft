@@ -35,12 +35,11 @@ function fallbackParse(message: string): ParsedRequest {
     returnDate: iso(back),
     needsCar: /auto|samoch|car/i.test(message),
     notes: message,
-    reply: undefined as string | undefined,
   };
 }
 
 /** Turns a free-form Polish request into a structured trip search. */
-async function understand(message: string) {
+async function understand(message: string): Promise<ParsedRequest> {
   const apiKey = process.env["LOVABLE_API_KEY"];
   if (!apiKey) return fallbackParse(message);
 
