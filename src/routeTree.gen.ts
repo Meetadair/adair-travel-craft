@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AsystentRouteImport } from './routes/asystent'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as InwestorzyRouteImport } from './routes/inwestorzy'
 import { Route as AuthenticatedPanelRouteImport } from './routes/_authenticated/panel'
 
 const IndexRoute = IndexRouteImport.update({
@@ -34,6 +35,11 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InwestorzyRoute = InwestorzyRouteImport.update({
+  id: '/inwestorzy',
+  path: '/inwestorzy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedPanelRoute = AuthenticatedPanelRouteImport.update({
   id: '/panel',
   path: '/panel',
@@ -44,12 +50,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/asystent': typeof AsystentRoute
   '/auth': typeof AuthRoute
+  '/inwestorzy': typeof InwestorzyRoute
   '/panel': typeof AuthenticatedPanelRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/asystent': typeof AsystentRoute
   '/auth': typeof AuthRoute
+  '/inwestorzy': typeof InwestorzyRoute
   '/panel': typeof AuthenticatedPanelRoute
 }
 export interface FileRoutesById {
@@ -58,19 +66,21 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/asystent': typeof AsystentRoute
   '/auth': typeof AuthRoute
+  '/inwestorzy': typeof InwestorzyRoute
   '/_authenticated/panel': typeof AuthenticatedPanelRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/asystent' | '/auth' | '/panel'
+  fullPaths: '/' | '/asystent' | '/auth' | '/inwestorzy' | '/panel'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/asystent' | '/auth' | '/panel'
+  to: '/' | '/asystent' | '/auth' | '/inwestorzy' | '/panel'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/asystent'
     | '/auth'
+    | '/inwestorzy'
     | '/_authenticated/panel'
   fileRoutesById: FileRoutesById
 }
@@ -79,6 +89,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AsystentRoute: typeof AsystentRoute
   AuthRoute: typeof AuthRoute
+  InwestorzyRoute: typeof InwestorzyRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -111,6 +122,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/inwestorzy': {
+      id: '/inwestorzy'
+      path: '/inwestorzy'
+      fullPath: '/inwestorzy'
+      preLoaderRoute: typeof InwestorzyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/panel': {
       id: '/_authenticated/panel'
       path: '/panel'
@@ -137,6 +155,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AsystentRoute: AsystentRoute,
   AuthRoute: AuthRoute,
+  InwestorzyRoute: InwestorzyRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
