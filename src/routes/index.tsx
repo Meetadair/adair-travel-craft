@@ -372,6 +372,27 @@ function MyTrips() {
   );
 }
 
+function PdfButton() {
+  const [loading, setLoading] = useState(false);
+  return (
+    <button
+      onClick={async () => {
+        setLoading(true);
+        try {
+          await downloadTripPdf();
+        } finally {
+          setLoading(false);
+        }
+      }}
+      disabled={loading}
+      className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-60"
+    >
+      <FileDown className="size-4" />
+      {loading ? "Generuję PDF…" : "Pobierz kartę podróży (PDF)"}
+    </button>
+  );
+}
+
 /* ---------- Travel profile ---------- */
 
 const profilePrefs = [
