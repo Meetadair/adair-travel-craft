@@ -373,6 +373,47 @@ function MyTrips() {
   );
 }
 
+const DEMO_INVOICE = {
+  documentNumber: "ADR/2025/DEMO/001",
+  issueDate: new Date().toISOString().slice(0, 10),
+  city: "Mediolan",
+  origin: "Warszawa",
+  startDate: "2025-09-18",
+  endDate: "2025-09-19",
+  currency: "EUR",
+  live: false,
+  buyer: { name: "", company: "", taxId: "", email: "" },
+  items: [
+    {
+      kind: "flight",
+      title: "LOT 391 · Warszawa → Mediolan Linate",
+      detail: "czw 18 wrz, 06:35 – 08:50 · powrót pt 19 wrz, 20:15",
+      provider: "Duffel · NDC",
+      offerReference: "LO391-DEMO",
+      amount: 312,
+      currency: "EUR",
+    },
+    {
+      kind: "hotel",
+      title: "Park Hyatt Milano · 1 noc",
+      detail: "120 m od Duomo, pokój Park Deluxe, śniadanie w cenie",
+      provider: "Adair Direct",
+      offerReference: "PHM-DEMO",
+      amount: 742,
+      currency: "EUR",
+    },
+    {
+      kind: "car",
+      title: "BMW seria 3 · 2 dni",
+      detail: "Odbiór na lotnisku Linate, zwrot w tym samym miejscu",
+      provider: "Duffel",
+      offerReference: "CAR-DEMO",
+      amount: 186,
+      currency: "EUR",
+    },
+  ],
+};
+
 function PdfButton() {
   const [loading, setLoading] = useState(false);
   return (
