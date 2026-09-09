@@ -1,5 +1,7 @@
 import { PDFDocument, rgb } from "pdf-lib";
-import fontUrl from "@/assets/fonts/PlusJakartaSans.ttf";
+import fontkit from "@pdf-lib/fontkit";
+import fontRegularUrl from "@/assets/fonts/PlusJakartaSans-Regular.ttf";
+import fontBoldUrl from "@/assets/fonts/PlusJakartaSans-Bold.ttf";
 
 const CREAM = rgb(0.984, 0.973, 0.949); // #FBF8F2
 const CARD = rgb(1, 1, 1);
@@ -13,9 +15,13 @@ const M = 48; // margin
 
 export async function downloadTripPdf() {
   const doc = await PDFDocument.create();
-  const fontBytes = await fetch(fontUrl).then((r) => r.arrayBuffer());
-  const font = await doc.embedFont(fontBytes);
-  const bold = await doc.embedFont(fontBytes, { subset: true });
+  doc.registerFontkit(fontkit);
+  const [regularBytes, boldBytes] = await Promise.all([
+    fetch(fontRegularUrl).then((r) => r.arrayBuffer()),
+    fetch(fontBoldUrl).then((r) => r.arrayBuffer()),
+  ]);
+  const font = await doc.embedFont(regularBytes, { subset: true });
+  const bold = await doc.embedFont(boldBytes, { subset: true });
 
   const page = doc.addPage([595, 842]); // A4
   const { width } = page.getSize();
