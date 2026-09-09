@@ -566,17 +566,7 @@ function Principles() {
 function Index() {
   return (
     <div className="min-h-screen bg-background">
-      <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
-        <span className="font-display text-xl font-semibold tracking-tight text-foreground">
-          Adair<span className="text-primary">.</span>
-        </span>
-        <a
-          href="#demo"
-          className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-card px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-secondary"
-        >
-          Zobacz demo <ArrowRight className="size-3.5" />
-        </a>
-      </header>
+      <SiteNav />
 
       <main>
         <Hero />
