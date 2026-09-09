@@ -119,7 +119,7 @@ export async function downloadTripPdf() {
       color: CARD,
       borderColor: BORDER,
       borderWidth: 1,
-      borderRadius: 10,
+
     });
     page.drawText(r.kind, { x: M + 16, y: y + cardH - 22, size: 8, font: bold, color: CORAL });
     page.drawText(r.title, { x: M + 16, y: y + cardH - 38, size: 11.5, font: bold, color: INK });
@@ -138,7 +138,7 @@ export async function downloadTripPdf() {
         height: 15,
         borderColor: t.startsWith("Adair") ? CORAL : BORDER,
         borderWidth: 1,
-        borderRadius: 7,
+
       });
       page.drawText(t, {
         x: tx + 7,
@@ -164,7 +164,7 @@ export async function downloadTripPdf() {
     color: CARD,
     borderColor: CORAL,
     borderWidth: 1,
-    borderRadius: 10,
+
   });
   page.drawText("Razem — jedna rezerwacja", { x: M + 16, y: y + 30, size: 8.5, font, color: MUTED });
   page.drawText("1 240 €", { x: M + 16, y: y + 12, size: 17, font: bold, color: CORAL });
