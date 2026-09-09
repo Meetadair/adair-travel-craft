@@ -14,7 +14,158 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          budget_per_trip: number | null
+          cabin_class: string | null
+          company: string | null
+          created_at: string
+          currency: string
+          diet: string | null
+          full_name: string | null
+          hotel_chains: string | null
+          id: string
+          preferred_airlines: string | null
+          seat_preference: string | null
+          tax_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          budget_per_trip?: number | null
+          cabin_class?: string | null
+          company?: string | null
+          created_at?: string
+          currency?: string
+          diet?: string | null
+          full_name?: string | null
+          hotel_chains?: string | null
+          id: string
+          preferred_airlines?: string | null
+          seat_preference?: string | null
+          tax_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          budget_per_trip?: number | null
+          cabin_class?: string | null
+          company?: string | null
+          created_at?: string
+          currency?: string
+          diet?: string | null
+          full_name?: string | null
+          hotel_chains?: string | null
+          id?: string
+          preferred_airlines?: string | null
+          seat_preference?: string | null
+          tax_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      trip_items: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          detail: string | null
+          id: string
+          kind: string
+          offer_reference: string | null
+          position: number
+          provider: string | null
+          title: string
+          trip_id: string
+          user_id: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          detail?: string | null
+          id?: string
+          kind: string
+          offer_reference?: string | null
+          position?: number
+          provider?: string | null
+          title: string
+          trip_id: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          detail?: string | null
+          id?: string
+          kind?: string
+          offer_reference?: string | null
+          position?: number
+          provider?: string | null
+          title?: string
+          trip_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trip_items_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trips: {
+        Row: {
+          city: string | null
+          created_at: string
+          currency: string
+          data_source: string
+          document_number: string | null
+          end_date: string | null
+          id: string
+          origin: string | null
+          start_date: string | null
+          status: string
+          title: string
+          total_amount: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          city?: string | null
+          created_at?: string
+          currency?: string
+          data_source?: string
+          document_number?: string | null
+          end_date?: string | null
+          id?: string
+          origin?: string | null
+          start_date?: string | null
+          status?: string
+          title: string
+          total_amount?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          city?: string | null
+          created_at?: string
+          currency?: string
+          data_source?: string
+          document_number?: string | null
+          end_date?: string | null
+          id?: string
+          origin?: string | null
+          start_date?: string | null
+          status?: string
+          title?: string
+          total_amount?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
