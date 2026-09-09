@@ -115,7 +115,7 @@ export async function downloadTripPdf() {
 
   // Cards
   for (const r of rows) {
-    const cardH = 96;
+    const cardH = 92 + 13 * (r.lines.length - 1);
     y -= 26 + cardH;
     page.drawRectangle({
       x: M,
