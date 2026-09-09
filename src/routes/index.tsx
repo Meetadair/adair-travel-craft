@@ -16,7 +16,10 @@ import {
   Clock,
   ChevronRight,
   Coffee,
+  FileDown,
 } from "lucide-react";
+import { useState } from "react";
+import { downloadTripPdf } from "@/lib/trip-pdf";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -361,7 +364,32 @@ function MyTrips() {
         </div>
         <span className="text-sm font-semibold text-primary">1 240 € · opłacone</span>
       </div>
+
+      <div className="mt-5 flex justify-end">
+        <PdfButton />
+      </div>
     </section>
+  );
+}
+
+function PdfButton() {
+  const [loading, setLoading] = useState(false);
+  return (
+    <button
+      onClick={async () => {
+        setLoading(true);
+        try {
+          await downloadTripPdf();
+        } finally {
+          setLoading(false);
+        }
+      }}
+      disabled={loading}
+      className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-60"
+    >
+      <FileDown className="size-4" />
+      {loading ? "Generuję PDF…" : "Pobierz kartę podróży (PDF)"}
+    </button>
   );
 }
 
