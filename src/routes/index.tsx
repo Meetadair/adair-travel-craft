@@ -380,7 +380,7 @@ function PdfButton() {
       onClick={async () => {
         setLoading(true);
         try {
-          await downloadTripPdf();
+          await downloadTripInvoice(DEMO_INVOICE);
         } finally {
           setLoading(false);
         }
