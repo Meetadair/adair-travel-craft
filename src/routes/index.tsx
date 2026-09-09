@@ -19,7 +19,8 @@ import {
   FileDown,
 } from "lucide-react";
 import { useState } from "react";
-import { downloadTripPdf } from "@/lib/trip-pdf";
+import { downloadTripInvoice } from "@/lib/trip-pdf";
+import { SiteNav } from "@/components/site-nav";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -372,6 +373,47 @@ function MyTrips() {
   );
 }
 
+const DEMO_INVOICE = {
+  documentNumber: "ADR/2025/DEMO/001",
+  issueDate: new Date().toISOString().slice(0, 10),
+  city: "Mediolan",
+  origin: "Warszawa",
+  startDate: "2025-09-18",
+  endDate: "2025-09-19",
+  currency: "EUR",
+  live: false,
+  buyer: { name: "", company: "", taxId: "", email: "" },
+  items: [
+    {
+      kind: "flight",
+      title: "LOT 391 · Warszawa → Mediolan Linate",
+      detail: "czw 18 wrz, 06:35 – 08:50 · powrót pt 19 wrz, 20:15",
+      provider: "Duffel · NDC",
+      offerReference: "LO391-DEMO",
+      amount: 312,
+      currency: "EUR",
+    },
+    {
+      kind: "hotel",
+      title: "Park Hyatt Milano · 1 noc",
+      detail: "120 m od Duomo, pokój Park Deluxe, śniadanie w cenie",
+      provider: "Adair Direct",
+      offerReference: "PHM-DEMO",
+      amount: 742,
+      currency: "EUR",
+    },
+    {
+      kind: "car",
+      title: "BMW seria 3 · 2 dni",
+      detail: "Odbiór na lotnisku Linate, zwrot w tym samym miejscu",
+      provider: "Duffel",
+      offerReference: "CAR-DEMO",
+      amount: 186,
+      currency: "EUR",
+    },
+  ],
+};
+
 function PdfButton() {
   const [loading, setLoading] = useState(false);
   return (
@@ -379,7 +421,7 @@ function PdfButton() {
       onClick={async () => {
         setLoading(true);
         try {
-          await downloadTripPdf();
+          await downloadTripInvoice(DEMO_INVOICE);
         } finally {
           setLoading(false);
         }
@@ -524,17 +566,7 @@ function Principles() {
 function Index() {
   return (
     <div className="min-h-screen bg-background">
-      <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
-        <span className="font-display text-xl font-semibold tracking-tight text-foreground">
-          Adair<span className="text-primary">.</span>
-        </span>
-        <a
-          href="#demo"
-          className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-card px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-secondary"
-        >
-          Zobacz demo <ArrowRight className="size-3.5" />
-        </a>
-      </header>
+      <SiteNav />
 
       <main>
         <Hero />
