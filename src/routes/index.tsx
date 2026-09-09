@@ -19,7 +19,8 @@ import {
   FileDown,
 } from "lucide-react";
 import { useState } from "react";
-import { downloadTripPdf } from "@/lib/trip-pdf";
+import { downloadTripInvoice } from "@/lib/trip-pdf";
+import { SiteNav } from "@/components/site-nav";
 
 export const Route = createFileRoute("/")({
   head: () => ({
