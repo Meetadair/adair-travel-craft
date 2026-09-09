@@ -16,7 +16,10 @@ import {
   Clock,
   ChevronRight,
   Coffee,
+  FileDown,
 } from "lucide-react";
+import { useState } from "react";
+import { downloadTripPdf } from "@/lib/trip-pdf";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -360,6 +363,10 @@ function MyTrips() {
           </span>
         </div>
         <span className="text-sm font-semibold text-primary">1 240 € · opłacone</span>
+      </div>
+
+      <div className="mt-5 flex justify-end">
+        <PdfButton />
       </div>
     </section>
   );
