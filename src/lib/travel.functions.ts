@@ -19,7 +19,9 @@ const parsedSchema = z.object({
   reply: z.string().optional(),
 });
 
-function fallbackParse(message: string) {
+type ParsedRequest = z.infer<typeof parsedSchema>;
+
+function fallbackParse(message: string): ParsedRequest {
   const today = new Date();
   const depart = new Date(today.getTime() + 7 * 86_400_000);
   const back = new Date(today.getTime() + 8 * 86_400_000);
