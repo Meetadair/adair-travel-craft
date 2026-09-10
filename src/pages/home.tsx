@@ -185,7 +185,8 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   );
 }
 
-function Hero({ t }: { t: Dict }) {
+function Hero({ t, onSubmit }: { t: Dict; onSubmit: (sentence: string) => void }) {
+  const [value, setValue] = useState("");
   return (
     <section className="mx-auto max-w-4xl px-6 pt-28 pb-20 text-center sm:pt-36">
       <div className="animate-rise" style={{ animationDelay: "0ms" }}>
@@ -207,21 +208,41 @@ function Hero({ t }: { t: Dict }) {
       >
         {t.home.hero.lead}
       </p>
-      <div
-        className="animate-rise mt-10 flex flex-wrap items-center justify-center gap-3"
+
+      <form
+        className="animate-rise mx-auto mt-10 w-full max-w-[560px]"
         style={{ animationDelay: "270ms" }}
+        onSubmit={(e) => {
+          e.preventDefault();
+          onSubmit(value);
+        }}
       >
+        <label htmlFor="hero-trip" className="sr-only">
+          {t.home.hero.inputLabel}
+        </label>
+        <div className="flex flex-col gap-2 rounded-2xl border border-border bg-card p-2 text-left sm:flex-row sm:items-center sm:rounded-full">
+          <input
+            id="hero-trip"
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            placeholder={t.home.hero.inputPlaceholder}
+            className="min-w-0 flex-1 bg-transparent px-4 py-3 text-sm text-foreground outline-none placeholder:text-muted-foreground"
+          />
+          <button
+            type="submit"
+            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 sm:rounded-full"
+          >
+            {t.home.hero.inputSubmit} <ArrowRight className="size-4" />
+          </button>
+        </div>
+      </form>
+
+      <div className="animate-rise mt-4" style={{ animationDelay: "340ms" }}>
         <a
           href="#demo"
-          className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+          className="text-sm font-medium text-muted-foreground underline decoration-border underline-offset-4 transition-colors hover:text-foreground"
         >
-          {t.home.hero.ctaPrimary} <ArrowRight className="size-4" />
-        </a>
-        <a
-          href="#principles"
-          className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-6 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-secondary"
-        >
-          {t.home.hero.ctaSecondary}
+          {t.home.hero.ctaPrimary}
         </a>
       </div>
     </section>
