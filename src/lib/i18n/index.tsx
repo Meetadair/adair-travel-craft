@@ -91,6 +91,8 @@ export function useLocale(): Locale {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const first = pathname.split("/")[1];
   const fromPath = isLocale(first) ? first : null;
+  /** Only the auth-only dashboard has no localized URL of its own. */
+  const usesStored = pathname.startsWith("/dashboard");
   const [stored, setStored] = useState<Locale | null>(null);
 
   useEffect(() => {
@@ -103,7 +105,7 @@ export function useLocale(): Locale {
     if (isLocale(saved ?? undefined)) setStored(saved as Locale);
   }, [fromPath]);
 
-  return fromPath ?? stored ?? "en";
+  return fromPath ?? (usesStored ? stored : null) ?? "en";
 }
 
 export function useT(): Dict {
