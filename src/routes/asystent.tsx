@@ -202,7 +202,7 @@ function AssistantPage() {
                           {o.detail}
                         </p>
                         <div className="mt-2 flex flex-wrap gap-2">
-                          <span className="tag-pill">{o.provider}</span>
+                          <span className="tag-pill">{displayProvider(o.provider)}</span>
                           <span className="tag-pill">{o.offerReference.slice(0, 22)}</span>
                         </div>
                         {o.kind === "hotel" && (

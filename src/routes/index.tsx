@@ -260,7 +260,7 @@ function ChatDemo() {
                   icon={<Plane className="size-4" />}
                   title="LOT 391 · Warszawa → Mediolan"
                   subtitle="Czw 06:55 – 09:05 · powrót pt 19:40 · miejsce przy oknie, preferowana linia"
-                  tags={[<Tag key="1">Duffel · NDC</Tag>, <Tag key="2">Premium Economy</Tag>]}
+                  tags={[<Tag key="1">LOT Polish Airlines</Tag>, <Tag key="2">Premium Economy</Tag>]}
                   price="412 €"
                 />
                 <TripRow
@@ -274,7 +274,7 @@ function ChatDemo() {
                   icon={<CarFront className="size-4" />}
                   title="BMW serii 3 · odbiór Linate"
                   subtitle="Czw 09:30 – pt 18:30 · pełne ubezpieczenie, bez kaucji"
-                  tags={[<Tag key="1">Duffel</Tag>, <Tag key="2">automat</Tag>]}
+                  tags={[<Tag key="1">Sixt</Tag>, <Tag key="2">automat</Tag>]}
                   price="218 €"
                 />
               </div>
@@ -388,7 +388,7 @@ const DEMO_INVOICE = {
       kind: "flight",
       title: "LOT 391 · Warszawa → Mediolan Linate",
       detail: "czw 18 wrz, 06:35 – 08:50 · powrót pt 19 wrz, 20:15",
-      provider: "Duffel · NDC",
+      provider: "LOT Polish Airlines",
       offerReference: "LO391-DEMO",
       amount: 312,
       currency: "EUR",
@@ -406,7 +406,7 @@ const DEMO_INVOICE = {
       kind: "car",
       title: "BMW seria 3 · 2 dni",
       detail: "Odbiór na lotnisku Linate, zwrot w tym samym miejscu",
-      provider: "Duffel",
+      provider: "Sixt",
       offerReference: "CAR-DEMO",
       amount: 186,
       currency: "EUR",
