@@ -10,15 +10,25 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as LangRouteImport } from './routes/$lang'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AssistantRouteImport } from './routes/assistant'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as InvestorsRouteImport } from './routes/investors'
+import { Route as LangIndexRouteImport } from './routes/$lang.index'
+import { Route as LangAssistantRouteImport } from './routes/$lang.assistant'
+import { Route as LangAuthRouteImport } from './routes/$lang.auth'
+import { Route as LangInvestorsRouteImport } from './routes/$lang.investors'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LangRoute = LangRouteImport.update({
+  id: '/$lang',
+  path: '/$lang',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
@@ -40,6 +50,26 @@ const InvestorsRoute = InvestorsRouteImport.update({
   path: '/investors',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LangIndexRoute = LangIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => LangRoute,
+} as any)
+const LangAssistantRoute = LangAssistantRouteImport.update({
+  id: '/assistant',
+  path: '/assistant',
+  getParentRoute: () => LangRoute,
+} as any)
+const LangAuthRoute = LangAuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => LangRoute,
+} as any)
+const LangInvestorsRoute = LangInvestorsRouteImport.update({
+  id: '/investors',
+  path: '/investors',
+  getParentRoute: () => LangRoute,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -48,45 +78,84 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/$lang': typeof LangRouteWithChildren
   '/assistant': typeof AssistantRoute
   '/auth': typeof AuthRoute
   '/investors': typeof InvestorsRoute
+  '/$lang/assistant': typeof LangAssistantRoute
+  '/$lang/auth': typeof LangAuthRoute
+  '/$lang/investors': typeof LangInvestorsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/$lang/': typeof LangIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/assistant': typeof AssistantRoute
   '/auth': typeof AuthRoute
   '/investors': typeof InvestorsRoute
+  '/$lang/assistant': typeof LangAssistantRoute
+  '/$lang/auth': typeof LangAuthRoute
+  '/$lang/investors': typeof LangInvestorsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/$lang': typeof LangIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/$lang': typeof LangRouteWithChildren
   '/assistant': typeof AssistantRoute
   '/auth': typeof AuthRoute
   '/investors': typeof InvestorsRoute
+  '/$lang/assistant': typeof LangAssistantRoute
+  '/$lang/auth': typeof LangAuthRoute
+  '/$lang/investors': typeof LangInvestorsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/$lang/': typeof LangIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/assistant' | '/auth' | '/investors' | '/dashboard'
+  fullPaths:
+    | '/'
+    | '/$lang'
+    | '/assistant'
+    | '/auth'
+    | '/investors'
+    | '/$lang/assistant'
+    | '/$lang/auth'
+    | '/$lang/investors'
+    | '/dashboard'
+    | '/$lang/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/assistant' | '/auth' | '/investors' | '/dashboard'
+  to:
+    | '/'
+    | '/assistant'
+    | '/auth'
+    | '/investors'
+    | '/$lang/assistant'
+    | '/$lang/auth'
+    | '/$lang/investors'
+    | '/dashboard'
+    | '/$lang'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/$lang'
     | '/assistant'
     | '/auth'
     | '/investors'
+    | '/$lang/assistant'
+    | '/$lang/auth'
+    | '/$lang/investors'
     | '/_authenticated/dashboard'
+    | '/$lang/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  LangRoute: typeof LangRouteWithChildren
   AssistantRoute: typeof AssistantRoute
   AuthRoute: typeof AuthRoute
   InvestorsRoute: typeof InvestorsRoute
@@ -99,6 +168,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$lang': {
+      id: '/$lang'
+      path: '/$lang'
+      fullPath: '/$lang'
+      preLoaderRoute: typeof LangRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -129,6 +205,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InvestorsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/$lang/': {
+      id: '/$lang/'
+      path: '/'
+      fullPath: '/$lang/'
+      preLoaderRoute: typeof LangIndexRouteImport
+      parentRoute: typeof LangRoute
+    }
+    '/$lang/assistant': {
+      id: '/$lang/assistant'
+      path: '/assistant'
+      fullPath: '/$lang/assistant'
+      preLoaderRoute: typeof LangAssistantRouteImport
+      parentRoute: typeof LangRoute
+    }
+    '/$lang/auth': {
+      id: '/$lang/auth'
+      path: '/auth'
+      fullPath: '/$lang/auth'
+      preLoaderRoute: typeof LangAuthRouteImport
+      parentRoute: typeof LangRoute
+    }
+    '/$lang/investors': {
+      id: '/$lang/investors'
+      path: '/investors'
+      fullPath: '/$lang/investors'
+      preLoaderRoute: typeof LangInvestorsRouteImport
+      parentRoute: typeof LangRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -150,9 +254,26 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface LangRouteChildren {
+  LangAssistantRoute: typeof LangAssistantRoute
+  LangAuthRoute: typeof LangAuthRoute
+  LangInvestorsRoute: typeof LangInvestorsRoute
+  LangIndexRoute: typeof LangIndexRoute
+}
+
+const LangRouteChildren: LangRouteChildren = {
+  LangAssistantRoute: LangAssistantRoute,
+  LangAuthRoute: LangAuthRoute,
+  LangInvestorsRoute: LangInvestorsRoute,
+  LangIndexRoute: LangIndexRoute,
+}
+
+const LangRouteWithChildren = LangRoute._addFileChildren(LangRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  LangRoute: LangRouteWithChildren,
   AssistantRoute: AssistantRoute,
   AuthRoute: AuthRoute,
   InvestorsRoute: InvestorsRoute,
