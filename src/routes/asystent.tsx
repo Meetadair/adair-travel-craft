@@ -52,14 +52,24 @@ function AssistantPage() {
   const [input, setInput] = useState("");
   const [asked, setAsked] = useState<string | null>(null);
   const [saved, setSaved] = useState<string | null>(null);
+  const [hotelRef, setHotelRef] = useState<string | null>(null);
+  const [showAlts, setShowAlts] = useState(false);
 
   const search = useMutation({
     mutationFn: (message: string) => compose({ data: { message } }),
   });
 
+  const raw = search.data;
+  const offers = (raw?.offers ?? []).map((o) => {
+    if (o.kind !== "hotel" || !hotelRef) return o;
+    const alt = o.alternatives?.find((a) => a.offerReference === hotelRef);
+    return alt ? { ...alt, ...(o.alternatives ? { alternatives: o.alternatives } : {}) } : o;
+  });
+  const total = Math.round(offers.reduce((sum, o) => sum + o.amount, 0) * 100) / 100;
+
   const store = useMutation({
     mutationFn: async () => {
-      const result = search.data;
+      const result = raw;
       if (!result) throw new Error("Brak podróży do zapisania");
       const { data } = await supabase.auth.getUser();
       if (!data.user) {
