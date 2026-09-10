@@ -100,7 +100,7 @@ function AssistantPage() {
     onSuccess: (res) => setSaved(res.documentNumber),
   });
 
-  const result = search.data;
+  const result = raw;
 
   return (
     <div className="min-h-screen bg-background">
