@@ -15,20 +15,24 @@ export const en = {
 
   home: {
     meta: {
-      title: "Adair Travel — One request. The whole trip.",
+      title: "Adair Travel — One sentence. The whole trip.",
       description:
         "Adair is an AI travel assistant that bundles your flight, hotel, and car into a single booking — all from one chat window.",
-      ogTitle: "Adair Travel — One request. The whole trip.",
+      ogTitle: "Adair Travel — One sentence. The whole trip.",
       ogDescription:
         "Flight, hotel, and car in a single booking card. Instead of five apps — one conversation.",
     },
     hero: {
       badge: "AI travel assistant — concept",
-      titleLine1: "One request.",
+      titleLine1: "One sentence.",
       titleLine2: "The whole trip.",
       lead: "Adair bundles your flight, hotel, and car into a single booking card — all in one chat window. Instead of five apps, one conversation.",
       ctaPrimary: "See how it works",
       ctaSecondary: "Three principles",
+      inputLabel: "Describe your trip in one sentence",
+      inputPlaceholder:
+        "e.g. Rome, Friday to Sunday, hotel with a terrace, invoice to my company",
+      inputSubmit: "Show me the trip",
     },
     comparison: {
       label: "Why Adair",
@@ -71,6 +75,48 @@ export const en = {
       total: "Total, one booking",
       bookAll: "Book it all",
       footnote: "3 items · 1 payment · 1 booking number",
+      typing: "Adair is building your trip…",
+      saved: "You saved €96 and 2 h 40 min vs. booking it yourself",
+      savedNote:
+        "vs. average public rates and time to book the same trip across separate sites",
+      invoiceLine: "Invoice → your company",
+      share: "Share this trip card",
+      shareCopied: "Copied",
+      cardTitleTpl: "{city} · {day1} – {day2}",
+      flightTitleTpl: "LOT 391 · Warsaw → {city}",
+      flightDetailTpl:
+        "{day1} 6:55 – 9:05 AM · returns {day2} 7:40 PM · window seat, preferred airline",
+      hotelDetailTpl: "1 night · King room, quiet floor · in the historic centre",
+      carTitleTpl: "BMW 3 Series · pickup at {code}",
+      carDetailTpl: "{day1} 9:30 AM – {day2} 6:30 PM · full insurance, no deposit",
+      weekdays: [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday",
+      ],
+      weekdaysShort: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+    },
+    campaign: {
+      earlyAccess: "Get early access",
+      emailLabel: "Your email",
+      emailPlaceholder: "you@company.com",
+      join: "Join",
+      joining: "One moment…",
+      success:
+        "You're in. Share your link — €40 in travel credit for you, €20 for every friend who books.",
+      referralLabel: "Your referral link",
+      copy: "Copy link",
+      copied: "Copied",
+      error: "That didn't go through. Please try again.",
+      teamsLabel: "For teams",
+      teamsTitle: "Adair for Teams",
+      teamsLine:
+        "One travel policy, one invoice, one place for the whole team. Coming after launch.",
+      teamsCta: "Join the Teams waitlist",
     },
     trips: {
       label: "My trips",
