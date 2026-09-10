@@ -38,7 +38,7 @@ const revenue = [
   },
   {
     title: "Prowizja lotnicza (NDC)",
-    body: "Loty przez Duffel/NDC: prowizja dystrybucyjna plus opłata serwisowa za obsługę zmian i zwrotów w jednym oknie.",
+    body: "Loty w kanale NDC: prowizja dystrybucyjna plus opłata serwisowa za obsługę zmian i zwrotów w jednym oknie.",
     margin: "1–3 %",
   },
   {
