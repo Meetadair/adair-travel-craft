@@ -7,9 +7,9 @@ const askSchema = z.object({
 });
 
 const parsedSchema = z.object({
-  originCity: z.string().default("Warszawa"),
+  originCity: z.string().default("Warsaw"),
   originIata: z.string().default("WAW"),
-  destinationCity: z.string().default("Mediolan"),
+  destinationCity: z.string().default("Milan"),
   destinationIata: z.string().default("MIL"),
   departDate: z.string(),
   returnDate: z.string(),
@@ -27,9 +27,9 @@ function fallbackParse(message: string): ParsedRequest {
   const back = new Date(today.getTime() + 8 * 86_400_000);
   const iso = (d: Date) => d.toISOString().slice(0, 10);
   return {
-    originCity: "Warszawa",
+    originCity: "Warsaw",
     originIata: "WAW",
-    destinationCity: "Mediolan",
+    destinationCity: "Milan",
     destinationIata: "MIL",
     departDate: iso(depart),
     returnDate: iso(back),
@@ -38,7 +38,7 @@ function fallbackParse(message: string): ParsedRequest {
   };
 }
 
-/** Turns a free-form Polish request into a structured trip search. */
+/** Turns a free-form natural-language request into a structured trip search. */
 async function understand(message: string): Promise<ParsedRequest> {
   const apiKey = process.env["LOVABLE_API_KEY"];
   if (!apiKey) return fallbackParse(message);
@@ -56,12 +56,12 @@ async function understand(message: string): Promise<ParsedRequest> {
         {
           role: "system",
           content:
-            `Jesteś parserem zapytań podróżnych. Dzisiaj jest ${today}. Zwróć WYŁĄCZNIE JSON ` +
-            `z polami: originCity, originIata (kod IATA miasta wylotu), destinationCity, destinationIata ` +
-            `(kod IATA miasta docelowego), departDate (YYYY-MM-DD), returnDate (YYYY-MM-DD), ` +
+            `You are a travel request parser. Today is ${today}. Return ONLY JSON ` +
+            `with fields: originCity, originIata (IATA code of the origin city), destinationCity, destinationIata ` +
+            `(IATA code of the destination city), departDate (YYYY-MM-DD), returnDate (YYYY-MM-DD), ` +
             `cabinClass (economy|premium_economy|business), needsCar (boolean), notes, ` +
-            `reply (jedno krótkie zdanie po polsku podsumowujące zrozumianą prośbę). ` +
-            `Jeśli miasto wylotu nie jest podane, użyj Warszawy (WAW).`,
+            `reply (one short sentence in English summarizing the understood request). ` +
+            `If the origin city is not given, use Warsaw (WAW).`,
         },
         { role: "user", content: message },
       ],
@@ -106,7 +106,7 @@ export const composeTrip = createServerFn({ method: "POST" })
     return {
       reply:
         parsed.reply ??
-        `${parsed.destinationCity}: ${parsed.departDate} – ${parsed.returnDate}. Poniżej złożona podróż.`,
+        `${parsed.destinationCity}: ${parsed.departDate} – ${parsed.returnDate}. Your composed trip is below.`,
       request: {
         originCity: parsed.originCity,
         destinationCity: parsed.destinationCity,
@@ -167,7 +167,7 @@ export const saveTrip = createServerFn({ method: "POST" })
       })
       .select("id")
       .single();
-    if (error || !trip) throw new Error(error?.message ?? "Nie udało się zapisać podróży");
+    if (error || !trip) throw new Error(error?.message ?? "Failed to save the trip");
 
     const { error: itemsError } = await supabase.from("trip_items").insert(
       data.items.map((item, index) => ({
