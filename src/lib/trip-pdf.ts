@@ -236,7 +236,7 @@ export async function downloadTripInvoice(data: InvoiceData) {
     font,
     color: INK_SOFT,
   });
-  page.drawText("Hotel rozliczony po stawce negocjowanej Adair Direct", {
+  page.drawText("Hotel rozliczony po stawce negocjowanej", {
     x: M + 14,
     y: y - 34,
     size: 9,
