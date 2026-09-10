@@ -1,3 +1,4 @@
+import { HotelGallery } from "@/components/hotel-gallery";
 import {
   Plane,
   BedDouble,
