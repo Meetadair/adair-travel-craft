@@ -41,6 +41,12 @@ const EXAMPLES = [
   "Wyjazd do Londynu w poniedziałek, powrót w środę, bez samochodu.",
 ];
 
+/** Nazwy dostawców technicznych nie są pokazywane klientowi. */
+const HIDDEN_PROVIDERS = ["duffel", "amadeus"];
+function displayProvider(provider: string) {
+  return HIDDEN_PROVIDERS.some((p) => provider.toLowerCase().includes(p)) ? "Adair" : provider;
+}
+
 function money(amount: number, currency: string) {
   return `${amount.toLocaleString("pl-PL", { maximumFractionDigits: 0 })} ${currency}`;
 }
@@ -89,7 +95,7 @@ function AssistantPage() {
             kind: o.kind,
             title: o.title,
             detail: o.detail,
-            provider: o.provider,
+            provider: displayProvider(o.provider),
             offerReference: o.offerReference,
             amount: o.amount,
             currency: o.currency,
