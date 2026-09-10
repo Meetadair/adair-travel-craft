@@ -25,17 +25,17 @@ import { SiteNav } from "@/components/site-nav";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Adair Travel — Jedna prośba. Cała podróż." },
+      { title: "Adair Travel — One request. The whole trip." },
       {
         name: "description",
         content:
-          "Adair to asystent podróży AI, który w jednym oknie czatu składa lot, hotel i samochód w jedną rezerwację.",
+          "Adair is an AI travel assistant that bundles your flight, hotel, and car into a single booking — all from one chat window.",
       },
-      { property: "og:title", content: "Adair Travel — Jedna prośba. Cała podróż." },
+      { property: "og:title", content: "Adair Travel — One request. The whole trip." },
       {
         property: "og:description",
         content:
-          "Lot, hotel i samochód w jednej karcie do rezerwacji. Zamiast pięciu appek — jedna rozmowa.",
+          "Flight, hotel, and car in a single booking card. Instead of five apps — one conversation.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -73,23 +73,23 @@ function Hero() {
     <section className="mx-auto max-w-4xl px-6 pt-28 pb-20 text-center sm:pt-36">
       <div className="animate-rise" style={{ animationDelay: "0ms" }}>
         <Tag>
-          <Sparkles className="size-3" /> Asystent podróży AI — koncept
+          <Sparkles className="size-3" /> AI travel assistant — concept
         </Tag>
       </div>
       <h1
         className="animate-rise mt-8 font-display text-5xl font-semibold leading-[1.04] tracking-tight text-foreground sm:text-7xl"
         style={{ animationDelay: "90ms" }}
       >
-        Jedna prośba.
+        One request.
         <br />
-        Cała podróż.
+        The whole trip.
       </h1>
       <p
         className="animate-rise mx-auto mt-6 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg"
         style={{ animationDelay: "180ms" }}
       >
-        Adair składa lot, hotel i samochód w jedną kartę do rezerwacji — w jednym
-        oknie czatu. Zamiast pięciu appek, jedna rozmowa.
+        Adair bundles your flight, hotel, and car into a single booking card — all in one
+        chat window. Instead of five apps, one conversation.
       </p>
       <div
         className="animate-rise mt-10 flex items-center justify-center gap-3"
@@ -99,13 +99,13 @@ function Hero() {
           href="#demo"
           className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
         >
-          Zobacz jak działa <ArrowRight className="size-4" />
+          See how it works <ArrowRight className="size-4" />
         </a>
         <a
-          href="#zasady"
+          href="#principles"
           className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-6 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-secondary"
         >
-          Trzy zasady
+          Three principles
         </a>
       </div>
     </section>
@@ -115,28 +115,28 @@ function Hero() {
 /* ---------- Comparison ---------- */
 
 const withoutApps = [
-  { name: "Skyscanner", detail: "szukanie lotu, 14 zakładek" },
-  { name: "Booking.com", detail: "hotel po publicznej stawce" },
-  { name: "Wypożyczalnia", detail: "osobna rezerwacja auta" },
-  { name: "Uber", detail: "dojazdy na miejscu" },
-  { name: "OpenTable", detail: "restauracje osobno" },
+  { name: "Skyscanner", detail: "flight search, 14 tabs" },
+  { name: "Booking.com", detail: "hotel at public rate" },
+  { name: "Rental agency", detail: "separate car booking" },
+  { name: "Uber", detail: "getting around locally" },
+  { name: "OpenTable", detail: "restaurants, separately" },
 ];
 
 function Comparison() {
   return (
     <section className="mx-auto max-w-5xl px-6 py-20">
-      <SectionLabel>Dlaczego Adair</SectionLabel>
+      <SectionLabel>Why Adair</SectionLabel>
       <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
-        Pięć appek albo jedno okno.
+        Five apps, or one window.
       </h2>
 
       <div className="mt-12 grid gap-5 md:grid-cols-2">
         {/* Without */}
         <div className="hairline-card p-6 sm:p-8">
           <div className="flex items-center justify-between">
-            <h3 className="font-display text-lg font-semibold">Bez Adaira</h3>
+            <h3 className="font-display text-lg font-semibold">Without Adair</h3>
             <Tag>
-              <X className="size-3" /> 5 appek
+              <X className="size-3" /> 5 apps
             </Tag>
           </div>
           <ul className="mt-6 space-y-3">
@@ -151,22 +151,22 @@ function Comparison() {
             ))}
           </ul>
           <p className="mt-6 border-t border-border pt-4 text-sm text-muted-foreground">
-            5 rezerwacji · 5 potwierdzeń · 5 miejsc do sprawdzania
+            5 bookings · 5 confirmations · 5 places to check
           </p>
         </div>
 
         {/* With */}
         <div className="hairline-card relative overflow-hidden p-6 sm:p-8">
           <div className="flex items-center justify-between">
-            <h3 className="font-display text-lg font-semibold">Z Adairem</h3>
+            <h3 className="font-display text-lg font-semibold">With Adair</h3>
             <Tag accent>
-              <Check className="size-3" /> 1 rozmowa
+              <Check className="size-3" /> 1 conversation
             </Tag>
           </div>
           <div className="mt-6 rounded-lg border border-primary/20 bg-primary/5 px-4 py-5">
             <p className="text-sm leading-relaxed text-foreground">
-              „Muszę być w Mediolanie w czwartek rano, wracam w piątek wieczorem,
-              coś blisko Duomo i auto na miejscu."
+              "I need to be in Milan Thursday morning, back Friday evening,
+              somewhere near the Duomo, and a car on the ground."
             </p>
           </div>
           <div className="mt-4 flex items-center gap-3 rounded-lg border border-border bg-background px-4 py-3">
@@ -174,11 +174,11 @@ function Comparison() {
             <BedDouble className="size-4 text-primary" />
             <CarFront className="size-4 text-primary" />
             <span className="text-sm font-medium text-foreground">
-              Lot + hotel + auto — jedna karta
+              Flight + hotel + car — one card
             </span>
           </div>
           <p className="mt-6 border-t border-border pt-4 text-sm text-muted-foreground">
-            1 rezerwacja · 1 potwierdzenie · <span className="font-semibold text-primary">1 240 €</span>
+            1 booking · 1 confirmation · <span className="font-semibold text-primary">€1,240</span>
           </p>
         </div>
       </div>
@@ -221,9 +221,9 @@ function TripRow({
 function ChatDemo() {
   return (
     <section id="demo" className="mx-auto max-w-3xl px-6 py-20">
-      <SectionLabel>Demo rozmowy</SectionLabel>
+      <SectionLabel>Conversation demo</SectionLabel>
       <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
-        Jedna wiadomość wystarczy.
+        One message is all it takes.
       </h2>
 
       <div className="mt-12 space-y-5">
@@ -231,10 +231,10 @@ function ChatDemo() {
         <div className="animate-rise flex justify-end" style={{ animationDelay: "100ms" }}>
           <div className="max-w-md rounded-xl rounded-br-sm border border-border bg-card px-5 py-4">
             <p className="text-sm leading-relaxed text-foreground">
-              Muszę być w Mediolanie w czwartek rano, wracam w piątek wieczorem,
-              coś blisko Duomo i auto na miejscu.
+              I need to be in Milan Thursday morning, back Friday evening,
+              somewhere near the Duomo, and a car on the ground.
             </p>
-            <p className="mt-2 text-right text-[11px] text-muted-foreground">Ty · 09:41</p>
+            <p className="mt-2 text-right text-[11px] text-muted-foreground">You · 9:41 AM</p>
           </div>
         </div>
 
@@ -244,53 +244,53 @@ function ChatDemo() {
             <Sparkles className="size-4" />
           </div>
           <div className="w-full max-w-lg">
-            <p className="mb-2 text-xs font-medium text-muted-foreground">Adair · 09:41</p>
+            <p className="mb-2 text-xs font-medium text-muted-foreground">Adair · 9:41 AM</p>
             <div className="hairline-card overflow-hidden">
               <div className="border-b border-border px-5 py-4">
                 <p className="text-sm font-semibold text-foreground">
-                  Mediolan · czw – pt
+                  Milan · Thu – Fri
                 </p>
                 <p className="mt-0.5 text-xs text-muted-foreground">
-                  Skomponowane pod Twój profil podróży
+                  Composed to match your travel profile
                 </p>
               </div>
 
               <div className="divide-y divide-border">
                 <TripRow
                   icon={<Plane className="size-4" />}
-                  title="LOT 391 · Warszawa → Mediolan"
-                  subtitle="Czw 06:55 – 09:05 · powrót pt 19:40 · miejsce przy oknie, preferowana linia"
+                  title="LOT 391 · Warsaw → Milan"
+                  subtitle="Thu 6:55 – 9:05 AM · returns Fri 7:40 PM · window seat, preferred airline"
                   tags={[<Tag key="1">LOT Polish Airlines</Tag>, <Tag key="2">Premium Economy</Tag>]}
-                  price="412 €"
+                  price="€412"
                 />
                 <TripRow
                   icon={<BedDouble className="size-4" />}
                   title="Park Hyatt Milano"
-                  subtitle="1 noc · pokój King, ciche piętro · 200 m od Duomo"
-                  tags={[<Tag key="1" accent>stawka negocjowana</Tag>]}
-                  price="610 €"
+                  subtitle="1 night · King room, quiet floor · 200 m from the Duomo"
+                  tags={[<Tag key="1" accent>negotiated rate</Tag>]}
+                  price="€610"
                 />
                 <TripRow
                   icon={<CarFront className="size-4" />}
-                  title="BMW serii 3 · odbiór Linate"
-                  subtitle="Czw 09:30 – pt 18:30 · pełne ubezpieczenie, bez kaucji"
-                  tags={[<Tag key="1">Sixt</Tag>, <Tag key="2">automat</Tag>]}
-                  price="218 €"
+                  title="BMW 3 Series · pickup at Linate"
+                  subtitle="Thu 9:30 AM – Fri 6:30 PM · full insurance, no deposit"
+                  tags={[<Tag key="1">Sixt</Tag>, <Tag key="2">automatic</Tag>]}
+                  price="€218"
                 />
               </div>
 
               <div className="flex items-center justify-between border-t border-border bg-cream-deep px-5 py-4">
                 <div>
-                  <p className="text-xs text-muted-foreground">Razem, jedna rezerwacja</p>
-                  <p className="font-display text-xl font-semibold text-primary">1 240 €</p>
+                  <p className="text-xs text-muted-foreground">Total, one booking</p>
+                  <p className="font-display text-xl font-semibold text-primary">€1,240</p>
                 </div>
                 <button className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90">
-                  Zarezerwuj całość <ChevronRight className="size-4" />
+                  Book it all <ChevronRight className="size-4" />
                 </button>
               </div>
             </div>
             <p className="mt-2 text-xs text-muted-foreground">
-              3 elementy · 1 płatność · 1 numer rezerwacji
+              3 items · 1 payment · 1 booking number
             </p>
           </div>
         </div>
@@ -304,23 +304,23 @@ function ChatDemo() {
 const trips = [
   {
     icon: <Plane className="size-4" />,
-    label: "Lot",
+    label: "Flight",
     title: "LOT 391 · WAW → MXP",
-    detail: "Czw 18 wrz · 06:55 · miejsce 7A",
-    code: "Rezerwacja ADR-8K2M4F",
+    detail: "Thu, Sep 18 · 6:55 AM · seat 7A",
+    code: "Booking ADR-8K2M4F",
   },
   {
     icon: <BedDouble className="size-4" />,
     label: "Hotel",
     title: "Park Hyatt Milano",
-    detail: "Zameldowanie 18 wrz · 1 noc · King",
-    code: "Potwierdzenie PH-55271",
+    detail: "Check-in Sep 18 · 1 night · King",
+    code: "Confirmation PH-55271",
   },
   {
     icon: <CarFront className="size-4" />,
-    label: "Samochód",
-    title: "BMW serii 3 · Linate",
-    detail: "Odbiór 09:30 · zwrot pt 18:30",
+    label: "Car",
+    title: "BMW 3 Series · Linate",
+    detail: "Pickup 9:30 AM · return Fri 6:30 PM",
     code: "Voucher ADR-CAR-0912",
   },
 ];
@@ -328,9 +328,9 @@ const trips = [
 function MyTrips() {
   return (
     <section className="mx-auto max-w-5xl px-6 py-20">
-      <SectionLabel>Moje podróże</SectionLabel>
+      <SectionLabel>My trips</SectionLabel>
       <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
-        Wszystko w jednym miejscu po rezerwacji.
+        Everything in one place after you book.
       </h2>
 
       <div className="mt-12 grid gap-5 sm:grid-cols-3">
@@ -354,16 +354,16 @@ function MyTrips() {
       <div className="mt-5 hairline-card flex flex-wrap items-center justify-between gap-4 px-6 py-4">
         <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-muted-foreground">
           <span className="inline-flex items-center gap-1.5">
-            <CalendarDays className="size-3.5" /> czw 18 – pt 19 wrz
+            <CalendarDays className="size-3.5" /> Thu 18 – Fri 19 Sep
           </span>
           <span className="inline-flex items-center gap-1.5">
-            <MapPin className="size-3.5" /> Mediolan, Włochy
+            <MapPin className="size-3.5" /> Milan, Italy
           </span>
           <span className="inline-flex items-center gap-1.5">
-            <Clock className="size-3.5" /> odjazd za 6 dni
+            <Clock className="size-3.5" /> departs in 6 days
           </span>
         </div>
-        <span className="text-sm font-semibold text-primary">1 240 € · opłacone</span>
+        <span className="text-sm font-semibold text-primary">€1,240 · paid</span>
       </div>
 
       <div className="mt-5 flex justify-end">
@@ -376,8 +376,8 @@ function MyTrips() {
 const DEMO_INVOICE = {
   documentNumber: "ADR/2025/DEMO/001",
   issueDate: new Date().toISOString().slice(0, 10),
-  city: "Mediolan",
-  origin: "Warszawa",
+  city: "Milan",
+  origin: "Warsaw",
   startDate: "2025-09-18",
   endDate: "2025-09-19",
   currency: "EUR",
@@ -386,8 +386,8 @@ const DEMO_INVOICE = {
   items: [
     {
       kind: "flight",
-      title: "LOT 391 · Warszawa → Mediolan Linate",
-      detail: "czw 18 wrz, 06:35 – 08:50 · powrót pt 19 wrz, 20:15",
+      title: "LOT 391 · Warsaw → Milan Linate",
+      detail: "Thu Sep 18, 6:35 – 8:50 AM · returns Fri Sep 19, 8:15 PM",
       provider: "LOT Polish Airlines",
       offerReference: "LO391-DEMO",
       amount: 312,
@@ -395,8 +395,8 @@ const DEMO_INVOICE = {
     },
     {
       kind: "hotel",
-      title: "Park Hyatt Milano · 1 noc",
-      detail: "120 m od Duomo, pokój Park Deluxe, śniadanie w cenie",
+      title: "Park Hyatt Milano · 1 night",
+      detail: "120 m from the Duomo, Park Deluxe room, breakfast included",
       provider: "Park Hyatt",
       offerReference: "PHM-DEMO",
       amount: 742,
@@ -404,8 +404,8 @@ const DEMO_INVOICE = {
     },
     {
       kind: "car",
-      title: "BMW seria 3 · 2 dni",
-      detail: "Odbiór na lotnisku Linate, zwrot w tym samym miejscu",
+      title: "BMW 3 Series · 2 days",
+      detail: "Pickup at Linate airport, return to the same location",
       provider: "Sixt",
       offerReference: "CAR-DEMO",
       amount: 186,
@@ -430,7 +430,7 @@ function PdfButton() {
       className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-60"
     >
       <FileDown className="size-4" />
-      {loading ? "Generuję PDF…" : "Pobierz kartę podróży (PDF)"}
+      {loading ? "Generating PDF…" : "Download trip card (PDF)"}
     </button>
   );
 }
@@ -440,23 +440,23 @@ function PdfButton() {
 const profilePrefs = [
   {
     icon: <Plane className="size-4" />,
-    title: "Loty",
-    items: ["LOT, Lufthansa, Air France", "Premium Economy od 2 h", "Miejsce przy oknie, przód"],
+    title: "Flights",
+    items: ["LOT, Lufthansa, Air France", "Premium Economy for 2h+ flights", "Window seat, front of cabin"],
   },
   {
     icon: <Building2 className="size-4" />,
-    title: "Hotele",
-    items: ["Hyatt, Small Luxury Hotels", "Ciche piętro, King bed", "Max 10 min pieszo od celu"],
+    title: "Hotels",
+    items: ["Hyatt, Small Luxury Hotels", "Quiet floor, King bed", "Max 10 min walk from destination"],
   },
   {
     icon: <UtensilsCrossed className="size-4" />,
-    title: "Dieta i czas",
-    items: ["Bez glutenu", "Śniadanie w cenie", "Wymeldowanie po 11:00"],
+    title: "Diet & timing",
+    items: ["Gluten-free", "Breakfast included", "Late checkout after 11:00 AM"],
   },
   {
     icon: <Wallet className="size-4" />,
-    title: "Budżet",
-    items: ["Do 1 500 € / podróż 2-dniowa", "Faktura VAT firmowa", "EUR, jedna karta"],
+    title: "Budget",
+    items: ["Up to €1,500 / 2-day trip", "Company VAT invoice", "EUR, one card"],
   },
 ];
 
@@ -466,20 +466,20 @@ function TravelProfile() {
       <div className="hairline-card overflow-hidden">
         <div className="grid md:grid-cols-[1fr_1.4fr]">
           <div className="border-b border-border bg-cream-deep p-8 sm:p-10 md:border-b-0 md:border-r">
-            <SectionLabel>Profil podróży</SectionLabel>
+            <SectionLabel>Travel profile</SectionLabel>
             <h2 className="mt-3 font-display text-3xl font-semibold leading-tight tracking-tight">
-              Ustawiasz raz.
+              Set it once.
               <br />
-              Działa zawsze.
+              It works every time.
             </h2>
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-              Adair uczy się Twoich preferencji raz — i każda kolejna podróż
-              automatycznie je respektuje. Bez klikania filtrów, bez porównywania.
+              Adair learns your preferences once — and every trip after that
+              honors them automatically. No filters to click, nothing to compare.
             </p>
             <div className="mt-6 inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2.5">
               <Armchair className="size-4 text-primary" />
               <span className="text-xs font-medium text-foreground">
-                18 preferencji aktywnych
+                18 active preferences
               </span>
             </div>
           </div>
@@ -516,27 +516,27 @@ function TravelProfile() {
 const principles = [
   {
     icon: <Sparkles className="size-5" />,
-    title: "Jedna podróż, nie trzy rezerwacje",
-    text: "Lot, hotel i samochód to jedna podróż — więc powinna być jedną rezerwacją. Jedno okno, jedna płatność, jedno potwierdzenie.",
+    title: "One trip, not three bookings",
+    text: "A flight, a hotel, and a car are one trip — so they should be one booking. One window, one payment, one confirmation.",
   },
   {
     icon: <Coffee className="size-5" />,
-    title: "Cena, jakiej inni nie mają",
-    text: "Hotele po własnych, negocjowanych stawkach — nie po publicznych cenach z Booking.com. Różnicę widzisz w podsumowaniu.",
+    title: "A price no one else gets you",
+    text: "Hotels at our own negotiated rates — not public Booking.com pricing. You see the difference right in the summary.",
   },
   {
     icon: <MapPin className="size-5" />,
-    title: "Jedno miejsce po rezerwacji",
-    text: "Numery rezerwacji, vouchery, zmiany i odwołania — wszystko w jednym widoku Moje podróże, do ostatniego dnia wyjazdu.",
+    title: "One place after you book",
+    text: "Confirmation numbers, vouchers, changes, and cancellations — all in one My Trips view, right up to the last day of your trip.",
   },
 ];
 
 function Principles() {
   return (
-    <section id="zasady" className="mx-auto max-w-5xl px-6 py-20">
-      <SectionLabel>Trzy zasady</SectionLabel>
+    <section id="principles" className="mx-auto max-w-5xl px-6 py-20">
+      <SectionLabel>Three principles</SectionLabel>
       <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
-        Na tym stoi Adair.
+        This is what Adair stands on.
       </h2>
 
       <div className="mt-12 grid gap-5 md:grid-cols-3">
@@ -598,7 +598,7 @@ function Index() {
             Adair<span className="text-primary">.</span>
           </span>
           <p className="text-xs text-muted-foreground">
-            Koncept produktu — dane przykładowe. Adair Travel, 2026.
+            Product concept — sample data. Adair Travel, 2026.
           </p>
         </div>
       </footer>
