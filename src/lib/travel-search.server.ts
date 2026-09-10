@@ -16,6 +16,8 @@ export type TripOffer = {
   live: boolean;
   /** Optional provider photos (empty when the provider exposes none). */
   images?: string[];
+  /** Optional swap-in options (hotels): shown only on demand. */
+  alternatives?: Array<Omit<TripOffer, "alternatives">>;
 };
 
 export type TripSearchInput = {
@@ -272,16 +274,29 @@ async function amadeusHotel(
     ),
   );
 
-  return {
+  const toOffer = (c: (typeof candidates)[number]): Omit<TripOffer, "alternatives"> => ({
     kind: "hotel",
-    title: best.hotel?.name ?? "Hotel",
+    title: c.hotel?.name ?? "Hotel",
     detail: `${nights} ${nights === 1 ? "noc" : "noce"} · zameldowanie ${fmtDate(input.departDate)} · ${input.destinationCity}`,
     provider: "Amadeus",
-    offerReference: best.offer.id ?? `AM-HT-${best.hotel?.hotelId ?? ""}`,
-    amount: round(Number(best.offer.price?.total ?? 0)),
-    currency: best.offer.price?.currency ?? "EUR",
+    offerReference: c.offer.id ?? `AM-HT-${c.hotel?.hotelId ?? ""}`,
+    amount: round(Number(c.offer.price?.total ?? 0)),
+    currency: c.offer.price?.currency ?? "EUR",
     live: true,
-  };
+  });
+
+  const seen = new Set<string>();
+  const alternatives = candidates
+    .filter((c) => {
+      const key = c.hotel?.hotelId ?? c.hotel?.name ?? "";
+      if (key === (best.hotel?.hotelId ?? best.hotel?.name ?? "") || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .slice(0, 3)
+    .map(toOffer);
+
+  return { ...toOffer(best), ...(alternatives.length ? { alternatives } : {}) };
 }
 
 /* ---------------- Sample fallbacks ---------------- */
@@ -308,12 +323,44 @@ function demoOffers(input: TripSearchInput): TripOffer[] {
     {
       kind: "hotel",
       title: `Hotel w centrum · ${input.destinationCity}`,
-      detail: `${nights} ${nights === 1 ? "noc" : "noce"} · dane przykładowe`,
+      detail: `${nights} ${nights === 1 ? "noc" : "noce"} · stawka Adair Direct · dane przykładowe`,
       provider: "przykład",
       offerReference: "PRZYKŁAD-HOTEL",
       amount: 305 * nights,
       currency: "EUR",
       live: false,
+      alternatives: [
+        {
+          kind: "hotel",
+          title: `Hotel design · ${input.destinationCity}`,
+          detail: `${nights} ${nights === 1 ? "noc" : "noce"} · 8 min od centrum · dane przykładowe`,
+          provider: "przykład",
+          offerReference: "PRZYKŁAD-HOTEL-2",
+          amount: 248 * nights,
+          currency: "EUR",
+          live: false,
+        },
+        {
+          kind: "hotel",
+          title: `Hotel przy dworcu · ${input.destinationCity}`,
+          detail: `${nights} ${nights === 1 ? "noc" : "noce"} · najtańsza opcja · dane przykładowe`,
+          provider: "przykład",
+          offerReference: "PRZYKŁAD-HOTEL-3",
+          amount: 179 * nights,
+          currency: "EUR",
+          live: false,
+        },
+        {
+          kind: "hotel",
+          title: `Hotel 5* z widokiem · ${input.destinationCity}`,
+          detail: `${nights} ${nights === 1 ? "noc" : "noce"} · pokój narożny · dane przykładowe`,
+          provider: "przykład",
+          offerReference: "PRZYKŁAD-HOTEL-4",
+          amount: 420 * nights,
+          currency: "EUR",
+          live: false,
+        },
+      ],
     },
   ];
   if (input.needsCar !== false) {

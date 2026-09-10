@@ -52,14 +52,24 @@ function AssistantPage() {
   const [input, setInput] = useState("");
   const [asked, setAsked] = useState<string | null>(null);
   const [saved, setSaved] = useState<string | null>(null);
+  const [hotelRef, setHotelRef] = useState<string | null>(null);
+  const [showAlts, setShowAlts] = useState(false);
 
   const search = useMutation({
     mutationFn: (message: string) => compose({ data: { message } }),
   });
 
+  const raw = search.data;
+  const offers = (raw?.offers ?? []).map((o) => {
+    if (o.kind !== "hotel" || !hotelRef) return o;
+    const alt = o.alternatives?.find((a) => a.offerReference === hotelRef);
+    return alt ? { ...alt, ...(o.alternatives ? { alternatives: o.alternatives } : {}) } : o;
+  });
+  const total = Math.round(offers.reduce((sum, o) => sum + o.amount, 0) * 100) / 100;
+
   const store = useMutation({
     mutationFn: async () => {
-      const result = search.data;
+      const result = raw;
       if (!result) throw new Error("Brak podróży do zapisania");
       const { data } = await supabase.auth.getUser();
       if (!data.user) {
@@ -75,7 +85,7 @@ function AssistantPage() {
           endDate: result.request.returnDate,
           currency: result.currency,
           source: result.source,
-          items: result.offers.map((o) => ({
+          items: offers.map((o) => ({
             kind: o.kind,
             title: o.title,
             detail: o.detail,
@@ -90,7 +100,7 @@ function AssistantPage() {
     onSuccess: (res) => setSaved(res.documentNumber),
   });
 
-  const result = search.data;
+  const result = raw;
 
   return (
     <div className="min-h-screen bg-background">
@@ -110,6 +120,8 @@ function AssistantPage() {
             if (!input.trim()) return;
             setAsked(input.trim());
             setSaved(null);
+            setHotelRef(null);
+            setShowAlts(false);
             search.mutate(input.trim());
           }}
           className="hairline-card mt-8 flex items-end gap-3 p-4"
@@ -179,7 +191,7 @@ function AssistantPage() {
                   </p>
                 </div>
                 <div className="divide-y divide-border">
-                  {result.offers.map((o) => (
+                  {offers.map((o) => (
                     <div key={o.kind + o.offerReference} className="flex gap-4 px-5 py-4">
                       <div className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-border bg-background">
                         {ICONS[o.kind]}
@@ -194,10 +206,63 @@ function AssistantPage() {
                           <span className="tag-pill">{o.offerReference.slice(0, 22)}</span>
                         </div>
                         {o.kind === "hotel" && (
-                          <HotelGallery
-                            {...(o.images ? { images: o.images } : {})}
-                            alt={o.title}
-                          />
+                          <>
+                            <HotelGallery
+                              {...(o.images ? { images: o.images } : {})}
+                              alt={o.title}
+                            />
+                            {o.alternatives && o.alternatives.length > 0 && (
+                              <div className="mt-3">
+                                <button
+                                  onClick={() => setShowAlts((v) => !v)}
+                                  className="text-xs font-medium text-primary underline underline-offset-4"
+                                >
+                                  {showAlts
+                                    ? "Ukryj alternatywy"
+                                    : `Pokaż ${Math.min(3, o.alternatives.length)} alternatywy`}
+                                </button>
+                                {showAlts && (
+                                  <div className="mt-3 space-y-2">
+                                    {[
+                                      ...(hotelRef
+                                        ? [
+                                            ...o.alternatives.filter(
+                                              (a) => a.offerReference !== o.offerReference,
+                                            ),
+                                          ]
+                                        : o.alternatives.slice(0, 3)),
+                                    ].map((a) => (
+                                      <button
+                                        key={a.offerReference}
+                                        onClick={() => setHotelRef(a.offerReference)}
+                                        className="flex w-full items-center justify-between gap-3 rounded-xl border border-border bg-background px-4 py-3 text-left transition-colors hover:bg-secondary"
+                                      >
+                                        <span className="min-w-0">
+                                          <span className="block truncate text-sm font-medium">
+                                            {a.title}
+                                          </span>
+                                          <span className="block truncate text-xs text-muted-foreground">
+                                            {a.detail}
+                                          </span>
+                                        </span>
+                                        <span className="shrink-0 text-sm font-semibold text-primary">
+                                          {money(a.amount, a.currency)}
+                                        </span>
+                                      </button>
+                                    ))}
+                                    {hotelRef && (
+                                      <button
+                                        onClick={() => setHotelRef(null)}
+                                        className="text-xs text-muted-foreground underline underline-offset-4"
+                                      >
+                                        Wróć do wyboru Adaira
+                                      </button>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </>
                         )}
                       </div>
                       <p className="shrink-0 text-sm font-semibold text-primary">
@@ -210,7 +275,7 @@ function AssistantPage() {
                   <div>
                     <p className="text-xs text-muted-foreground">Razem, jedna rezerwacja</p>
                     <p className="font-display text-xl font-semibold text-primary">
-                      {money(result.total, result.currency)}
+                      {money(total, result.currency)}
                     </p>
                   </div>
                   <button
