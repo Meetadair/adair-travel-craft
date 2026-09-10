@@ -222,6 +222,7 @@ function ChatDemo({ t }: { t: Dict }) {
                     </Tag>,
                   ]}
                   price="€610"
+                  extra={<HotelGallery alt={d.hotelTitle} />}
                 />
                 <TripRow
                   icon={<CarFront className="size-4" />}
