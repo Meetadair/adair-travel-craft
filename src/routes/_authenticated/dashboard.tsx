@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { listTrips, deleteTrip, getProfile, saveProfile } from "@/lib/travel.functions";
 import { downloadTripInvoice } from "@/lib/trip-pdf";
 
-export const Route = createFileRoute("/_authenticated/panel")({
+export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
       { title: "Panel klienta Adair — podróże i faktury" },

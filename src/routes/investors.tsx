@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteNav } from "@/components/site-nav";
 
-export const Route = createFileRoute("/inwestorzy")({
+export const Route = createFileRoute("/investors")({
   head: () => ({
     meta: [
       { title: "Adair Travel dla inwestorów — model, marża, runda" },

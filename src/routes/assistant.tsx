@@ -8,7 +8,7 @@ import { HotelGallery } from "@/components/hotel-gallery";
 import { composeTrip, saveTrip } from "@/lib/travel.functions";
 import { supabase } from "@/integrations/supabase/client";
 
-export const Route = createFileRoute("/asystent")({
+export const Route = createFileRoute("/assistant")({
   head: () => ({
     meta: [
       { title: "Asystent Adair — złóż całą podróż w jednej rozmowie" },
