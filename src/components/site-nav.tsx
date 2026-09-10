@@ -1,6 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Globe, Check } from "lucide-react";
+import logoMark from "@/assets/logo-adair.png";
 import { supabase } from "@/integrations/supabase/client";
 import {
   LocaleLink,
