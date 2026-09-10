@@ -17,11 +17,157 @@ import {
   ChevronRight,
   Coffee,
   FileDown,
+  Share2,
+  Receipt,
+  Users,
+  Copy,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { downloadTripInvoice } from "@/lib/trip-pdf";
 import { SiteNav } from "@/components/site-nav";
 import { useLocale, useT, type Dict } from "@/lib/i18n";
+import { parseDemoSentence, fill, referralCode } from "@/lib/demo-sentence";
+import { joinWaitlist } from "@/lib/waitlist.functions";
+
+type Submission = { sentence: string; key: number };
+
+const ghostButton =
+  "inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-card px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-secondary";
+
+/** True when the visitor asked the system to reduce motion. */
+function usePrefersReducedMotion() {
+  const [reduced, setReduced] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReduced(mq.matches);
+    const onChange = () => setReduced(mq.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+  return reduced;
+}
+
+/** "You saved …" line with the comparison footnote as a tooltip. */
+function SavedLine({ t, className }: { t: Dict; className?: string }) {
+  return (
+    <p className={`text-xs font-medium text-primary ${className ?? ""}`}>
+      <span
+        title={t.home.demo.savedNote}
+        className="cursor-help underline decoration-primary/30 decoration-dotted underline-offset-4"
+      >
+        {t.home.demo.saved}
+      </span>
+    </p>
+  );
+}
+
+/** Inline early-access / Teams waitlist form with a placeholder referral link. */
+function EarlyAccess({
+  t,
+  type,
+  label,
+  sentence,
+}: {
+  t: Dict;
+  type: "early_access" | "teams";
+  label: string;
+  sentence?: string;
+}) {
+  const c = t.home.campaign;
+  const [open, setOpen] = useState(false);
+  const [email, setEmail] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const [code, setCode] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+  const link = code ? `adair.travel/r/${code}` : "";
+
+  async function copyLink() {
+    try {
+      await navigator.clipboard.writeText(`https://${link}`);
+    } catch {
+      /* clipboard unavailable — the link stays visible for manual copying */
+    }
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 2000);
+  }
+
+  if (code) {
+    return (
+      <div className="animate-rise hairline-card w-full max-w-md p-5">
+        <p className="text-sm leading-relaxed text-foreground">{c.success}</p>
+        <p className="mt-4 text-xs text-muted-foreground">{c.referralLabel}</p>
+        <div className="mt-2 flex flex-wrap items-center gap-2">
+          <code className="rounded-lg border border-border bg-background px-3 py-2 font-mono text-xs text-foreground">
+            {link}
+          </code>
+          <button type="button" onClick={copyLink} className={ghostButton}>
+            <Copy className="size-4" />
+            {copied ? c.copied : c.copy}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!open) {
+    return (
+      <button type="button" onClick={() => setOpen(true)} className={ghostButton}>
+        {label}
+      </button>
+    );
+  }
+
+  return (
+    <form
+      className="animate-rise w-full max-w-md"
+      onSubmit={async (e) => {
+        e.preventDefault();
+        const generated = referralCode();
+        setBusy(true);
+        setFailed(false);
+        try {
+          await joinWaitlist({
+            data: {
+              email,
+              referralCode: generated,
+              type,
+              ...(sentence ? { sentence: sentence.slice(0, 1000) } : {}),
+            },
+          });
+          setCode(generated);
+        } catch {
+          setFailed(true);
+        } finally {
+          setBusy(false);
+        }
+      }}
+    >
+      <label htmlFor={`early-${type}`} className="sr-only">
+        {c.emailLabel}
+      </label>
+      <div className="flex flex-col gap-2 sm:flex-row">
+        <input
+          id={`early-${type}`}
+          type="email"
+          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder={c.emailPlaceholder}
+          className="min-w-0 flex-1 rounded-xl border border-border bg-card px-4 py-2.5 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary/40"
+        />
+        <button
+          type="submit"
+          disabled={busy}
+          className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-60"
+        >
+          {busy ? c.joining : c.join}
+        </button>
+      </div>
+      {failed && <p className="mt-2 text-xs text-destructive">{c.error}</p>}
+    </form>
+  );
+}
 
 function Tag({ children, accent }: { children: React.ReactNode; accent?: boolean }) {
   return (
