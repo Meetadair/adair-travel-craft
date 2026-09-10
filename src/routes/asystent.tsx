@@ -120,6 +120,8 @@ function AssistantPage() {
             if (!input.trim()) return;
             setAsked(input.trim());
             setSaved(null);
+            setHotelRef(null);
+            setShowAlts(false);
             search.mutate(input.trim());
           }}
           className="hairline-card mt-8 flex items-end gap-3 p-4"
