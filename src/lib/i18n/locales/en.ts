@@ -82,6 +82,18 @@ export const en = {
       invoiceLine: "Invoice → your company",
       share: "Share this trip card",
       shareCopied: "Copied",
+      sourceFlight: "Duffel · NDC/GDS",
+      sourceStay: "Duffel Stays",
+      sourceCar: "Duffel Cars",
+      testMode: "Test mode — sample airline data",
+      bookTooltip: "Booking opens at launch",
+      approx: "approx.",
+      searchFailed:
+        "We couldn't reach live availability right now — showing our sample trip instead.",
+      savedLive: "You saved about {amount} and 2 h 40 min vs. booking it yourself",
+      savedEstimate: "estimate",
+      nightsOne: "1 night",
+      nightsMany: "{count} nights",
       cardTitleTpl: "{city} · {day1} – {day2}",
       flightTitleTpl: "LOT 391 · Warsaw → {city}",
       flightDetailTpl:

@@ -18,6 +18,8 @@ import { Route as LangIndexRouteImport } from './routes/$lang.index'
 import { Route as LangAssistantRouteImport } from './routes/$lang.assistant'
 import { Route as LangAuthRouteImport } from './routes/$lang.auth'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as ApiTripParseRouteImport } from './routes/api/trip/parse'
+import { Route as ApiTripSearchRouteImport } from './routes/api/trip/search'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -63,6 +65,16 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiTripParseRoute = ApiTripParseRouteImport.update({
+  id: '/api/trip/parse',
+  path: '/api/trip/parse',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiTripSearchRoute = ApiTripSearchRouteImport.update({
+  id: '/api/trip/search',
+  path: '/api/trip/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -73,6 +85,8 @@ export interface FileRoutesByFullPath {
   '/$lang/auth': typeof LangAuthRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/$lang/': typeof LangIndexRoute
+  '/api/trip/parse': typeof ApiTripParseRoute
+  '/api/trip/search': typeof ApiTripSearchRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -82,6 +96,8 @@ export interface FileRoutesByTo {
   '/$lang/auth': typeof LangAuthRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/$lang': typeof LangIndexRoute
+  '/api/trip/parse': typeof ApiTripParseRoute
+  '/api/trip/search': typeof ApiTripSearchRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -94,6 +110,8 @@ export interface FileRoutesById {
   '/$lang/auth': typeof LangAuthRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/$lang/': typeof LangIndexRoute
+  '/api/trip/parse': typeof ApiTripParseRoute
+  '/api/trip/search': typeof ApiTripSearchRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -106,6 +124,8 @@ export interface FileRouteTypes {
     | '/$lang/auth'
     | '/dashboard'
     | '/$lang/'
+    | '/api/trip/parse'
+    | '/api/trip/search'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -115,6 +135,8 @@ export interface FileRouteTypes {
     | '/$lang/auth'
     | '/dashboard'
     | '/$lang'
+    | '/api/trip/parse'
+    | '/api/trip/search'
   id:
     | '__root__'
     | '/'
@@ -126,6 +148,8 @@ export interface FileRouteTypes {
     | '/$lang/auth'
     | '/_authenticated/dashboard'
     | '/$lang/'
+    | '/api/trip/parse'
+    | '/api/trip/search'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -134,6 +158,8 @@ export interface RootRouteChildren {
   LangRoute: typeof LangRouteWithChildren
   AssistantRoute: typeof AssistantRoute
   AuthRoute: typeof AuthRoute
+  ApiTripParseRoute: typeof ApiTripParseRoute
+  ApiTripSearchRoute: typeof ApiTripSearchRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -201,6 +227,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/trip/parse': {
+      id: '/api/trip/parse'
+      path: '/api/trip/parse'
+      fullPath: '/api/trip/parse'
+      preLoaderRoute: typeof ApiTripParseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/trip/search': {
+      id: '/api/trip/search'
+      path: '/api/trip/search'
+      fullPath: '/api/trip/search'
+      preLoaderRoute: typeof ApiTripSearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -235,6 +275,8 @@ const rootRouteChildren: RootRouteChildren = {
   LangRoute: LangRouteWithChildren,
   AssistantRoute: AssistantRoute,
   AuthRoute: AuthRoute,
+  ApiTripParseRoute: ApiTripParseRoute,
+  ApiTripSearchRoute: ApiTripSearchRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

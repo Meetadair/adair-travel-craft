@@ -28,6 +28,8 @@ import { SiteNav } from "@/components/site-nav";
 import { useLocale, useT, type Dict } from "@/lib/i18n";
 import { parseDemoSentence, fill, referralCode } from "@/lib/demo-sentence";
 import { joinWaitlist } from "@/lib/waitlist.functions";
+import { parseTrip, searchTrip, eur, timeLabel, dayLabel } from "@/lib/trip/client";
+import type { TripSearchResponse } from "@/lib/trip/types";
 
 type Submission = { sentence: string; key: number };
 
@@ -342,6 +344,7 @@ function TripRow({
 
 function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null }) {
   const d = t.home.demo;
+  const locale = useLocale();
   const reduced = usePrefersReducedMotion();
   const typedSentence = submission?.sentence.trim() ?? "";
   const fullText = typedSentence || d.userMessage;
@@ -353,6 +356,8 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
   const [showSaved, setShowSaved] = useState(true);
   const [showActions, setShowActions] = useState(true);
   const [copied, setCopied] = useState(false);
+  const [live, setLive] = useState<TripSearchResponse | null>(null);
+  const [liveFailed, setLiveFailed] = useState(false);
 
   const runKey = submission?.key ?? 0;
   useEffect(() => {
@@ -366,6 +371,26 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
 
     const text = submission.sentence.trim() || d.userMessage;
 
+    setLive(null);
+    setLiveFailed(false);
+
+    // Kick the real search off immediately; the animation runs alongside it.
+    const startedAt = Date.now();
+    const search = (async () => {
+      const request = await parseTrip(text);
+      return searchTrip(request);
+    })();
+    const settled = search
+      .then((result) => {
+        if (!cancelled) {
+          if (result.flight || result.stay) setLive(result);
+          else setLiveFailed(true);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setLiveFailed(true);
+      });
+
     if (reduced) {
       setTyped(text);
       setThinking(false);
@@ -373,7 +398,10 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
       setShowTotal(true);
       setShowSaved(true);
       setShowActions(true);
-      return;
+      return () => {
+        cancelled = true;
+        timers.forEach(clearTimeout);
+      };
     }
 
     setTyped("");
@@ -390,7 +418,10 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
         setTyped(text.slice(0, i));
       }
       setThinking(true);
-      await wait(2000);
+      // Wait for the real request, but keep the indicator up for at least 1.5 s.
+      await settled;
+      const elapsed = Date.now() - startedAt;
+      if (elapsed < 1500) await wait(1500 - elapsed);
       if (cancelled) return;
       setThinking(false);
       for (let i = 1; i <= 3; i += 1) {
@@ -418,7 +449,7 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
   const days = parsed
     ? { day1: d.weekdaysShort[parsed.day1] ?? "", day2: d.weekdaysShort[parsed.day2] ?? "" }
     : null;
-  const card =
+  const sampleCard =
     parsed && days
       ? {
           title: fill(d.cardTitleTpl, { city: parsed.city, ...days }),
@@ -439,11 +470,30 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
           carDetail: d.carDetail,
         };
 
+  const req = live?.request;
+  const nights = req
+    ? Math.max(
+        1,
+        Math.round(
+          (new Date(req.returnDate).getTime() - new Date(req.departDate).getTime()) / 86_400_000,
+        ),
+      )
+    : 1;
+  const nightsLabel =
+    nights === 1 ? d.nightsOne : fill(d.nightsMany, { count: String(nights) });
+
+  const cardTitle = req
+    ? `${req.destinationCity} · ${dayLabel(req.departDate, locale)} – ${dayLabel(req.returnDate, locale)}`
+    : sampleCard.title;
+
+  const totalLabel = live ? eur(live.totalEur) : "€1,240";
+  const invoiceVisible = req ? req.invoiceToCompany : Boolean(parsed?.invoice);
+
   const reveal = (index: number) => (revealed >= index ? "animate-rise" : "hidden");
 
   async function shareCard() {
     const url = `${window.location.origin}${window.location.pathname}#demo`;
-    const payload = { title: "Adair", text: `${card.title} · €1,240`, url };
+    const payload = { title: "Adair", text: `${cardTitle} · ${totalLabel}`, url };
     if (typeof navigator.share === "function") {
       try {
         await navigator.share(payload);
@@ -501,47 +551,107 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
               <>
                 <div className={`hairline-card overflow-hidden ${revealed > 0 ? "" : "hidden"}`}>
                   <div className="border-b border-border px-5 py-4">
-                    <p className="text-sm font-semibold text-foreground">{card.title}</p>
+                    <p className="text-sm font-semibold text-foreground">{cardTitle}</p>
                     <p className="mt-0.5 text-xs text-muted-foreground">{d.cardSubtitle}</p>
                   </div>
 
                   <div className="divide-y divide-border">
-                    <div className={reveal(1)}>
-                      <TripRow
-                        icon={<Plane className="size-4" />}
-                        title={card.flightTitle}
-                        subtitle={card.flightDetail}
-                        tags={[
-                          <Tag key="1">LOT Polish Airlines</Tag>,
-                          <Tag key="2">{d.flightTagClass}</Tag>,
-                        ]}
-                        price="€412"
-                      />
-                    </div>
-                    <div className={reveal(2)}>
-                      <TripRow
-                        icon={<BedDouble className="size-4" />}
-                        title={card.hotelTitle}
-                        subtitle={card.hotelDetail}
-                        tags={[
-                          <Tag key="1" accent>
-                            {d.hotelTag}
-                          </Tag>,
-                        ]}
-                        price="€610"
-                        extra={<HotelGallery alt={card.hotelTitle} />}
-                      />
-                    </div>
-                    <div className={reveal(3)}>
-                      <TripRow
-                        icon={<CarFront className="size-4" />}
-                        title={card.carTitle}
-                        subtitle={card.carDetail}
-                        tags={[<Tag key="1">Sixt</Tag>, <Tag key="2">{d.carTag}</Tag>]}
-                        price="€218"
-                      />
-                    </div>
-                    {parsed?.invoice && showTotal && (
+                    {live?.flight && req ? (
+                      <div className={reveal(1)}>
+                        <TripRow
+                          icon={<Plane className="size-4" />}
+                          title={`${live.flight.carrier} ${live.flight.flightNumbers.join(" / ")} · ${req.originIata} → ${req.destinationIata}`}
+                          subtitle={`${timeLabel(live.flight.departAt, locale)} – ${timeLabel(live.flight.arriveAt, locale)}${
+                            live.flight.returnDepartAt
+                              ? ` · ${timeLabel(live.flight.returnDepartAt, locale)}`
+                              : ""
+                          }`}
+                          tags={[
+                            <Tag key="1">{d.sourceFlight}</Tag>,
+                            <Tag key="2">{live.flight.cabin.replace("_", " ")}</Tag>,
+                          ]}
+                          price={eur(live.flight.amountEur)}
+                        />
+                      </div>
+                    ) : live ? null : (
+                      <div className={reveal(1)}>
+                        <TripRow
+                          icon={<Plane className="size-4" />}
+                          title={sampleCard.flightTitle}
+                          subtitle={sampleCard.flightDetail}
+                          tags={[
+                            <Tag key="1">LOT Polish Airlines</Tag>,
+                            <Tag key="2">{d.flightTagClass}</Tag>,
+                          ]}
+                          price="€412"
+                        />
+                      </div>
+                    )}
+
+                    {live?.stay ? (
+                      <div className={reveal(2)}>
+                        <TripRow
+                          icon={<BedDouble className="size-4" />}
+                          title={live.stay.name}
+                          subtitle={`${nightsLabel}${live.stay.address ? ` · ${live.stay.address}` : ""}`}
+                          tags={[
+                            <Tag key="1">{d.sourceStay}</Tag>,
+                            ...(live.stay.rating
+                              ? [<Tag key="2">{`★ ${live.stay.rating}`}</Tag>]
+                              : []),
+                          ]}
+                          price={eur(live.stay.amountEur)}
+                          extra={
+                            <HotelGallery
+                              alt={live.stay.name}
+                              {...(live.stay.photoUrl ? { images: [live.stay.photoUrl] } : {})}
+                            />
+                          }
+                        />
+                      </div>
+                    ) : live ? null : (
+                      <div className={reveal(2)}>
+                        <TripRow
+                          icon={<BedDouble className="size-4" />}
+                          title={sampleCard.hotelTitle}
+                          subtitle={sampleCard.hotelDetail}
+                          tags={[
+                            <Tag key="1" accent>
+                              {d.hotelTag}
+                            </Tag>,
+                          ]}
+                          price="€610"
+                          extra={<HotelGallery alt={sampleCard.hotelTitle} />}
+                        />
+                      </div>
+                    )}
+
+                    {live?.car && req ? (
+                      <div className={reveal(3)}>
+                        <TripRow
+                          icon={<CarFront className="size-4" />}
+                          title={`${live.car.vehicle} · ${req.destinationIata}`}
+                          subtitle={`${dayLabel(req.departDate, locale)} – ${dayLabel(req.returnDate, locale)} · ${live.car.supplier}`}
+                          tags={[
+                            <Tag key="1">{d.sourceCar}</Tag>,
+                            <Tag key="2">{live.car.transmission}</Tag>,
+                          ]}
+                          price={eur(live.car.amountEur)}
+                        />
+                      </div>
+                    ) : live ? null : (
+                      <div className={reveal(3)}>
+                        <TripRow
+                          icon={<CarFront className="size-4" />}
+                          title={sampleCard.carTitle}
+                          subtitle={sampleCard.carDetail}
+                          tags={[<Tag key="1">Sixt</Tag>, <Tag key="2">{d.carTag}</Tag>]}
+                          price="€218"
+                        />
+                      </div>
+                    )}
+
+                    {invoiceVisible && showTotal && (
                       <div className="animate-rise flex items-center gap-2 px-5 py-3 text-xs text-muted-foreground">
                         <Receipt className="size-3.5 text-primary" />
                         {d.invoiceLine}
@@ -554,14 +664,38 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                   >
                     <div className="flex items-center justify-between gap-4">
                       <div>
-                        <p className="text-xs text-muted-foreground">{d.total}</p>
-                        <p className="font-display text-xl font-semibold text-primary">€1,240</p>
+                        <p className="text-xs text-muted-foreground">
+                          {d.total}
+                          {live?.approx ? ` · ${d.approx}` : ""}
+                        </p>
+                        <p className="font-display text-xl font-semibold text-primary">
+                          {totalLabel}
+                        </p>
                       </div>
-                      <button className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90">
+                      <button
+                        type="button"
+                        disabled
+                        title={d.bookTooltip}
+                        className="inline-flex shrink-0 cursor-not-allowed items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground opacity-70"
+                      >
                         {d.bookAll} <ChevronRight className="size-4" />
                       </button>
                     </div>
-                    <SavedLine t={t} className={showSaved ? "animate-rise mt-3" : "hidden"} />
+                    {live ? (
+                      <p
+                        className={`text-xs font-medium text-primary ${showSaved ? "animate-rise mt-3" : "hidden"}`}
+                      >
+                        <span
+                          title={d.savedNote}
+                          className="cursor-help underline decoration-primary/30 decoration-dotted underline-offset-4"
+                        >
+                          {fill(d.savedLive, { amount: eur(live.savedEur) })} ·{" "}
+                          {d.savedEstimate}
+                        </span>
+                      </p>
+                    ) : (
+                      <SavedLine t={t} className={showSaved ? "animate-rise mt-3" : "hidden"} />
+                    )}
                   </div>
                 </div>
 
@@ -583,6 +717,12 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                 <p className={`mt-2 text-xs text-muted-foreground ${showActions ? "" : "hidden"}`}>
                   {d.footnote}
                 </p>
+                {liveFailed && showActions && (
+                  <p className="mt-1 text-xs text-muted-foreground">{d.searchFailed}</p>
+                )}
+                {live?.testMode && showActions && (
+                  <p className="mt-1 text-xs text-muted-foreground">{d.testMode}</p>
+                )}
               </>
             )}
           </div>
