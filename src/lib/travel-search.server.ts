@@ -274,16 +274,29 @@ async function amadeusHotel(
     ),
   );
 
-  return {
+  const toOffer = (c: (typeof candidates)[number]): Omit<TripOffer, "alternatives"> => ({
     kind: "hotel",
-    title: best.hotel?.name ?? "Hotel",
+    title: c.hotel?.name ?? "Hotel",
     detail: `${nights} ${nights === 1 ? "noc" : "noce"} · zameldowanie ${fmtDate(input.departDate)} · ${input.destinationCity}`,
     provider: "Amadeus",
-    offerReference: best.offer.id ?? `AM-HT-${best.hotel?.hotelId ?? ""}`,
-    amount: round(Number(best.offer.price?.total ?? 0)),
-    currency: best.offer.price?.currency ?? "EUR",
+    offerReference: c.offer.id ?? `AM-HT-${c.hotel?.hotelId ?? ""}`,
+    amount: round(Number(c.offer.price?.total ?? 0)),
+    currency: c.offer.price?.currency ?? "EUR",
     live: true,
-  };
+  });
+
+  const seen = new Set<string>();
+  const alternatives = candidates
+    .filter((c) => {
+      const key = c.hotel?.hotelId ?? c.hotel?.name ?? "";
+      if (key === (best.hotel?.hotelId ?? best.hotel?.name ?? "") || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .slice(0, 3)
+    .map(toOffer);
+
+  return { ...toOffer(best), ...(alternatives.length ? { alternatives } : {}) };
 }
 
 /* ---------------- Sample fallbacks ---------------- */
