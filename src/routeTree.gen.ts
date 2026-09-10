@@ -14,11 +14,9 @@ import { Route as LangRouteImport } from './routes/$lang'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AssistantRouteImport } from './routes/assistant'
 import { Route as AuthRouteImport } from './routes/auth'
-import { Route as InvestorsRouteImport } from './routes/investors'
 import { Route as LangIndexRouteImport } from './routes/$lang.index'
 import { Route as LangAssistantRouteImport } from './routes/$lang.assistant'
 import { Route as LangAuthRouteImport } from './routes/$lang.auth'
-import { Route as LangInvestorsRouteImport } from './routes/$lang.investors'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 
 const IndexRoute = IndexRouteImport.update({
@@ -45,11 +43,6 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const InvestorsRoute = InvestorsRouteImport.update({
-  id: '/investors',
-  path: '/investors',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const LangIndexRoute = LangIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -65,11 +58,6 @@ const LangAuthRoute = LangAuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => LangRoute,
 } as any)
-const LangInvestorsRoute = LangInvestorsRouteImport.update({
-  id: '/investors',
-  path: '/investors',
-  getParentRoute: () => LangRoute,
-} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -81,10 +69,8 @@ export interface FileRoutesByFullPath {
   '/$lang': typeof LangRouteWithChildren
   '/assistant': typeof AssistantRoute
   '/auth': typeof AuthRoute
-  '/investors': typeof InvestorsRoute
   '/$lang/assistant': typeof LangAssistantRoute
   '/$lang/auth': typeof LangAuthRoute
-  '/$lang/investors': typeof LangInvestorsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/$lang/': typeof LangIndexRoute
 }
@@ -92,10 +78,8 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/assistant': typeof AssistantRoute
   '/auth': typeof AuthRoute
-  '/investors': typeof InvestorsRoute
   '/$lang/assistant': typeof LangAssistantRoute
   '/$lang/auth': typeof LangAuthRoute
-  '/$lang/investors': typeof LangInvestorsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/$lang': typeof LangIndexRoute
 }
@@ -106,10 +90,8 @@ export interface FileRoutesById {
   '/$lang': typeof LangRouteWithChildren
   '/assistant': typeof AssistantRoute
   '/auth': typeof AuthRoute
-  '/investors': typeof InvestorsRoute
   '/$lang/assistant': typeof LangAssistantRoute
   '/$lang/auth': typeof LangAuthRoute
-  '/$lang/investors': typeof LangInvestorsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/$lang/': typeof LangIndexRoute
 }
@@ -120,10 +102,8 @@ export interface FileRouteTypes {
     | '/$lang'
     | '/assistant'
     | '/auth'
-    | '/investors'
     | '/$lang/assistant'
     | '/$lang/auth'
-    | '/$lang/investors'
     | '/dashboard'
     | '/$lang/'
   fileRoutesByTo: FileRoutesByTo
@@ -131,10 +111,8 @@ export interface FileRouteTypes {
     | '/'
     | '/assistant'
     | '/auth'
-    | '/investors'
     | '/$lang/assistant'
     | '/$lang/auth'
-    | '/$lang/investors'
     | '/dashboard'
     | '/$lang'
   id:
@@ -144,10 +122,8 @@ export interface FileRouteTypes {
     | '/$lang'
     | '/assistant'
     | '/auth'
-    | '/investors'
     | '/$lang/assistant'
     | '/$lang/auth'
-    | '/$lang/investors'
     | '/_authenticated/dashboard'
     | '/$lang/'
   fileRoutesById: FileRoutesById
@@ -158,7 +134,6 @@ export interface RootRouteChildren {
   LangRoute: typeof LangRouteWithChildren
   AssistantRoute: typeof AssistantRoute
   AuthRoute: typeof AuthRoute
-  InvestorsRoute: typeof InvestorsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -198,13 +173,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/investors': {
-      id: '/investors'
-      path: '/investors'
-      fullPath: '/investors'
-      preLoaderRoute: typeof InvestorsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/$lang/': {
       id: '/$lang/'
       path: '/'
@@ -224,13 +192,6 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/$lang/auth'
       preLoaderRoute: typeof LangAuthRouteImport
-      parentRoute: typeof LangRoute
-    }
-    '/$lang/investors': {
-      id: '/$lang/investors'
-      path: '/investors'
-      fullPath: '/$lang/investors'
-      preLoaderRoute: typeof LangInvestorsRouteImport
       parentRoute: typeof LangRoute
     }
     '/_authenticated/dashboard': {
@@ -257,14 +218,12 @@ const AuthenticatedRouteRouteWithChildren =
 interface LangRouteChildren {
   LangAssistantRoute: typeof LangAssistantRoute
   LangAuthRoute: typeof LangAuthRoute
-  LangInvestorsRoute: typeof LangInvestorsRoute
   LangIndexRoute: typeof LangIndexRoute
 }
 
 const LangRouteChildren: LangRouteChildren = {
   LangAssistantRoute: LangAssistantRoute,
   LangAuthRoute: LangAuthRoute,
-  LangInvestorsRoute: LangInvestorsRoute,
   LangIndexRoute: LangIndexRoute,
 }
 
@@ -276,7 +235,6 @@ const rootRouteChildren: RootRouteChildren = {
   LangRoute: LangRouteWithChildren,
   AssistantRoute: AssistantRoute,
   AuthRoute: AuthRoute,
-  InvestorsRoute: InvestorsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
