@@ -206,10 +206,63 @@ function AssistantPage() {
                           <span className="tag-pill">{o.offerReference.slice(0, 22)}</span>
                         </div>
                         {o.kind === "hotel" && (
-                          <HotelGallery
-                            {...(o.images ? { images: o.images } : {})}
-                            alt={o.title}
-                          />
+                          <>
+                            <HotelGallery
+                              {...(o.images ? { images: o.images } : {})}
+                              alt={o.title}
+                            />
+                            {o.alternatives && o.alternatives.length > 0 && (
+                              <div className="mt-3">
+                                <button
+                                  onClick={() => setShowAlts((v) => !v)}
+                                  className="text-xs font-medium text-primary underline underline-offset-4"
+                                >
+                                  {showAlts
+                                    ? "Ukryj alternatywy"
+                                    : `Pokaż ${Math.min(3, o.alternatives.length)} alternatywy`}
+                                </button>
+                                {showAlts && (
+                                  <div className="mt-3 space-y-2">
+                                    {[
+                                      ...(hotelRef
+                                        ? [
+                                            ...o.alternatives.filter(
+                                              (a) => a.offerReference !== o.offerReference,
+                                            ),
+                                          ]
+                                        : o.alternatives.slice(0, 3)),
+                                    ].map((a) => (
+                                      <button
+                                        key={a.offerReference}
+                                        onClick={() => setHotelRef(a.offerReference)}
+                                        className="flex w-full items-center justify-between gap-3 rounded-xl border border-border bg-background px-4 py-3 text-left transition-colors hover:bg-secondary"
+                                      >
+                                        <span className="min-w-0">
+                                          <span className="block truncate text-sm font-medium">
+                                            {a.title}
+                                          </span>
+                                          <span className="block truncate text-xs text-muted-foreground">
+                                            {a.detail}
+                                          </span>
+                                        </span>
+                                        <span className="shrink-0 text-sm font-semibold text-primary">
+                                          {money(a.amount, a.currency)}
+                                        </span>
+                                      </button>
+                                    ))}
+                                    {hotelRef && (
+                                      <button
+                                        onClick={() => setHotelRef(null)}
+                                        className="text-xs text-muted-foreground underline underline-offset-4"
+                                      >
+                                        Wróć do wyboru Adaira
+                                      </button>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </>
                         )}
                       </div>
                       <p className="shrink-0 text-sm font-semibold text-primary">
