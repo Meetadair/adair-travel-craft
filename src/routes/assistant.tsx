@@ -8,19 +8,19 @@ import { HotelGallery } from "@/components/hotel-gallery";
 import { composeTrip, saveTrip } from "@/lib/travel.functions";
 import { supabase } from "@/integrations/supabase/client";
 
-export const Route = createFileRoute("/asystent")({
+export const Route = createFileRoute("/assistant")({
   head: () => ({
     meta: [
-      { title: "Asystent Adair — złóż całą podróż w jednej rozmowie" },
+      { title: "Adair Assistant — compose your whole trip in one conversation" },
       {
         name: "description",
         content:
-          "Napisz, gdzie i kiedy musisz być. Adair wyszukuje rzeczywiste oferty lotu, hotelu i samochodu i składa je w jedną kartę.",
+          "Tell us where and when you need to be. Adair searches real flight, hotel and car offers and composes them into one card.",
       },
-      { property: "og:title", content: "Asystent Adair — cała podróż w jednej rozmowie" },
+      { property: "og:title", content: "Adair Assistant — a whole trip in one conversation" },
       {
         property: "og:description",
-        content: "Rzeczywiste oferty lotów, hoteli i samochodów w jednej karcie do rezerwacji.",
+        content: "Real flight, hotel and car offers in one bookable card.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -36,19 +36,19 @@ const ICONS: Record<string, React.ReactNode> = {
 };
 
 const EXAMPLES = [
-  "Muszę być w Mediolanie w czwartek rano, wracam w piątek wieczorem, hotel blisko Duomo i auto na miejscu.",
-  "Konferencja w Barcelonie 12–14 października, klasa premium economy, hotel przy centrum kongresowym.",
-  "Wyjazd do Londynu w poniedziałek, powrót w środę, bez samochodu.",
+  "I need to be in Milan Thursday morning, back Friday evening, something near the Duomo and a car waiting.",
+  "Conference in Barcelona Oct 12–14, premium economy, hotel near the convention center.",
+  "Trip to London on Monday, back Wednesday, no car needed.",
 ];
 
-/** Nazwy dostawców technicznych nie są pokazywane klientowi. */
+/** Technical provider names are not shown to the customer. */
 const HIDDEN_PROVIDERS = ["duffel", "amadeus"];
 function displayProvider(provider: string) {
   return HIDDEN_PROVIDERS.some((p) => provider.toLowerCase().includes(p)) ? "Adair" : provider;
 }
 
 function money(amount: number, currency: string) {
-  return `${amount.toLocaleString("pl-PL", { maximumFractionDigits: 0 })} ${currency}`;
+  return `${amount.toLocaleString("en-US", { maximumFractionDigits: 0 })} ${currency}`;
 }
 
 function AssistantPage() {
@@ -76,11 +76,11 @@ function AssistantPage() {
   const store = useMutation({
     mutationFn: async () => {
       const result = raw;
-      if (!result) throw new Error("Brak podróży do zapisania");
+      if (!result) throw new Error("No trip to save");
       const { data } = await supabase.auth.getUser();
       if (!data.user) {
         navigate({ to: "/auth" });
-        throw new Error("Zaloguj się, aby zapisać podróż");
+        throw new Error("Sign in to save this trip");
       }
       return persist({
         data: {
@@ -113,11 +113,11 @@ function AssistantPage() {
       <SiteNav />
       <main className="mx-auto max-w-3xl px-6 py-16">
         <h1 className="font-display text-4xl font-semibold tracking-tight">
-          Napisz, gdzie musisz być.
+          Tell us where you need to be.
         </h1>
         <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground">
-          Adair rozumie zdanie po polsku, pyta dostawców o dostępność i składa lot, hotel i
-          samochód w jedną kartę do rezerwacji.
+          Adair understands plain English, checks availability with providers, and composes a
+          flight, hotel and car into one bookable card.
         </p>
 
         <form
@@ -136,7 +136,7 @@ function AssistantPage() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             rows={2}
-            placeholder="np. Muszę być w Mediolanie w czwartek rano, wracam w piątek wieczorem…"
+            placeholder="e.g. I need to be in Milan Thursday morning, back Friday evening…"
             className="min-h-[56px] w-full resize-none bg-transparent px-2 py-2 text-sm outline-none"
           />
           <button
@@ -145,7 +145,7 @@ function AssistantPage() {
             className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-60"
           >
             <Send className="size-4" />
-            {search.isPending ? "Szukam…" : "Złóż podróż"}
+            {search.isPending ? "Searching…" : "Compose trip"}
           </button>
         </form>
 
@@ -171,7 +171,7 @@ function AssistantPage() {
 
         {search.isError && (
           <p className="mt-6 text-sm text-primary">
-            Nie udało się złożyć podróży. Spróbuj ponownie lub podaj daty wprost.
+            We couldn't compose this trip. Try again or give dates explicitly.
           </p>
         )}
 
@@ -190,10 +190,10 @@ function AssistantPage() {
                   <p className="mt-0.5 text-xs text-muted-foreground">
                     {result.request.departDate} – {result.request.returnDate} ·{" "}
                     {result.source === "live"
-                      ? "ceny z API dostawców"
+                      ? "prices from provider APIs"
                       : result.source === "partial"
-                        ? "część pozycji z API dostawców"
-                        : "dane przykładowe"}
+                        ? "some items from provider APIs"
+                        : "sample data"}
                   </p>
                 </div>
                 <div className="divide-y divide-border">
@@ -224,8 +224,8 @@ function AssistantPage() {
                                   className="text-xs font-medium text-primary underline underline-offset-4"
                                 >
                                   {showAlts
-                                    ? "Ukryj alternatywy"
-                                    : `Pokaż ${Math.min(3, o.alternatives.length)} alternatywy`}
+                                    ? "Hide alternatives"
+                                    : `Show ${Math.min(3, o.alternatives.length)} alternatives`}
                                 </button>
                                 {showAlts && (
                                   <div className="mt-3 space-y-2">
@@ -261,7 +261,7 @@ function AssistantPage() {
                                         onClick={() => setHotelRef(null)}
                                         className="text-xs text-muted-foreground underline underline-offset-4"
                                       >
-                                        Wróć do wyboru Adaira
+                                        Back to Adair's recommendation
                                       </button>
                                     )}
                                   </div>
@@ -279,7 +279,7 @@ function AssistantPage() {
                 </div>
                 <div className="flex items-center justify-between border-t border-border bg-cream-deep px-5 py-4">
                   <div>
-                    <p className="text-xs text-muted-foreground">Razem, jedna rezerwacja</p>
+                    <p className="text-xs text-muted-foreground">Total, one booking</p>
                     <p className="font-display text-xl font-semibold text-primary">
                       {money(total, result.currency)}
                     </p>
@@ -289,7 +289,7 @@ function AssistantPage() {
                     disabled={store.isPending}
                     className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-60"
                   >
-                    {store.isPending ? "Zapisuję…" : "Zapisz w moich podróżach"}
+                    {store.isPending ? "Saving…" : "Save trip"}
                     <ChevronRight className="size-4" />
                   </button>
                 </div>
@@ -297,12 +297,12 @@ function AssistantPage() {
 
               {saved && (
                 <p className="mt-3 text-sm text-muted-foreground">
-                  Zapisane jako {saved}.{" "}
+                  Saved as {saved}.{" "}
                   <button
-                    onClick={() => navigate({ to: "/panel" })}
+                    onClick={() => navigate({ to: "/dashboard" })}
                     className="text-primary underline underline-offset-4"
                   >
-                    Otwórz panel
+                    Open dashboard
                   </button>
                 </p>
               )}

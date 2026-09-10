@@ -17,8 +17,8 @@ const VAT_RATE = 0.23;
 /** Placeholder issuer details — replace with the real company data. */
 export const SELLER = {
   name: "Adair Travel sp. z o.o.",
-  address: "ul. Prosta 51, 00-838 Warszawa",
-  taxId: "NIP 000-000-00-00",
+  address: "ul. Prosta 51, 00-838 Warsaw, Poland",
+  taxId: "VAT ID 000-000-00-00",
   contact: "faktury@adair.travel",
 };
 
@@ -54,9 +54,9 @@ const money = (value: number, currency: string) =>
   `${value.toFixed(2).replace(".", ",")} ${currency}`;
 
 const KIND_LABEL: Record<string, string> = {
-  flight: "Lot",
+  flight: "Flight",
   hotel: "Hotel",
-  car: "Samochód",
+  car: "Car",
 };
 
 export async function downloadTripInvoice(data: InvoiceData) {
@@ -78,7 +78,7 @@ export async function downloadTripInvoice(data: InvoiceData) {
 
   // Header
   page.drawText("Adair.", { x: M, y, size: 22, font: bold, color: INK });
-  const head = "FAKTURA / KARTA PODRÓŻY";
+  const head = "INVOICE / TRIP CARD";
   page.drawText(head, {
     x: width - M - bold.widthOfTextAtSize(head, 9),
     y: y + 7,
@@ -87,7 +87,7 @@ export async function downloadTripInvoice(data: InvoiceData) {
     color: CORAL,
   });
   y -= 14;
-  page.drawText(`Nr ${data.documentNumber} · wystawiono ${data.issueDate}`, {
+  page.drawText(`No. ${data.documentNumber} · issued ${data.issueDate}`, {
     x: M,
     y,
     size: 8.5,
@@ -100,15 +100,15 @@ export async function downloadTripInvoice(data: InvoiceData) {
   const colW = (W - 16) / 2;
   const partyLines: [string, string[]][] = [
     [
-      "SPRZEDAWCA",
+      "SELLER",
       [SELLER.name, SELLER.address, SELLER.taxId, SELLER.contact],
     ],
     [
-      "NABYWCA",
+      "BUYER",
       [
         data.buyer.company || data.buyer.name || "—",
         data.buyer.name && data.buyer.company ? data.buyer.name : data.buyer.email,
-        data.buyer.taxId ? `NIP ${data.buyer.taxId}` : "NIP —",
+        data.buyer.taxId ? `VAT ID ${data.buyer.taxId}` : "VAT ID —",
         data.buyer.email,
       ],
     ],
@@ -141,16 +141,16 @@ export async function downloadTripInvoice(data: InvoiceData) {
   y -= 14;
   page.drawText(
     data.live
-      ? "Pozycje wycenione na podstawie ofert dostawców pobranych przez API Adair"
-      : "Dokument koncepcyjny — pozycje zawierają dane przykładowe",
+      ? "Items priced from provider offers retrieved via the Adair API"
+      : "Concept document — items contain sample data",
     { x: M, y, size: 9, font, color: INK_SOFT },
   );
 
   // Table head
   y -= 26;
-  page.drawText("POZYCJA", { x: M, y, size: 7.5, font: bold, color: MUTED });
-  page.drawText("REFERENCJA OFERTY", { x: M + 250, y, size: 7.5, font: bold, color: MUTED });
-  const netHead = "NETTO";
+  page.drawText("ITEM", { x: M, y, size: 7.5, font: bold, color: MUTED });
+  page.drawText("OFFER REFERENCE", { x: M + 250, y, size: 7.5, font: bold, color: MUTED });
+  const netHead = "NET";
   page.drawText(netHead, {
     x: M + W - bold.widthOfTextAtSize(netHead, 7.5),
     y,
@@ -200,9 +200,9 @@ export async function downloadTripInvoice(data: InvoiceData) {
   // Totals
   y -= 22;
   const rows: [string, string, boolean][] = [
-    ["Suma netto", money(net, data.currency), false],
+    ["Net total", money(net, data.currency), false],
     [`VAT ${Math.round(VAT_RATE * 100)}%`, money(vat, data.currency), false],
-    ["Do zapłaty", money(gross, data.currency), true],
+    ["Total due", money(gross, data.currency), true],
   ];
   for (const [label, value, strong] of rows) {
     const size = strong ? 13 : 9.5;
@@ -229,14 +229,14 @@ export async function downloadTripInvoice(data: InvoiceData) {
     borderColor: BORDER,
     borderWidth: 1,
   });
-  page.drawText("Płatność: jedna transakcja kartą firmową · termin 14 dni", {
+  page.drawText("Payment: single company card transaction · 14-day term", {
     x: M + 14,
     y: y - 20,
     size: 9,
     font,
     color: INK_SOFT,
   });
-  page.drawText("Hotel rozliczony po stawce negocjowanej", {
+  page.drawText("Hotel billed at negotiated rate", {
     x: M + 14,
     y: y - 34,
     size: 9,
@@ -251,7 +251,7 @@ export async function downloadTripInvoice(data: InvoiceData) {
     color: BORDER,
     thickness: 1,
   });
-  page.drawText("Adair Travel · Jedna prośba. Cała podróż. · adair.travel", {
+  page.drawText("Adair Travel · One request. The whole trip. · adair.travel", {
     x: M,
     y: 48,
     size: 8,

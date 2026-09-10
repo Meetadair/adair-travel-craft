@@ -3,9 +3,9 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 const links = [
-  { to: "/asystent", label: "Asystent" },
-  { to: "/panel", label: "Moje podróże" },
-  { to: "/inwestorzy", label: "Dla inwestorów" },
+  { to: "/assistant", label: "Assistant" },
+  { to: "/dashboard", label: "My trips" },
+  { to: "/investors", label: "For investors" },
 ] as const;
 
 export function SiteNav() {
@@ -40,17 +40,17 @@ export function SiteNav() {
           ))}
           {signedIn ? (
             <Link
-              to="/panel"
+              to="/dashboard"
               className="ml-1 rounded-xl border border-border bg-card px-4 py-2 text-xs font-semibold sm:text-sm"
             >
-              Moje konto
+              My account
             </Link>
           ) : (
             <Link
               to="/auth"
               className="ml-1 rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground transition-colors hover:bg-primary/90 sm:text-sm"
             >
-              Zaloguj się
+              Sign in
             </Link>
           )}
         </div>

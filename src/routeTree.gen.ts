@@ -11,10 +11,10 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
-import { Route as AsystentRouteImport } from './routes/asystent'
+import { Route as AssistantRouteImport } from './routes/assistant'
 import { Route as AuthRouteImport } from './routes/auth'
-import { Route as InwestorzyRouteImport } from './routes/inwestorzy'
-import { Route as AuthenticatedPanelRouteImport } from './routes/_authenticated/panel'
+import { Route as InvestorsRouteImport } from './routes/investors'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -25,9 +25,9 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AsystentRoute = AsystentRouteImport.update({
-  id: '/asystent',
-  path: '/asystent',
+const AssistantRoute = AssistantRouteImport.update({
+  id: '/assistant',
+  path: '/assistant',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -35,61 +35,61 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const InwestorzyRoute = InwestorzyRouteImport.update({
-  id: '/inwestorzy',
-  path: '/inwestorzy',
+const InvestorsRoute = InvestorsRouteImport.update({
+  id: '/investors',
+  path: '/investors',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedPanelRoute = AuthenticatedPanelRouteImport.update({
-  id: '/panel',
-  path: '/panel',
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/asystent': typeof AsystentRoute
+  '/assistant': typeof AssistantRoute
   '/auth': typeof AuthRoute
-  '/inwestorzy': typeof InwestorzyRoute
-  '/panel': typeof AuthenticatedPanelRoute
+  '/investors': typeof InvestorsRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/asystent': typeof AsystentRoute
+  '/assistant': typeof AssistantRoute
   '/auth': typeof AuthRoute
-  '/inwestorzy': typeof InwestorzyRoute
-  '/panel': typeof AuthenticatedPanelRoute
+  '/investors': typeof InvestorsRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
-  '/asystent': typeof AsystentRoute
+  '/assistant': typeof AssistantRoute
   '/auth': typeof AuthRoute
-  '/inwestorzy': typeof InwestorzyRoute
-  '/_authenticated/panel': typeof AuthenticatedPanelRoute
+  '/investors': typeof InvestorsRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/asystent' | '/auth' | '/inwestorzy' | '/panel'
+  fullPaths: '/' | '/assistant' | '/auth' | '/investors' | '/dashboard'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/asystent' | '/auth' | '/inwestorzy' | '/panel'
+  to: '/' | '/assistant' | '/auth' | '/investors' | '/dashboard'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
-    | '/asystent'
+    | '/assistant'
     | '/auth'
-    | '/inwestorzy'
-    | '/_authenticated/panel'
+    | '/investors'
+    | '/_authenticated/dashboard'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
-  AsystentRoute: typeof AsystentRoute
+  AssistantRoute: typeof AssistantRoute
   AuthRoute: typeof AuthRoute
-  InwestorzyRoute: typeof InwestorzyRoute
+  InvestorsRoute: typeof InvestorsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -108,11 +108,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/asystent': {
-      id: '/asystent'
-      path: '/asystent'
-      fullPath: '/asystent'
-      preLoaderRoute: typeof AsystentRouteImport
+    '/assistant': {
+      id: '/assistant'
+      path: '/assistant'
+      fullPath: '/assistant'
+      preLoaderRoute: typeof AssistantRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -122,29 +122,29 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/inwestorzy': {
-      id: '/inwestorzy'
-      path: '/inwestorzy'
-      fullPath: '/inwestorzy'
-      preLoaderRoute: typeof InwestorzyRouteImport
+    '/investors': {
+      id: '/investors'
+      path: '/investors'
+      fullPath: '/investors'
+      preLoaderRoute: typeof InvestorsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/panel': {
-      id: '/_authenticated/panel'
-      path: '/panel'
-      fullPath: '/panel'
-      preLoaderRoute: typeof AuthenticatedPanelRouteImport
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
-  AuthenticatedPanelRoute: typeof AuthenticatedPanelRoute
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedPanelRoute: AuthenticatedPanelRoute,
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -153,9 +153,9 @@ const AuthenticatedRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
-  AsystentRoute: AsystentRoute,
+  AssistantRoute: AssistantRoute,
   AuthRoute: AuthRoute,
-  InwestorzyRoute: InwestorzyRoute,
+  InvestorsRoute: InvestorsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

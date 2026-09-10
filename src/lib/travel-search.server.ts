@@ -120,7 +120,7 @@ async function duffelFlight(input: TripSearchInput): Promise<TripOffer | null> {
     .sort((a, b) => Number(a.total_amount) - Number(b.total_amount))[0]!;
 
   const seg = best.slices?.[0]?.segments?.[0];
-  const carrier = seg?.marketing_carrier?.name ?? best.owner?.name ?? "Przewoźnik";
+  const carrier = seg?.marketing_carrier?.name ?? best.owner?.name ?? "Carrier";
   const flightNo = `${seg?.marketing_carrier?.iata_code ?? ""}${seg?.marketing_carrier_flight_number ?? ""}`;
   const dep = seg?.departing_at?.slice(11, 16) ?? "";
   const arr = seg?.arriving_at?.slice(11, 16) ?? "";
@@ -128,7 +128,7 @@ async function duffelFlight(input: TripSearchInput): Promise<TripOffer | null> {
   return {
     kind: "flight",
     title: `${carrier} ${flightNo} · ${input.originIata} → ${input.destinationIata}`.trim(),
-    detail: `Wylot ${fmtDate(input.departDate)} ${dep} – ${arr} · powrót ${fmtDate(input.returnDate)} · ${cabin.replace("_", " ")}`,
+    detail: `Departure ${fmtDate(input.departDate)} ${dep} – ${arr} · return ${fmtDate(input.returnDate)} · ${cabin.replace("_", " ")}`,
     provider: "Duffel",
     offerReference: best.id,
     amount: round(Number(best.total_amount)),
@@ -203,7 +203,7 @@ async function amadeusFlight(
   return {
     kind: "flight",
     title: `${seg?.carrierCode ?? ""} ${seg?.number ?? ""} · ${input.originIata} → ${input.destinationIata}`.trim(),
-    detail: `Wylot ${fmtDate(input.departDate)} ${seg?.departure?.at?.slice(11, 16) ?? ""} – ${seg?.arrival?.at?.slice(11, 16) ?? ""} · powrót ${fmtDate(input.returnDate)}`,
+    detail: `Departure ${fmtDate(input.departDate)} ${seg?.departure?.at?.slice(11, 16) ?? ""} – ${seg?.arrival?.at?.slice(11, 16) ?? ""} · return ${fmtDate(input.returnDate)}`,
     provider: "Amadeus",
     offerReference: `AM-FL-${best.id}`,
     amount: round(Number(best.price?.total ?? 0)),
@@ -277,7 +277,7 @@ async function amadeusHotel(
   const toOffer = (c: (typeof candidates)[number]): Omit<TripOffer, "alternatives"> => ({
     kind: "hotel",
     title: c.hotel?.name ?? "Hotel",
-    detail: `${nights} ${nights === 1 ? "noc" : "noce"} · zameldowanie ${fmtDate(input.departDate)} · ${input.destinationCity}`,
+    detail: `${nights} ${nights === 1 ? "night" : "nights"} · check-in ${fmtDate(input.departDate)} · ${input.destinationCity}`,
     provider: "Amadeus",
     offerReference: c.offer.id ?? `AM-HT-${c.hotel?.hotelId ?? ""}`,
     amount: round(Number(c.offer.price?.total ?? 0)),
@@ -312,50 +312,50 @@ function demoOffers(input: TripSearchInput): TripOffer[] {
   const offers: TripOffer[] = [
     {
       kind: "flight",
-      title: `Lot ${input.originIata} → ${input.destinationIata}`,
-      detail: `Wylot ${fmtDate(input.departDate)} · powrót ${fmtDate(input.returnDate)} · dane przykładowe`,
-      provider: "przykład",
-      offerReference: "PRZYKŁAD-LOT",
+      title: `Flight ${input.originIata} → ${input.destinationIata}`,
+      detail: `Departure ${fmtDate(input.departDate)} · return ${fmtDate(input.returnDate)} · sample data`,
+      provider: "sample",
+      offerReference: "SAMPLE-FLIGHT",
       amount: 412,
       currency: "EUR",
       live: false,
     },
     {
       kind: "hotel",
-      title: `Hotel w centrum · ${input.destinationCity}`,
-      detail: `${nights} ${nights === 1 ? "noc" : "noce"} · stawka negocjowana · dane przykładowe`,
-      provider: "przykład",
-      offerReference: "PRZYKŁAD-HOTEL",
+      title: `Downtown hotel · ${input.destinationCity}`,
+      detail: `${nights} ${nights === 1 ? "night" : "nights"} · negotiated rate · sample data`,
+      provider: "sample",
+      offerReference: "SAMPLE-HOTEL",
       amount: 305 * nights,
       currency: "EUR",
       live: false,
       alternatives: [
         {
           kind: "hotel",
-          title: `Hotel design · ${input.destinationCity}`,
-          detail: `${nights} ${nights === 1 ? "noc" : "noce"} · 8 min od centrum · dane przykładowe`,
-          provider: "przykład",
-          offerReference: "PRZYKŁAD-HOTEL-2",
+          title: `Design hotel · ${input.destinationCity}`,
+          detail: `${nights} ${nights === 1 ? "night" : "nights"} · 8 min from downtown · sample data`,
+          provider: "sample",
+          offerReference: "SAMPLE-HOTEL-2",
           amount: 248 * nights,
           currency: "EUR",
           live: false,
         },
         {
           kind: "hotel",
-          title: `Hotel przy dworcu · ${input.destinationCity}`,
-          detail: `${nights} ${nights === 1 ? "noc" : "noce"} · najtańsza opcja · dane przykładowe`,
-          provider: "przykład",
-          offerReference: "PRZYKŁAD-HOTEL-3",
+          title: `Station-side hotel · ${input.destinationCity}`,
+          detail: `${nights} ${nights === 1 ? "night" : "nights"} · cheapest option · sample data`,
+          provider: "sample",
+          offerReference: "SAMPLE-HOTEL-3",
           amount: 179 * nights,
           currency: "EUR",
           live: false,
         },
         {
           kind: "hotel",
-          title: `Hotel 5* z widokiem · ${input.destinationCity}`,
-          detail: `${nights} ${nights === 1 ? "noc" : "noce"} · pokój narożny · dane przykładowe`,
-          provider: "przykład",
-          offerReference: "PRZYKŁAD-HOTEL-4",
+          title: `5-star hotel with a view · ${input.destinationCity}`,
+          detail: `${nights} ${nights === 1 ? "night" : "nights"} · corner room · sample data`,
+          provider: "sample",
+          offerReference: "SAMPLE-HOTEL-4",
           amount: 420 * nights,
           currency: "EUR",
           live: false,
@@ -366,10 +366,10 @@ function demoOffers(input: TripSearchInput): TripOffer[] {
   if (input.needsCar !== false) {
     offers.push({
       kind: "car",
-      title: `Samochód · odbiór ${input.destinationIata}`,
-      detail: `${fmtDate(input.departDate)} – ${fmtDate(input.returnDate)} · automat, pełne ubezpieczenie · dane przykładowe`,
-      provider: "przykład",
-      offerReference: "PRZYKŁAD-AUTO",
+      title: `Car · pickup ${input.destinationIata}`,
+      detail: `${fmtDate(input.departDate)} – ${fmtDate(input.returnDate)} · automatic, full insurance · sample data`,
+      provider: "sample",
+      offerReference: "SAMPLE-CAR",
       amount: 109 * nights,
       currency: "EUR",
       live: false,
@@ -388,25 +388,25 @@ export async function searchTrip(input: TripSearchInput): Promise<TripSearchResu
   try {
     flight = await duffelFlight(input);
   } catch {
-    warnings.push("Duffel nie zwrócił ofert lotów — pokazuję wartość przykładową.");
+    warnings.push("Duffel did not return any flight offers — showing a sample value.");
   }
 
   const token = await amadeusToken();
   if (!token && !flight) {
     warnings.push(
-      "Brak kluczy API dostawców — karta zawiera dane przykładowe. Dodaj klucze Duffel i Amadeus, aby zobaczyć rzeczywiste ceny.",
+      "No provider API keys configured — the card contains sample data. Add Duffel and Amadeus keys to see real prices.",
     );
   }
 
   if (!flight && token) {
     flight = await amadeusFlight(input, token);
-    if (!flight) warnings.push("Brak dostępnych lotów w API na te daty.");
+    if (!flight) warnings.push("No flights available from the API for these dates.");
   }
 
   let hotel: TripOffer | null = null;
   if (token) {
     hotel = await amadeusHotel(input, token);
-    if (!hotel) warnings.push("Brak dostępnych ofert hotelowych w API na te daty.");
+    if (!hotel) warnings.push("No hotel offers available from the API for these dates.");
   }
 
   const demo = demoOffers(input);
@@ -417,7 +417,7 @@ export async function searchTrip(input: TripSearchInput): Promise<TripSearchResu
     offers.push(car);
     if (token || flight) {
       warnings.push(
-        "Wynajem samochodu: brak publicznego API u obecnych dostawców — pozycja wyceniona szacunkowo.",
+        "Car rental: no public API available from current providers — item priced as an estimate.",
       );
     }
   }

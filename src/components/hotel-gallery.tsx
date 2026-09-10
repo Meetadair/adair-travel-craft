@@ -40,7 +40,7 @@ export function HotelGallery({ images, alt }: Props) {
           <img
             key={src}
             src={src}
-            alt={`${alt} — zdjęcie ${i + 1}`}
+            alt={`${alt} — photo ${i + 1}`}
             loading="lazy"
             width={1024}
             height={640}
@@ -53,7 +53,7 @@ export function HotelGallery({ images, alt }: Props) {
         <>
           <button
             type="button"
-            aria-label="Poprzednie zdjęcie"
+            aria-label="Previous photo"
             onClick={() => go(index - 1)}
             disabled={index === 0}
             className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full border border-border bg-background/85 p-1.5 backdrop-blur transition-opacity disabled:opacity-0"
@@ -62,7 +62,7 @@ export function HotelGallery({ images, alt }: Props) {
           </button>
           <button
             type="button"
-            aria-label="Następne zdjęcie"
+            aria-label="Next photo"
             onClick={() => go(index + 1)}
             disabled={index === photos.length - 1}
             className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full border border-border bg-background/85 p-1.5 backdrop-blur transition-opacity disabled:opacity-0"
@@ -74,7 +74,7 @@ export function HotelGallery({ images, alt }: Props) {
               <button
                 key={src}
                 type="button"
-                aria-label={`Zdjęcie ${i + 1}`}
+                aria-label={`Photo ${i + 1}`}
                 onClick={() => go(i)}
                 className={`size-1.5 rounded-full transition-colors ${
                   i === index ? "bg-primary" : "bg-background/70"
