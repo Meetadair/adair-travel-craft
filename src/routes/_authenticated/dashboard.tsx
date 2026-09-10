@@ -11,16 +11,16 @@ import { downloadTripInvoice } from "@/lib/trip-pdf";
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
-      { title: "Panel klienta Adair — podróże i faktury" },
+      { title: "Adair client dashboard — trips and invoices" },
       {
         name: "description",
         content:
-          "Twoje zapisane podróże Adair, preferencje podróżne i faktury do pobrania w PDF.",
+          "Your saved Adair trips, travel preferences, and invoices available for PDF download.",
       },
-      { property: "og:title", content: "Panel klienta Adair" },
+      { property: "og:title", content: "Adair client dashboard" },
       {
         property: "og:description",
-        content: "Podróże, preferencje i faktury w jednym miejscu.",
+        content: "Trips, preferences, and invoices in one place.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -29,7 +29,7 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
   component: PanelPage,
   errorComponent: () => (
     <div className="mx-auto max-w-3xl px-6 py-24 text-sm text-muted-foreground">
-      Nie udało się wczytać panelu. Odśwież stronę.
+      We couldn't load the dashboard. Please refresh the page.
     </div>
   ),
 });
@@ -41,7 +41,7 @@ const ICONS: Record<string, React.ReactNode> = {
 };
 
 const money = (amount: number, currency: string) =>
-  `${Number(amount).toLocaleString("pl-PL", { maximumFractionDigits: 2 })} ${currency}`;
+  `${Number(amount).toLocaleString("en-US", { maximumFractionDigits: 2 })} ${currency}`;
 
 function PanelPage() {
   const navigate = useNavigate();
@@ -139,7 +139,7 @@ function PanelPage() {
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <h1 className="font-display text-3xl font-semibold tracking-tight">
-              Moje podróże
+              My trips
             </h1>
             <p className="mt-2 text-sm text-muted-foreground">{email}</p>
           </div>
@@ -147,24 +147,24 @@ function PanelPage() {
             onClick={signOut}
             className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2 text-sm font-semibold hover:bg-secondary"
           >
-            <LogOut className="size-4" /> Wyloguj
+            <LogOut className="size-4" /> Sign out
           </button>
         </div>
 
         {trips.isLoading && (
-          <p className="mt-10 text-sm text-muted-foreground">Wczytuję podróże…</p>
+          <p className="mt-10 text-sm text-muted-foreground">Loading trips…</p>
         )}
 
         {trips.data?.length === 0 && (
           <div className="hairline-card mt-10 p-8 text-center">
             <p className="text-sm text-muted-foreground">
-              Nie masz jeszcze zapisanych podróży.
+              You don't have any saved trips yet.
             </p>
             <button
-              onClick={() => navigate({ to: "/asystent" })}
+              onClick={() => navigate({ to: "/assistant" })}
               className="mt-5 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
             >
-              Złóż pierwszą podróż
+              Book your first trip
             </button>
           </div>
         )}
@@ -214,11 +214,11 @@ function PanelPage() {
                     }
                     className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:bg-primary/90"
                   >
-                    <FileDown className="size-4" /> Faktura PDF
+                    <FileDown className="size-4" /> Download invoice (PDF)
                   </button>
                   <button
                     onClick={() => removeMutation.mutate(trip.id)}
-                    aria-label="Usuń podróż"
+                    aria-label="Delete trip"
                     className="rounded-xl border border-border p-2 text-muted-foreground hover:bg-secondary"
                   >
                     <Trash2 className="size-4" />
@@ -250,10 +250,10 @@ function PanelPage() {
 
         <section className="mt-20">
           <h2 className="font-display text-2xl font-semibold tracking-tight">
-            Profil podróży
+            Travel profile
           </h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            Ustaw raz — każda kolejna podróż i faktura respektuje te dane.
+            Set it once — every future trip and invoice will follow these preferences.
           </p>
           <form
             onSubmit={(e) => {
@@ -262,26 +262,26 @@ function PanelPage() {
             }}
             className="hairline-card mt-8 grid gap-5 p-6 sm:grid-cols-2"
           >
-            {field("full_name", "Imię i nazwisko")}
-            {field("company", "Firma (nabywca na fakturze)")}
-            {field("tax_id", "NIP")}
-            {field("preferred_airlines", "Preferowane linie", "LOT, Lufthansa")}
-            {field("cabin_class", "Klasa", "premium economy")}
-            {field("seat_preference", "Miejsce", "przy oknie, przód")}
-            {field("hotel_chains", "Sieci hotelowe", "Hyatt, SLH")}
-            {field("diet", "Dieta", "bez glutenu")}
-            {field("budget_per_trip", "Budżet na podróż", "1500")}
-            {field("currency", "Waluta", "EUR")}
+            {field("full_name", "Full name")}
+            {field("company", "Company (invoice bill-to)")}
+            {field("tax_id", "VAT number")}
+            {field("preferred_airlines", "Preferred airlines", "LOT, Lufthansa")}
+            {field("cabin_class", "Cabin class", "premium economy")}
+            {field("seat_preference", "Seat preference", "window, front")}
+            {field("hotel_chains", "Hotel chains", "Hyatt, SLH")}
+            {field("diet", "Diet", "gluten-free")}
+            {field("budget_per_trip", "Budget per trip", "1500")}
+            {field("currency", "Currency", "EUR")}
             <div className="sm:col-span-2">
               <button
                 type="submit"
                 disabled={saveProfileMutation.isPending}
                 className="rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
               >
-                {saveProfileMutation.isPending ? "Zapisuję…" : "Zapisz preferencje"}
+                {saveProfileMutation.isPending ? "Saving…" : "Save preferences"}
               </button>
               {saveProfileMutation.isSuccess && (
-                <span className="ml-3 text-sm text-muted-foreground">Zapisano.</span>
+                <span className="ml-3 text-sm text-muted-foreground">Saved.</span>
               )}
             </div>
           </form>

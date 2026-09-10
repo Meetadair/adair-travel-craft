@@ -77,18 +77,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Adair Travel — Jedna prośba. Cała podróż." },
+      { title: "Adair Travel — One request. The whole trip." },
       {
         name: "description",
         content:
-          "Adair to asystent podróży AI, który w jednym oknie czatu składa lot, hotel i samochód w jedną rezerwację.",
+          "Adair is an AI travel assistant that bundles a flight, hotel, and car into a single booking, all from one chat window.",
       },
       { name: "author", content: "Adair Travel" },
-      { property: "og:title", content: "Adair Travel — Jedna prośba. Cała podróż." },
+      { property: "og:title", content: "Adair Travel — One request. The whole trip." },
       {
         property: "og:description",
         content:
-          "Lot, hotel i samochód w jednej karcie do rezerwacji. Zamiast pięciu appek — jedna rozmowa.",
+          "Flight, hotel, and car in a single booking card. Instead of five apps — one conversation.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

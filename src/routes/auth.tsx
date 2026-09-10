@@ -6,16 +6,16 @@ import { SiteNav } from "@/components/site-nav";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Konto Adair — zaloguj się lub zarejestruj" },
+      { title: "Adair account — sign in or sign up" },
       {
         name: "description",
         content:
-          "Zaloguj się do Adair Travel, aby przechowywać podróże, preferencje i pobierać faktury w PDF.",
+          "Sign in to Adair Travel to store your trips, preferences, and download PDF invoices.",
       },
-      { property: "og:title", content: "Konto Adair — zaloguj się lub zarejestruj" },
+      { property: "og:title", content: "Adair account — sign in or sign up" },
       {
         property: "og:description",
-        content: "Twoje podróże, preferencje i faktury w jednym panelu klienta Adair.",
+        content: "Your trips, preferences, and invoices in one client dashboard.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -51,20 +51,20 @@ function AuthPage() {
         });
         if (signUpError) throw signUpError;
         if (data.session) {
-          navigate({ to: "/panel" });
+          navigate({ to: "/dashboard" });
           return;
         }
-        setMessage("Sprawdź skrzynkę — wysłaliśmy link potwierdzający rejestrację.");
+        setMessage("Check your inbox — we've sent you a confirmation link.");
       } else {
         const { error: signInError } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
         if (signInError) throw signInError;
-        navigate({ to: "/panel" });
+        navigate({ to: "/dashboard" });
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Coś poszło nie tak");
+      setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
       setBusy(false);
     }
@@ -75,16 +75,16 @@ function AuthPage() {
       <SiteNav />
       <main className="mx-auto max-w-md px-6 py-20">
         <h1 className="font-display text-3xl font-semibold tracking-tight">
-          {mode === "signin" ? "Zaloguj się" : "Utwórz konto"}
+          {mode === "signin" ? "Sign in" : "Create an account"}
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Twoje podróże, preferencje i faktury w jednym miejscu.
+          Your trips, preferences, and invoices in one place.
         </p>
 
         <form onSubmit={submit} className="hairline-card mt-8 space-y-4 p-6">
           {mode === "signup" && (
             <label className="block">
-              <span className="text-xs font-medium text-muted-foreground">Imię i nazwisko</span>
+              <span className="text-xs font-medium text-muted-foreground">Full name</span>
               <input
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
@@ -94,7 +94,7 @@ function AuthPage() {
             </label>
           )}
           <label className="block">
-            <span className="text-xs font-medium text-muted-foreground">E-mail</span>
+            <span className="text-xs font-medium text-muted-foreground">Email</span>
             <input
               type="email"
               required
@@ -105,7 +105,7 @@ function AuthPage() {
             />
           </label>
           <label className="block">
-            <span className="text-xs font-medium text-muted-foreground">Hasło</span>
+            <span className="text-xs font-medium text-muted-foreground">Password</span>
             <input
               type="password"
               required
@@ -125,7 +125,7 @@ function AuthPage() {
             disabled={busy}
             className="w-full rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-60"
           >
-            {busy ? "Chwilka…" : mode === "signin" ? "Zaloguj się" : "Zarejestruj się"}
+            {busy ? "One moment…" : mode === "signin" ? "Sign in" : "Sign up"}
           </button>
         </form>
 
@@ -137,13 +137,13 @@ function AuthPage() {
           }}
           className="mt-5 text-sm text-muted-foreground underline decoration-border underline-offset-4 hover:text-foreground"
         >
-          {mode === "signin" ? "Nie mam jeszcze konta" : "Mam już konto"}
+          {mode === "signin" ? "I don't have an account yet" : "I already have an account"}
         </button>
 
         <p className="mt-8 text-xs text-muted-foreground">
-          Wolisz najpierw zobaczyć demo?{" "}
-          <Link to="/asystent" className="text-primary">
-            Otwórz asystenta
+          Prefer to see a demo first?{" "}
+          <Link to="/assistant" className="text-primary">
+            Open the assistant
           </Link>
         </p>
       </main>
