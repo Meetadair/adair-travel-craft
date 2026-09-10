@@ -267,7 +267,7 @@ function ChatDemo() {
                   icon={<BedDouble className="size-4" />}
                   title="Park Hyatt Milano"
                   subtitle="1 noc · pokój King, ciche piętro · 200 m od Duomo"
-                  tags={[<Tag key="1" accent>Adair Direct</Tag>, <Tag key="2">stawka negocjowana</Tag>]}
+                  tags={[<Tag key="1" accent>stawka negocjowana</Tag>]}
                   price="610 €"
                 />
                 <TripRow
@@ -397,7 +397,7 @@ const DEMO_INVOICE = {
       kind: "hotel",
       title: "Park Hyatt Milano · 1 noc",
       detail: "120 m od Duomo, pokój Park Deluxe, śniadanie w cenie",
-      provider: "Adair Direct",
+      provider: "Park Hyatt",
       offerReference: "PHM-DEMO",
       amount: 742,
       currency: "EUR",
@@ -522,7 +522,7 @@ const principles = [
   {
     icon: <Coffee className="size-5" />,
     title: "Cena, jakiej inni nie mają",
-    text: "Hotele po własnych, negocjowanych stawkach Adair Direct — nie po publicznych cenach z Booking.com. Różnicę widzisz w podsumowaniu.",
+    text: "Hotele po własnych, negocjowanych stawkach — nie po publicznych cenach z Booking.com. Różnicę widzisz w podsumowaniu.",
   },
   {
     icon: <MapPin className="size-5" />,

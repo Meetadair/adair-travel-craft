@@ -32,7 +32,7 @@ const metrics = [
 
 const revenue = [
   {
-    title: "Stawka negocjowana (Adair Direct)",
+    title: "Stawka negocjowana",
     body: "Kupujemy pokoje po własnej stawce korporacyjnej i sprzedajemy je poniżej ceny publicznej OTA. Marża zostaje u nas, nie u pośrednika.",
     margin: "8–14 %",
   },
@@ -50,7 +50,7 @@ const revenue = [
 
 const unit = [
   ["Lot (LOT, NDC)", "312 €", "6 €"],
-  ["Hotel 1 noc (stawka Adair Direct)", "742 €", "96 €"],
+  ["Hotel 1 noc (stawka negocjowana)", "742 €", "96 €"],
   ["Samochód 2 dni", "186 €", "22 €"],
 ];
 

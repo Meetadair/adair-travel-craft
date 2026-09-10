@@ -323,7 +323,7 @@ function demoOffers(input: TripSearchInput): TripOffer[] {
     {
       kind: "hotel",
       title: `Hotel w centrum · ${input.destinationCity}`,
-      detail: `${nights} ${nights === 1 ? "noc" : "noce"} · stawka Adair Direct · dane przykładowe`,
+      detail: `${nights} ${nights === 1 ? "noc" : "noce"} · stawka negocjowana · dane przykładowe`,
       provider: "przykład",
       offerReference: "PRZYKŁAD-HOTEL",
       amount: 305 * nights,
