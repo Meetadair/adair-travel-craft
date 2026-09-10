@@ -643,19 +643,22 @@ function MyTrips({ t }: { t: Dict }) {
         ))}
       </div>
 
-      <div className="mt-5 hairline-card flex flex-wrap items-center justify-between gap-4 px-6 py-4">
-        <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-muted-foreground">
-          <span className="inline-flex items-center gap-1.5">
-            <CalendarDays className="size-3.5" /> {m.dates}
-          </span>
-          <span className="inline-flex items-center gap-1.5">
-            <MapPin className="size-3.5" /> {m.place}
-          </span>
-          <span className="inline-flex items-center gap-1.5">
-            <Clock className="size-3.5" /> {m.departs}
-          </span>
+      <div className="mt-5 hairline-card px-6 py-4">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-muted-foreground">
+            <span className="inline-flex items-center gap-1.5">
+              <CalendarDays className="size-3.5" /> {m.dates}
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <MapPin className="size-3.5" /> {m.place}
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <Clock className="size-3.5" /> {m.departs}
+            </span>
+          </div>
+          <span className="text-sm font-semibold text-primary">€1,240 · {m.paid}</span>
         </div>
-        <span className="text-sm font-semibold text-primary">€1,240 · {m.paid}</span>
+        <SavedLine t={t} className="mt-3" />
       </div>
 
       <div className="mt-5 flex justify-end">
