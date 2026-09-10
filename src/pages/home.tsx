@@ -145,23 +145,26 @@ function TripRow({
   subtitle,
   tags,
   price,
+  extra,
 }: {
   icon: React.ReactNode;
   title: string;
   subtitle: string;
   tags: React.ReactNode[];
   price: string;
+  extra?: React.ReactNode;
 }) {
   return (
     <div className="flex items-start justify-between gap-4 px-5 py-4">
-      <div className="flex items-start gap-3.5">
+      <div className="flex min-w-0 items-start gap-3.5">
         <div className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg border border-border bg-background text-foreground">
           {icon}
         </div>
-        <div>
+        <div className="min-w-0">
           <p className="text-sm font-semibold text-foreground">{title}</p>
           <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">{subtitle}</p>
           <div className="mt-2 flex flex-wrap gap-1.5">{tags}</div>
+          {extra}
         </div>
       </div>
       <p className="shrink-0 text-sm font-semibold text-foreground">{price}</p>
