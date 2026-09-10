@@ -85,7 +85,7 @@ function AssistantPage() {
           endDate: result.request.returnDate,
           currency: result.currency,
           source: result.source,
-          items: result.offers.map((o) => ({
+          items: offers.map((o) => ({
             kind: o.kind,
             title: o.title,
             detail: o.detail,
