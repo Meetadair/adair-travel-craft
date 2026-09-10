@@ -1,0 +1,342 @@
+{
+  "nav": {
+    "assistant": "Assistent",
+    "trips": "Mina resor",
+    "investors": "För investerare",
+    "account": "Mitt konto",
+    "signIn": "Logga in",
+    "language": "Språk"
+  },
+  "home": {
+    "meta": {
+      "title": "Adair Travel — En förfrågan. Hela resan.",
+      "description": "Adair är en AI-reseassistent som samlar flyg, hotell och hyrbil i en enda bokning – direkt i ett chattfönster.",
+      "ogTitle": "Adair Travel — En förfrågan. Hela resan.",
+      "ogDescription": "Flyg, hotell och hyrbil i ett enda bokningskort. Istället för fem appar – en konversation."
+    },
+    "hero": {
+      "badge": "AI-reseassistent — koncept",
+      "titleLine1": "En förfrågan.",
+      "titleLine2": "Hela resan.",
+      "lead": "Adair samlar flyg, hotell och hyrbil i ett enda bokningskort – allt i ett chattfönster. Istället för fem appar, en konversation.",
+      "ctaPrimary": "Se hur det fungerar",
+      "ctaSecondary": "Tre principer"
+    },
+    "comparison": {
+      "label": "Varför Adair",
+      "title": "Fem appar eller ett fönster.",
+      "withoutTitle": "Utan Adair",
+      "withoutTag": "5 appar",
+      "withoutFooter": "5 bokningar · 5 bekräftelser · 5 ställen att hålla koll på",
+      "withTitle": "Med Adair",
+      "withTag": "1 konversation",
+      "withFooter": "1 bokning · 1 bekräftelse ·",
+      "quote": "\"Jag behöver vara i Milan torsdag morgon, hem fredag kväll, nära Duomo och med en hyrbil på plats.\"",
+      "bundle": "Flyg + hotell + hyrbil — ett kort",
+      "apps": [
+        {
+          "name": "Skyscanner",
+          "detail": "flygsökning, 14 flikar"
+        },
+        {
+          "name": "Booking.com",
+          "detail": "hotell till ordinarie pris"
+        },
+        {
+          "name": "Rental agency",
+          "detail": "separat bilbokning"
+        },
+        {
+          "name": "Uber",
+          "detail": "lokala resor"
+        },
+        {
+          "name": "OpenTable",
+          "detail": "restauranger, separat"
+        }
+      ]
+    },
+    "demo": {
+      "label": "Konversationsdemo",
+      "title": "Ett meddelande räcker.",
+      "userMessage": "Jag behöver vara i Milan torsdag morgon, hem fredag kväll, nära Duomo och med en hyrbil på plats.",
+      "you": "Du",
+      "cardTitle": "Milan · Thu – Fri",
+      "cardSubtitle": "Sammansatt efter din reseprofil",
+      "flightTitle": "LOT 391 · Warsaw → Milan",
+      "flightDetail": "Thu 6:55 – 9:05 AM · retur Fri 7:40 PM · fönsterplats, föredraget flygbolag",
+      "flightTagClass": "Premium Economy",
+      "hotelTitle": "Park Hyatt Milano",
+      "hotelDetail": "1 natt · King-rum, lugn våning · 200 m från Duomo",
+      "hotelTag": "avtalspris",
+      "carTitle": "BMW 3 Series · pickup at Linate",
+      "carDetail": "Thu 9:30 AM – Fri 6:30 PM · helförsäkring, utan deposition",
+      "carTag": "automat",
+      "total": "Totalt, en bokning",
+      "bookAll": "Boka allt",
+      "footnote": "3 delar · 1 betalning · 1 bokningsnummer"
+    },
+    "trips": {
+      "label": "Mina resor",
+      "title": "Allt samlat efter bokning.",
+      "flight": "Flyg",
+      "hotel": "Hotell",
+      "car": "Hyrbil",
+      "flightTitle": "LOT 391 · WAW → MXP",
+      "flightDetail": "Thu, Sep 18 · 6:55 AM · plats 7A",
+      "flightCode": "Bokning ADR-8K2M4F",
+      "hotelTitle": "Park Hyatt Milano",
+      "hotelDetail": "Check-in Sep 18 · 1 natt · King",
+      "hotelCode": "Bekräftelse PH-55271",
+      "carTitle": "BMW 3 Series · Linate",
+      "carDetail": "Pickup 9:30 AM · retur Fri 6:30 PM",
+      "carCode": "Voucher ADR-CAR-0912",
+      "dates": "Thu 18 – Fri 19 Sep",
+      "place": "Milan, Italien",
+      "departs": "avgår om 6 dagar",
+      "paid": "betald",
+      "pdfIdle": "Ladda ner resekort (PDF)",
+      "pdfBusy": "Skapar PDF…"
+    },
+    "profile": {
+      "label": "Reseprofil",
+      "titleLine1": "Ställ in en gång.",
+      "titleLine2": "Fungerar varje gång.",
+      "lead": "Adair lär sig dina preferenser en gång – och varje resa därefter anpassas automatiskt. Inga filter att klicka i, inget att jämföra.",
+      "activeCount": "18 aktiva preferenser",
+      "groups": [
+        {
+          "title": "Flyg",
+          "items": [
+            "LOT, Lufthansa, Air France",
+            "Premium Economy för flyg över 2h",
+            "Fönsterplats, långt fram i kabinen"
+          ]
+        },
+        {
+          "title": "Hotell",
+          "items": [
+            "Hyatt, Small Luxury Hotels",
+            "Lugn våning, King-säng",
+            "Max 10 min promenad från destinationen"
+          ]
+        },
+        {
+          "title": "Kost & tider",
+          "items": [
+            "Glutenfritt",
+            "Frukost ingår",
+            "Sen utcheckning efter 11:00 AM"
+          ]
+        },
+        {
+          "title": "Budget",
+          "items": [
+            "Upp till €1,500 / 2-dagarsresa",
+            "VAT-faktura till företaget",
+            "EUR, ett kort"
+          ]
+        }
+      ]
+    },
+    "principles": {
+      "label": "Tre principer",
+      "title": "Det här vilar Adair på.",
+      "items": [
+        {
+          "title": "En resa, inte tre bokningar",
+          "text": "Flyg, hotell och hyrbil är en och samma resa – så det borde vara en och samma bokning. Ett fönster, en betalning, en bekräftelse."
+        },
+        {
+          "title": "Ett pris ingen annan ger dig",
+          "text": "Hotell till våra egna förhandlade priser – inte publika priser från Booking.com. Du ser skillnaden direkt i sammanställningen."
+        },
+        {
+          "title": "Ett ställe efter bokning",
+          "text": "Bekräftelsenummer, vouchers, ändringar och avbokningar – allt i Mina resor, hela vägen fram till resans sista dag."
+        }
+      ]
+    },
+    "footer": "Produktkoncept — exempeldata. Adair Travel, 2026."
+  },
+  "assistant": {
+    "meta": {
+      "title": "Adair Assistant — sätt ihop hela resan i en konversation",
+      "description": "Berätta var och när du vill resa. Adair söker verkliga erbjudanden på flyg, hotell och hyrbil och sammanställer dem på ett kort.",
+      "ogTitle": "Adair Assistant — hela resan i en konversation",
+      "ogDescription": "Verkliga erbjudanden på flyg, hotell och hyrbil i ett bokningsbart kort."
+    },
+    "title": "Berätta vart du vill resa.",
+    "lead": "Adair förstår vardagligt språk, kontrollerar tillgänglighet hos leverantörer och sätter ihop flyg, hotell och hyrbil i ett bokningsbart kort.",
+    "placeholder": "t.ex. Jag behöver vara i Milan torsdag morgon, hem fredag kväll…",
+    "submitIdle": "Skapa resa",
+    "submitBusy": "Söker…",
+    "examples": [
+      "Jag behöver vara i Milan torsdag morgon, hem fredag kväll, nära Duomo och en bil som väntar.",
+      "Konferens i Barcelona Oct 12–14, premium economy, hotell nära kongresscentret.",
+      "Resa till London på måndag, hem på onsdag, ingen hyrbil behövs."
+    ],
+    "error": "Vi kunde inte sätta ihop resan. Försök igen eller ange datum tydligare.",
+    "sourceLive": "priser från leverantörers API:er",
+    "sourcePartial": "vissa delar från leverantörers API:er",
+    "sourceDemo": "exempeldata",
+    "hideAlternatives": "Dölj alternativ",
+    "showAlternatives": "Visa alternativ",
+    "backToRecommendation": "Tillbaka till Adairs rekommendation",
+    "total": "Totalt, en bokning",
+    "saveIdle": "Spara resa",
+    "saveBusy": "Sparar…",
+    "savedAs": "Sparad som",
+    "openDashboard": "Öppna översikt",
+    "galleryPrev": "Föregående bild",
+    "galleryNext": "Nästa bild",
+    "galleryGoTo": "Gå till bild"
+  },
+  "auth": {
+    "meta": {
+      "title": "Adair-konto — logga in eller skapa konto",
+      "description": "Logga in på Adair Travel för att spara dina resor, preferenser och ladda ner fakturor i PDF.",
+      "ogTitle": "Adair-konto — logga in eller skapa konto",
+      "ogDescription": "Dina resor, preferenser och fakturor på en och samma plats."
+    },
+    "signInTitle": "Logga in",
+    "signUpTitle": "Skapa konto",
+    "lead": "Dina resor, preferenser och fakturor på ett ställe.",
+    "fullName": "Fullständigt namn",
+    "email": "E-post",
+    "password": "Lösenord",
+    "submitBusy": "Ett ögonblick…",
+    "signIn": "Logga in",
+    "signUp": "Skapa konto",
+    "toSignUp": "Jag har inget konto ännu",
+    "toSignIn": "Jag har redan ett konto",
+    "confirmSent": "Kolla din inkorg – vi har skickat en bekräftelselänk.",
+    "genericError": "Något gick fel",
+    "demoHint": "Föredrar du att se en demo först?",
+    "demoLink": "Öppna assistenten"
+  },
+  "dashboard": {
+    "meta": {
+      "title": "Adair kundöversikt — resor och fakturor",
+      "description": "Dina sparade Adair-resor, resepreferenser och fakturor tillgängliga för PDF-nedladdning.",
+      "ogTitle": "Adair kundöversikt",
+      "ogDescription": "Resor, preferenser och fakturor på ett ställe."
+    },
+    "loadError": "Vi kunde inte läsa in översikten. Uppdatera sidan.",
+    "title": "Mina resor",
+    "signOut": "Logga ut",
+    "loading": "Laddar resor…",
+    "empty": "Du har inga sparade resor ännu.",
+    "emptyCta": "Boka din första resa",
+    "invoice": "Ladda ner faktura (PDF)",
+    "deleteTrip": "Ta bort resa",
+    "profileTitle": "Reseprofil",
+    "profileLead": "Ställ in en gång – alla framtida resor och fakturor följer dessa preferenser.",
+    "fields": {
+      "fullName": "Fullständigt namn",
+      "company": "Företag (fakturamottagare)",
+      "taxId": "VAT-nummer",
+      "airlines": "Föredragna flygbolag",
+      "cabin": "Kabinklass",
+      "seat": "Sätesval",
+      "chains": "Hotellkedjor",
+      "diet": "Kost",
+      "budget": "Budget per resa",
+      "currency": "Valuta"
+    },
+    "saveIdle": "Spara preferenser",
+    "saveBusy": "Sparar…",
+    "saved": "Sparat."
+  },
+  "investors": {
+    "meta": {
+      "title": "Adair Travel för investerare — modell, marginal, såddrunda",
+      "description": "Adair Travel samlar flyg, hotell och hyrbil i en enda bokning. Intäktsmodell, marginal från förhandlade hotellpriser och villkor för såddrunda.",
+      "ogTitle": "Adair Travel för investerare",
+      "ogDescription": "En assistent istället för fem appar. Marginal från egna förhandlade hotellpriser, inte OTA-provisioner."
+    },
+    "badge": "Såddrunda · investerarmaterial",
+    "titleLine1": "Affärsresor innebär fem appar idag.",
+    "titleLine2": "Hos oss räcker det med en mening.",
+    "lead": "Adair Travel är assistenten som gör en enda förfrågan till flyg, hotell och hyrbil samlat på ett kort och en faktura. Vi tjänar på egna förhandlade hotellpriser snarare än provision från jämförelsesajter – därför är vårt pris lägre och vår marginal högre.",
+    "metrics": [
+      {
+        "label": "Genomsnittligt resvärde",
+        "value": "€1,240"
+      },
+      {
+        "label": "Bruttomarginal per resa",
+        "value": "11–17%"
+      },
+      {
+        "label": "Tid för att boka resa",
+        "value": "< 40 s"
+      },
+      {
+        "label": "Ersatta appar",
+        "value": "5"
+      }
+    ],
+    "revenueTitle": "Härifrån kommer intäkterna",
+    "revenue": [
+      {
+        "title": "Förhandlat pris",
+        "body": "Vi köper rum till egna företagspriser och säljer under publika OTA-priser. Marginalen stannar hos oss, inte hos en mellanhand.",
+        "margin": "8–14%"
+      },
+      {
+        "title": "Flygprovision (NDC)",
+        "body": "Flyg via NDC-kanalen: distributionsprovision samt serviceavgift för hantering av ändringar och återbetalningar i ett enda fönster.",
+        "margin": "1–3%"
+      },
+      {
+        "title": "Företagsabonnemang",
+        "body": "Team betalar för reseprofil, resepolicy och en samlad VAT-faktura för hela resan istället för tre olika dokument.",
+        "margin": "€29 / user / mo."
+      }
+    ],
+    "unitTitle": "Exempelresa — enhetsekonomi",
+    "colItem": "Post",
+    "colPrice": "Kundpris",
+    "colMargin": "Vår marginal",
+    "unit": [
+      {
+        "item": "Flyg (LOT, NDC)",
+        "price": "€312",
+        "margin": "€6"
+      },
+      {
+        "item": "Hotell, 1 natt (avtalspris)",
+        "price": "€742",
+        "margin": "€96"
+      },
+      {
+        "item": "Hyrbil, 2 dagar",
+        "price": "€186",
+        "margin": "€22"
+      }
+    ],
+    "unitTotal": "Totalt, en bokning",
+    "unitNote": "Rutten Warsaw–Milan, illustrativa siffror baserade på testpriser från leverantörer.",
+    "askTitle": "Vad vi söker",
+    "askBody": "Vi tar in en såddrunda för att expandera basen av förhandlade hotellpriser i tio affärsstäder, erbjuda komplett stöd för bokningsändringar i ett fönster och sälja till team på 20–200 personer.",
+    "contact": "Kontakta oss",
+    "seeProduct": "Se produkten live"
+  },
+  "invoice": {
+    "documentTitle": "Resefaktura",
+    "seller": "Säljare",
+    "buyer": "Köpare",
+    "route": "Rutt",
+    "dates": "Datum",
+    "item": "Post",
+    "reference": "Referens",
+    "net": "Netto",
+    "vat": "VAT 23%",
+    "gross": "Totalt brutto",
+    "issued": "Utfärdad",
+    "number": "Dokumentnr",
+    "demoNote": "Exempeldata — ej ett skattedokument.",
+    "liveNote": "Priser bekräftade med leverantörer vid tidpunkten då resan sammanställdes."
+  }
+}
