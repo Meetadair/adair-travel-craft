@@ -340,8 +340,127 @@ function TripRow({
   );
 }
 
-function ChatDemo({ t }: { t: Dict }) {
+function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null }) {
   const d = t.home.demo;
+  const reduced = usePrefersReducedMotion();
+  const typedSentence = submission?.sentence.trim() ?? "";
+  const fullText = typedSentence || d.userMessage;
+
+  const [typed, setTyped] = useState<string | null>(null);
+  const [thinking, setThinking] = useState(false);
+  const [revealed, setRevealed] = useState(3);
+  const [showTotal, setShowTotal] = useState(true);
+  const [showSaved, setShowSaved] = useState(true);
+  const [showActions, setShowActions] = useState(true);
+  const [copied, setCopied] = useState(false);
+
+  const runKey = submission?.key ?? 0;
+  useEffect(() => {
+    if (!submission) return;
+    let cancelled = false;
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    const wait = (ms: number) =>
+      new Promise<void>((resolve) => {
+        timers.push(setTimeout(resolve, ms));
+      });
+
+    const text = submission.sentence.trim() || d.userMessage;
+
+    if (reduced) {
+      setTyped(text);
+      setThinking(false);
+      setRevealed(3);
+      setShowTotal(true);
+      setShowSaved(true);
+      setShowActions(true);
+      return;
+    }
+
+    setTyped("");
+    setThinking(false);
+    setRevealed(0);
+    setShowTotal(false);
+    setShowSaved(false);
+    setShowActions(false);
+
+    void (async () => {
+      for (let i = 1; i <= text.length; i += 1) {
+        await wait(40);
+        if (cancelled) return;
+        setTyped(text.slice(0, i));
+      }
+      setThinking(true);
+      await wait(2000);
+      if (cancelled) return;
+      setThinking(false);
+      for (let i = 1; i <= 3; i += 1) {
+        setRevealed(i);
+        await wait(350);
+        if (cancelled) return;
+      }
+      setShowTotal(true);
+      await wait(400);
+      if (cancelled) return;
+      setShowSaved(true);
+      await wait(300);
+      if (cancelled) return;
+      setShowActions(true);
+    })();
+
+    return () => {
+      cancelled = true;
+      timers.forEach(clearTimeout);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [runKey, reduced]);
+
+  const parsed = typedSentence ? parseDemoSentence(typedSentence, d.weekdays) : null;
+  const days = parsed
+    ? { day1: d.weekdaysShort[parsed.day1] ?? "", day2: d.weekdaysShort[parsed.day2] ?? "" }
+    : null;
+  const card =
+    parsed && days
+      ? {
+          title: fill(d.cardTitleTpl, { city: parsed.city, ...days }),
+          flightTitle: fill(d.flightTitleTpl, { city: parsed.city }),
+          flightDetail: fill(d.flightDetailTpl, days),
+          hotelTitle: parsed.hotel,
+          hotelDetail: d.hotelDetailTpl,
+          carTitle: fill(d.carTitleTpl, { code: parsed.code }),
+          carDetail: fill(d.carDetailTpl, days),
+        }
+      : {
+          title: d.cardTitle,
+          flightTitle: d.flightTitle,
+          flightDetail: d.flightDetail,
+          hotelTitle: d.hotelTitle,
+          hotelDetail: d.hotelDetail,
+          carTitle: d.carTitle,
+          carDetail: d.carDetail,
+        };
+
+  const reveal = (index: number) => (revealed >= index ? "animate-rise" : "hidden");
+
+  async function shareCard() {
+    const url = `${window.location.origin}${window.location.pathname}#demo`;
+    const payload = { title: "Adair", text: `${card.title} · €1,240`, url };
+    if (typeof navigator.share === "function") {
+      try {
+        await navigator.share(payload);
+        return;
+      } catch {
+        /* visitor dismissed the share sheet */
+      }
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+    } catch {
+      /* clipboard unavailable */
+    }
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 2000);
+  }
+
   return (
     <section id="demo" className="mx-auto max-w-3xl px-6 py-20">
       <SectionLabel>{d.label}</SectionLabel>
@@ -352,7 +471,12 @@ function ChatDemo({ t }: { t: Dict }) {
       <div className="mt-12 space-y-5">
         <div className="animate-rise flex justify-end" style={{ animationDelay: "100ms" }}>
           <div className="max-w-md rounded-xl rounded-br-sm border border-border bg-card px-5 py-4">
-            <p className="text-sm leading-relaxed text-foreground">{d.userMessage}</p>
+            <p className="min-h-5 text-sm leading-relaxed text-foreground">
+              {typed ?? d.userMessage}
+              {typed !== null && typed.length < fullText.length && (
+                <span className="ml-0.5 inline-block h-4 w-px translate-y-0.5 bg-primary" />
+              )}
+            </p>
             <p className="mt-2 text-right text-[11px] text-muted-foreground">{d.you} · 9:41</p>
           </div>
         </div>
@@ -363,55 +487,104 @@ function ChatDemo({ t }: { t: Dict }) {
           </div>
           <div className="w-full max-w-lg">
             <p className="mb-2 text-xs font-medium text-muted-foreground">Adair · 9:41</p>
-            <div className="hairline-card overflow-hidden">
-              <div className="border-b border-border px-5 py-4">
-                <p className="text-sm font-semibold text-foreground">{d.cardTitle}</p>
-                <p className="mt-0.5 text-xs text-muted-foreground">{d.cardSubtitle}</p>
-              </div>
 
-              <div className="divide-y divide-border">
-                <TripRow
-                  icon={<Plane className="size-4" />}
-                  title={d.flightTitle}
-                  subtitle={d.flightDetail}
-                  tags={[
-                    <Tag key="1">LOT Polish Airlines</Tag>,
-                    <Tag key="2">{d.flightTagClass}</Tag>,
-                  ]}
-                  price="€412"
-                />
-                <TripRow
-                  icon={<BedDouble className="size-4" />}
-                  title={d.hotelTitle}
-                  subtitle={d.hotelDetail}
-                  tags={[
-                    <Tag key="1" accent>
-                      {d.hotelTag}
-                    </Tag>,
-                  ]}
-                  price="€610"
-                  extra={<HotelGallery alt={d.hotelTitle} />}
-                />
-                <TripRow
-                  icon={<CarFront className="size-4" />}
-                  title={d.carTitle}
-                  subtitle={d.carDetail}
-                  tags={[<Tag key="1">Sixt</Tag>, <Tag key="2">{d.carTag}</Tag>]}
-                  price="€218"
-                />
+            {thinking ? (
+              <div className="animate-rise inline-flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-3">
+                <span className="flex gap-1">
+                  <span className="pulse size-1.5 rounded-full bg-primary" />
+                  <span className="pulse size-1.5 rounded-full bg-primary/70" />
+                  <span className="pulse size-1.5 rounded-full bg-primary/40" />
+                </span>
+                <span className="text-xs text-muted-foreground">{d.typing}</span>
               </div>
+            ) : (
+              <>
+                <div className={`hairline-card overflow-hidden ${revealed > 0 ? "" : "hidden"}`}>
+                  <div className="border-b border-border px-5 py-4">
+                    <p className="text-sm font-semibold text-foreground">{card.title}</p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">{d.cardSubtitle}</p>
+                  </div>
 
-              <div className="flex items-center justify-between border-t border-border bg-cream-deep px-5 py-4">
-                <div>
-                  <p className="text-xs text-muted-foreground">{d.total}</p>
-                  <p className="font-display text-xl font-semibold text-primary">€1,240</p>
+                  <div className="divide-y divide-border">
+                    <div className={reveal(1)}>
+                      <TripRow
+                        icon={<Plane className="size-4" />}
+                        title={card.flightTitle}
+                        subtitle={card.flightDetail}
+                        tags={[
+                          <Tag key="1">LOT Polish Airlines</Tag>,
+                          <Tag key="2">{d.flightTagClass}</Tag>,
+                        ]}
+                        price="€412"
+                      />
+                    </div>
+                    <div className={reveal(2)}>
+                      <TripRow
+                        icon={<BedDouble className="size-4" />}
+                        title={card.hotelTitle}
+                        subtitle={card.hotelDetail}
+                        tags={[
+                          <Tag key="1" accent>
+                            {d.hotelTag}
+                          </Tag>,
+                        ]}
+                        price="€610"
+                        extra={<HotelGallery alt={card.hotelTitle} />}
+                      />
+                    </div>
+                    <div className={reveal(3)}>
+                      <TripRow
+                        icon={<CarFront className="size-4" />}
+                        title={card.carTitle}
+                        subtitle={card.carDetail}
+                        tags={[<Tag key="1">Sixt</Tag>, <Tag key="2">{d.carTag}</Tag>]}
+                        price="€218"
+                      />
+                    </div>
+                    {parsed?.invoice && showTotal && (
+                      <div className="animate-rise flex items-center gap-2 px-5 py-3 text-xs text-muted-foreground">
+                        <Receipt className="size-3.5 text-primary" />
+                        {d.invoiceLine}
+                      </div>
+                    )}
+                  </div>
+
+                  <div
+                    className={`border-t border-border bg-cream-deep px-5 py-4 ${showTotal ? "animate-rise" : "hidden"}`}
+                  >
+                    <div className="flex items-center justify-between gap-4">
+                      <div>
+                        <p className="text-xs text-muted-foreground">{d.total}</p>
+                        <p className="font-display text-xl font-semibold text-primary">€1,240</p>
+                      </div>
+                      <button className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90">
+                        {d.bookAll} <ChevronRight className="size-4" />
+                      </button>
+                    </div>
+                    <SavedLine t={t} className={showSaved ? "animate-rise mt-3" : "hidden"} />
+                  </div>
                 </div>
-                <button className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90">
-                  {d.bookAll} <ChevronRight className="size-4" />
-                </button>
-              </div>
-            </div>
-            <p className="mt-2 text-xs text-muted-foreground">{d.footnote}</p>
+
+                <div
+                  className={`mt-3 flex flex-wrap items-start gap-2 ${showActions ? "animate-rise" : "hidden"}`}
+                >
+                  <button type="button" onClick={shareCard} className={ghostButton}>
+                    <Share2 className="size-4" />
+                    {copied ? d.shareCopied : d.share}
+                  </button>
+                  <EarlyAccess
+                    t={t}
+                    type="early_access"
+                    label={t.home.campaign.earlyAccess}
+                    sentence={typedSentence}
+                  />
+                </div>
+
+                <p className={`mt-2 text-xs text-muted-foreground ${showActions ? "" : "hidden"}`}>
+                  {d.footnote}
+                </p>
+              </>
+            )}
           </div>
         </div>
       </div>
