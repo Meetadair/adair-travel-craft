@@ -1,0 +1,348 @@
+{
+  "nav": {
+    "assistant": "Assistant",
+    "trips": "Mes voyages",
+    "investors": "Investisseurs",
+    "account": "Mon compte",
+    "signIn": "Se connecter",
+    "language": "Langue"
+  },
+  "home": {
+    "meta": {
+      "title": "Adair Travel — Une demande. Tout le voyage.",
+      "description": "Adair est un assistant de voyage IA qui réunit vol, hôtel et voiture en une seule réservation — depuis un unique échange.",
+      "ogTitle": "Adair Travel — Une demande. Tout le voyage.",
+      "ogDescription": "Vol, hôtel et voiture sur une seule carte de réservation. Au lieu de cinq applications — une conversation."
+    },
+    "hero": {
+      "badge": "Assistant de voyage IA — concept",
+      "titleLine1": "Une demande.",
+      "titleLine2": "Tout le voyage.",
+      "lead": "Adair rassemble votre vol, votre hôtel et votre voiture en une seule carte de réservation — au sein d'une même conversation. Plus besoin de cinq applications.",
+      "ctaPrimary": "Découvrir le fonctionnement",
+      "ctaSecondary": "Trois principes"
+    },
+    "comparison": {
+      "label": "Pourquoi Adair",
+      "title": "Cinq applications, ou une seule fenêtre.",
+      "withoutTitle": "Sans Adair",
+      "withoutTag": "5 applications",
+      "withoutFooter": "5 réservations · 5 confirmations · 5 endroits à vérifier",
+      "withTitle": "Avec Adair",
+      "withTag": "1 conversation",
+      "withFooter": "1 réservation · 1 confirmation ·",
+      "quote": "\"Je dois être à Milan jeudi matin, retour vendredi soir, près du Duomo, avec une voiture sur place.\"",
+      "bundle": "Vol + hôtel + voiture — une seule carte",
+      "apps": [
+        {
+          "name": "Skyscanner",
+          "detail": "recherche de vols, 14 onglets"
+        },
+        {
+          "name": "Booking.com",
+          "detail": "hôtel au tarif public"
+        },
+        {
+          "name": "Rental agency",
+          "detail": "réservation de voiture séparée"
+        },
+        {
+          "name": "Uber",
+          "detail": "déplacements locaux"
+        },
+        {
+          "name": "OpenTable",
+          "detail": "restaurants, séparément"
+        }
+      ]
+    },
+    "demo": {
+      "label": "Démonstration d'échange",
+      "title": "Un seul message suffit.",
+      "userMessage": "Je dois être à Milan jeudi matin, retour vendredi soir, près du Duomo, avec une voiture sur place.",
+      "you": "Vous",
+      "cardTitle": "Milan · Jeu – Ven",
+      "cardSubtitle": "Conçu selon votre profil de voyage",
+      "flightTitle": "LOT 391 · Varsovie → Milan",
+      "flightDetail": "Jeu 6:55 – 9:05 · retour Ven 19:40 · siège hublot, compagnie préférée",
+      "flightTagClass": "Premium Economy",
+      "hotelTitle": "Park Hyatt Milano",
+      "hotelDetail": "1 nuit · Chambre King, étage calme · à 200 m du Duomo",
+      "hotelTag": "tarif négocié",
+      "carTitle": "BMW 3 Series · retrait à Linate",
+      "carDetail": "Jeu 9:30 – Ven 18:30 · assurance tous risques, sans caution",
+      "carTag": "automatique",
+      "total": "Total, une seule réservation",
+      "bookAll": "Tout réserver",
+      "footnote": "3 prestations · 1 paiement · 1 numéro de réservation"
+    },
+    "trips": {
+      "label": "Mes voyages",
+      "title": "Tout réuni au même endroit après confirmation.",
+      "flight": "Vol",
+      "hotel": "Hôtel",
+      "car": "Voiture",
+      "flightTitle": "LOT 391 · WAW → MXP",
+      "flightDetail": "Jeu 18 sep · 6:55 · siège 7A",
+      "flightCode": "Réservation ADR-8K2M4F",
+      "hotelTitle": "Park Hyatt Milano",
+      "hotelDetail": "Arrivée 18 sep · 1 nuit · King",
+      "hotelCode": "Confirmation PH-55271",
+      "carTitle": "BMW 3 Series · Linate",
+      "carDetail": "Prise en charge 9:30 · restitution Ven 18:30",
+      "carCode": "Bon d'échange ADR-CAR-0912",
+      "dates": "Jeu 18 – Ven 19 sep",
+      "place": "Milan, Italie",
+      "departs": "départ dans 6 jours",
+      "paid": "réglé",
+      "pdfIdle": "Télécharger la fiche voyage (PDF)",
+      "pdfBusy": "Génération du PDF…"
+    },
+    "profile": {
+      "label": "Profil de voyage",
+      "titleLine1": "Indiquez-le une fois.",
+      "titleLine2": "Valable à chaque voyage.",
+      "lead": "Adair mémorise vos préférences une fois pour toutes — chaque déplacement les applique naturellement. Plus aucun filtre à cocher, rien à comparer.",
+      "activeCount": "18 préférences actives",
+      "groups": [
+        {
+          "title": "Vols",
+          "items": [
+            "LOT, Lufthansa, Air France",
+            "Premium Economy pour les vols de plus de 2 h",
+            "Siège hublot, avant de cabine"
+          ]
+        },
+        {
+          "title": "Hôtels",
+          "items": [
+            "Hyatt, Small Luxury Hotels",
+            "Étage calme, lit King",
+            "10 min à pied maximum de la destination"
+          ]
+        },
+        {
+          "title": "Repas et horaires",
+          "items": [
+            "Sans gluten",
+            "Petit-déjeuner inclus",
+            "Départ tardif après 11:00"
+          ]
+        },
+        {
+          "title": "Budget",
+          "items": [
+            "Jusqu'à 1 500 € / séjour de 2 jours",
+            "Facture entreprise avec VAT",
+            "EUR, une seule carte"
+          ]
+        }
+      ]
+    },
+    "principles": {
+      "label": "Trois principes",
+      "title": "Ce qui fonde Adair.",
+      "items": [
+        {
+          "title": "Un voyage, pas trois réservations",
+          "text": "Un vol, un hôtel et une voiture forment un seul voyage — ils méritent une seule réservation. Une interface, un paiement, une confirmation."
+        },
+        {
+          "title": "Un prix inaccessible ailleurs",
+          "text": "Des hôtels négociés à nos propres tarifs — loin des prix publics de Booking.com. La différence se voit directement sur le récapitulatif."
+        },
+        {
+          "title": "Un seul espace après l'achat",
+          "text": "Numéros de confirmation, bons d'échange, modifications et annulations — centralisés dans Mes voyages jusqu'au dernier instant."
+        }
+      ]
+    },
+    "footer": "Concept de produit — données indicatives. Adair Travel, 2026."
+  },
+  "assistant": {
+    "meta": {
+      "title": "Assistant Adair — composez votre voyage en une conversation",
+      "description": "Dites-nous où et quand vous devez aller. Adair recherche des offres réelles de vols, d'hôtels et de voitures et les assemble sur une seule carte.",
+      "ogTitle": "Assistant Adair — tout un voyage en une conversation",
+      "ogDescription": "Des offres réelles de vol, hôtel et voiture réunies sur une seule carte à réserver."
+    },
+    "title": "Indiquez-nous votre destination.",
+    "lead": "Adair comprend le langage naturel, interroge la disponibilité des prestataires et compose vol, hôtel et voiture en une seule carte prête à réserver.",
+    "placeholder": "ex. Je dois être à Milan jeudi matin, retour vendredi soir…",
+    "submitIdle": "Composer le voyage",
+    "submitBusy": "Recherche en cours…",
+    "examples": [
+      "Je dois être à Milan jeudi matin, retour vendredi soir, près du Duomo avec une voiture sur place.",
+      "Conférence à Barcelone du 12 au 14 oct, premium economy, hôtel proche du palais des congrès.",
+      "Déplacement à Londres lundi, retour mercredi, sans voiture."
+    ],
+    "error": "Impossible de composer ce voyage. Veuillez réessayer ou préciser les dates.",
+    "sourceLive": "tarifs issus des API prestataires",
+    "sourcePartial": "certaines offres issues des API prestataires",
+    "sourceDemo": "données indicatives",
+    "hideAlternatives": "Masquer les alternatives",
+    "showAlternatives": "Afficher les alternatives",
+    "backToRecommendation": "Retour à la suggestion Adair",
+    "total": "Total, une seule réservation",
+    "saveIdle": "Enregistrer le voyage",
+    "saveBusy": "Enregistrement…",
+    "savedAs": "Enregistré sous",
+    "openDashboard": "Ouvrir le tableau de bord",
+    "galleryPrev": "Photo précédente",
+    "galleryNext": "Photo suivante",
+    "galleryGoTo": "Aller à la photo"
+  },
+  "auth": {
+    "meta": {
+      "title": "Compte Adair — connexion ou inscription",
+      "description": "Connectez-vous à Adair Travel pour retrouver vos voyages, vos préférences et télécharger vos factures en PDF.",
+      "ogTitle": "Compte Adair — connexion ou inscription",
+      "ogDescription": "Vos voyages, vos préférences et vos factures réunis dans votre espace client."
+    },
+    "signInTitle": "Connexion",
+    "signUpTitle": "Créer un compte",
+    "lead": "Vos voyages, préférences et factures réunis au même endroit.",
+    "fullName": "Nom complet",
+    "email": "E-mail",
+    "password": "Mot de passe",
+    "submitBusy": "Un instant…",
+    "signIn": "Se connecter",
+    "signUp": "S'inscrire",
+    "toSignUp": "Je n'ai pas encore de compte",
+    "toSignIn": "J'ai déjà un compte",
+    "confirmSent": "Consultez votre boîte de réception — un lien de confirmation vous attend.",
+    "genericError": "Une erreur est survenue",
+    "demoHint": "Vous préférez d'abord voir la démo ?",
+    "demoLink": "Ouvrir l'assistant"
+  },
+  "dashboard": {
+    "meta": {
+      "title": "Tableau de bord Adair — voyages et factures",
+      "description": "Vos voyages Adair enregistrés, vos préférences et vos factures disponibles au téléchargement en PDF.",
+      "ogTitle": "Tableau de bord Adair",
+      "ogDescription": "Voyages, préférences et factures réunis au même endroit."
+    },
+    "loadError": "Impossible de charger le tableau de bord. Veuillez rafraîchir la page.",
+    "title": "Mes voyages",
+    "signOut": "Se déconnecter",
+    "loading": "Chargement des voyages…",
+    "empty": "Vous n'avez pas encore de voyage enregistré.",
+    "emptyCta": "Réserver un premier voyage",
+    "invoice": "Télécharger la facture (PDF)",
+    "deleteTrip": "Supprimer le voyage",
+    "profileTitle": "Profil de voyage",
+    "profileLead": "Enregistrez-le une fois — chaque voyage et facture à venir suivra ces critères.",
+    "fields": {
+      "fullName": "Nom complet",
+      "company": "Entreprise (facturation)",
+      "taxId": "Numéro de VAT",
+      "airlines": "Compagnies préférées",
+      "cabin": "Classe de cabine",
+      "seat": "Préférence de siège",
+      "chains": "Chaînes hôtelières",
+      "diet": "Régime alimentaire",
+      "budget": "Budget par séjour",
+      "currency": "Devise"
+    },
+    "saveIdle": "Enregistrer les préférences",
+    "saveBusy": "Enregistrement…",
+    "saved": "Enregistré."
+  },
+  "investors": {
+    "meta": {
+      "title": "Adair Travel pour les investisseurs — modèle, marge, tour de table",
+      "description": "Adair Travel réunit vol, hôtel et voiture en une seule réservation. Modèle de revenus, marge sur tarifs hôteliers négociés et conditions du tour d'amorçage.",
+      "ogTitle": "Adair Travel pour les investisseurs",
+      "ogDescription": "Un seul assistant au lieu de cinq applications. Une marge issue de nos tarifs d'hôtel négociés, sans dépendre des commissions d'OTA."
+    },
+    "badge": "Tour d'amorçage · documentation investisseurs",
+    "titleLine1": "Le voyage d'affaires exige cinq applications.",
+    "titleLine2": "Avec nous, une seule phrase suffit.",
+    "lead": "Adair Travel transforme une simple demande en un vol, un hôtel et une voiture réunis sur une seule carte et une seule facture. Nous tirons nos revenus de nos propres tarifs d'hôtel négociés, non d'une commission de comparateur — offrant ainsi un prix plus doux et une marge supérieure.",
+    "metrics": [
+      {
+        "label": "Valeur moyenne par voyage",
+        "value": "€1,240"
+      },
+      {
+        "label": "Marge brute par voyage",
+        "value": "11–17%"
+      },
+      {
+        "label": "Temps de réservation",
+        "value": "< 40 s"
+      },
+      {
+        "label": "Applications remplacées",
+        "value": "5"
+      }
+    ],
+    "revenueTitle": "Structure des revenus",
+    "revenue": [
+      {
+        "title": "Tarif négocié",
+        "body": "Nous achetons les chambres à nos tarifs d'entreprise pour les revendre sous le prix public des OTA. La marge nous revient directement, sans intermédiaire.",
+        "margin": "8–14%"
+      },
+      {
+        "title": "Commission aérienne (NDC)",
+        "body": "Distribution des vols via NDC : commission d'agence associée à des frais de gestion pour le traitement centralisé des échanges et remboursements.",
+        "margin": "1–3%"
+      },
+      {
+        "title": "Abonnement d'entreprise",
+        "body": "Les équipes souscrivent pour paramétrer profils, règles de dépense et recevoir une facture unique avec VAT pour l'ensemble du séjour plutôt que trois justificatifs.",
+        "margin": "€29 / user / mo."
+      }
+    ],
+    "unitTitle": "Voyage type — économie unitaire",
+    "colItem": "Prestation",
+    "colPrice": "Prix client",
+    "colMargin": "Notre marge",
+    "unit": [
+      {
+        "item": "Vol (LOT, NDC)",
+        "price": "€312",
+        "margin": "€6"
+      },
+      {
+        "item": "Hôtel, 1 nuit (tarif négocié)",
+        "price": "€742",
+        "margin": "€96"
+      },
+      {
+        "item": "Voiture, 2 jours",
+        "price": "€186",
+        "margin": "€22"
+      }
+    ],
+    "unitTotal": "Total, une seule réservation",
+    "unitNote": "Liaison Varsovie–Milan, chiffres indicatifs calculés d'après les tarifs fournisseurs de test.",
+    "askTitle": "Nos ambitions",
+    "askBody": "Nous levons un tour d'amorçage pour étendre nos accords hôteliers négociés à dix métropoles d'affaires, intégrer la gestion complète des modifications au sein d'une même interface et déployer l'offre auprès d'équipes de 20 à 200 personnes.",
+    "contact": "Nous contacter",
+    "seeProduct": "Découvrir le produit en direct"
+  },
+  "invoice": {
+    "documentTitle": "FACTURE / FICHE VOYAGE",
+    "seller": "ÉMETTEUR",
+    "buyer": "DESTINATAIRE",
+    "item": "DÉSIGNATION",
+    "reference": "RÉFÉRENCE DE L'OFFRE",
+    "net": "HORS TAXES",
+    "netTotal": "Total hors taxes",
+    "vat": "VAT",
+    "totalDue": "Net à payer",
+    "issued": "émise le",
+    "number": "N°",
+    "vatId": "N° de VAT",
+    "kindFlight": "Vol",
+    "kindHotel": "Hôtel",
+    "kindCar": "Voiture",
+    "demoNote": "Document conceptuel — données à titre indicatif",
+    "liveNote": "Prestations chiffrées d'après les offres de prestataires obtenues via l'API Adair",
+    "paymentNote": "Règlement : prélèvement unique sur carte d'entreprise · échéance à 14 jours",
+    "hotelNote": "Hôtel facturé au tarif négocié",
+    "tagline": "Adair Travel · One request. The whole trip. · adair.travel"
+  }
+}

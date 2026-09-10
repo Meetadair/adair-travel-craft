@@ -4,7 +4,26 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const askSchema = z.object({
   message: z.string().min(3).max(1000),
+  locale: z.string().max(8).optional(),
 });
+
+/** Language the assistant answers in, keyed by UI locale. */
+const REPLY_LANGUAGE: Record<string, string> = {
+  en: "English",
+  de: "German",
+  ja: "Japanese",
+  uk: "Ukrainian",
+  zh: "Simplified Chinese",
+  es: "Spanish",
+  pt: "Portuguese",
+  fr: "French",
+  it: "Italian",
+  sr: "Serbian (Latin script)",
+  fi: "Finnish",
+  no: "Norwegian",
+  sv: "Swedish",
+  pl: "Polish",
+};
 
 const parsedSchema = z.object({
   originCity: z.string().default("Warsaw"),
@@ -39,7 +58,7 @@ function fallbackParse(message: string): ParsedRequest {
 }
 
 /** Turns a free-form natural-language request into a structured trip search. */
-async function understand(message: string): Promise<ParsedRequest> {
+async function understand(message: string, locale = "en"): Promise<ParsedRequest> {
   const apiKey = process.env["LOVABLE_API_KEY"];
   if (!apiKey) return fallbackParse(message);
 
@@ -60,7 +79,7 @@ async function understand(message: string): Promise<ParsedRequest> {
             `with fields: originCity, originIata (IATA code of the origin city), destinationCity, destinationIata ` +
             `(IATA code of the destination city), departDate (YYYY-MM-DD), returnDate (YYYY-MM-DD), ` +
             `cabinClass (economy|premium_economy|business), needsCar (boolean), notes, ` +
-            `reply (one short sentence in English summarizing the understood request). ` +
+            `reply (one short sentence summarizing the understood request, written in ${REPLY_LANGUAGE[locale] ?? "English"}). ` +
             `If the origin city is not given, use Warsaw (WAW).`,
         },
         { role: "user", content: message },
@@ -89,7 +108,7 @@ async function understand(message: string): Promise<ParsedRequest> {
 export const composeTrip = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => askSchema.parse(data))
   .handler(async ({ data }) => {
-    const parsed = await understand(data.message);
+    const parsed = await understand(data.message, data.locale ?? "en");
     const { searchTrip } = await import("./travel-search.server");
     const result = await searchTrip({
       originCity: parsed.originCity,
