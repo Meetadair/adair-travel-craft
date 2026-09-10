@@ -822,30 +822,64 @@ function Principles({ t }: { t: Dict }) {
   );
 }
 
+function Teams({ t }: { t: Dict }) {
+  const c = t.home.campaign;
+  return (
+    <section className="mx-auto max-w-5xl px-6 py-20">
+      <SectionLabel>{c.teamsLabel}</SectionLabel>
+      <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
+        {c.teamsTitle}
+      </h2>
+      <div className="hairline-card mt-8 flex flex-col gap-6 p-7 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-start gap-3.5">
+          <div className="flex size-10 shrink-0 items-center justify-center rounded-lg border border-border bg-background text-primary">
+            <Users className="size-5" />
+          </div>
+          <p className="max-w-md text-sm leading-relaxed text-muted-foreground">{c.teamsLine}</p>
+        </div>
+        <div className="sm:w-80 sm:shrink-0">
+          <EarlyAccess t={t} type="teams" label={c.teamsCta} />
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export function HomePage() {
   const t = useT();
+  const [submission, setSubmission] = useState<Submission | null>(null);
+  const reduced = usePrefersReducedMotion();
   const divider = (
     <div className="mx-auto max-w-6xl px-6">
       <div className="border-t border-border" />
     </div>
   );
 
+  function runDemo(sentence: string) {
+    setSubmission({ sentence, key: Date.now() });
+    document
+      .getElementById("demo")
+      ?.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" });
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <SiteNav />
 
       <main>
-        <Hero t={t} />
+        <Hero t={t} onSubmit={runDemo} />
         {divider}
         <Comparison t={t} />
         {divider}
-        <ChatDemo t={t} />
+        <ChatDemo t={t} submission={submission} />
         {divider}
         <MyTrips t={t} />
         {divider}
         <TravelProfile t={t} />
         {divider}
         <Principles t={t} />
+        {divider}
+        <Teams t={t} />
       </main>
 
       <footer className="mx-auto max-w-6xl px-6 pb-10 pt-6">
