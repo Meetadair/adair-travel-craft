@@ -15,20 +15,24 @@ export const en = {
 
   home: {
     meta: {
-      title: "Adair Travel — One request. The whole trip.",
+      title: "Adair Travel — One sentence. The whole trip.",
       description:
         "Adair is an AI travel assistant that bundles your flight, hotel, and car into a single booking — all from one chat window.",
-      ogTitle: "Adair Travel — One request. The whole trip.",
+      ogTitle: "Adair Travel — One sentence. The whole trip.",
       ogDescription:
         "Flight, hotel, and car in a single booking card. Instead of five apps — one conversation.",
     },
     hero: {
       badge: "AI travel assistant — concept",
-      titleLine1: "One request.",
+      titleLine1: "One sentence.",
       titleLine2: "The whole trip.",
       lead: "Adair bundles your flight, hotel, and car into a single booking card — all in one chat window. Instead of five apps, one conversation.",
       ctaPrimary: "See how it works",
       ctaSecondary: "Three principles",
+      inputLabel: "Describe your trip in one sentence",
+      inputPlaceholder:
+        "e.g. Rome, Friday to Sunday, hotel with a terrace, invoice to my company",
+      inputSubmit: "Show me the trip",
     },
     comparison: {
       label: "Why Adair",
