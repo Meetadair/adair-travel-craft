@@ -2,6 +2,7 @@ import { PDFDocument, rgb } from "pdf-lib";
 import fontkit from "@pdf-lib/fontkit";
 import fontRegularUrl from "@/assets/fonts/PlusJakartaSans-Regular.ttf";
 import fontBoldUrl from "@/assets/fonts/PlusJakartaSans-Bold.ttf";
+import { dict } from "@/lib/i18n";
 
 const CREAM = rgb(0.984, 0.973, 0.949);
 const CARD = rgb(1, 1, 1);
@@ -41,6 +42,8 @@ export type InvoiceData = {
   endDate: string;
   currency: string;
   live: boolean;
+  /** Invoice label language. Non-Latin scripts fall back to English labels. */
+  locale?: string;
   buyer: {
     name: string;
     company: string;
@@ -53,11 +56,12 @@ export type InvoiceData = {
 const money = (value: number, currency: string) =>
   `${value.toFixed(2).replace(".", ",")} ${currency}`;
 
-const KIND_LABEL: Record<string, string> = {
-  flight: "Flight",
-  hotel: "Hotel",
-  car: "Car",
-};
+/** The embedded font covers Latin scripts only. */
+const LATIN_LOCALES = ["en","de","es","pt","fr","it","sr","fi","no","sv","pl"];
+
+function labels(locale: string | undefined) {
+  return dict(locale && LATIN_LOCALES.includes(locale) ? locale : "en").invoice;
+}
 
 export async function downloadTripInvoice(data: InvoiceData) {
   const doc = await PDFDocument.create();
