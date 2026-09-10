@@ -275,7 +275,7 @@ function AssistantPage() {
                   <div>
                     <p className="text-xs text-muted-foreground">Razem, jedna rezerwacja</p>
                     <p className="font-display text-xl font-semibold text-primary">
-                      {money(result.total, result.currency)}
+                      {money(total, result.currency)}
                     </p>
                   </div>
                   <button
