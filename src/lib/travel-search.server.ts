@@ -16,6 +16,8 @@ export type TripOffer = {
   live: boolean;
   /** Optional provider photos (empty when the provider exposes none). */
   images?: string[];
+  /** Optional swap-in options (hotels): shown only on demand. */
+  alternatives?: Array<Omit<TripOffer, "alternatives">>;
 };
 
 export type TripSearchInput = {
