@@ -9,29 +9,32 @@
   },
   "home": {
     "meta": {
-      "title": "Adair Travel — Én forespørsel. Hele reisen.",
-      "description": "Adair er en AI-reiseassistent som samler fly, hotell og leiebil i én bestilling — direkte i en chat.",
-      "ogTitle": "Adair Travel — Én forespørsel. Hele reisen.",
-      "ogDescription": "Fly, hotell og leiebil i ett enkelt bestillingskort. I stedet for fem apper — én samtale."
+      "title": "Adair Travel — Én setning. Hele reisen.",
+      "description": "Adair er en AI-reiseassistent som samler fly, hotell og leiebil i én bestilling — fra ett samtalevindu.",
+      "ogTitle": "Adair Travel — Én setning. Hele reisen.",
+      "ogDescription": "Fly, hotell og leiebil i ett reisekort. Én samtale i stedet for fem apper."
     },
     "hero": {
       "badge": "AI-reiseassistent — konsept",
-      "titleLine1": "Én forespørsel.",
+      "titleLine1": "Én setning.",
       "titleLine2": "Hele reisen.",
-      "lead": "Adair samler fly, hotell og leiebil i ett bestillingskort — alt i ett chattevindu. I stedet for fem apper, én samtale.",
+      "lead": "Adair samler fly, hotell og leiebil i ett reisekort — alt i ett samtalevindu. Én samtale i stedet for fem apper.",
       "ctaPrimary": "Se hvordan det fungerer",
-      "ctaSecondary": "Tre prinsipper"
+      "ctaSecondary": "Tre prinsipper",
+      "inputLabel": "Beskriv reisen din med én setning",
+      "inputPlaceholder": "f.eks. Roma, fredag til søndag, hotell med terrasse, faktura til firmaet",
+      "inputSubmit": "Vis meg reisen"
     },
     "comparison": {
       "label": "Hvorfor Adair",
       "title": "Fem apper, eller ett vindu.",
       "withoutTitle": "Uten Adair",
       "withoutTag": "5 apper",
-      "withoutFooter": "5 bestillinger · 5 bekreftelser · 5 steder å følge med",
+      "withoutFooter": "5 bestillinger · 5 bekreftelser · 5 steder å sjekke",
       "withTitle": "Med Adair",
       "withTag": "1 samtale",
       "withFooter": "1 bestilling · 1 bekreftelse ·",
-      "quote": "\"Jeg må være i Milano torsdag morgen, tilbake fredag kveld, et sted nær Duomo, og en bil klar ved ankomst.\"",
+      "quote": "\"Jeg må til Milano torsdag morgen, tilbake fredag kveld, et sted nær Duomo, og leiebil på plass.\"",
       "bundle": "Fly + hotell + leiebil — ett kort",
       "apps": [
         {
@@ -44,7 +47,7 @@
         },
         {
           "name": "Rental agency",
-          "detail": "separat leiebilbestilling"
+          "detail": "egen leiebilbestilling"
         },
         {
           "name": "Uber",
@@ -52,46 +55,92 @@
         },
         {
           "name": "OpenTable",
-          "detail": "restauranter, hver for seg"
+          "detail": "restauranter, separat"
         }
       ]
     },
     "demo": {
-      "label": "Demonstrasjon",
+      "label": "Samtaledemo",
       "title": "Én melding er alt som skal til.",
-      "userMessage": "Jeg må være i Milano torsdag morgen, tilbake fredag kveld, et sted nær Duomo, og en bil klar ved ankomst.",
+      "userMessage": "Jeg må til Milano torsdag morgen, tilbake fredag kveld, et sted nær Duomo, og leiebil på plass.",
       "you": "Deg",
-      "cardTitle": "Milano · Thu – Fri",
-      "cardSubtitle": "Satt sammen etter din reiseprofil",
-      "flightTitle": "LOT 391 · Warsaw → Milan",
-      "flightDetail": "Thu 6:55 – 9:05 AM · returns Fri 7:40 PM · vindusplass, foretrukket flyselskap",
+      "cardTitle": "Milano · tor – fre",
+      "cardSubtitle": "Satt sammen etter reiseprofilen din",
+      "flightTitle": "LOT 391 · Warszawa → Milano",
+      "flightDetail": "Tor 6:55 – 9:05 AM · retur fre 7:40 PM · vindusplass, foretrukket flyselskap",
       "flightTagClass": "Premium Economy",
       "hotelTitle": "Park Hyatt Milano",
-      "hotelDetail": "1 night · King-rom, rolig etasje · 200 m from the Duomo",
+      "hotelDetail": "1 natt · King-rom, rolig etasje · 200 m fra Duomo",
       "hotelTag": "forhandlet pris",
-      "carTitle": "BMW 3 Series · pickup at Linate",
-      "carDetail": "Thu 9:30 AM – Fri 6:30 PM · full forsikring, uten depositum",
+      "carTitle": "BMW 3 Series · henting på Linate",
+      "carDetail": "Tor 9:30 AM – fre 6:30 PM · full forsikring, uten depositum",
       "carTag": "automatgir",
       "total": "Totalt, én bestilling",
       "bookAll": "Bestill alt",
-      "footnote": "3 elementer · 1 betaling · 1 bestillingsnummer"
+      "footnote": "3 deler · 1 betaling · 1 bestillingsnummer",
+      "typing": "Adair setter sammen reisen din…",
+      "saved": "Du sparte €96 og 2 t 40 min mot å bestille selv",
+      "savedNote": "sammenlignet med gjennomsnittlige offentlige priser og tidsbruk på separate nettsteder",
+      "invoiceLine": "Faktura → firmaet ditt",
+      "share": "Del dette reisekortet",
+      "shareCopied": "Kopiert",
+      "cardTitleTpl": "{city} · {day1} – {day2}",
+      "flightTitleTpl": "LOT 391 · Warszawa → {city}",
+      "flightDetailTpl": "{day1} 6:55 – 9:05 AM · retur {day2} 7:40 PM · vindusplass, foretrukket flyselskap",
+      "hotelDetailTpl": "1 natt · King-rom, rolig etasje · i det historiske sentrum",
+      "carTitleTpl": "BMW 3 Series · henting på {code}",
+      "carDetailTpl": "{day1} 9:30 AM – {day2} 6:30 PM · full forsikring, uten depositum",
+      "weekdays": [
+        "Mandag",
+        "Tirsdag",
+        "Onsdag",
+        "Torsdag",
+        "Fredag",
+        "Lørdag",
+        "Søndag"
+      ],
+      "weekdaysShort": [
+        "Man",
+        "Tir",
+        "Ons",
+        "Tor",
+        "Fre",
+        "Lør",
+        "Søn"
+      ]
+    },
+    "campaign": {
+      "earlyAccess": "Få tidlig tilgang",
+      "emailLabel": "E-posten din",
+      "emailPlaceholder": "deg@selskap.no",
+      "join": "Bli med",
+      "joining": "Et øyeblikk…",
+      "success": "Du er inne. Del lenken din — €40 i reisekreditt til deg, €20 for hver venn som bestiller.",
+      "referralLabel": "Din vervelenke",
+      "copy": "Kopier lenke",
+      "copied": "Kopiert",
+      "error": "Det gikk ikke gjennom. Vennligst prøv igjen.",
+      "teamsLabel": "For team",
+      "teamsTitle": "Adair for Teams",
+      "teamsLine": "Én reisepolicy, én faktura, ett sted for hele teamet. Kommer etter lansering.",
+      "teamsCta": "Sett deg på ventelisten for Teams"
     },
     "trips": {
       "label": "Mine reiser",
-      "title": "Alt på ett sted etter bestilling.",
+      "title": "Alt på ett sted etter at du har bestilt.",
       "flight": "Fly",
       "hotel": "Hotell",
       "car": "Leiebil",
       "flightTitle": "LOT 391 · WAW → MXP",
-      "flightDetail": "Thu, Sep 18 · 6:55 AM · sete 7A",
-      "flightCode": "Booking ADR-8K2M4F",
+      "flightDetail": "Tor, 18. sep · 6:55 AM · sete 7A",
+      "flightCode": "Bestilling ADR-8K2M4F",
       "hotelTitle": "Park Hyatt Milano",
-      "hotelDetail": "Check-in Sep 18 · 1 night · King",
-      "hotelCode": "Confirmation PH-55271",
+      "hotelDetail": "Innsjekking 18. sep · 1 natt · King",
+      "hotelCode": "Bekreftelse PH-55271",
       "carTitle": "BMW 3 Series · Linate",
-      "carDetail": "Pickup 9:30 AM · return Fri 6:30 PM",
+      "carDetail": "Henting 9:30 AM · retur fre 6:30 PM",
       "carCode": "Voucher ADR-CAR-0912",
-      "dates": "Thu 18 – Fri 19 Sep",
+      "dates": "Tor 18 – fre 19 sep",
       "place": "Milano, Italia",
       "departs": "avreise om 6 dager",
       "paid": "betalt",
@@ -100,16 +149,16 @@
     },
     "profile": {
       "label": "Reiseprofil",
-      "titleLine1": "Angi én gang.",
-      "titleLine2": "Fungerer hver gang.",
-      "lead": "Adair lærer preferansene dine én gang — og tilpasser hver reise automatisk. Ingen filtre å klikke på, ingenting å sammenligne.",
+      "titleLine1": "Angi det én gang.",
+      "titleLine2": "Det fungerer hver gang.",
+      "lead": "Adair lærer preferansene dine én gang — og hver reise etter det følger dem automatisk. Ingen filtre å klikke på, ingenting å sammenligne.",
       "activeCount": "18 aktive preferanser",
       "groups": [
         {
           "title": "Fly",
           "items": [
             "LOT, Lufthansa, Air France",
-            "Premium Economy for flyreiser over 2t",
+            "Premium Economy for flyreiser over 2 t",
             "Vindusplass, foran i kabinen"
           ]
         },
@@ -126,14 +175,14 @@
           "items": [
             "Glutenfritt",
             "Frokost inkludert",
-            "Sen utsjekk etter 11:00 AM"
+            "Sen utsjekking etter kl. 11:00"
           ]
         },
         {
           "title": "Budsjett",
           "items": [
             "Opptil €1,500 / 2-dagersreise",
-            "Bedriftsfaktura med VAT",
+            "VAT-faktura til firma",
             "EUR, ett kort"
           ]
         }
@@ -141,19 +190,19 @@
     },
     "principles": {
       "label": "Tre prinsipper",
-      "title": "Dette bygger Adair på.",
+      "title": "Dette er hva Adair bygger på.",
       "items": [
         {
           "title": "Én reise, ikke tre bestillinger",
-          "text": "Fly, hotell og leiebil utgjør én reise — derfor bør de være én bestilling. Ett vindu, én betaling, én bekreftelse."
+          "text": "Et fly, et hotell og en leiebil utgjør én reise — derfor bør de være én bestilling. Ett vindu, én betaling, én bekreftelse."
         },
         {
           "title": "En pris ingen andre gir deg",
-          "text": "Hoteller til våre egne forhandlede priser — ikke ordinære priser fra Booking.com. Du ser forskjellen direkte i oversikten."
+          "text": "Hoteller til våre egne forhandlede priser — ikke ordinære Booking.com-priser. Du ser forskjellen direkte i oversikten."
         },
         {
           "title": "Ett sted etter at du har bestilt",
-          "text": "Bekreftelsesnumre, vouchere, endringer og kanselleringer — alt i én felles oversikt helt frem til reisens siste dag."
+          "text": "Bekreftelsesnumre, vouchere, endringer og avbestillinger — alt i én Mine reiser-visning, helt frem til turens siste dag."
         }
       ]
     },
@@ -162,21 +211,21 @@
   "assistant": {
     "meta": {
       "title": "Adair Assistant — sett sammen hele reisen i én samtale",
-      "description": "Fortell oss hvor og når du skal reise. Adair søker blant reelle tilbud på fly, hotell og leiebil og samler dem i ett kort.",
+      "description": "Fortell oss hvor og når du skal. Adair søker blant reelle tilbud på fly, hotell og leiebil, og setter dem sammen i ett kort.",
       "ogTitle": "Adair Assistant — en hel reise i én samtale",
-      "ogDescription": "Reelle tilbud på fly, hotell og leiebil i ett bestillingsklart kort."
+      "ogDescription": "Ekte tilbud på fly, hotell og leiebil i ett bestillbart kort."
     },
     "title": "Fortell oss hvor du skal.",
-    "lead": "Adair forstår naturlig språk, sjekker tilgjengelighet hos leverandører og setter sammen fly, hotell og leiebil i ett bestillingsklart kort.",
+    "lead": "Adair forstår vanlig språk, sjekker tilgjengelighet hos leverandører og setter sammen fly, hotell og leiebil i ett bestillbart reisekort.",
     "placeholder": "f.eks. Jeg må være i Milano torsdag morgen, tilbake fredag kveld…",
     "submitIdle": "Sett sammen reise",
     "submitBusy": "Søker…",
     "examples": [
-      "Jeg må være i Milano torsdag morgen, tilbake fredag kveld, et sted nær Duomo og en bil klar.",
-      "Konferanse i Barcelona Oct 12–14, premium economy, hotell nær kongressenteret.",
-      "Tur til London på mandag, hjem onsdag, ikke behov for leiebil."
+      "Jeg må være i Milano torsdag morgen, tilbake fredag kveld, et sted nær Duomo og en leiebil klar.",
+      "Konferanse i Barcelona 12.–14. okt, premium economy, hotell nær kongressenteret.",
+      "Tur til London på mandag, tilbake onsdag, trenger ikke bil."
     ],
-    "error": "Vi kunne ikke sette sammen denne reisen. Prøv igjen, eller oppgi datoene nøyaktig.",
+    "error": "Vi klarte ikke å sette sammen denne reisen. Prøv igjen eller oppgi datoer mer presist.",
     "sourceLive": "priser fra leverandørenes API-er",
     "sourcePartial": "enkelte elementer fra leverandørenes API-er",
     "sourceDemo": "eksempeldata",
@@ -187,7 +236,7 @@
     "saveIdle": "Lagre reise",
     "saveBusy": "Lagrer…",
     "savedAs": "Lagret som",
-    "openDashboard": "Åpne oversikt",
+    "openDashboard": "Åpne dashbord",
     "galleryPrev": "Forrige bilde",
     "galleryNext": "Neste bilde",
     "galleryGoTo": "Gå til bilde"
@@ -195,34 +244,34 @@
   "auth": {
     "meta": {
       "title": "Adair-konto — logg inn eller opprett konto",
-      "description": "Logg inn på Adair Travel for å ta vare på reiser, preferanser og laste ned PDF-fakturaer.",
+      "description": "Logg inn på Adair Travel for å lagre reisene dine, preferanser og laste ned PDF-fakturaer.",
       "ogTitle": "Adair-konto — logg inn eller opprett konto",
-      "ogDescription": "Dine reiser, preferanser og fakturaer samlet i ett kundepanel."
+      "ogDescription": "Reisene dine, preferanser og fakturaer i ett kundedashbord."
     },
     "signInTitle": "Logg inn",
     "signUpTitle": "Opprett konto",
-    "lead": "Dine reiser, preferanser og fakturaer på ett sted.",
+    "lead": "Reisene dine, preferanser og fakturaer på ett sted.",
     "fullName": "Fullt navn",
     "email": "E-post",
     "password": "Passord",
     "submitBusy": "Et øyeblikk…",
     "signIn": "Logg inn",
     "signUp": "Opprett konto",
-    "toSignUp": "Jeg har ikke konto ennå",
+    "toSignUp": "Jeg har ikke en konto ennå",
     "toSignIn": "Jeg har allerede en konto",
     "confirmSent": "Sjekk innboksen din — vi har sendt deg en bekreftelseslenke.",
     "genericError": "Noe gikk galt",
-    "demoHint": "Vil du se en demo først?",
+    "demoHint": "Vil du heller se en demo først?",
     "demoLink": "Åpne assistenten"
   },
   "dashboard": {
     "meta": {
-      "title": "Adair-kundepanel — reiser og fakturaer",
-      "description": "Dine lagrede Adair-reiser, reisepreferanser og fakturaer klare for PDF-nedlasting.",
-      "ogTitle": "Adair-kundepanel",
+      "title": "Adair kundedashbord — reiser og fakturaer",
+      "description": "Dine lagrede Adair-reiser, reisepreferanser og fakturaer tilgjengelig for PDF-nedlasting.",
+      "ogTitle": "Adair kundedashbord",
       "ogDescription": "Reiser, preferanser og fakturaer på ett sted."
     },
-    "loadError": "Vi kunne ikke laste inn oversikten. Vennligst oppdater siden.",
+    "loadError": "Vi kunne ikke laste inn dashbordet. Vennligst oppdater siden.",
     "title": "Mine reiser",
     "signOut": "Logg ut",
     "loading": "Laster reiser…",
@@ -231,10 +280,10 @@
     "invoice": "Last ned faktura (PDF)",
     "deleteTrip": "Slett reise",
     "profileTitle": "Reiseprofil",
-    "profileLead": "Angi én gang — alle fremtidige reiser og fakturaer vil følge disse preferansene.",
+    "profileLead": "Angi det én gang — alle fremtidige reiser og fakturaer vil følge disse preferansene.",
     "fields": {
       "fullName": "Fullt navn",
-      "company": "Selskap (fakturamottaker)",
+      "company": "Firma (fakturamottaker)",
       "taxId": "VAT-nummer",
       "airlines": "Foretrukne flyselskaper",
       "cabin": "Kabinklasse",
@@ -250,15 +299,15 @@
   },
   "investors": {
     "meta": {
-      "title": "Adair Travel for investorer — modell, margin, emisjon",
-      "description": "Adair Travel samler fly, hotell og leiebil i én bestilling. Forretningsmodell, margin fra forhandlede hotellavtaler og vilkår for såkornrunden.",
+      "title": "Adair Travel for investorer — modell, margin, runde",
+      "description": "Adair Travel samler fly, hotell og leiebil i én bestilling. Inntektsmodell, margin fra forhandlede hotellpriser og betingelser for såkornrunden.",
       "ogTitle": "Adair Travel for investorer",
-      "ogDescription": "Én assistent i stedet for fem apper. Margin fra egne forhandlede hotellpriser, ikke provisjon fra sammenligningssider."
+      "ogDescription": "Én assistent i stedet for fem apper. Margin fra egne forhandlede hotellpriser, ikke provisjoner fra bookingsider."
     },
     "badge": "Såkornrunde · investormateriell",
-    "titleLine1": "Forretningsreiser i dag betyr fem apper.",
-    "titleLine2": "Hos oss er det én setning.",
-    "lead": "Adair Travel er en assistent som forvandler én forespørsel til fly, hotell og leiebil samlet i ett kort og én faktura. Vi tjener på egne forhandlede hotellpriser, ikke provisjon fra sammenligningssider — derfor er prisen vår lavere og marginen høyere.",
+    "titleLine1": "Forretningsreiser i dag krever fem apper.",
+    "titleLine2": "Hos oss holder det med én setning.",
+    "lead": "Adair Travel er en assistent som gjør én forespørsel om til fly, hotell og leiebil samlet i ett kort og én faktura. Vi tjener på våre egne forhandlede hotellpriser, ikke på provisjon fra sammenligningstjenester — derfor er prisen vår lavere og marginen vår høyere.",
     "metrics": [
       {
         "label": "Gjennomsnittlig reiseverdi",
@@ -269,11 +318,11 @@
         "value": "11–17%"
       },
       {
-        "label": "Tid for å bestille en reise",
+        "label": "Tid for å bestille reise",
         "value": "< 40 s"
       },
       {
-        "label": "Erstatter antall apper",
+        "label": "Apper erstattet",
         "value": "5"
       }
     ],
@@ -281,45 +330,45 @@
     "revenue": [
       {
         "title": "Forhandlet pris",
-        "body": "Vi kjøper hotellrom til egne bedriftspriser og selger dem under ordinære priser fra OTA-er. Marginen blir hos oss, ikke hos et mellomledd.",
+        "body": "Vi kjøper rom til vår egen bedriftspris og selger dem under den åpne OTA-prisen. Marginen blir hos oss, ikke hos et mellomledd.",
         "margin": "8–14%"
       },
       {
         "title": "Flyselskapsprovisjon (NDC)",
-        "body": "Flybilletter via NDC-kanalen: distribusjonsprovisjon pluss et servicegebyr for håndtering av endringer og refusjoner i ett felles vindu.",
+        "body": "Flyreiser via NDC-kanalen: en distribusjonsprovisjon pluss et servicegebyr for håndtering av endringer og refusjoner i ett enkelt vindu.",
         "margin": "1–3%"
       },
       {
         "title": "Bedriftsabonnement",
-        "body": "Team betaler for felles reiseprofil, utgiftspolicy og én samlet VAT-faktura for hele reisen i stedet for tre separate bilag.",
-        "margin": "€29 / user / mo."
+        "body": "Team betaler for reiseprofil, utgiftspolicy og én samlet VAT-faktura for hele reisen i stedet for tre dokumenter.",
+        "margin": "€29 / bruker / md."
       }
     ],
     "unitTitle": "Eksempelreise — enhetsøkonomi",
-    "colItem": "Element",
+    "colItem": "Post",
     "colPrice": "Kundepris",
     "colMargin": "Vår margin",
     "unit": [
       {
-        "item": "Flight (LOT, NDC)",
+        "item": "Fly (LOT, NDC)",
         "price": "€312",
         "margin": "€6"
       },
       {
-        "item": "Hotel, 1 night (negotiated rate)",
+        "item": "Hotell, 1 natt (forhandlet pris)",
         "price": "€742",
         "margin": "€96"
       },
       {
-        "item": "Car, 2 days",
+        "item": "Leiebil, 2 dager",
         "price": "€186",
         "margin": "€22"
       }
     ],
     "unitTotal": "Totalt, én bestilling",
-    "unitNote": "Warsaw–Milan route, illustrative figures based on test supplier rates.",
-    "askTitle": "Hva vi ser etter",
-    "askBody": "Vi henter en såkornrunde for å utvide basen av forhandlede hotellpriser i ti sentrale forretningsbyer, levere full støtte for endringer i ett vindu, og selge til team på 20–200 ansatte.",
+    "unitNote": "Ruten Warszawa–Milano, illustrative tall basert på testpriser fra leverandører.",
+    "askTitle": "Hva vi søker",
+    "askBody": "Vi henter en såkornrunde for å utvide basen av forhandlede hotellpriser til ti forretningsbyer, levere full støtte for reiseendringer i ett vindu, og selge til team på 20–200 personer.",
     "contact": "Ta kontakt",
     "seeProduct": "Se produktet live"
   },
@@ -327,10 +376,10 @@
     "documentTitle": "FAKTURA / REISEKORT",
     "seller": "SELGER",
     "buyer": "KJØPER",
-    "item": "ELEMENT",
+    "item": "POST",
     "reference": "TILBUDSREFERANSE",
     "net": "NETTO",
-    "netTotal": "Netto totalt",
+    "netTotal": "Nettototal",
     "vat": "VAT",
     "totalDue": "Totalt å betale",
     "issued": "utstedt",
@@ -339,9 +388,9 @@
     "kindFlight": "Fly",
     "kindHotel": "Hotell",
     "kindCar": "Leiebil",
-    "demoNote": "Konseptdokument — elementene inneholder eksempeldata",
-    "liveNote": "Elementer priset fra leverandørtilbud hentet via Adair API",
-    "paymentNote": "Betaling: én samlet firmakorttransaksjon · 14-dagers forfall",
+    "demoNote": "Konseptdokument — postene inneholder eksempeldata",
+    "liveNote": "Poster priset fra leverandørtilbud hentet via Adair-API-et",
+    "paymentNote": "Betaling: én firmakorttransaksjon · 14 dagers forfall",
     "hotelNote": "Hotell fakturert til forhandlet pris",
     "tagline": "Adair Travel · Én forespørsel. Hele reisen. · adair.travel"
   }
