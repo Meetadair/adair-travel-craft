@@ -191,7 +191,7 @@ function AssistantPage() {
                   </p>
                 </div>
                 <div className="divide-y divide-border">
-                  {result.offers.map((o) => (
+                  {offers.map((o) => (
                     <div key={o.kind + o.offerReference} className="flex gap-4 px-5 py-4">
                       <div className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-border bg-background">
                         {ICONS[o.kind]}
