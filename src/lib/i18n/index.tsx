@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import { en, type Dict } from "./locales/en";
 import de from "./locales/de.json";
@@ -81,11 +81,29 @@ export function dict(locale: string | undefined): Dict {
   return isLocale(locale) ? dictionaries[locale] : en;
 }
 
-/** Locale of the current URL: first path segment, or English at the root. */
+const STORAGE_KEY = "adair-locale";
+
+/**
+ * Locale of the current URL (first path segment). Pages without a localized
+ * URL — the signed-in dashboard — reuse the language last chosen in the browser.
+ */
 export function useLocale(): Locale {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const first = pathname.split("/")[1];
-  return isLocale(first) ? first : "en";
+  const fromPath = isLocale(first) ? first : null;
+  const [stored, setStored] = useState<Locale | null>(null);
+
+  useEffect(() => {
+    if (fromPath) {
+      window.localStorage.setItem(STORAGE_KEY, fromPath);
+      setStored(fromPath);
+      return;
+    }
+    const saved = window.localStorage.getItem(STORAGE_KEY);
+    if (isLocale(saved ?? undefined)) setStored(saved as Locale);
+  }, [fromPath]);
+
+  return fromPath ?? stored ?? "en";
 }
 
 export function useT(): Dict {
