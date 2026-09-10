@@ -14,6 +14,8 @@ export type TripOffer = {
   amount: number;
   currency: string;
   live: boolean;
+  /** Optional provider photos (empty when the provider exposes none). */
+  images?: string[];
 };
 
 export type TripSearchInput = {

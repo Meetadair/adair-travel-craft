@@ -4,6 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { Plane, BedDouble, CarFront, Sparkles, ChevronRight, Send } from "lucide-react";
 import { SiteNav } from "@/components/site-nav";
+import { HotelGallery } from "@/components/hotel-gallery";
 import { composeTrip, saveTrip } from "@/lib/travel.functions";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -192,6 +193,12 @@ function AssistantPage() {
                           <span className="tag-pill">{o.provider}</span>
                           <span className="tag-pill">{o.offerReference.slice(0, 22)}</span>
                         </div>
+                        {o.kind === "hotel" && (
+                          <HotelGallery
+                            {...(o.images ? { images: o.images } : {})}
+                            alt={o.title}
+                          />
+                        )}
                       </div>
                       <p className="shrink-0 text-sm font-semibold text-primary">
                         {money(o.amount, o.currency)}
