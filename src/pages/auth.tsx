@@ -1,11 +1,24 @@
 import { useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteNav } from "@/components/site-nav";
+import { getAccount } from "@/lib/account.functions";
 import { LocaleLink, useLocale, useT } from "@/lib/i18n";
 
 export function AuthPage() {
   const navigate = useNavigate();
+  const fetchAccount = useServerFn(getAccount);
+
+  /** First-time travellers go through the 3-step setup, others straight in. */
+  async function continueAfterSignIn() {
+    try {
+      const account = await fetchAccount({});
+      navigate({ to: account.onboarded ? "/dashboard" : "/onboarding" });
+    } catch {
+      navigate({ to: "/dashboard" });
+    }
+  }
   const t = useT();
   const locale = useLocale();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
