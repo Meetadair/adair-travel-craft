@@ -192,18 +192,28 @@ function nightsBetween(a: string, b: string): number {
 }
 
 export async function searchStay(req: TripRequest): Promise<StayResult | null> {
+  const sample = usesTestInventory();
   const json = await duffel<{ data?: { results?: DuffelStay[] } }>("/stays/search", {
     data: {
       check_in_date: req.departDate,
       check_out_date: req.returnDate,
       rooms: 1,
       guests: [{ type: "adult" }],
-      location: {
-        radius: 3,
-        geographic_coordinates: { latitude: req.lat, longitude: req.lon },
-      },
+      location: sample
+        ? {
+            radius: TEST_LOCATION.radius,
+            geographic_coordinates: {
+              latitude: TEST_LOCATION.latitude,
+              longitude: TEST_LOCATION.longitude,
+            },
+          }
+        : {
+            radius: 3,
+            geographic_coordinates: { latitude: req.lat, longitude: req.lon },
+          },
     },
   });
+
 
   const results = (json.data?.results ?? []).filter((r) =>
     Number.isFinite(Number(r.cheapest_rate_total_amount)),
