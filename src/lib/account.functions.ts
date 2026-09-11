@@ -2,21 +2,23 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { DEFAULT_PREFS, type TravelPrefs } from "@/lib/prefs/questions";
 
-export type Preferences = {
-  seat: string;
-  cabinClass: string;
-  maxConnections: number;
-  hotelMinRating: number;
-  hotelRules: string | null;
-  carTransmission: string;
-};
+export type Preferences = TravelPrefs;
 
 export type Company = {
   id: string;
   name: string;
+  legalForm: string | null;
+  country: string | null;
+  city: string | null;
+  postcode: string | null;
+  street: string | null;
+  building: string | null;
+  addressExtra: string | null;
   vatId: string | null;
   address: string | null;
+  invoiceEmails: string[];
   invoiceEmail: string | null;
   isDefault: boolean;
 };
@@ -31,14 +33,106 @@ export type Account = {
   companies: Company[];
 };
 
-const DEFAULT_PREFS: Preferences = {
-  seat: "window",
-  cabinClass: "economy",
-  maxConnections: 1,
-  hotelMinRating: 4,
-  hotelRules: null,
-  carTransmission: "automatic",
-};
+const asList = (value: unknown): string[] =>
+  Array.isArray(value) ? value.filter((v): v is string => typeof v === "string") : [];
+
+type PrefRow = Record<string, unknown>;
+
+function rowToPrefs(row: PrefRow | null): TravelPrefs {
+  if (!row) return DEFAULT_PREFS;
+  return {
+    seat: (row["seat"] as string) ?? DEFAULT_PREFS.seat,
+    cabinClass: (row["cabin_class"] as string) ?? DEFAULT_PREFS.cabinClass,
+    maxConnections: Number(row["max_connections"] ?? DEFAULT_PREFS.maxConnections),
+    hotelMinRating: Number(row["hotel_min_rating"] ?? DEFAULT_PREFS.hotelMinRating),
+    hotelRules: (row["hotel_rules"] as string | null) ?? null,
+    carTransmission: (row["car_transmission"] as string) ?? DEFAULT_PREFS.carTransmission,
+    tripPurpose: asList(row["trip_purpose"]),
+    airlines: asList(row["airlines"]),
+    cabinRule: (row["cabin_rule"] as string | null) ?? null,
+    seatFront: Boolean(row["seat_front"]),
+    seatLegroom: Boolean(row["seat_legroom"]),
+    hotelTypes: asList(row["hotel_types"]),
+    hotelChains: asList(row["hotel_chains"]),
+    hotelStars: asList(row["hotel_stars"]),
+    hotelRatingLevel: (row["hotel_rating_level"] as string | null) ?? null,
+    hotelAmenities: asList(row["hotel_amenities"]),
+    hotelMaxKm: row["hotel_max_km"] == null ? null : Number(row["hotel_max_km"]),
+    carBrands: asList(row["car_brands"]),
+    carClass: (row["car_class"] as string | null) ?? null,
+    carNavigation: Boolean(row["car_navigation"]),
+    carChildSeat: Boolean(row["car_child_seat"]),
+    carCompanies: asList(row["car_companies"]),
+    cuisines: asList(row["cuisines"]),
+    diets: asList(row["diets"]),
+    interests: asList(row["interests"]),
+    music: asList(row["music"]),
+    budgetBand: (row["budget_band"] as string | null) ?? null,
+  };
+}
+
+function prefsToRow(userId: string, p: TravelPrefs) {
+  return {
+    user_id: userId,
+    seat: p.seat,
+    cabin_class: p.cabinClass,
+    max_connections: p.maxConnections,
+    hotel_min_rating: p.hotelMinRating,
+    hotel_rules: p.hotelRules,
+    car_transmission: p.carTransmission,
+    trip_purpose: p.tripPurpose,
+    airlines: p.airlines,
+    cabin_rule: p.cabinRule,
+    seat_front: p.seatFront,
+    seat_legroom: p.seatLegroom,
+    hotel_types: p.hotelTypes,
+    hotel_chains: p.hotelChains,
+    hotel_stars: p.hotelStars,
+    hotel_rating_level: p.hotelRatingLevel,
+    hotel_amenities: p.hotelAmenities,
+    hotel_max_km: p.hotelMaxKm,
+    car_brands: p.carBrands,
+    car_class: p.carClass,
+    car_navigation: p.carNavigation,
+    car_child_seat: p.carChildSeat,
+    car_companies: p.carCompanies,
+    cuisines: p.cuisines,
+    diets: p.diets,
+    interests: p.interests,
+    music: p.music,
+    budget_band: p.budgetBand,
+  };
+}
+
+type CompanyRow = Record<string, unknown>;
+
+function rowToCompany(row: CompanyRow): Company {
+  const emails = asList(row["invoice_emails"]);
+  const legacy = (row["invoice_email"] as string | null) ?? null;
+  const all = emails.length ? emails : legacy ? [legacy] : [];
+  return {
+    id: row["id"] as string,
+    name: row["name"] as string,
+    legalForm: (row["legal_form"] as string | null) ?? null,
+    country: (row["country"] as string | null) ?? null,
+    city: (row["city"] as string | null) ?? null,
+    postcode: (row["postcode"] as string | null) ?? null,
+    street: (row["street"] as string | null) ?? null,
+    building: (row["building"] as string | null) ?? null,
+    addressExtra: (row["address_extra"] as string | null) ?? null,
+    vatId: (row["vat_id"] as string | null) ?? null,
+    address: (row["address"] as string | null) ?? null,
+    invoiceEmails: all,
+    invoiceEmail: all[0] ?? null,
+    isDefault: Boolean(row["is_default"]),
+  };
+}
+
+const COMPANY_COLUMNS =
+  "id, name, legal_form, country, city, postcode, street, building, address_extra, vat_id, address, invoice_email, invoice_emails, is_default";
+
+const PREF_COLUMNS =
+  "seat, cabin_class, max_connections, hotel_min_rating, hotel_rules, car_transmission, trip_purpose, airlines, cabin_rule, seat_front, seat_legroom, hotel_types, hotel_chains, hotel_stars, hotel_rating_level, hotel_amenities, hotel_max_km, car_brands, car_class, car_navigation, car_child_seat, car_companies, cuisines, diets, interests, music, budget_band";
 
 export const getAccount = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -51,30 +145,16 @@ export const getAccount = createServerFn({ method: "GET" })
         .select("full_name, home_airport, plan, onboarded")
         .eq("id", userId)
         .maybeSingle(),
-      supabase
-        .from("preferences")
-        .select("seat, cabin_class, max_connections, hotel_min_rating, hotel_rules, car_transmission")
-        .eq("user_id", userId)
-        .maybeSingle(),
+      supabase.from("preferences").select(PREF_COLUMNS).eq("user_id", userId).maybeSingle(),
       supabase
         .from("companies")
-        .select("id, name, vat_id, address, invoice_email, is_default")
+        .select(COMPANY_COLUMNS)
         .eq("user_id", userId)
         .order("created_at", { ascending: true }),
     ]);
 
     const profile = profileRes.data as
       | { full_name: string | null; home_airport: string; plan: string; onboarded: boolean }
-      | null;
-    const prefs = prefsRes.data as
-      | {
-          seat: string;
-          cabin_class: string;
-          max_connections: number;
-          hotel_min_rating: number;
-          hotel_rules: string | null;
-          car_transmission: string;
-        }
       | null;
 
     return {
@@ -83,55 +163,92 @@ export const getAccount = createServerFn({ method: "GET" })
       homeAirport: profile?.home_airport ?? "WAW",
       plan: profile?.plan ?? "free",
       onboarded: profile?.onboarded ?? false,
-      preferences: prefs
-        ? {
-            seat: prefs.seat,
-            cabinClass: prefs.cabin_class,
-            maxConnections: prefs.max_connections,
-            hotelMinRating: Number(prefs.hotel_min_rating),
-            hotelRules: prefs.hotel_rules,
-            carTransmission: prefs.car_transmission,
-          }
-        : DEFAULT_PREFS,
-      companies: ((companiesRes.data ?? []) as Array<{
-        id: string;
-        name: string;
-        vat_id: string | null;
-        address: string | null;
-        invoice_email: string | null;
-        is_default: boolean;
-      }>).map((c) => ({
-        id: c.id,
-        name: c.name,
-        vatId: c.vat_id,
-        address: c.address,
-        invoiceEmail: c.invoice_email,
-        isDefault: c.is_default,
-      })),
+      preferences: rowToPrefs((prefsRes.data as PrefRow | null) ?? null),
+      companies: ((companiesRes.data ?? []) as CompanyRow[]).map(rowToCompany),
     };
   });
+
+/* ------------------------------- validation ------------------------------- */
+
+const strList = z.array(z.string().trim().min(1).max(60)).max(60).default([]);
+
+const prefsSchema = z.object({
+  seat: z.enum(["window", "aisle", "any"]).default("any"),
+  cabinClass: z.enum(["economy", "premium_economy", "business", "first"]).default("economy"),
+  maxConnections: z.number().int().min(0).max(3).default(1),
+  hotelMinRating: z.number().min(0).max(5).default(4),
+  hotelRules: z.string().trim().max(500).nullable().default(null),
+  carTransmission: z.enum(["automatic", "manual", "any"]).default("automatic"),
+  tripPurpose: strList,
+  airlines: strList,
+  cabinRule: z.string().trim().max(40).nullable().default(null),
+  seatFront: z.boolean().default(false),
+  seatLegroom: z.boolean().default(false),
+  hotelTypes: strList,
+  hotelChains: strList,
+  hotelStars: strList,
+  hotelRatingLevel: z.string().trim().max(40).nullable().default(null),
+  hotelAmenities: strList,
+  hotelMaxKm: z.number().int().min(1).max(50).nullable().default(null),
+  carBrands: strList,
+  carClass: z.string().trim().max(40).nullable().default(null),
+  carNavigation: z.boolean().default(false),
+  carChildSeat: z.boolean().default(false),
+  carCompanies: strList,
+  cuisines: strList,
+  diets: strList,
+  interests: strList,
+  music: strList,
+  budgetBand: z.string().trim().max(40).nullable().default(null),
+});
+
+const companySchema = z.object({
+  name: z.string().trim().min(1).max(160),
+  legalForm: z.string().trim().max(60).nullable().default(null),
+  country: z.string().trim().max(60).nullable().default(null),
+  city: z.string().trim().max(80).nullable().default(null),
+  postcode: z.string().trim().max(20).nullable().default(null),
+  street: z.string().trim().max(120).nullable().default(null),
+  building: z.string().trim().max(40).nullable().default(null),
+  addressExtra: z.string().trim().max(160).nullable().default(null),
+  vatId: z.string().trim().max(40).nullable().default(null),
+  invoiceEmails: z.array(z.string().trim().email()).max(10).default([]),
+  isDefault: z.boolean().default(false),
+});
+
+type CompanyInput = z.infer<typeof companySchema>;
+
+function companyToRow(userId: string, c: CompanyInput, isDefault: boolean) {
+  const address = [c.street, c.building, c.postcode, c.city, c.addressExtra]
+    .filter((part) => part && part.length)
+    .join(", ");
+  return {
+    user_id: userId,
+    name: c.name,
+    legal_form: c.legalForm,
+    country: c.country,
+    city: c.city,
+    postcode: c.postcode,
+    street: c.street,
+    building: c.building,
+    address_extra: c.addressExtra,
+    vat_id: c.vatId,
+    address: address || null,
+    invoice_emails: c.invoiceEmails,
+    invoice_email: c.invoiceEmails[0] ?? null,
+    is_default: isDefault,
+  };
+}
 
 const onboardingSchema = z.object({
   fullName: z.string().trim().min(1).max(120),
   homeAirport: z.string().trim().regex(/^[A-Za-z]{3}$/),
-  preferences: z.object({
-    seat: z.enum(["window", "aisle", "any"]),
-    cabinClass: z.enum(["economy", "premium_economy", "business", "first"]),
-    maxConnections: z.number().int().min(0).max(3),
-    hotelMinRating: z.number().min(0).max(5),
-    hotelRules: z.string().trim().max(500).nullable(),
-    carTransmission: z.enum(["automatic", "manual", "any"]),
-  }),
-  company: z
-    .object({
-      name: z.string().trim().min(1).max(160),
-      vatId: z.string().trim().max(40).nullable(),
-      address: z.string().trim().max(300).nullable(),
-      invoiceEmail: z.string().trim().email().nullable(),
-    })
-    .nullable(),
+  preferences: prefsSchema,
+  companies: z.array(companySchema).max(20).default([]),
   complete: z.boolean().default(true),
 });
+
+/* --------------------------------- writes --------------------------------- */
 
 export const saveOnboarding = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -151,68 +268,63 @@ export const saveOnboarding = createServerFn({ method: "POST" })
       .single();
     if (profile.error) throw new Error(profile.error.message);
 
-    const prefs = await supabase.from("preferences").upsert({
-      user_id: userId,
-      seat: data.preferences.seat,
-      cabin_class: data.preferences.cabinClass,
-      max_connections: data.preferences.maxConnections,
-      hotel_min_rating: data.preferences.hotelMinRating,
-      hotel_rules: data.preferences.hotelRules,
-      car_transmission: data.preferences.carTransmission,
-    });
+    const prefs = await supabase.from("preferences").upsert(prefsToRow(userId, data.preferences));
     if (prefs.error) throw new Error(prefs.error.message);
 
-    if (data.company) {
-      const existing = await supabase
-        .from("companies")
-        .select("id")
-        .eq("user_id", userId)
-        .limit(1);
-      const isFirst = !existing.data?.length;
-      const inserted = await supabase.from("companies").insert({
-        user_id: userId,
-        name: data.company.name,
-        vat_id: data.company.vatId,
-        address: data.company.address,
-        invoice_email: data.company.invoiceEmail,
-        is_default: isFirst,
-      });
+    if (data.companies.length) {
+      const existing = await supabase.from("companies").select("id").eq("user_id", userId).limit(1);
+      const hadAny = Boolean(existing.data?.length);
+      const explicitDefault = data.companies.findIndex((c) => c.isDefault);
+      const defaultIndex = explicitDefault >= 0 ? explicitDefault : hadAny ? -1 : 0;
+      if (defaultIndex >= 0) {
+        await supabase.from("companies").update({ is_default: false }).eq("user_id", userId);
+      }
+      const rows = data.companies.map((c, i) => companyToRow(userId, c, i === defaultIndex));
+      const inserted = await supabase.from("companies").insert(rows);
       if (inserted.error) throw new Error(inserted.error.message);
     }
 
     return { ok: true };
   });
 
-const companySchema = z.object({
-  name: z.string().trim().min(1).max(160),
-  vatId: z.string().trim().max(40).nullable(),
-  address: z.string().trim().max(300).nullable(),
-  invoiceEmail: z.string().trim().email().nullable(),
-  isDefault: z.boolean().default(false),
-});
-
 export const addCompany = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => companySchema.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    if (data.isDefault) {
+    const existing = await supabase.from("companies").select("id").eq("user_id", userId).limit(1);
+    const isDefault = data.isDefault || !existing.data?.length;
+    if (isDefault) {
       await supabase.from("companies").update({ is_default: false }).eq("user_id", userId);
     }
     const res = await supabase
       .from("companies")
-      .insert({
-        user_id: userId,
-        name: data.name,
-        vat_id: data.vatId,
-        address: data.address,
-        invoice_email: data.invoiceEmail,
-        is_default: data.isDefault,
-      })
+      .insert(companyToRow(userId, data, isDefault))
       .select("id")
       .single();
     if (res.error) throw new Error(res.error.message);
     return { id: (res.data as { id: string }).id };
+  });
+
+export const updateCompany = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    companySchema.extend({ id: z.string().uuid() }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { id, ...rest } = data;
+    if (rest.isDefault) {
+      await supabase.from("companies").update({ is_default: false }).eq("user_id", userId);
+    }
+    const row = companyToRow(userId, rest, rest.isDefault);
+    const res = await supabase
+      .from("companies")
+      .update(row)
+      .eq("user_id", userId)
+      .eq("id", id);
+    if (res.error) throw new Error(res.error.message);
+    return { ok: true };
   });
 
 export const setDefaultCompany = createServerFn({ method: "POST" })
@@ -245,17 +357,25 @@ export const deleteCompany = createServerFn({ method: "POST" })
 
 export const savePreferences = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => onboardingSchema.shape.preferences.parse(input))
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        fullName: z.string().trim().min(1).max(120).nullable().default(null),
+        homeAirport: z.string().trim().regex(/^[A-Za-z]{3}$/).nullable().default(null),
+        preferences: prefsSchema,
+      })
+      .parse(input),
+  )
   .handler(async ({ data, context }) => {
-    const res = await context.supabase.from("preferences").upsert({
-      user_id: context.userId,
-      seat: data.seat,
-      cabin_class: data.cabinClass,
-      max_connections: data.maxConnections,
-      hotel_min_rating: data.hotelMinRating,
-      hotel_rules: data.hotelRules,
-      car_transmission: data.carTransmission,
-    });
+    const { supabase, userId } = context;
+    if (data.fullName || data.homeAirport) {
+      const profile: Record<string, unknown> = { id: userId };
+      if (data.fullName) profile["full_name"] = data.fullName;
+      if (data.homeAirport) profile["home_airport"] = data.homeAirport.toUpperCase();
+      const up = await supabase.from("profiles").upsert(profile);
+      if (up.error) throw new Error(up.error.message);
+    }
+    const res = await supabase.from("preferences").upsert(prefsToRow(userId, data.preferences));
     if (res.error) throw new Error(res.error.message);
     return { ok: true };
   });
