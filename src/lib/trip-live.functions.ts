@@ -97,6 +97,15 @@ export const searchLiveTrip = createServerFn({ method: "POST" })
     const total = Math.round(((flight ?? 0) + (stay ?? 0) + (car ?? 0)) * 100) / 100;
     const netTotal = search.totalEur;
 
+    const { insuranceQuoteFor } = await import("@/lib/insurance.server");
+    const insurance = await insuranceQuoteFor(
+      supabase,
+      table,
+      request.departDate,
+      request.returnDate,
+      request.passengers,
+    );
+
     const expiresAt =
       search.flight?.expiresAt ?? new Date(Date.now() + 20 * 60_000).toISOString();
 
@@ -110,7 +119,7 @@ export const searchLiveTrip = createServerFn({ method: "POST" })
         saved_minor: pricing.toMinor(search.savedEur),
         saved_minutes: search.savedMinutes,
         expires_at: expiresAt,
-        items: { search, priced: { flight, stay, car, total } },
+        items: { search, priced: { flight, stay, car, total }, insurance },
       })
       .select("id")
       .single();
@@ -121,6 +130,7 @@ export const searchLiveTrip = createServerFn({ method: "POST" })
       plan,
       search,
       priced: { flight, stay, car, total },
+      insurance,
       expiresAt,
     };
   });
