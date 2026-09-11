@@ -1,9 +1,13 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { Plane, BedDouble, CarFront, X } from "lucide-react";
 import { SiteNav } from "@/components/site-nav";
-import { listMyTrips, cancelTripItem } from "@/lib/booking.functions";
+import { AddToCalendar } from "@/components/add-to-calendar";
+import { TripMonthCalendar } from "@/components/trip-month-calendar";
+import { listMyTrips, cancelTripItem, type MyTrip } from "@/lib/booking.functions";
+import { tripCalendarEvents } from "@/lib/calendar";
 import { eur } from "@/lib/trip/client";
 
 const ICONS: Record<string, React.ReactNode> = {
@@ -13,11 +17,31 @@ const ICONS: Record<string, React.ReactNode> = {
   car: <CarFront className="size-4" />,
 };
 
+function eventsFor(trip: MyTrip) {
+  return tripCalendarEvents({
+    id: trip.id,
+    title: trip.title,
+    city: trip.city,
+    startDate: trip.startDate,
+    endDate: trip.endDate,
+    reference: trip.reference,
+    items: trip.items.map((item) => ({
+      id: item.id,
+      kind: item.kind,
+      title: item.title,
+      status: item.status,
+      reference: item.reference,
+      payload: item.payload,
+    })),
+  });
+}
+
 export function TripsPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const fetchTrips = useServerFn(listMyTrips);
   const cancelItem = useServerFn(cancelTripItem);
+  const [view, setView] = useState<"list" | "calendar">("list");
 
   const trips = useQuery({ queryKey: ["my-trips"], queryFn: () => fetchTrips({}) });
 
@@ -25,6 +49,7 @@ export function TripsPage() {
     mutationFn: (itemId: string) => cancelItem({ data: { itemId } }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["my-trips"] }),
   });
+
 
   return (
     <div className="min-h-screen bg-background">
@@ -34,6 +59,25 @@ export function TripsPage() {
         <p className="mt-2 text-sm text-muted-foreground">
           Everything you booked, with its confirmation and status.
         </p>
+
+        <div className="mt-6 inline-flex rounded-xl border border-border p-1">
+          {(["list", "calendar"] as const).map((mode) => (
+            <button
+              key={mode}
+              type="button"
+              onClick={() => setView(mode)}
+              aria-pressed={view === mode}
+              className={`rounded-lg px-4 py-1.5 text-xs font-medium capitalize ${
+                view === mode
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {mode}
+            </button>
+          ))}
+        </div>
+
 
         {trips.isLoading && <p className="mt-10 text-sm text-muted-foreground">Loading…</p>}
 
@@ -49,7 +93,14 @@ export function TripsPage() {
           </div>
         )}
 
-        <div className="mt-10 space-y-6">
+        {view === "calendar" && (trips.data?.length ?? 0) > 0 && (
+          <div className="mt-10">
+            <TripMonthCalendar trips={trips.data ?? []} />
+          </div>
+        )}
+
+        <div className={`mt-10 space-y-6 ${view === "calendar" ? "hidden" : ""}`}>
+
           {trips.data?.map((trip) => (
             <article key={trip.id} className="hairline-card overflow-hidden">
               <header className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-5 py-4">
@@ -97,6 +148,13 @@ export function TripsPage() {
                   </li>
                 ))}
               </ul>
+
+              {eventsFor(trip).length > 0 && (
+                <div className="border-t border-border px-5 py-4">
+                  <AddToCalendar events={eventsFor(trip)} title={trip.city ?? trip.title} />
+                </div>
+              )}
+
             </article>
           ))}
         </div>

@@ -4,6 +4,8 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { Plane, BedDouble, CarFront, Check, AlertTriangle } from "lucide-react";
 import { SiteNav } from "@/components/site-nav";
+import { AddToCalendar } from "@/components/add-to-calendar";
+
 import { getTripCard } from "@/lib/trip-live.functions";
 import { bookTripCard, type BookingResult } from "@/lib/booking.functions";
 import { getAccount } from "@/lib/account.functions";
@@ -297,6 +299,14 @@ export function BookPage({ cardId }: { cardId: string }) {
                 </li>
               ))}
             </ul>
+            {result.calendar.length > 0 && (
+              <AddToCalendar
+                events={result.calendar}
+                title={card.data?.search?.request.destinationCity ?? "Adair trip"}
+                className="mt-5"
+              />
+            )}
+
             {result.status === "failed" ? (
               <button
                 onClick={() => navigate({ to: "/" })}

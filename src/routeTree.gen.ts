@@ -25,6 +25,7 @@ import { Route as AuthenticatedPlanRouteImport } from './routes/_authenticated/p
 import { Route as AuthenticatedTripsRouteImport } from './routes/_authenticated/trips'
 import { Route as AuthenticatedBookCardIdRouteImport } from './routes/_authenticated/book.$cardId'
 import { Route as AuthenticatedDevStatusRouteImport } from './routes/_authenticated/dev.status'
+import { Route as ApiPublicTripRemindersRouteImport } from './routes/api/public/trip-reminders'
 import { Route as ApiTripParseRouteImport } from './routes/api/trip/parse'
 import { Route as ApiTripSearchRouteImport } from './routes/api/trip/search'
 
@@ -107,6 +108,11 @@ const AuthenticatedDevStatusRoute = AuthenticatedDevStatusRouteImport.update({
   path: '/dev/status',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiPublicTripRemindersRoute = ApiPublicTripRemindersRouteImport.update({
+  id: '/api/public/trip-reminders',
+  path: '/api/public/trip-reminders',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiTripParseRoute = ApiTripParseRouteImport.update({
   id: '/api/trip/parse',
   path: '/api/trip/parse',
@@ -134,6 +140,7 @@ export interface FileRoutesByFullPath {
   '/$lang/': typeof LangIndexRoute
   '/book/$cardId': typeof AuthenticatedBookCardIdRoute
   '/dev/status': typeof AuthenticatedDevStatusRoute
+  '/api/public/trip-reminders': typeof ApiPublicTripRemindersRoute
   '/api/trip/parse': typeof ApiTripParseRoute
   '/api/trip/search': typeof ApiTripSearchRoute
 }
@@ -152,6 +159,7 @@ export interface FileRoutesByTo {
   '/$lang': typeof LangIndexRoute
   '/book/$cardId': typeof AuthenticatedBookCardIdRoute
   '/dev/status': typeof AuthenticatedDevStatusRoute
+  '/api/public/trip-reminders': typeof ApiPublicTripRemindersRoute
   '/api/trip/parse': typeof ApiTripParseRoute
   '/api/trip/search': typeof ApiTripSearchRoute
 }
@@ -173,6 +181,7 @@ export interface FileRoutesById {
   '/$lang/': typeof LangIndexRoute
   '/_authenticated/book/$cardId': typeof AuthenticatedBookCardIdRoute
   '/_authenticated/dev/status': typeof AuthenticatedDevStatusRoute
+  '/api/public/trip-reminders': typeof ApiPublicTripRemindersRoute
   '/api/trip/parse': typeof ApiTripParseRoute
   '/api/trip/search': typeof ApiTripSearchRoute
 }
@@ -194,6 +203,7 @@ export interface FileRouteTypes {
     | '/$lang/'
     | '/book/$cardId'
     | '/dev/status'
+    | '/api/public/trip-reminders'
     | '/api/trip/parse'
     | '/api/trip/search'
   fileRoutesByTo: FileRoutesByTo
@@ -212,6 +222,7 @@ export interface FileRouteTypes {
     | '/$lang'
     | '/book/$cardId'
     | '/dev/status'
+    | '/api/public/trip-reminders'
     | '/api/trip/parse'
     | '/api/trip/search'
   id:
@@ -232,6 +243,7 @@ export interface FileRouteTypes {
     | '/$lang/'
     | '/_authenticated/book/$cardId'
     | '/_authenticated/dev/status'
+    | '/api/public/trip-reminders'
     | '/api/trip/parse'
     | '/api/trip/search'
   fileRoutesById: FileRoutesById
@@ -243,6 +255,7 @@ export interface RootRouteChildren {
   AssistantRoute: typeof AssistantRoute
   AuthRoute: typeof AuthRoute
   BusinessRoute: typeof BusinessRoute
+  ApiPublicTripRemindersRoute: typeof ApiPublicTripRemindersRoute
   ApiTripParseRoute: typeof ApiTripParseRoute
   ApiTripSearchRoute: typeof ApiTripSearchRoute
 }
@@ -361,6 +374,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDevStatusRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/trip-reminders': {
+      id: '/api/public/trip-reminders'
+      path: '/api/public/trip-reminders'
+      fullPath: '/api/public/trip-reminders'
+      preLoaderRoute: typeof ApiPublicTripRemindersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/trip/parse': {
       id: '/api/trip/parse'
       path: '/api/trip/parse'
@@ -422,6 +442,7 @@ const rootRouteChildren: RootRouteChildren = {
   AssistantRoute: AssistantRoute,
   AuthRoute: AuthRoute,
   BusinessRoute: BusinessRoute,
+  ApiPublicTripRemindersRoute: ApiPublicTripRemindersRoute,
   ApiTripParseRoute: ApiTripParseRoute,
   ApiTripSearchRoute: ApiTripSearchRoute,
 }

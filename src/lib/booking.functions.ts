@@ -129,7 +129,15 @@ export const bookTripCard = createServerFn({ method: "POST" })
           amountEur: flightGross,
           reference: order.bookingReference,
           note: null,
+          payload: {
+            route: `${request.originIata} → ${request.destinationIata}`,
+            returnRoute: `${request.destinationIata} → ${request.originIata}`,
+            departAt: search.flight.departAt,
+            arriveAt: search.flight.arriveAt,
+            returnDepartAt: search.flight.returnDepartAt,
+          },
         });
+
       } catch (error) {
         failed = true;
         const message = error instanceof Error ? error.message : "unknown";
@@ -163,6 +171,11 @@ export const bookTripCard = createServerFn({ method: "POST" })
         amountEur: priced.stay ?? 0,
         reference: null,
         note: "supplier-not-enabled",
+        payload: {
+          checkin: request.departDate,
+          checkout: request.returnDate,
+          address: search.stay.address ?? request.destinationCity,
+        },
       });
     }
     if (data.include.car && search.car) {
@@ -173,8 +186,14 @@ export const bookTripCard = createServerFn({ method: "POST" })
         amountEur: priced.car ?? 0,
         reference: null,
         note: "supplier-not-enabled",
+        payload: {
+          pickup: request.departDate,
+          dropoff: request.returnDate,
+          location: request.destinationCity,
+        },
       });
     }
+
 
     if (!lines.length) throw new Error("nothing-selected");
 
@@ -218,7 +237,9 @@ export const bookTripCard = createServerFn({ method: "POST" })
         repriced,
         reason,
         testMode: isTestKey(),
+        calendar: [],
       };
+
     }
 
     const tripRow = await supabase
@@ -258,11 +279,18 @@ export const bookTripCard = createServerFn({ method: "POST" })
       net_minor: line.kind === "flight" ? Math.round(flightNet * 100) : 0,
       gross_minor: Math.round(line.amountEur * 100),
       position: index,
-      payload: {},
+      payload: (line.payload ?? {}) as never,
       documents: [],
     }));
-    const itemsRes = await supabase.from("trip_items").insert(itemsInsert);
+    const itemsRes = await supabase.from("trip_items").insert(itemsInsert).select("id, position");
     if (itemsRes.error) throw new Error(itemsRes.error.message);
+    const insertedIds = new Map(
+      ((itemsRes.data ?? []) as Array<{ id: string; position: number }>).map((r) => [
+        r.position,
+        r.id,
+      ]),
+    );
+
 
     await supabase
       .from("trip_cards")
@@ -288,6 +316,23 @@ export const bookTripCard = createServerFn({ method: "POST" })
       testMode: isTestKey(),
     });
 
+    const calendar = tripCalendarEvents({
+      id: tripId,
+      title: `${request.destinationCity} · ${request.departDate} – ${request.returnDate}`,
+      city: request.destinationCity,
+      startDate: request.departDate,
+      endDate: request.returnDate,
+      reference: flightReference,
+      items: lines.map((line, index) => ({
+        id: insertedIds.get(index) ?? `${tripId}-${index}`,
+        kind: line.kind,
+        title: line.title,
+        status: line.status,
+        reference: line.reference,
+        payload: line.payload ?? null,
+      })),
+    });
+
     return {
       tripId,
       status,
@@ -297,7 +342,9 @@ export const bookTripCard = createServerFn({ method: "POST" })
       repriced,
       reason,
       testMode: isTestKey(),
+      calendar,
     };
+
 
   });
 
@@ -320,7 +367,9 @@ export type MyTrip = {
     status: string;
     amountEur: number;
     reference: string | null;
+    payload: ItemCalendarPayload | null;
   }>;
+
 };
 
 export const listMyTrips = createServerFn({ method: "GET" })
@@ -351,7 +400,9 @@ export const listMyTrips = createServerFn({ method: "GET" })
 
     const itemsRes = await supabase
       .from("trip_items")
-      .select("id, trip_id, kind, title, detail, status, amount, offer_reference, position")
+      .select(
+        "id, trip_id, kind, title, detail, status, amount, offer_reference, position, payload",
+      )
       .eq("user_id", userId)
       .in(
         "trip_id",
@@ -368,7 +419,9 @@ export const listMyTrips = createServerFn({ method: "GET" })
       status: string;
       amount: number;
       offer_reference: string | null;
+      payload: ItemCalendarPayload | null;
     }>;
+
 
     return trips.map((trip) => ({
       id: trip.id,
@@ -391,6 +444,8 @@ export const listMyTrips = createServerFn({ method: "GET" })
           status: i.status,
           amountEur: Number(i.amount),
           reference: i.offer_reference,
+          payload: (i.payload ?? null) as ItemCalendarPayload | null,
+
         })),
     }));
   });
