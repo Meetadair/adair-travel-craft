@@ -24,6 +24,7 @@ import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authentic
 import { Route as AuthenticatedPlanRouteImport } from './routes/_authenticated/plan'
 import { Route as AuthenticatedTripsRouteImport } from './routes/_authenticated/trips'
 import { Route as AuthenticatedBookCardIdRouteImport } from './routes/_authenticated/book.$cardId'
+import { Route as AuthenticatedDevStatusRouteImport } from './routes/_authenticated/dev.status'
 import { Route as ApiTripParseRouteImport } from './routes/api/trip/parse'
 import { Route as ApiTripSearchRouteImport } from './routes/api/trip/search'
 
@@ -101,6 +102,11 @@ const AuthenticatedBookCardIdRoute = AuthenticatedBookCardIdRouteImport.update({
   path: '/book/$cardId',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedDevStatusRoute = AuthenticatedDevStatusRouteImport.update({
+  id: '/dev/status',
+  path: '/dev/status',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const ApiTripParseRoute = ApiTripParseRouteImport.update({
   id: '/api/trip/parse',
   path: '/api/trip/parse',
@@ -127,6 +133,7 @@ export interface FileRoutesByFullPath {
   '/trips': typeof AuthenticatedTripsRoute
   '/$lang/': typeof LangIndexRoute
   '/book/$cardId': typeof AuthenticatedBookCardIdRoute
+  '/dev/status': typeof AuthenticatedDevStatusRoute
   '/api/trip/parse': typeof ApiTripParseRoute
   '/api/trip/search': typeof ApiTripSearchRoute
 }
@@ -144,6 +151,7 @@ export interface FileRoutesByTo {
   '/trips': typeof AuthenticatedTripsRoute
   '/$lang': typeof LangIndexRoute
   '/book/$cardId': typeof AuthenticatedBookCardIdRoute
+  '/dev/status': typeof AuthenticatedDevStatusRoute
   '/api/trip/parse': typeof ApiTripParseRoute
   '/api/trip/search': typeof ApiTripSearchRoute
 }
@@ -164,6 +172,7 @@ export interface FileRoutesById {
   '/_authenticated/trips': typeof AuthenticatedTripsRoute
   '/$lang/': typeof LangIndexRoute
   '/_authenticated/book/$cardId': typeof AuthenticatedBookCardIdRoute
+  '/_authenticated/dev/status': typeof AuthenticatedDevStatusRoute
   '/api/trip/parse': typeof ApiTripParseRoute
   '/api/trip/search': typeof ApiTripSearchRoute
 }
@@ -184,6 +193,7 @@ export interface FileRouteTypes {
     | '/trips'
     | '/$lang/'
     | '/book/$cardId'
+    | '/dev/status'
     | '/api/trip/parse'
     | '/api/trip/search'
   fileRoutesByTo: FileRoutesByTo
@@ -201,6 +211,7 @@ export interface FileRouteTypes {
     | '/trips'
     | '/$lang'
     | '/book/$cardId'
+    | '/dev/status'
     | '/api/trip/parse'
     | '/api/trip/search'
   id:
@@ -220,6 +231,7 @@ export interface FileRouteTypes {
     | '/_authenticated/trips'
     | '/$lang/'
     | '/_authenticated/book/$cardId'
+    | '/_authenticated/dev/status'
     | '/api/trip/parse'
     | '/api/trip/search'
   fileRoutesById: FileRoutesById
@@ -342,6 +354,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedBookCardIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/dev/status': {
+      id: '/_authenticated/dev/status'
+      path: '/dev/status'
+      fullPath: '/dev/status'
+      preLoaderRoute: typeof AuthenticatedDevStatusRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/api/trip/parse': {
       id: '/api/trip/parse'
       path: '/api/trip/parse'
@@ -365,6 +384,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedPlanRoute: typeof AuthenticatedPlanRoute
   AuthenticatedTripsRoute: typeof AuthenticatedTripsRoute
   AuthenticatedBookCardIdRoute: typeof AuthenticatedBookCardIdRoute
+  AuthenticatedDevStatusRoute: typeof AuthenticatedDevStatusRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -373,6 +393,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPlanRoute: AuthenticatedPlanRoute,
   AuthenticatedTripsRoute: AuthenticatedTripsRoute,
   AuthenticatedBookCardIdRoute: AuthenticatedBookCardIdRoute,
+  AuthenticatedDevStatusRoute: AuthenticatedDevStatusRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
