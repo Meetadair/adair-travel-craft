@@ -396,7 +396,14 @@ export async function searchTripWithDuffel(req: TripRequest): Promise<TripSearch
   const [flightRes, stayRes, carRes] = await Promise.allSettled([
     searchFlight(req),
     searchStay(req),
-    req.needsCar ? searchCar(req) : Promise.resolve(null),
+    req.needsCar
+      ? searchCar(req)
+      : Promise.resolve<CarSearchOutcome>({
+          car: null,
+          alternatives: [],
+          requested: null,
+          notFound: false,
+        }),
   ]);
 
   let flight: FlightResult | null = null;
@@ -408,18 +415,30 @@ export async function searchTripWithDuffel(req: TripRequest): Promise<TripSearch
   }
 
   let stay: StayResult | null = null;
+  let hotelRequested: string | null = req.hotelNameExact?.trim() || null;
+  let hotelNotFound = false;
+  let hotelAlternatives: StayResult[] = [];
   if (stayRes.status === "fulfilled") {
-    stay = stayRes.value;
-    if (!stay) errors.stays = "no-availability";
+    stay = stayRes.value.stay;
+    hotelNotFound = stayRes.value.notFound;
+    hotelAlternatives = stayRes.value.alternatives;
+    hotelRequested = stayRes.value.requested ?? hotelRequested;
+    if (!stay) errors.stays = hotelNotFound ? "name-not-found" : "no-availability";
   } else {
     errors.stays = noteFor(stayRes.reason);
   }
 
   let car: CarResult | null = null;
+  let carRequested: string | null = req.needsCar ? req.carNameExact?.trim() || null : null;
+  let carNotFound = false;
+  let carAlternatives: CarResult[] = [];
   if (carRes.status === "fulfilled") {
-    car = carRes.value;
+    car = carRes.value.car;
+    carNotFound = carRes.value.notFound;
+    carAlternatives = carRes.value.alternatives;
+    carRequested = carRes.value.requested ?? carRequested;
     // Cars are optional: no note when the traveller did not ask for one.
-    if (!car && req.needsCar) errors.cars = "unavailable";
+    if (!car && req.needsCar) errors.cars = carNotFound ? "name-not-found" : "unavailable";
   } else {
     errors.cars = noteFor(carRes.reason);
   }
@@ -440,6 +459,13 @@ export async function searchTripWithDuffel(req: TripRequest): Promise<TripSearch
     savedEur: round(totalEur * 0.08),
     savedMinutes: 160,
     testMode: isTestKey(),
+    hotelRequested,
+    hotelNotFound,
+    hotelAlternatives,
+    carRequested,
+    carNotFound,
+    carAlternatives,
     errors,
   };
 }
+
