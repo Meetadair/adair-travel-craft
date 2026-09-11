@@ -60,6 +60,25 @@ export function TripsPage() {
           Everything you booked, with its confirmation and status.
         </p>
 
+        <div className="mt-6 inline-flex rounded-xl border border-border p-1">
+          {(["list", "calendar"] as const).map((mode) => (
+            <button
+              key={mode}
+              type="button"
+              onClick={() => setView(mode)}
+              aria-pressed={view === mode}
+              className={`rounded-lg px-4 py-1.5 text-xs font-medium capitalize ${
+                view === mode
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {mode}
+            </button>
+          ))}
+        </div>
+
+
         {trips.isLoading && <p className="mt-10 text-sm text-muted-foreground">Loading…</p>}
 
         {trips.data?.length === 0 && (
