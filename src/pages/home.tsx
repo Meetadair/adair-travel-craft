@@ -375,6 +375,10 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
   const [copied, setCopied] = useState(false);
   const [live, setLive] = useState<TripSearchResponse | null>(null);
   const [liveFailed, setLiveFailed] = useState(false);
+  const [dropped, setDropped] = useState({ flight: false, hotel: false, car: false });
+  const drop = (kind: "flight" | "hotel" | "car") =>
+    setDropped((prev) => ({ ...prev, [kind]: true }));
+  const anyDropped = dropped.flight || dropped.hotel || dropped.car;
 
   const runKey = submission?.key ?? 0;
   useEffect(() => {
