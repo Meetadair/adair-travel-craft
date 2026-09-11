@@ -308,15 +308,17 @@ export async function searchCar(req: TripRequest): Promise<CarResult | null> {
 
   const amount = Number(best.total_amount ?? 0);
   const currency = best.total_currency ?? "EUR";
+  const vehicle = best.vehicle?.name ?? best.vehicle?.model ?? "Car";
   return {
     supplier: best.supplier?.name ?? "Car supplier",
-    vehicle: best.vehicle?.name ?? best.vehicle?.model ?? "Car",
+    vehicle: sample ? `Test Drive — sample data (${vehicle})` : vehicle,
     amount: round(amount),
     currency,
     ...toEur(amount, currency),
     transmission: best.transmission ?? best.vehicle?.transmission ?? "automatic",
   };
 }
+
 
 /* ------------------------------ orchestration --------------------------- */
 
