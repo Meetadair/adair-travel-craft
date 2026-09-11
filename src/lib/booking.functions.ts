@@ -87,8 +87,11 @@ export const bookTripCard = createServerFn({ method: "POST" })
     let flightGross = 0;
     let flightNet = 0;
     let failed = false;
+    let reason: string | null = null;
 
-    const table = await pricing.loadPricing(supabase, "free");
+    const planRes = await supabase.from("profiles").select("plan").eq("id", userId).maybeSingle();
+    const plan = (planRes.data as { plan: string } | null)?.plan ?? "free";
+    const table = await pricing.loadPricing(supabase, plan);
 
     if (data.include.flight && search.flight?.offerId) {
       try {
@@ -107,7 +110,9 @@ export const bookTripCard = createServerFn({ method: "POST" })
         flightOrderId = order.id;
         flightReference = order.bookingReference;
         flightNet = search.flight.amountEur;
-        flightGross = pricing.fromMinor(pricing.grossMinor(flightNet, table.flight));
+        // The card already holds the traveller price; only recompute if missing.
+        flightGross =
+          priced.flight ?? pricing.fromMinor(pricing.grossMinor(flightNet, table.flight));
         lines.push({
           kind: "flight",
           title: `${search.flight.carrier} ${search.flight.flightNumbers.join(" / ")}`,
@@ -119,6 +124,12 @@ export const bookTripCard = createServerFn({ method: "POST" })
       } catch (error) {
         failed = true;
         const message = error instanceof Error ? error.message : "unknown";
+        reason =
+          message === "offer-gone" || message === "duffel-422" || message === "duffel-404"
+            ? "offer-expired"
+            : message === "missing-key"
+              ? "supplier-not-configured"
+              : "supplier-error";
         lines.push({
           kind: "flight",
           title: search.flight
@@ -127,10 +138,11 @@ export const bookTripCard = createServerFn({ method: "POST" })
           status: "failed",
           amountEur: 0,
           reference: null,
-          note: message === "offer-gone" ? "offer-expired" : "supplier-error",
+          note: reason,
         });
       }
     }
+
 
     // Stays and cars are not bookable on this supplier account yet: they are
     // stored as requested lines so nothing is silently charged.
