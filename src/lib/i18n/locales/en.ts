@@ -550,6 +550,8 @@ export const en = {
       {
         name: "Enterprise",
         forWho: "50+ travellers",
+        price: "On request",
+        priceNote: "quoted for your team",
         features: [
           "Cost centres and custom policy rules",
           "Accounting export on your format",
