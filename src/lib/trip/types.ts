@@ -1,5 +1,13 @@
 /** Shared shapes for the trip parse + search endpoints. */
 
+/** One stop on the journey, in travel order. */
+export type TripStop = {
+  city: string;
+  iata: string;
+  lat: number;
+  lon: number;
+};
+
 export type TripRequest = {
   originCity: string;
   originIata: string;
@@ -20,6 +28,8 @@ export type TripRequest = {
   carNameExact: string | null;
   needsCar: boolean;
   invoiceToCompany: boolean;
+  /** Ordered stops: origin first, then every destination named in the sentence. */
+  stops: TripStop[];
 };
 
 
