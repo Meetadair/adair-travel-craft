@@ -444,6 +444,8 @@ export const listMyTrips = createServerFn({ method: "GET" })
           status: i.status,
           amountEur: Number(i.amount),
           reference: i.offer_reference,
+          payload: (i.payload ?? null) as ItemCalendarPayload | null,
+
         })),
     }));
   });
