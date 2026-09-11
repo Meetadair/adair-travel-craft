@@ -104,6 +104,42 @@ export type Database = {
         }
         Relationships: []
       }
+      insurance_rates: {
+        Row: {
+          active: boolean
+          base_daily_minor: number
+          created_at: string
+          currency: string
+          effective_from: string
+          id: string
+          minimum_minor: number
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          base_daily_minor?: number
+          created_at?: string
+          currency?: string
+          effective_from?: string
+          id?: string
+          minimum_minor?: number
+          name?: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          base_daily_minor?: number
+          created_at?: string
+          currency?: string
+          effective_from?: string
+          id?: string
+          minimum_minor?: number
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       payments: {
         Row: {
           amount_minor: number
