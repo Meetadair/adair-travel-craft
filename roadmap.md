@@ -30,3 +30,10 @@
 - [x] Part A: one-question-per-screen onboarding (config-driven), searchable home airport, all preference groups, repeatable companies; editable at /preferences; preferences feed search ranking
 - [x] Part C: hotel/car lines always explain themselves when nothing is available; insurance + requested names on the signed-in card
 - [x] Part B: multi-city parsing into ordered stops, "Show on map" (OpenStreetMap, no key), drag/arrow reordering with re-search and re-pricing, total distance + detour hint, stops stored with each booking
+
+## Round: user testing feedback (Sep 11)
+- [x] Email text for supplier form (enable Stays/Cars on the account) — delivered in chat
+- [x] Verify signed-in card really renders car, insurance and requested names (present; only visible after sign-in)
+- [x] Verify onboarding/preferences show selectable lists: airlines, cabin, seat, hotel chains/amenities/stars/rating/distance, cars, cuisines, music, interests
+- [x] Multi-city map + reordering available for any trip, incl. private (Warsaw>Paris>New York>London)
+- [ ] Idea to consider: early-booking discounts for private trips (honeymoon/holidays)
