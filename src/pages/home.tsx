@@ -34,6 +34,8 @@ import {
   type InsuranceQuote,
 } from "@/lib/trip/insurance";
 import { parseTripSentence } from "@/lib/trip/parse";
+import { TripRoute } from "@/components/trip-route";
+import type { TripStop } from "@/lib/trip/types";
 
 import { downloadTripInvoice } from "@/lib/trip-pdf";
 import { SiteNav } from "@/components/site-nav";
@@ -449,6 +451,33 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
     };
   }, []);
 
+  const [routeStops, setRouteStops] = useState<TripStop[] | null>(null);
+  const [rerouting, setRerouting] = useState(false);
+
+  /** Same sentence, new stop order: re-search and re-price the first leg. */
+  const reorderStops = async (next: TripStop[]) => {
+    setRouteStops(next);
+    if (!signedIn) return;
+    const sentence = submission?.sentence.trim() || d.userMessage;
+    setRerouting(true);
+    try {
+      const result = await runLiveSearch({ data: { sentence, stops: next } });
+      const priced = result.search;
+      if (priced.flight && result.priced.flight != null) priced.flight.amountEur = result.priced.flight;
+      if (priced.stay && result.priced.stay != null) priced.stay.amountEur = result.priced.stay;
+      if (priced.car && result.priced.car != null) priced.car.amountEur = result.priced.car;
+      priced.totalEur = result.priced.total;
+      setCardId(result.cardId);
+      setInsurance(result.insurance);
+      setLive(priced);
+      setRouteStops(priced.request.stops ?? next);
+    } catch {
+      // Keep the new order on screen; prices stay as they were.
+    } finally {
+      setRerouting(false);
+    }
+  };
+
   const runKey = submission?.key ?? 0;
   useEffect(() => {
     if (!submission) return;
@@ -462,6 +491,7 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
     const text = submission.sentence.trim() || d.userMessage;
 
     setLive(null);
+    setRouteStops(null);
     setLiveFailed(false);
     setCardId(null);
     setInsurance(null);
@@ -505,8 +535,10 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
     const settled = search
       .then((result) => {
         if (!cancelled) {
-          if (result.flight || result.stay || result.car) setLive(result);
-          else setLiveFailed(true);
+          if (result.flight || result.stay || result.car) {
+            setLive(result);
+            setRouteStops(result.request.stops ?? null);
+          } else setLiveFailed(true);
         }
       })
       .catch(() => {
@@ -1012,6 +1044,17 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                     )}
                   </div>
                 </div>
+
+                {routeStops && routeStops.length > 2 && showActions && (
+                  <div className="animate-rise mt-4 rounded-2xl border border-border bg-background p-4">
+                    <p className="font-display text-sm font-semibold">Show on map</p>
+                    <p className="mt-1 mb-3 text-xs text-muted-foreground">
+                      Drag a stop, or use the arrows, to change the order — we re-check the route
+                      and the price.
+                    </p>
+                    <TripRoute stops={routeStops} onReorder={reorderStops} reordering={rerouting} />
+                  </div>
+                )}
 
                 <div
                   className={`mt-3 flex flex-wrap items-start gap-2 ${showActions ? "animate-rise" : "hidden"}`}

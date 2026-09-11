@@ -5,7 +5,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import type { TripSearchResponse } from "@/lib/trip/types";
+import type { TripSearchResponse, TripStop } from "@/lib/trip/types";
+import { CITIES } from "@/lib/trip/cities";
 import {
   tripCalendarEvents,
   type CalendarEvent,
@@ -286,6 +287,7 @@ export const bookTripCard = createServerFn({ method: "POST" })
         booked_at: new Date().toISOString(),
         document_number: flightReference,
         data_source: "duffel-test",
+        segments: request.stops ?? [],
       })
       .select("id")
       .single();
@@ -381,6 +383,23 @@ export const bookTripCard = createServerFn({ method: "POST" })
 
   });
 
+/** Stored stop list, falling back to origin + destination from the city map. */
+function tripStops(raw: unknown, origin: string | null, city: string | null): TripStop[] {
+  if (Array.isArray(raw) && raw.length) {
+    return raw.filter(
+      (s): s is TripStop =>
+        Boolean(s) &&
+        typeof (s as TripStop).city === "string" &&
+        typeof (s as TripStop).lat === "number",
+    );
+  }
+  const byName = (name: string | null) =>
+    name ? CITIES.find((c) => c.city.toLowerCase() === name.toLowerCase()) : undefined;
+  return [byName(origin), byName(city)]
+    .filter((c): c is (typeof CITIES)[number] => Boolean(c))
+    .map((c) => ({ city: c.city, iata: c.iata, lat: c.lat, lon: c.lon }));
+}
+
 export type MyTrip = {
   id: string;
   title: string;
@@ -392,6 +411,8 @@ export type MyTrip = {
   reference: string | null;
   /** True when the trip was created against the supplier's test environment. */
   testMode: boolean;
+  /** Ordered stops, for the map view. */
+  stops: TripStop[];
   items: Array<{
     id: string;
     kind: string;
@@ -412,7 +433,7 @@ export const listMyTrips = createServerFn({ method: "GET" })
     const tripsRes = await supabase
       .from("trips")
       .select(
-        "id, title, city, start_date, end_date, status, total_amount, document_number, data_source, created_at",
+        "id, title, city, origin, start_date, end_date, status, total_amount, document_number, data_source, segments, created_at",
       )
       .eq("user_id", userId)
       .order("created_at", { ascending: false });
@@ -421,12 +442,14 @@ export const listMyTrips = createServerFn({ method: "GET" })
       id: string;
       title: string;
       city: string | null;
+      origin: string | null;
       start_date: string | null;
       end_date: string | null;
       status: string;
       total_amount: number;
       document_number: string | null;
       data_source: string | null;
+      segments: unknown;
     }>;
 
     if (!trips.length) return [];
@@ -466,6 +489,7 @@ export const listMyTrips = createServerFn({ method: "GET" })
       totalEur: Number(trip.total_amount),
       reference: trip.document_number,
       testMode: (trip.data_source ?? "").includes("test"),
+      stops: tripStops(trip.segments, trip.origin, trip.city),
 
       items: items
         .filter((i) => i.trip_id === trip.id)
