@@ -44,14 +44,19 @@ export type InvoiceData = {
   live: boolean;
   /** Invoice label language. Non-Latin scripts fall back to English labels. */
   locale?: string;
+  /** "vat" adds net/VAT split; "receipt" shows gross amounts only. */
+  variant?: "receipt" | "vat";
   buyer: {
     name: string;
     company: string;
     taxId: string;
     email: string;
+    /** Billing address of the chosen company, one line each. */
+    addressLines?: string[];
   };
   items: InvoiceItem[];
 };
+
 
 const money = (value: number, currency: string) =>
   `${value.toFixed(2).replace(".", ",")} ${currency}`;
