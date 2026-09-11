@@ -4,6 +4,8 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { Plane, BedDouble, CarFront, Check, AlertTriangle } from "lucide-react";
 import { SiteNav } from "@/components/site-nav";
+import { AddToCalendar } from "@/components/add-to-calendar";
+
 import { getTripCard } from "@/lib/trip-live.functions";
 import { bookTripCard, type BookingResult } from "@/lib/booking.functions";
 import { getAccount } from "@/lib/account.functions";
