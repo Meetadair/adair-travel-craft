@@ -341,7 +341,20 @@ function TripRow({
           {extra}
         </div>
       </div>
-      <p className="shrink-0 text-sm font-semibold text-foreground">{price}</p>
+      <div className="flex shrink-0 items-center gap-3">
+        <p className="text-sm font-semibold text-foreground">{price}</p>
+        {onRemove && (
+          <button
+            type="button"
+            onClick={onRemove}
+            aria-label={removeLabel}
+            title={removeLabel}
+            className="flex size-7 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground transition-colors hover:border-primary/30 hover:text-primary"
+          >
+            <X className="size-3.5" />
+          </button>
+        )}
+      </div>
     </div>
   );
 }
