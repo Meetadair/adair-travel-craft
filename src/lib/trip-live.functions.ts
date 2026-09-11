@@ -25,8 +25,17 @@ export type LiveTripResult = {
   expiresAt: string | null;
 };
 
+const stopSchema = z.object({
+  city: z.string().trim().min(1).max(60),
+  iata: z.string().trim().length(3),
+  lat: z.number(),
+  lon: z.number(),
+});
+
 const sentenceSchema = z.object({
   sentence: z.string().trim().min(3).max(400),
+  /** Reordered stop list from the map view: search the new first leg instead. */
+  stops: z.array(stopSchema).min(2).max(8).optional(),
 });
 
 export const searchLiveTrip = createServerFn({ method: "POST" })
@@ -76,9 +85,23 @@ export const searchLiveTrip = createServerFn({ method: "POST" })
     };
 
     const parsed = parseTripSentence(data.sentence, new Date(), profile?.home_airport);
+    const reordered = data.stops?.length ? data.stops : null;
+    const origin = reordered?.[0];
+    const firstStop = reordered?.[1];
     const request: TripRequest = {
       ...parsed,
       cabinClass: (row?.["cabin_class"] as TripRequest["cabinClass"]) ?? parsed.cabinClass,
+      ...(reordered && origin && firstStop
+        ? {
+            originCity: origin.city,
+            originIata: origin.iata,
+            destinationCity: firstStop.city,
+            destinationIata: firstStop.iata,
+            lat: firstStop.lat,
+            lon: firstStop.lon,
+            stops: reordered,
+          }
+        : {}),
     };
 
     const requestRow = await supabase
