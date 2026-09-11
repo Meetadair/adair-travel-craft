@@ -93,7 +93,14 @@ export function TripsPage() {
           </div>
         )}
 
-        <div className="mt-10 space-y-6">
+        {view === "calendar" && (trips.data?.length ?? 0) > 0 && (
+          <div className="mt-10">
+            <TripMonthCalendar trips={trips.data ?? []} />
+          </div>
+        )}
+
+        <div className={`mt-10 space-y-6 ${view === "calendar" ? "hidden" : ""}`}>
+
           {trips.data?.map((trip) => (
             <article key={trip.id} className="hairline-card overflow-hidden">
               <header className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-5 py-4">
