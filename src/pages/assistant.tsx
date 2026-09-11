@@ -239,11 +239,34 @@ export function AssistantPage() {
                           </>
                         )}
                       </div>
-                      <p className="shrink-0 text-sm font-semibold text-primary">
-                        {money(o.amount, o.currency)}
-                      </p>
+                      <div className="flex shrink-0 items-center gap-3">
+                        <p className="text-sm font-semibold text-primary">
+                          {money(o.amount, o.currency)}
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => setRemoved((prev) => [...prev, o.kind])}
+                          aria-label={t.assistant.remove}
+                          title={t.assistant.remove}
+                          className="flex size-7 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground transition-colors hover:border-primary/30 hover:text-primary"
+                        >
+                          <X className="size-3.5" />
+                        </button>
+                      </div>
                     </div>
                   ))}
+                  {removed.length > 0 && (
+                    <div className="flex flex-wrap items-center justify-between gap-2 px-5 py-3 text-xs text-muted-foreground">
+                      <span>{t.assistant.removedNote}</span>
+                      <button
+                        type="button"
+                        onClick={() => setRemoved([])}
+                        className="font-medium text-primary underline underline-offset-4"
+                      >
+                        {t.assistant.restoreAll}
+                      </button>
+                    </div>
+                  )}
                 </div>
                 <div className="flex items-center justify-between border-t border-border bg-cream-deep px-5 py-4">
                   <div>
