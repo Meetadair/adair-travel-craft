@@ -6,6 +6,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { TripRequest, TripSearchResponse } from "@/lib/trip/types";
+import type { InsuranceQuote } from "@/lib/trip/insurance";
 
 export type LiveTripResult = {
   cardId: string;
@@ -18,6 +19,8 @@ export type LiveTripResult = {
     car: number | null;
     total: number;
   };
+  /** Optional travel-insurance offer; only counted when the traveller opts in. */
+  insurance: InsuranceQuote | null;
   expiresAt: string | null;
 };
 
