@@ -1,0 +1,32 @@
+ALTER TABLE public.preferences
+  ADD COLUMN IF NOT EXISTS trip_purpose jsonb NOT NULL DEFAULT '[]'::jsonb,
+  ADD COLUMN IF NOT EXISTS airlines jsonb NOT NULL DEFAULT '[]'::jsonb,
+  ADD COLUMN IF NOT EXISTS cabin_rule text,
+  ADD COLUMN IF NOT EXISTS seat_front boolean NOT NULL DEFAULT false,
+  ADD COLUMN IF NOT EXISTS seat_legroom boolean NOT NULL DEFAULT false,
+  ADD COLUMN IF NOT EXISTS hotel_types jsonb NOT NULL DEFAULT '[]'::jsonb,
+  ADD COLUMN IF NOT EXISTS hotel_chains jsonb NOT NULL DEFAULT '[]'::jsonb,
+  ADD COLUMN IF NOT EXISTS hotel_stars jsonb NOT NULL DEFAULT '[]'::jsonb,
+  ADD COLUMN IF NOT EXISTS hotel_rating_level text,
+  ADD COLUMN IF NOT EXISTS hotel_amenities jsonb NOT NULL DEFAULT '[]'::jsonb,
+  ADD COLUMN IF NOT EXISTS hotel_max_km integer,
+  ADD COLUMN IF NOT EXISTS car_brands jsonb NOT NULL DEFAULT '[]'::jsonb,
+  ADD COLUMN IF NOT EXISTS car_class text,
+  ADD COLUMN IF NOT EXISTS car_navigation boolean NOT NULL DEFAULT false,
+  ADD COLUMN IF NOT EXISTS car_child_seat boolean NOT NULL DEFAULT false,
+  ADD COLUMN IF NOT EXISTS car_companies jsonb NOT NULL DEFAULT '[]'::jsonb,
+  ADD COLUMN IF NOT EXISTS cuisines jsonb NOT NULL DEFAULT '[]'::jsonb,
+  ADD COLUMN IF NOT EXISTS diets jsonb NOT NULL DEFAULT '[]'::jsonb,
+  ADD COLUMN IF NOT EXISTS interests jsonb NOT NULL DEFAULT '[]'::jsonb,
+  ADD COLUMN IF NOT EXISTS music jsonb NOT NULL DEFAULT '[]'::jsonb,
+  ADD COLUMN IF NOT EXISTS budget_band text;
+
+ALTER TABLE public.companies
+  ADD COLUMN IF NOT EXISTS legal_form text,
+  ADD COLUMN IF NOT EXISTS country text,
+  ADD COLUMN IF NOT EXISTS city text,
+  ADD COLUMN IF NOT EXISTS postcode text,
+  ADD COLUMN IF NOT EXISTS street text,
+  ADD COLUMN IF NOT EXISTS building text,
+  ADD COLUMN IF NOT EXISTS address_extra text,
+  ADD COLUMN IF NOT EXISTS invoice_emails jsonb NOT NULL DEFAULT '[]'::jsonb;

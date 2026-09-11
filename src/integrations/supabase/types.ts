@@ -47,33 +47,57 @@ export type Database = {
       companies: {
         Row: {
           address: string | null
+          address_extra: string | null
+          building: string | null
+          city: string | null
+          country: string | null
           created_at: string
           id: string
           invoice_email: string | null
+          invoice_emails: Json
           is_default: boolean
+          legal_form: string | null
           name: string
+          postcode: string | null
+          street: string | null
           updated_at: string
           user_id: string
           vat_id: string | null
         }
         Insert: {
           address?: string | null
+          address_extra?: string | null
+          building?: string | null
+          city?: string | null
+          country?: string | null
           created_at?: string
           id?: string
           invoice_email?: string | null
+          invoice_emails?: Json
           is_default?: boolean
+          legal_form?: string | null
           name: string
+          postcode?: string | null
+          street?: string | null
           updated_at?: string
           user_id: string
           vat_id?: string | null
         }
         Update: {
           address?: string | null
+          address_extra?: string | null
+          building?: string | null
+          city?: string | null
+          country?: string | null
           created_at?: string
           id?: string
           invoice_email?: string | null
+          invoice_emails?: Json
           is_default?: boolean
+          legal_form?: string | null
           name?: string
+          postcode?: string | null
+          street?: string | null
           updated_at?: string
           user_id?: string
           vat_id?: string | null
@@ -192,35 +216,98 @@ export type Database = {
       }
       preferences: {
         Row: {
+          airlines: Json
+          budget_band: string | null
           cabin_class: string
+          cabin_rule: string | null
+          car_brands: Json
+          car_child_seat: boolean
+          car_class: string | null
+          car_companies: Json
+          car_navigation: boolean
           car_transmission: string
           created_at: string
+          cuisines: Json
+          diets: Json
+          hotel_amenities: Json
+          hotel_chains: Json
+          hotel_max_km: number | null
           hotel_min_rating: number
+          hotel_rating_level: string | null
           hotel_rules: string | null
+          hotel_stars: Json
+          hotel_types: Json
+          interests: Json
           max_connections: number
+          music: Json
           seat: string
+          seat_front: boolean
+          seat_legroom: boolean
+          trip_purpose: Json
           updated_at: string
           user_id: string
         }
         Insert: {
+          airlines?: Json
+          budget_band?: string | null
           cabin_class?: string
+          cabin_rule?: string | null
+          car_brands?: Json
+          car_child_seat?: boolean
+          car_class?: string | null
+          car_companies?: Json
+          car_navigation?: boolean
           car_transmission?: string
           created_at?: string
+          cuisines?: Json
+          diets?: Json
+          hotel_amenities?: Json
+          hotel_chains?: Json
+          hotel_max_km?: number | null
           hotel_min_rating?: number
+          hotel_rating_level?: string | null
           hotel_rules?: string | null
+          hotel_stars?: Json
+          hotel_types?: Json
+          interests?: Json
           max_connections?: number
+          music?: Json
           seat?: string
+          seat_front?: boolean
+          seat_legroom?: boolean
+          trip_purpose?: Json
           updated_at?: string
           user_id: string
         }
         Update: {
+          airlines?: Json
+          budget_band?: string | null
           cabin_class?: string
+          cabin_rule?: string | null
+          car_brands?: Json
+          car_child_seat?: boolean
+          car_class?: string | null
+          car_companies?: Json
+          car_navigation?: boolean
           car_transmission?: string
           created_at?: string
+          cuisines?: Json
+          diets?: Json
+          hotel_amenities?: Json
+          hotel_chains?: Json
+          hotel_max_km?: number | null
           hotel_min_rating?: number
+          hotel_rating_level?: string | null
           hotel_rules?: string | null
+          hotel_stars?: Json
+          hotel_types?: Json
+          interests?: Json
           max_connections?: number
+          music?: Json
           seat?: string
+          seat_front?: boolean
+          seat_legroom?: boolean
+          trip_purpose?: Json
           updated_at?: string
           user_id?: string
         }
