@@ -5,7 +5,7 @@ Marketing pages (home, /business, all 14 languages), design system, logo and cop
 ## Two things to confirm
 
 1. **Real bookings now?** Earlier we agreed booking and payments stay switched off until ~1000 active accounts. This request asks for real test-mode booking. Plan below builds the full booking flow in **test mode only** (test travel key + test card, no real money, clearly labelled). Say the word if you'd rather stop before the booking step.
-2. **Missing keys.** The travel data key and the card-payment key are not saved yet. Without the travel key, signed-in users will see "Connect live search" instead of sample data (as you asked). I'll ask for both keys once the flow is ready.
+2. **Keys.** Your travel test key is saved and live flight results already work. Hotels and cars are refused by that account ("not authorised") — they need to be switched on for your travel account, otherwise those two lines stay empty for signed-in users. The card-payment key is still missing, so the Plan page will show "Coming soon" until you add it.
 
 ## 1. Sign in and onboarding
 
