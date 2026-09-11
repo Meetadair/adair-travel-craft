@@ -178,6 +178,40 @@ export const bookTripCard = createServerFn({ method: "POST" })
         ? "partial"
         : "confirmed";
 
+    const audit = async (action: string, after: unknown) => {
+      try {
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        await supabaseAdmin
+          .from("audit_log")
+          .insert({ actor: userId, action, entity: "trip_card", after: after as never });
+      } catch (error) {
+        console.error("audit_log insert failed", error);
+      }
+    };
+
+    // Nothing at all could be booked: keep the card open so the traveller can
+    // simply search again instead of ending up with an empty trip.
+    if (status === "failed") {
+      await supabase.from("payments").insert({
+        user_id: userId,
+        provider: "duffel-test",
+        amount_minor: Math.round(priced.total * 100),
+        status: "failed",
+        idempotency_key: `${card.id}-payment`,
+      });
+      await audit("booking_failed", { cardId: card.id, reason });
+      return {
+        tripId: null,
+        status,
+        reference: null,
+        totalEur: 0,
+        lines,
+        repriced,
+        reason,
+        testMode: isTestKey(),
+      };
+    }
+
     const tripRow = await supabase
       .from("trips")
       .insert({
@@ -187,7 +221,7 @@ export const bookTripCard = createServerFn({ method: "POST" })
         origin: request.originCity,
         start_date: request.departDate,
         end_date: request.returnDate,
-        status: status === "failed" ? "failed" : "booked",
+        status: "booked",
         total_amount: confirmedTotal,
         card_id: card.id,
         company_id: data.companyId,
@@ -223,18 +257,26 @@ export const bookTripCard = createServerFn({ method: "POST" })
 
     await supabase
       .from("trip_cards")
-      .update({ status: status === "failed" ? "open" : "booked" })
+      .update({ status: "booked" })
       .eq("id", card.id)
       .eq("user_id", userId);
 
     await supabase.from("payments").insert({
       user_id: userId,
       trip_id: tripId,
-      provider: "duffel-balance",
+      provider: "duffel-test",
       provider_ref: flightOrderId,
       amount_minor: Math.round(confirmedTotal * 100),
-      status: status === "failed" ? "failed" : "test_settled",
+      status: "test_settled",
       idempotency_key: `${card.id}-payment`,
+    });
+
+    await audit("booking_created", {
+      cardId: card.id,
+      tripId,
+      status,
+      totalEur: confirmedTotal,
+      testMode: isTestKey(),
     });
 
     return {
@@ -244,8 +286,10 @@ export const bookTripCard = createServerFn({ method: "POST" })
       totalEur: confirmedTotal,
       lines,
       repriced,
+      reason,
       testMode: isTestKey(),
     };
+
   });
 
 export type MyTrip = {
