@@ -4,6 +4,7 @@
  * failing part returns a short note instead of breaking the response.
  */
 import { findByName } from "./match";
+import { carScore, flightScore, stayScore, type SearchPrefs } from "@/lib/trip/rank";
 import type {
   CarResult,
   FlightResult,
@@ -112,7 +113,10 @@ type DuffelOffer = {
   }>;
 };
 
-export async function searchFlight(req: TripRequest): Promise<FlightResult | null> {
+export async function searchFlight(
+  req: TripRequest,
+  prefs?: SearchPrefs,
+): Promise<FlightResult | null> {
   const json = await duffel<{ data?: { offers?: DuffelOffer[] } }>(
     "/air/offer_requests?return_offers=true",
     {
@@ -141,9 +145,15 @@ export async function searchFlight(req: TripRequest): Promise<FlightResult | nul
     (o.slices ?? []).every((s) => (s.segments?.length ?? 1) <= 2),
   );
   const pool = simple.length ? simple : offers;
+  const carrierText = (o: DuffelOffer) =>
+    `${o.owner?.name ?? ""} ${o.slices?.[0]?.segments?.[0]?.marketing_carrier?.name ?? ""}`;
   const best = pool
     .slice()
-    .sort((a, b) => Number(a.total_amount) - Number(b.total_amount))[0];
+    .sort(
+      (a, b) =>
+        flightScore(carrierText(a), Number(a.total_amount), prefs) -
+        flightScore(carrierText(b), Number(b.total_amount), prefs),
+    )[0];
   if (!best) return null;
 
   const outbound = best.slices?.[0]?.segments ?? [];
@@ -201,7 +211,10 @@ export type StaySearchOutcome = {
   notFound: boolean;
 };
 
-export async function searchStay(req: TripRequest): Promise<StaySearchOutcome> {
+export async function searchStay(
+  req: TripRequest,
+  prefs?: SearchPrefs,
+): Promise<StaySearchOutcome> {
   const sample = usesTestInventory();
   const json = await duffel<{ data?: { results?: DuffelStay[] } }>("/stays/search", {
     data: {
@@ -274,14 +287,17 @@ export async function searchStay(req: TripRequest): Promise<StaySearchOutcome> {
     return { stay: null, alternatives, requested, notFound: true };
   }
 
-  // Above the 25th price percentile, best rating — "premium but not silly".
+  // Above the 25th price percentile, then ranked by the traveller's hotel
+  // preferences (chain, stars, rating, amenities) rather than price alone.
   const prices = results.map((r) => Number(r.cheapest_rate_total_amount)).sort((a, b) => a - b);
   const floor = prices[Math.floor(prices.length * 0.25)] ?? prices[0]!;
   const pool = mapped.filter((m) => m.result.amount >= floor);
   const best = (pool.length ? pool : mapped)
     .slice()
     .sort(
-      (a, b) => (b.result.rating ?? 0) - (a.result.rating ?? 0) || a.result.amount - b.result.amount,
+      (a, b) =>
+        stayScore(b.rawName, b.result.rating, b.result.amount, prefs) -
+        stayScore(a.rawName, a.result.rating, a.result.amount, prefs),
     )[0]!;
 
   return { stay: best.result, alternatives: [], requested: null, notFound: false };
@@ -306,7 +322,10 @@ export type CarSearchOutcome = {
   notFound: boolean;
 };
 
-export async function searchCar(req: TripRequest): Promise<CarSearchOutcome> {
+export async function searchCar(
+  req: TripRequest,
+  prefs?: SearchPrefs,
+): Promise<CarSearchOutcome> {
   const sample = usesTestInventory();
   const location = sample
     ? {
@@ -371,9 +390,13 @@ export async function searchCar(req: TripRequest): Promise<CarSearchOutcome> {
     return { car: null, alternatives, requested, notFound: true };
   }
 
-  const automatic = mapped.filter((m) => /automatic/i.test(m.result.transmission));
-  const pool = automatic.length ? automatic : mapped;
-  const best = pool.slice().sort((a, b) => a.result.amount - b.result.amount)[0]!;
+  const best = mapped
+    .slice()
+    .sort(
+      (a, b) =>
+        carScore(b.result.supplier, b.rawName, b.result.transmission, b.result.amount, prefs) -
+        carScore(a.result.supplier, a.rawName, a.result.transmission, a.result.amount, prefs),
+    )[0]!;
   return { car: best.result, alternatives: [], requested: null, notFound: false };
 }
 
@@ -390,14 +413,17 @@ function noteFor(error: unknown): string {
   return "unavailable";
 }
 
-export async function searchTripWithDuffel(req: TripRequest): Promise<TripSearchResponse> {
+export async function searchTripWithDuffel(
+  req: TripRequest,
+  prefs?: SearchPrefs,
+): Promise<TripSearchResponse> {
   const errors: TripSearchResponse["errors"] = {};
 
   const [flightRes, stayRes, carRes] = await Promise.allSettled([
-    searchFlight(req),
-    searchStay(req),
+    searchFlight(req, prefs),
+    searchStay(req, prefs),
     req.needsCar
-      ? searchCar(req)
+      ? searchCar(req, prefs)
       : Promise.resolve<CarSearchOutcome>({
           car: null,
           alternatives: [],

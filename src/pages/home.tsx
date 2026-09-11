@@ -505,7 +505,7 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
     const settled = search
       .then((result) => {
         if (!cancelled) {
-          if (result.flight || result.stay) setLive(result);
+          if (result.flight || result.stay || result.car) setLive(result);
           else setLiveFailed(true);
         }
       })
@@ -796,7 +796,18 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                           </>
                         )}
                       </div>
-                    ) : live ? null : (
+                    ) : live ? (
+                      <div className={`${reveal(2)} px-5 py-4`}>
+                        <p className="flex items-center gap-2 text-sm font-medium">
+                          <BedDouble className="size-4 text-primary" /> Hotel
+                        </p>
+                        <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                          {live.testMode
+                            ? "No hotel available in test mode for this destination — real properties appear once hotels are live on our account."
+                            : "No room available for these dates. Try shifting the dates by a day."}
+                        </p>
+                      </div>
+                    ) : (
                       <div className={reveal(2)}>
                         <TripRow
                           icon={<BedDouble className="size-4" />}
@@ -874,6 +885,17 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                             </ul>
                           </>
                         )}
+                      </div>
+                    ) : live && req?.needsCar ? (
+                      <div className={`${reveal(3)} px-5 py-4`}>
+                        <p className="flex items-center gap-2 text-sm font-medium">
+                          <CarFront className="size-4 text-primary" /> Car hire
+                        </p>
+                        <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                          {live.testMode
+                            ? "No car available in test mode for this destination — the real inventory appears once car hire is live on our account."
+                            : "No car available for these dates. Ask again with different dates and we will look once more."}
+                        </p>
                       </div>
                     ) : live ? null : (
 

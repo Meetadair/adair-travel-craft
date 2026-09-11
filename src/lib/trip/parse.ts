@@ -4,7 +4,8 @@
  * to today; unparseable input falls back to Milan, next Tuesday–Thursday.
  */
 import { CITIES, DEFAULT_DESTINATION, DEFAULT_ORIGIN, findCity, type CityEntry } from "./cities";
-import type { TripRequest } from "./types";
+import { airportByIata } from "@/lib/prefs/airports";
+import type { TripRequest, TripStop } from "./types";
 
 /** Weekday match terms, index 0 = Monday. */
 const WEEKDAYS: string[][] = [
@@ -100,24 +101,74 @@ function carNameExactOf(sentence: string): string | null {
 }
 
 
-function originOf(text: string, destination: CityEntry): CityEntry {
-  // "from Berlin", "z Warszawy" — otherwise default to Warsaw.
+/** The traveller's saved home airport, as a city entry we can search from. */
+function homeAirportEntry(iata: string | undefined): CityEntry | null {
+  if (!iata) return null;
+  const code = iata.trim().toUpperCase();
+  if (!/^[A-Z]{3}$/.test(code)) return null;
+  const known = CITIES.find((c) => c.iata === code);
+  if (known) return known;
+  const airport = airportByIata(code);
+  if (!airport) return null;
+  return { city: airport.city, iata: airport.iata, lat: 0, lon: 0, aliases: [] };
+}
+
+function originOf(text: string, destination: CityEntry, homeIata?: string): CityEntry {
+  // "from Berlin", "z Warszawy" — otherwise the saved home airport.
   const fromMatch = /\b(?:from|out of|z|ze)\s+([\p{L}\s-]{3,24})/u.exec(text);
   if (fromMatch?.[1]) {
     const found = findCity(fromMatch[1].toLowerCase(), destination.iata);
     if (found) return found;
   }
+  const home = homeAirportEntry(homeIata);
+  if (home && home.iata !== destination.iata) return home;
   if (destination.iata === DEFAULT_ORIGIN.iata) {
     return CITIES.find((c) => c.iata === "BER")!;
   }
   return DEFAULT_ORIGIN;
 }
 
-export function parseTripSentence(sentence: string, today = new Date()): TripRequest {
+/**
+ * Every city named in the sentence, in the order it appears — this is how a
+ * multi-city trip ("Rome then Athens then Santorini") becomes a stop list.
+ */
+function findCitiesInOrder(text: string): CityEntry[] {
+  const hits: { entry: CityEntry; at: number }[] = [];
+  for (const entry of CITIES) {
+    let at = -1;
+    for (const alias of [entry.city.toLowerCase(), entry.iata.toLowerCase(), ...entry.aliases]) {
+      const found = text.indexOf(alias.length <= 3 ? ` ${alias} ` : alias);
+      if (found >= 0 && (at < 0 || found < at)) at = found;
+    }
+    if (at >= 0) hits.push({ entry, at });
+  }
+  hits.sort((a, b) => a.at - b.at);
+
+  // Drop a city that is only there as the departure point ("from Berlin").
+  const fromMatch = /\b(?:from|out of|z|ze)\s+([\p{L}\s-]{3,24})/u.exec(text);
+  const originName = fromMatch?.[1] ? findCity(fromMatch[1].toLowerCase())?.iata : undefined;
+
+  const seen = new Set<string>();
+  return hits
+    .map((h) => h.entry)
+    .filter((entry) => {
+      if (entry.iata === originName) return false;
+      if (seen.has(entry.iata)) return false;
+      seen.add(entry.iata);
+      return true;
+    });
+}
+
+export function parseTripSentence(
+  sentence: string,
+  today = new Date(),
+  homeAirportIata?: string,
+): TripRequest {
   const text = ` ${sentence.toLowerCase()} `;
 
-  const destination = findCity(text) ?? DEFAULT_DESTINATION;
-  const origin = originOf(text, destination);
+  const destinations = findCitiesInOrder(text);
+  const destination = destinations[0] ?? findCity(text) ?? DEFAULT_DESTINATION;
+  const origin = originOf(text, destination, homeAirportIata);
 
   // Weekday hits, in the order they appear in the sentence.
   const hits: { index: number; at: number }[] = [];
@@ -161,6 +212,12 @@ export function parseTripSentence(sentence: string, today = new Date()): TripReq
       (c) => c.toLowerCase() === value.toLowerCase(),
     );
 
+  const stopEntries = destinations.length ? destinations : [destination];
+  const stops: TripStop[] = [
+    { city: origin.city, iata: origin.iata, lat: origin.lat, lon: origin.lon },
+    ...stopEntries.map((c) => ({ city: c.city, iata: c.iata, lat: c.lat, lon: c.lon })),
+  ];
+
   return {
     originCity: origin.city,
     originIata: origin.iata,
@@ -177,6 +234,7 @@ export function parseTripSentence(sentence: string, today = new Date()): TripReq
     carNameExact: carNameExactOf(sentence),
     needsCar: /\bcar\b|auto|samoch|rental|mietwagen|voiture/.test(text) && !/no car|without a car|bez auta|bez samoch/.test(text),
     invoiceToCompany: /invoice|company|vat|faktur|firm|rechnung|societ|empresa/.test(text),
+    stops,
   };
 
 }

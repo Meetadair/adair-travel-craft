@@ -38,6 +38,10 @@ export const getSystemStatus = createServerFn({ method: "GET" })
         carNameExact: null,
         needsCar: true,
         invoiceToCompany: false,
+        stops: [
+          { city: "Warsaw", iata: "WAW", lat: 52.23, lon: 21.01 },
+          { city: "Milan", iata: "LIN", lat: 45.464, lon: 9.19 },
+        ],
       };
 
       const [flight, stay, car] = await Promise.allSettled([
