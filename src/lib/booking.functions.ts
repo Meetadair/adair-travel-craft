@@ -316,6 +316,23 @@ export const bookTripCard = createServerFn({ method: "POST" })
       testMode: isTestKey(),
     });
 
+    const calendar = tripCalendarEvents({
+      id: tripId,
+      title: `${request.destinationCity} · ${request.departDate} – ${request.returnDate}`,
+      city: request.destinationCity,
+      startDate: request.departDate,
+      endDate: request.returnDate,
+      reference: flightReference,
+      items: lines.map((line, index) => ({
+        id: insertedIds.get(index) ?? `${tripId}-${index}`,
+        kind: line.kind,
+        title: line.title,
+        status: line.status,
+        reference: line.reference,
+        payload: line.payload ?? null,
+      })),
+    });
+
     return {
       tripId,
       status,
@@ -325,7 +342,9 @@ export const bookTripCard = createServerFn({ method: "POST" })
       repriced,
       reason,
       testMode: isTestKey(),
+      calendar,
     };
+
 
   });
 
