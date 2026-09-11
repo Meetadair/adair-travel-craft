@@ -297,7 +297,14 @@ type DuffelCar = {
   supplier?: { name?: string };
 };
 
-export async function searchCar(req: TripRequest): Promise<CarResult | null> {
+export type CarSearchOutcome = {
+  car: CarResult | null;
+  alternatives: CarResult[];
+  requested: string | null;
+  notFound: boolean;
+};
+
+export async function searchCar(req: TripRequest): Promise<CarSearchOutcome> {
   const sample = usesTestInventory();
   const location = sample
     ? {
@@ -321,29 +328,53 @@ export async function searchCar(req: TripRequest): Promise<CarResult | null> {
     },
   );
 
-
+  const requested = req.carNameExact?.trim() || null;
   const results = json.data?.results ?? json.data?.offers ?? [];
-  const automatic = results.filter((r) =>
-    /automatic/i.test(r.transmission ?? r.vehicle?.transmission ?? ""),
-  );
-  const pool = automatic.length ? automatic : results;
-  const best = pool
-    .slice()
-    .sort((a, b) => Number(a.total_amount ?? 0) - Number(b.total_amount ?? 0))[0];
-  if (!best) return null;
+  if (!results.length) {
+    return { car: null, alternatives: [], requested, notFound: Boolean(requested) };
+  }
 
-  const amount = Number(best.total_amount ?? 0);
-  const currency = best.total_currency ?? "EUR";
-  const vehicle = best.vehicle?.name ?? best.vehicle?.model ?? "Car";
-  return {
-    supplier: best.supplier?.name ?? "Car supplier",
-    vehicle: sample ? `Test Drive — sample data (${vehicle})` : vehicle,
-    amount: round(amount),
-    currency,
-    ...toEur(amount, currency),
-    transmission: best.transmission ?? best.vehicle?.transmission ?? "automatic",
+  const map = (raw: DuffelCar): { rawName: string; result: CarResult } => {
+    const amount = Number(raw.total_amount ?? 0);
+    const currency = raw.total_currency ?? "EUR";
+    const vehicle = raw.vehicle?.name ?? raw.vehicle?.model ?? "Car";
+    const supplier = raw.supplier?.name ?? "Car supplier";
+    return {
+      rawName: `${supplier} ${vehicle}`,
+      result: {
+        supplier,
+        vehicle: sample ? `Test Drive — sample data (${vehicle})` : vehicle,
+        amount: round(amount),
+        currency,
+        ...toEur(amount, currency),
+        transmission: raw.transmission ?? raw.vehicle?.transmission ?? "automatic",
+      },
+    };
   };
+
+  const mapped = results.map(map);
+
+  // A named supplier or model overrides the cheapest-automatic pick.
+  if (requested) {
+    const hit = findByName(mapped, requested, (m) => m.rawName);
+    if (hit) {
+      return { car: { ...hit.result, exact: true }, alternatives: [], requested, notFound: false };
+    }
+    const alternatives = mapped
+      .filter((m) => m !== hit)
+      .slice()
+      .sort((a, b) => a.result.amount - b.result.amount)
+      .slice(0, 3)
+      .map((m) => m.result);
+    return { car: null, alternatives, requested, notFound: true };
+  }
+
+  const automatic = mapped.filter((m) => /automatic/i.test(m.result.transmission));
+  const pool = automatic.length ? automatic : mapped;
+  const best = pool.slice().sort((a, b) => a.result.amount - b.result.amount)[0]!;
+  return { car: best.result, alternatives: [], requested: null, notFound: false };
 }
+
 
 
 /* ------------------------------ orchestration --------------------------- */
