@@ -24,7 +24,12 @@ const travellerSchema = z.object({
 
 const bookSchema = z.object({
   cardId: z.string().uuid(),
-  include: z.object({ flight: z.boolean(), stay: z.boolean(), car: z.boolean() }),
+  include: z.object({
+    flight: z.boolean(),
+    stay: z.boolean(),
+    car: z.boolean(),
+    insurance: z.boolean().optional(),
+  }),
   companyId: z.string().uuid().nullable(),
   traveller: travellerSchema,
 });
