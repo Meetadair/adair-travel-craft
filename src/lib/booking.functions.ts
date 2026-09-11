@@ -6,6 +6,11 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { TripSearchResponse } from "@/lib/trip/types";
+import {
+  tripCalendarEvents,
+  type CalendarEvent,
+  type ItemCalendarPayload,
+} from "@/lib/calendar";
 
 const travellerSchema = z.object({
   givenName: z.string().trim().min(1).max(60),
@@ -36,12 +41,16 @@ export type BookingResult = {
     amountEur: number;
     reference: string | null;
     note: string | null;
+    payload?: ItemCalendarPayload;
   }>;
   repriced: { from: number; to: number } | null;
   /** Machine-readable failure reason, e.g. "offer-expired". */
   reason: string | null;
   testMode: boolean;
+  /** Calendar events for the booked legs, ready for .ics / Google Calendar. */
+  calendar: CalendarEvent[];
 };
+
 
 type CardItems = {
   search: TripSearchResponse;
