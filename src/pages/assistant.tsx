@@ -42,11 +42,13 @@ export function AssistantPage() {
   });
 
   const raw = search.data;
-  const offers = (raw?.offers ?? []).map((o) => {
-    if (o.kind !== "hotel" || !hotelRef) return o;
-    const alt = o.alternatives?.find((a) => a.offerReference === hotelRef);
-    return alt ? { ...alt, ...(o.alternatives ? { alternatives: o.alternatives } : {}) } : o;
-  });
+  const offers = (raw?.offers ?? [])
+    .filter((o) => !removed.includes(o.kind))
+    .map((o) => {
+      if (o.kind !== "hotel" || !hotelRef) return o;
+      const alt = o.alternatives?.find((a) => a.offerReference === hotelRef);
+      return alt ? { ...alt, ...(o.alternatives ? { alternatives: o.alternatives } : {}) } : o;
+    });
   const total = Math.round(offers.reduce((sum, o) => sum + o.amount, 0) * 100) / 100;
 
   const store = useMutation({
