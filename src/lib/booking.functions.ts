@@ -300,11 +300,16 @@ export const bookTripCard = createServerFn({ method: "POST" })
       title: line.title,
       detail: line.note,
       status: line.status,
-      supplier: "duffel",
+      supplier: line.kind === "insurance" ? "adair" : "duffel",
       supplier_order_id: line.kind === "flight" ? flightOrderId : null,
       offer_reference: line.reference,
       amount: line.amountEur,
-      net_minor: line.kind === "flight" ? Math.round(flightNet * 100) : 0,
+      net_minor:
+        line.kind === "flight"
+          ? Math.round(flightNet * 100)
+          : line.kind === "insurance"
+            ? Math.round((insurance?.netEur ?? 0) * 100)
+            : 0,
       gross_minor: Math.round(line.amountEur * 100),
       position: index,
       payload: (line.payload ?? {}) as never,
