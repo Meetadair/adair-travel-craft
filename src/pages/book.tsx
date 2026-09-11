@@ -2,7 +2,8 @@ import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { Plane, BedDouble, CarFront, Check, AlertTriangle } from "lucide-react";
+import { Plane, BedDouble, CarFront, Check, AlertTriangle, ShieldCheck } from "lucide-react";
+import { INSURANCE_DETAIL, INSURANCE_TITLE } from "@/lib/trip/insurance";
 import { SiteNav } from "@/components/site-nav";
 import { AddToCalendar } from "@/components/add-to-calendar";
 
@@ -150,6 +151,38 @@ export function BookPage({ cardId }: { cardId: string }) {
                   checked={include.car}
                   onToggle={() => setInclude((s) => ({ ...s, car: !s.car }))}
                 />
+              )}
+              {insurance && (
+                <div className="px-5 py-4">
+                  <div className="flex items-center gap-4">
+                    <input
+                      type="checkbox"
+                      checked={include.insurance}
+                      onChange={() =>
+                        setInclude((s) => ({ ...s, insurance: !s.insurance }))
+                      }
+                      className="accent-primary"
+                      aria-label="Add travel insurance"
+                    />
+                    <span className="text-muted-foreground">
+                      <ShieldCheck className="size-4" />
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-sm font-medium">
+                        {INSURANCE_TITLE}
+                      </span>
+                      <span className="block text-xs text-muted-foreground">
+                        Insurance · {insurance.nights} night
+                        {insurance.nights === 1 ? "" : "s"} · {insurance.passengers} traveller
+                        {insurance.passengers === 1 ? "" : "s"}
+                      </span>
+                    </span>
+                    <span className="text-sm">{eur(insurance.grossEur)}</span>
+                  </div>
+                  <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+                    {INSURANCE_DETAIL}
+                  </p>
+                </div>
               )}
               <div className="flex items-center justify-between px-5 py-4">
                 <span className="text-sm font-semibold">Total</span>
