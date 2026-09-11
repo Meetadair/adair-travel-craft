@@ -119,7 +119,7 @@ export const getTripCard = createServerFn({ method: "POST" })
     if (res.error) throw new Error(res.error.message);
     if (!res.data) throw new Error("card-not-found");
 
-    const row = res.data as {
+    const row = res.data as unknown as {
       id: string;
       items: { search: TripSearchResponse; priced: LiveTripResult["priced"] };
       total_minor: number;
