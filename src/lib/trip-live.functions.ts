@@ -150,7 +150,11 @@ export const getTripCard = createServerFn({ method: "POST" })
 
     const row = res.data as unknown as {
       id: string;
-      items: { search: TripSearchResponse; priced: LiveTripResult["priced"] };
+      items: {
+        search: TripSearchResponse;
+        priced: LiveTripResult["priced"];
+        insurance?: InsuranceQuote | null;
+      };
       total_minor: number;
       saved_minor: number;
       expires_at: string | null;
@@ -160,6 +164,7 @@ export const getTripCard = createServerFn({ method: "POST" })
       cardId: row.id,
       search: row.items.search,
       priced: row.items.priced,
+      insurance: row.items.insurance ?? null,
       totalEur: row.total_minor / 100,
       savedEur: row.saved_minor / 100,
       expiresAt: row.expires_at,
@@ -200,7 +205,11 @@ export const swapCardAlternative = createServerFn({ method: "POST" })
     if (!cardRes.data) throw new Error("card-not-found");
 
     const row = cardRes.data as unknown as {
-      items: { search: TripSearchResponse; priced: LiveTripResult["priced"] };
+      items: {
+        search: TripSearchResponse;
+        priced: LiveTripResult["priced"];
+        insurance?: InsuranceQuote | null;
+      };
       saved_minor: number;
       expires_at: string | null;
     };
@@ -241,12 +250,13 @@ export const swapCardAlternative = createServerFn({ method: "POST" })
     search.totalEur = netTotal;
 
     const priced = { flight, stay, car, total };
+    const insurance = row.items.insurance ?? null;
     const update = await supabase
       .from("trip_cards")
       .update({
         total_minor: pricing.toMinor(total),
         markup_minor: pricing.toMinor(Math.max(0, total - netTotal)),
-        items: { search, priced },
+        items: { search, priced, insurance },
       })
       .eq("user_id", userId)
       .eq("id", data.cardId);
@@ -257,6 +267,7 @@ export const swapCardAlternative = createServerFn({ method: "POST" })
       plan,
       search,
       priced,
+      insurance,
       expiresAt: row.expires_at,
     } satisfies LiveTripResult;
   });
