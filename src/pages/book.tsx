@@ -1,7 +1,7 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Plane, BedDouble, CarFront, Check, AlertTriangle } from "lucide-react";
 import { SiteNav } from "@/components/site-nav";
 import { getTripCard } from "@/lib/trip-live.functions";
@@ -11,6 +11,19 @@ import { eur } from "@/lib/trip/client";
 
 const inputClass =
   "mt-1 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary";
+
+/** Plain-language explanation for each supplier failure. */
+function failureMessage(reason: string | null): string {
+  switch (reason) {
+    case "offer-expired":
+      return "The airline released this fare while you were confirming. Nothing was charged — search again to get a fresh price.";
+    case "supplier-not-configured":
+      return "Live booking is not switched on yet. Nothing was charged.";
+    default:
+      return "The airline could not complete this booking. Nothing was charged — please search again.";
+  }
+}
+
 
 export function BookPage({ cardId }: { cardId: string }) {
   const navigate = useNavigate();
@@ -53,6 +66,15 @@ export function BookPage({ cardId }: { cardId: string }) {
       }),
     onSuccess: (data) => setResult(data),
   });
+
+  // Booked (fully or partly): show the confirmation, then move on to My trips.
+  useEffect(() => {
+    if (!result || result.status === "failed") return;
+    const timer = window.setTimeout(() => navigate({ to: "/trips" }), 3500);
+    return () => window.clearTimeout(timer);
+  }, [result, navigate]);
+
+
 
   const search = card.data?.search;
   const priced = card.data?.priced;
@@ -211,9 +233,14 @@ export function BookPage({ cardId }: { cardId: string }) {
 
               {mutation.isError && (
                 <p className="text-sm text-primary">
-                  The booking did not go through. Nothing was charged — please try again.
+                  {failureMessage(
+                    mutation.error instanceof Error && mutation.error.message.includes("offer")
+                      ? "offer-expired"
+                      : null,
+                  )}
                 </p>
               )}
+
 
               <button
                 onClick={() => mutation.mutate()}
@@ -240,6 +267,14 @@ export function BookPage({ cardId }: { cardId: string }) {
                 {result.status === "failed" && "Nothing was booked"}
               </h2>
             </div>
+            {result.testMode && (
+              <span className="mt-3 inline-block rounded-full border border-border px-3 py-1 text-xs text-muted-foreground">
+                Test mode — no real charge
+              </span>
+            )}
+            {result.status === "failed" && (
+              <p className="mt-3 text-sm text-muted-foreground">{failureMessage(result.reason)}</p>
+            )}
             {result.reference && (
               <p className="mt-2 text-sm text-muted-foreground">
                 Booking reference {result.reference}
@@ -262,14 +297,29 @@ export function BookPage({ cardId }: { cardId: string }) {
                 </li>
               ))}
             </ul>
-            <button
-              onClick={() => navigate({ to: "/trips" })}
-              className="mt-6 w-full rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
-            >
-              Go to my trips
-            </button>
+            {result.status === "failed" ? (
+              <button
+                onClick={() => navigate({ to: "/" })}
+                className="mt-6 w-full rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+              >
+                Search again
+              </button>
+            ) : (
+              <>
+                <button
+                  onClick={() => navigate({ to: "/trips" })}
+                  className="mt-6 w-full rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+                >
+                  Go to my trips
+                </button>
+                <p className="mt-3 text-center text-xs text-muted-foreground">
+                  Taking you to My trips…
+                </p>
+              </>
+            )}
           </div>
         )}
+
       </main>
     </div>
   );

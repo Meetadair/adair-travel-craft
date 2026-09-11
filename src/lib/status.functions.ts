@@ -81,10 +81,11 @@ export const getSystemStatus = createServerFn({ method: "GET" })
         : "Falling back to rules only",
     });
     capabilities.push({
-      name: "Payments",
-      state: "off",
-      note: "Card payments open at 1,000 active accounts",
+      name: "Booking & payment",
+      state: "ok",
+      note: "Test-mode booking live — supplier test payment, no real charge",
     });
+
 
     return { capabilities, checkedAt: new Date().toISOString() };
   });

@@ -25,7 +25,7 @@ const bookSchema = z.object({
 });
 
 export type BookingResult = {
-  tripId: string;
+  tripId: string | null;
   status: "confirmed" | "partial" | "failed";
   reference: string | null;
   totalEur: number;
@@ -38,6 +38,8 @@ export type BookingResult = {
     note: string | null;
   }>;
   repriced: { from: number; to: number } | null;
+  /** Machine-readable failure reason, e.g. "offer-expired". */
+  reason: string | null;
   testMode: boolean;
 };
 
@@ -45,6 +47,7 @@ type CardItems = {
   search: TripSearchResponse;
   priced: { flight: number | null; stay: number | null; car: number | null; total: number };
 };
+
 
 export const bookTripCard = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -84,8 +87,11 @@ export const bookTripCard = createServerFn({ method: "POST" })
     let flightGross = 0;
     let flightNet = 0;
     let failed = false;
+    let reason: string | null = null;
 
-    const table = await pricing.loadPricing(supabase, "free");
+    const planRes = await supabase.from("profiles").select("plan").eq("id", userId).maybeSingle();
+    const plan = (planRes.data as { plan: string } | null)?.plan ?? "free";
+    const table = await pricing.loadPricing(supabase, plan);
 
     if (data.include.flight && search.flight?.offerId) {
       try {
@@ -104,7 +110,9 @@ export const bookTripCard = createServerFn({ method: "POST" })
         flightOrderId = order.id;
         flightReference = order.bookingReference;
         flightNet = search.flight.amountEur;
-        flightGross = pricing.fromMinor(pricing.grossMinor(flightNet, table.flight));
+        // The card already holds the traveller price; only recompute if missing.
+        flightGross =
+          priced.flight ?? pricing.fromMinor(pricing.grossMinor(flightNet, table.flight));
         lines.push({
           kind: "flight",
           title: `${search.flight.carrier} ${search.flight.flightNumbers.join(" / ")}`,
@@ -116,6 +124,12 @@ export const bookTripCard = createServerFn({ method: "POST" })
       } catch (error) {
         failed = true;
         const message = error instanceof Error ? error.message : "unknown";
+        reason =
+          message === "offer-gone" || message === "duffel-422" || message === "duffel-404"
+            ? "offer-expired"
+            : message === "missing-key"
+              ? "supplier-not-configured"
+              : "supplier-error";
         lines.push({
           kind: "flight",
           title: search.flight
@@ -124,10 +138,11 @@ export const bookTripCard = createServerFn({ method: "POST" })
           status: "failed",
           amountEur: 0,
           reference: null,
-          note: message === "offer-gone" ? "offer-expired" : "supplier-error",
+          note: reason,
         });
       }
     }
+
 
     // Stays and cars are not bookable on this supplier account yet: they are
     // stored as requested lines so nothing is silently charged.
@@ -163,6 +178,40 @@ export const bookTripCard = createServerFn({ method: "POST" })
         ? "partial"
         : "confirmed";
 
+    const audit = async (action: string, after: unknown) => {
+      try {
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        await supabaseAdmin
+          .from("audit_log")
+          .insert({ actor: userId, action, entity: "trip_card", after: after as never });
+      } catch (error) {
+        console.error("audit_log insert failed", error);
+      }
+    };
+
+    // Nothing at all could be booked: keep the card open so the traveller can
+    // simply search again instead of ending up with an empty trip.
+    if (status === "failed") {
+      await supabase.from("payments").insert({
+        user_id: userId,
+        provider: "duffel-test",
+        amount_minor: Math.round(priced.total * 100),
+        status: "failed",
+        idempotency_key: `${card.id}-payment`,
+      });
+      await audit("booking_failed", { cardId: card.id, reason });
+      return {
+        tripId: null,
+        status,
+        reference: null,
+        totalEur: 0,
+        lines,
+        repriced,
+        reason,
+        testMode: isTestKey(),
+      };
+    }
+
     const tripRow = await supabase
       .from("trips")
       .insert({
@@ -172,7 +221,7 @@ export const bookTripCard = createServerFn({ method: "POST" })
         origin: request.originCity,
         start_date: request.departDate,
         end_date: request.returnDate,
-        status: status === "failed" ? "failed" : "booked",
+        status: "booked",
         total_amount: confirmedTotal,
         card_id: card.id,
         company_id: data.companyId,
@@ -208,18 +257,26 @@ export const bookTripCard = createServerFn({ method: "POST" })
 
     await supabase
       .from("trip_cards")
-      .update({ status: status === "failed" ? "open" : "booked" })
+      .update({ status: "booked" })
       .eq("id", card.id)
       .eq("user_id", userId);
 
     await supabase.from("payments").insert({
       user_id: userId,
       trip_id: tripId,
-      provider: "duffel-balance",
+      provider: "duffel-test",
       provider_ref: flightOrderId,
       amount_minor: Math.round(confirmedTotal * 100),
-      status: status === "failed" ? "failed" : "test_settled",
+      status: "test_settled",
       idempotency_key: `${card.id}-payment`,
+    });
+
+    await audit("booking_created", {
+      cardId: card.id,
+      tripId,
+      status,
+      totalEur: confirmedTotal,
+      testMode: isTestKey(),
     });
 
     return {
@@ -229,8 +286,10 @@ export const bookTripCard = createServerFn({ method: "POST" })
       totalEur: confirmedTotal,
       lines,
       repriced,
+      reason,
       testMode: isTestKey(),
     };
+
   });
 
 export type MyTrip = {
@@ -242,6 +301,8 @@ export type MyTrip = {
   status: string;
   totalEur: number;
   reference: string | null;
+  /** True when the trip was created against the supplier's test environment. */
+  testMode: boolean;
   items: Array<{
     id: string;
     kind: string;
@@ -260,7 +321,7 @@ export const listMyTrips = createServerFn({ method: "GET" })
     const tripsRes = await supabase
       .from("trips")
       .select(
-        "id, title, city, start_date, end_date, status, total_amount, document_number, created_at",
+        "id, title, city, start_date, end_date, status, total_amount, document_number, data_source, created_at",
       )
       .eq("user_id", userId)
       .order("created_at", { ascending: false });
@@ -274,7 +335,9 @@ export const listMyTrips = createServerFn({ method: "GET" })
       status: string;
       total_amount: number;
       document_number: string | null;
+      data_source: string | null;
     }>;
+
     if (!trips.length) return [];
 
     const itemsRes = await supabase
@@ -307,6 +370,8 @@ export const listMyTrips = createServerFn({ method: "GET" })
       status: trip.status,
       totalEur: Number(trip.total_amount),
       reference: trip.document_number,
+      testMode: (trip.data_source ?? "").includes("test"),
+
       items: items
         .filter((i) => i.trip_id === trip.id)
         .map((i) => ({
