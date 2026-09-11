@@ -1,0 +1,107 @@
+/**
+ * Reminder emails for upcoming trips. Called by a scheduler (once or twice a
+ * day). Sends one email 24 h before departure and one on the morning of it.
+ * If RESEND_API_KEY is not configured, the run does nothing and reports so.
+ */
+import { createFileRoute } from "@tanstack/react-router";
+
+type ItemRow = {
+  trip_id: string;
+  kind: string;
+  title: string;
+  status: string;
+  payload: Record<string, string | null> | null;
+};
+
+function itineraryLines(items: ItemRow[]): string {
+  return items
+    .filter((item) => item.status !== "cancelled" && item.status !== "failed")
+    .map((item) => {
+      const p = item.payload ?? {};
+      const when =
+        p['departAt'] ?? p['checkin'] ?? p['pickup'] ?? null;
+      const label = item.kind === "flight" ? "Flight" : item.kind === "car" ? "Car" : "Hotel";
+      return `<li>${label}: ${item.title}${when ? ` — ${String(when).replace("T", " ").slice(0, 16)}` : ""}</li>`;
+    })
+    .join("");
+}
+
+async function run(): Promise<Response> {
+  const apiKey = process.env['RESEND_API_KEY'];
+  if (!apiKey) return Response.json({ ok: true, skipped: "no-email-key", sent: 0 });
+
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+  const day = 86_400_000;
+  const iso = (d: Date) => d.toISOString().slice(0, 10);
+  const today = iso(new Date());
+  const tomorrow = iso(new Date(Date.now() + day));
+
+  const tripsRes = await supabaseAdmin
+    .from("trips")
+    .select("id, user_id, title, city, start_date, status")
+    .in("start_date", [today, tomorrow])
+    .eq("status", "booked");
+  if (tripsRes.error) return Response.json({ ok: false, error: tripsRes.error.message }, { status: 500 });
+  const trips = (tripsRes.data ?? []) as Array<{
+    id: string;
+    user_id: string;
+    title: string;
+    city: string | null;
+    start_date: string;
+  }>;
+  if (!trips.length) return Response.json({ ok: true, sent: 0 });
+
+  const itemsRes = await supabaseAdmin
+    .from("trip_items")
+    .select("trip_id, kind, title, status, payload")
+    .in("trip_id", trips.map((t) => t.id));
+  const items = (itemsRes.data ?? []) as ItemRow[];
+
+  const sentRes = await supabaseAdmin
+    .from("trip_reminders")
+    .select("trip_id, kind")
+    .in("trip_id", trips.map((t) => t.id));
+  const alreadySent = new Set(
+    ((sentRes.data ?? []) as Array<{ trip_id: string; kind: string }>).map(
+      (r) => `${r.trip_id}:${r.kind}`,
+    ),
+  );
+
+  let sent = 0;
+  for (const trip of trips) {
+    const kind = trip.start_date === today ? "day_of" : "day_before";
+    if (alreadySent.has(`${trip.id}:${kind}`)) continue;
+
+    const userRes = await supabaseAdmin.auth.admin.getUserById(trip.user_id);
+    const email = userRes.data.user?.email;
+    if (!email) continue;
+
+    const subject =
+      kind === "day_of"
+        ? `Today: your trip to ${trip.city ?? "your destination"}`
+        : `Tomorrow: your trip to ${trip.city ?? "your destination"}`;
+    const html = `<p>${subject}</p><ul>${itineraryLines(items.filter((i) => i.trip_id === trip.id))}</ul><p>Adair</p>`;
+
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        from: process.env['RESEND_FROM'] ?? "Adair <onboarding@resend.dev>",
+        to: [email],
+        subject,
+        html,
+      }),
+    });
+    if (!res.ok) continue;
+
+    await supabaseAdmin.from("trip_reminders").insert({ trip_id: trip.id, kind });
+    sent += 1;
+  }
+
+  return Response.json({ ok: true, sent });
+}
+
+export const Route = createFileRoute("/api/public/trip-reminders")({
+  server: { handlers: { GET: () => run(), POST: () => run() } },
+});
