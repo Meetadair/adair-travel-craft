@@ -68,6 +68,22 @@ export const searchLiveTrip = createServerFn({ method: "POST" })
 
     const search = await searchTripWithDuffel(request);
 
+    // Internal demand reporting: which named hotels we cannot source yet.
+    if (search.hotelNotFound && search.hotelRequested) {
+      try {
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        await supabaseAdmin.from("hotel_requests_missed").insert({
+          name_requested: search.hotelRequested,
+          destination_iata: request.destinationIata,
+          checkin_date: request.departDate,
+        });
+      } catch (error) {
+        console.error("Could not log missed hotel request", error);
+      }
+    }
+
+
+
     const table = await pricing.loadPricing(supabase, plan);
     const priceLine = (net: number | null | undefined, kind: "flight" | "stay" | "car") =>
       net == null ? null : pricing.fromMinor(pricing.grossMinor(net, table[kind]));
