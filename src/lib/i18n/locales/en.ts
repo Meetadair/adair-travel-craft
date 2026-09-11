@@ -538,8 +538,8 @@ export const en = {
       {
         name: "Teams",
         forWho: "5–50 travellers",
-        price: "199 USD",
-        priceNote: "per month, whole team",
+        price: "19 USD",
+        priceNote: "per traveller, per month — minimum 5",
         features: [
           "Budgets and approval thresholds",
           "Booking on behalf of colleagues",
