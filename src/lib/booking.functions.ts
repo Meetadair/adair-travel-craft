@@ -370,6 +370,8 @@ export const listMyTrips = createServerFn({ method: "GET" })
       status: trip.status,
       totalEur: Number(trip.total_amount),
       reference: trip.document_number,
+      testMode: (trip.data_source ?? "").includes("test"),
+
       items: items
         .filter((i) => i.trip_id === trip.id)
         .map((i) => ({
