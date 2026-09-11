@@ -10,8 +10,9 @@
 - [x] New copy in en.ts + 13 locale files regenerated
 - [x] Verified at 390 px, reduced motion, typecheck
 
-## Blocked
-- [ ] Live results need the DUFFEL_API_KEY secret (user adds it in project settings); until then the sample trip shows with a note.
+## In progress
+- [ ] Real product behind sign-in: auth + onboarding, data model, live search, test-mode booking, My Trips, plans, /dev/status
+- [x] DUFFEL_API_KEY saved (test mode) — verify live search
 
 ## Done
 - Business card for Kitti Fodor in the chosen layout
