@@ -20,8 +20,8 @@ export function AddToCalendar({
   title: string;
   className?: string;
 }) {
-  if (!events.length) return null;
   const first = events[0];
+  if (!first) return null;
   const timeZone =
     typeof Intl !== "undefined" ? Intl.DateTimeFormat().resolvedOptions().timeZone : undefined;
 
