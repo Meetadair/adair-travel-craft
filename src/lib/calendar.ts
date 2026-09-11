@@ -28,6 +28,8 @@ export type ItemCalendarPayload = {
   dropoff?: string | null;
   address?: string | null;
   location?: string | null;
+  /** Free-text note stored with the line (e.g. the insurance offer wording). */
+  note?: string | null;
 };
 
 type TripLike = {

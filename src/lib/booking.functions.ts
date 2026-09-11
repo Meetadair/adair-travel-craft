@@ -11,6 +11,11 @@ import {
   type CalendarEvent,
   type ItemCalendarPayload,
 } from "@/lib/calendar";
+import {
+  INSURANCE_NOTE,
+  INSURANCE_TITLE,
+  type InsuranceQuote,
+} from "@/lib/trip/insurance";
 
 const travellerSchema = z.object({
   givenName: z.string().trim().min(1).max(60),
@@ -60,6 +65,7 @@ export type BookingResult = {
 type CardItems = {
   search: TripSearchResponse;
   priced: { flight: number | null; stay: number | null; car: number | null; total: number };
+  insurance?: InsuranceQuote | null;
 };
 
 
