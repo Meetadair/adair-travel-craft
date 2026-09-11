@@ -2,7 +2,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
-import { Plane, BedDouble, CarFront, Sparkles, ChevronRight, Send } from "lucide-react";
+import { Plane, BedDouble, CarFront, Sparkles, ChevronRight, Send, X } from "lucide-react";
 import { SiteNav } from "@/components/site-nav";
 import { HotelGallery } from "@/components/hotel-gallery";
 import { composeTrip, saveTrip } from "@/lib/travel.functions";
