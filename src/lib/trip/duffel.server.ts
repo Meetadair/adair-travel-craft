@@ -50,6 +50,19 @@ export function isTestKey(): boolean {
   return !key || key.includes("test");
 }
 
+/**
+ * Duffel test mode only has fake stay/car inventory at one fixed spot
+ * (Duffel Test Hotel / Duffel Test Drive). Real cities return nothing there,
+ * so we search these coordinates instead while a test key is in use and label
+ * the results as samples. A live key automatically uses the real destination.
+ */
+const TEST_LOCATION = { latitude: -24.38, longitude: -128.32, radius: 2 };
+
+function usesTestInventory(): boolean {
+  return (duffelKey() ?? "").startsWith("duffel_test_");
+}
+
+
 export function hasDuffelKey(): boolean {
   return Boolean(duffelKey());
 }
