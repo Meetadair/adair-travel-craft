@@ -589,7 +589,7 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                   </div>
 
                   <div className="divide-y divide-border">
-                    {live?.flight && req ? (
+                    {dropped.flight ? null : live?.flight && req ? (
                       <div className={reveal(1)}>
                         <TripRow
                           icon={<Plane className="size-4" />}
@@ -604,6 +604,8 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                             <Tag key="2">{live.flight.cabin.replace("_", " ")}</Tag>,
                           ]}
                           price={eur(live.flight.amountEur)}
+                          onRemove={() => drop("flight")}
+                          removeLabel={d.remove}
                         />
                       </div>
                     ) : live ? null : (
@@ -617,11 +619,13 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                             <Tag key="2">{d.flightTagClass}</Tag>,
                           ]}
                           price="€412"
+                          onRemove={() => drop("flight")}
+                          removeLabel={d.remove}
                         />
                       </div>
                     )}
 
-                    {live?.stay ? (
+                    {dropped.hotel ? null : live?.stay ? (
                       <div className={reveal(2)}>
                         <TripRow
                           icon={<BedDouble className="size-4" />}
@@ -634,6 +638,8 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                               : []),
                           ]}
                           price={eur(live.stay.amountEur)}
+                          onRemove={() => drop("hotel")}
+                          removeLabel={d.remove}
                           extra={
                             <HotelGallery
                               alt={live.stay.name}
@@ -654,12 +660,14 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                             </Tag>,
                           ]}
                           price="€610"
+                          onRemove={() => drop("hotel")}
+                          removeLabel={d.remove}
                           extra={<HotelGallery alt={sampleCard.hotelTitle} />}
                         />
                       </div>
                     )}
 
-                    {live?.car && req ? (
+                    {dropped.car ? null : live?.car && req ? (
                       <div className={reveal(3)}>
                         <TripRow
                           icon={<CarFront className="size-4" />}
@@ -670,6 +678,8 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                             <Tag key="2">{live.car.transmission}</Tag>,
                           ]}
                           price={eur(live.car.amountEur)}
+                          onRemove={() => drop("car")}
+                          removeLabel={d.remove}
                         />
                       </div>
                     ) : live ? null : (
@@ -680,9 +690,25 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                           subtitle={sampleCard.carDetail}
                           tags={[<Tag key="1">Sixt</Tag>, <Tag key="2">{d.carTag}</Tag>]}
                           price="€218"
+                          onRemove={() => drop("car")}
+                          removeLabel={d.remove}
                         />
                       </div>
                     )}
+
+                    {anyDropped && (
+                      <div className="flex flex-wrap items-center justify-between gap-2 px-5 py-3 text-xs text-muted-foreground">
+                        <span>{d.removedNote}</span>
+                        <button
+                          type="button"
+                          onClick={() => setDropped({ flight: false, hotel: false, car: false })}
+                          className="font-medium text-primary underline underline-offset-4"
+                        >
+                          {d.restoreAll}
+                        </button>
+                      </div>
+                    )}
+
 
                     {invoiceVisible && showTotal && (
                       <div className="animate-rise flex items-center gap-2 px-5 py-3 text-xs text-muted-foreground">
