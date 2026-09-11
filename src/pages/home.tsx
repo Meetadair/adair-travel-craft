@@ -463,6 +463,8 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
     setLive(null);
     setLiveFailed(false);
     setCardId(null);
+    setInsurance(null);
+    setAddInsurance(false);
     setDropped({ flight: false, hotel: false, car: false });
     if (signedIn) {
       const named = parseTripSentence(text);
@@ -490,7 +492,10 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
           priced.car.amountEur = result.priced.car;
         }
         priced.totalEur = result.priced.total;
-        if (!cancelled) setCardId(result.cardId);
+        if (!cancelled) {
+          setCardId(result.cardId);
+          setInsurance(result.insurance);
+        }
         return priced;
       }
       const request = await parseTrip(text);
