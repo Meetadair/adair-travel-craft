@@ -390,6 +390,39 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
   const [signedIn, setSignedIn] = useState(false);
   const [cardId, setCardId] = useState<string | null>(null);
   const runLiveSearch = useServerFn(searchLiveTrip);
+  const runSwap = useServerFn(swapCardAlternative);
+  // The exact hotel / car the traveller named, shown while search is running.
+  const [requestedNames, setRequestedNames] = useState<{
+    hotel: string | null;
+    car: string | null;
+  }>({ hotel: null, car: null });
+  const [swapping, setSwapping] = useState(false);
+
+  const applyPriced = (result: {
+    search: TripSearchResponse;
+    priced: { flight: number | null; stay: number | null; car: number | null; total: number };
+  }): TripSearchResponse => {
+    const next = result.search;
+    if (next.flight && result.priced.flight != null) next.flight.amountEur = result.priced.flight;
+    if (next.stay && result.priced.stay != null) next.stay.amountEur = result.priced.stay;
+    if (next.car && result.priced.car != null) next.car.amountEur = result.priced.car;
+    next.totalEur = result.priced.total;
+    return next;
+  };
+
+  const swapAlternative = async (kind: "stay" | "car", index: number) => {
+    if (!cardId || swapping) return;
+    setSwapping(true);
+    try {
+      const result = await runSwap({ data: { cardId, kind, index } });
+      setLive(applyPriced(result));
+    } catch {
+      /* leave the current card in place; the traveller can search again */
+    } finally {
+      setSwapping(false);
+    }
+  };
+
 
   useEffect(() => {
     let active = true;
