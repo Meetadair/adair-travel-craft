@@ -267,6 +267,14 @@ export function BookPage({ cardId }: { cardId: string }) {
                 {result.status === "failed" && "Nothing was booked"}
               </h2>
             </div>
+            {result.testMode && (
+              <span className="mt-3 inline-block rounded-full border border-border px-3 py-1 text-xs text-muted-foreground">
+                Test mode — no real charge
+              </span>
+            )}
+            {result.status === "failed" && (
+              <p className="mt-3 text-sm text-muted-foreground">{failureMessage(result.reason)}</p>
+            )}
             {result.reference && (
               <p className="mt-2 text-sm text-muted-foreground">
                 Booking reference {result.reference}
@@ -289,14 +297,29 @@ export function BookPage({ cardId }: { cardId: string }) {
                 </li>
               ))}
             </ul>
-            <button
-              onClick={() => navigate({ to: "/trips" })}
-              className="mt-6 w-full rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
-            >
-              Go to my trips
-            </button>
+            {result.status === "failed" ? (
+              <button
+                onClick={() => navigate({ to: "/" })}
+                className="mt-6 w-full rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+              >
+                Search again
+              </button>
+            ) : (
+              <>
+                <button
+                  onClick={() => navigate({ to: "/trips" })}
+                  className="mt-6 w-full rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+                >
+                  Go to my trips
+                </button>
+                <p className="mt-3 text-center text-xs text-muted-foreground">
+                  Taking you to My trips…
+                </p>
+              </>
+            )}
           </div>
         )}
+
       </main>
     </div>
   );
