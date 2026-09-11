@@ -25,3 +25,8 @@
 - [x] My trips at /trips with real bookings, /plan (paid plans Coming soon), /dev/status
 - [ ] Hotels and cars: supplier account returns not-authorised; stored as requested lines until enabled
 - [ ] Card payments: open at ~1000 active accounts
+
+## Rich onboarding + map (this round)
+- [x] Part A: one-question-per-screen onboarding (config-driven), searchable home airport, all preference groups, repeatable companies; editable at /preferences; preferences feed search ranking
+- [x] Part C: hotel/car lines always explain themselves when nothing is available; insurance + requested names on the signed-in card
+- [x] Part B: multi-city parsing into ordered stops, "Show on map" (OpenStreetMap, no key), drag/arrow reordering with re-search and re-pricing, total distance + detour hint, stops stored with each booking
