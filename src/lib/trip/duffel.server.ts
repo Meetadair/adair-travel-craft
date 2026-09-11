@@ -4,6 +4,7 @@
  * failing part returns a short note instead of breaking the response.
  */
 import { findByName } from "./match";
+import { carScore, flightScore, stayScore, type SearchPrefs } from "@/lib/trip/rank";
 import type {
   CarResult,
   FlightResult,
