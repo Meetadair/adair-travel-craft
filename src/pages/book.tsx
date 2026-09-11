@@ -85,10 +85,15 @@ export function BookPage({ cardId }: { cardId: string }) {
 
   const search = card.data?.search;
   const priced = card.data?.priced;
+  const insurance = card.data?.insurance ?? null;
   const selectedTotal =
-    (include.flight ? (priced?.flight ?? 0) : 0) +
-    (include.stay ? (priced?.stay ?? 0) : 0) +
-    (include.car ? (priced?.car ?? 0) : 0);
+    Math.round(
+      ((include.flight ? (priced?.flight ?? 0) : 0) +
+        (include.stay ? (priced?.stay ?? 0) : 0) +
+        (include.car ? (priced?.car ?? 0) : 0) +
+        (include.insurance && insurance ? insurance.grossEur : 0)) *
+        100,
+    ) / 100;
 
   return (
     <div className="min-h-screen bg-background">
