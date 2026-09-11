@@ -20,6 +20,7 @@ import { Route as LangAssistantRouteImport } from './routes/$lang.assistant'
 import { Route as LangAuthRouteImport } from './routes/$lang.auth'
 import { Route as LangBusinessRouteImport } from './routes/$lang.business'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedTripsRouteImport } from './routes/_authenticated/trips'
 import { Route as ApiTripParseRouteImport } from './routes/api/trip/parse'
 import { Route as ApiTripSearchRouteImport } from './routes/api/trip/search'
 
@@ -77,6 +78,11 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedTripsRoute = AuthenticatedTripsRouteImport.update({
+  id: '/trips',
+  path: '/trips',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const ApiTripParseRoute = ApiTripParseRouteImport.update({
   id: '/api/trip/parse',
   path: '/api/trip/parse',
@@ -98,6 +104,7 @@ export interface FileRoutesByFullPath {
   '/$lang/auth': typeof LangAuthRoute
   '/$lang/business': typeof LangBusinessRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/trips': typeof AuthenticatedTripsRoute
   '/$lang/': typeof LangIndexRoute
   '/api/trip/parse': typeof ApiTripParseRoute
   '/api/trip/search': typeof ApiTripSearchRoute
@@ -111,6 +118,7 @@ export interface FileRoutesByTo {
   '/$lang/auth': typeof LangAuthRoute
   '/$lang/business': typeof LangBusinessRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/trips': typeof AuthenticatedTripsRoute
   '/$lang': typeof LangIndexRoute
   '/api/trip/parse': typeof ApiTripParseRoute
   '/api/trip/search': typeof ApiTripSearchRoute
@@ -127,6 +135,7 @@ export interface FileRoutesById {
   '/$lang/auth': typeof LangAuthRoute
   '/$lang/business': typeof LangBusinessRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/trips': typeof AuthenticatedTripsRoute
   '/$lang/': typeof LangIndexRoute
   '/api/trip/parse': typeof ApiTripParseRoute
   '/api/trip/search': typeof ApiTripSearchRoute
@@ -143,6 +152,7 @@ export interface FileRouteTypes {
     | '/$lang/auth'
     | '/$lang/business'
     | '/dashboard'
+    | '/trips'
     | '/$lang/'
     | '/api/trip/parse'
     | '/api/trip/search'
@@ -156,6 +166,7 @@ export interface FileRouteTypes {
     | '/$lang/auth'
     | '/$lang/business'
     | '/dashboard'
+    | '/trips'
     | '/$lang'
     | '/api/trip/parse'
     | '/api/trip/search'
@@ -171,6 +182,7 @@ export interface FileRouteTypes {
     | '/$lang/auth'
     | '/$lang/business'
     | '/_authenticated/dashboard'
+    | '/_authenticated/trips'
     | '/$lang/'
     | '/api/trip/parse'
     | '/api/trip/search'
@@ -266,6 +278,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/trips': {
+      id: '/_authenticated/trips'
+      path: '/trips'
+      fullPath: '/trips'
+      preLoaderRoute: typeof AuthenticatedTripsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/api/trip/parse': {
       id: '/api/trip/parse'
       path: '/api/trip/parse'
@@ -285,10 +304,12 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedTripsRoute: typeof AuthenticatedTripsRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedTripsRoute: AuthenticatedTripsRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
