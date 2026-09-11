@@ -233,9 +233,14 @@ export function BookPage({ cardId }: { cardId: string }) {
 
               {mutation.isError && (
                 <p className="text-sm text-primary">
-                  The booking did not go through. Nothing was charged — please try again.
+                  {failureMessage(
+                    mutation.error instanceof Error && mutation.error.message.includes("offer")
+                      ? "offer-expired"
+                      : null,
+                  )}
                 </p>
               )}
+
 
               <button
                 onClick={() => mutation.mutate()}
