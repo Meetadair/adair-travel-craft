@@ -4,6 +4,7 @@
  * to today; unparseable input falls back to Milan, next Tuesday–Thursday.
  */
 import { CITIES, DEFAULT_DESTINATION, DEFAULT_ORIGIN, findCity, type CityEntry } from "./cities";
+import { airportByIata } from "@/lib/prefs/airports";
 import type { TripRequest } from "./types";
 
 /** Weekday match terms, index 0 = Monday. */
@@ -100,24 +101,42 @@ function carNameExactOf(sentence: string): string | null {
 }
 
 
-function originOf(text: string, destination: CityEntry): CityEntry {
-  // "from Berlin", "z Warszawy" — otherwise default to Warsaw.
+/** The traveller's saved home airport, as a city entry we can search from. */
+function homeAirportEntry(iata: string | undefined): CityEntry | null {
+  if (!iata) return null;
+  const code = iata.trim().toUpperCase();
+  if (!/^[A-Z]{3}$/.test(code)) return null;
+  const known = CITIES.find((c) => c.iata === code);
+  if (known) return known;
+  const airport = airportByIata(code);
+  if (!airport) return null;
+  return { city: airport.city, iata: airport.iata, lat: 0, lon: 0, aliases: [] };
+}
+
+function originOf(text: string, destination: CityEntry, homeIata?: string): CityEntry {
+  // "from Berlin", "z Warszawy" — otherwise the saved home airport.
   const fromMatch = /\b(?:from|out of|z|ze)\s+([\p{L}\s-]{3,24})/u.exec(text);
   if (fromMatch?.[1]) {
     const found = findCity(fromMatch[1].toLowerCase(), destination.iata);
     if (found) return found;
   }
+  const home = homeAirportEntry(homeIata);
+  if (home && home.iata !== destination.iata) return home;
   if (destination.iata === DEFAULT_ORIGIN.iata) {
     return CITIES.find((c) => c.iata === "BER")!;
   }
   return DEFAULT_ORIGIN;
 }
 
-export function parseTripSentence(sentence: string, today = new Date()): TripRequest {
+export function parseTripSentence(
+  sentence: string,
+  today = new Date(),
+  homeAirportIata?: string,
+): TripRequest {
   const text = ` ${sentence.toLowerCase()} `;
 
   const destination = findCity(text) ?? DEFAULT_DESTINATION;
-  const origin = originOf(text, destination);
+  const origin = originOf(text, destination, homeAirportIata);
 
   // Weekday hits, in the order they appear in the sentence.
   const hits: { index: number; at: number }[] = [];
