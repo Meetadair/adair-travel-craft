@@ -21,6 +21,7 @@ import {
   Receipt,
   Users,
   Copy,
+  X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { downloadTripInvoice } from "@/lib/trip-pdf";
