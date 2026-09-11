@@ -64,7 +64,55 @@ export function AuthPage() {
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">{t.auth.lead}</p>
 
-        <form onSubmit={submit} className="hairline-card mt-8 space-y-4 p-6">
+        <div className="mt-8 space-y-3">
+          <button
+            type="button"
+            onClick={async () => {
+              setError(null);
+              setMessage(null);
+              try {
+                const { lovable } = await import("@/integrations/lovable");
+                await lovable.auth.signInWithOAuth("google", {
+                  redirect_uri: window.location.origin,
+                });
+              } catch (err) {
+                setError(err instanceof Error ? err.message : t.auth.genericError);
+              }
+            }}
+            className="w-full rounded-xl border border-border bg-card px-5 py-3 text-sm font-semibold hover:bg-secondary"
+          >
+            Continue with Google
+          </button>
+          <button
+            type="button"
+            disabled={busy || !email}
+            onClick={async () => {
+              setBusy(true);
+              setError(null);
+              setMessage(null);
+              try {
+                const { error: linkError } = await supabase.auth.signInWithOtp({
+                  email,
+                  options: { emailRedirectTo: window.location.origin },
+                });
+                if (linkError) throw linkError;
+                setMessage("Check your inbox — we've sent you a sign-in link.");
+              } catch (err) {
+                setError(err instanceof Error ? err.message : t.auth.genericError);
+              } finally {
+                setBusy(false);
+              }
+            }}
+            className="w-full rounded-xl border border-border bg-card px-5 py-3 text-sm font-semibold hover:bg-secondary disabled:opacity-60"
+          >
+            Email me a sign-in link
+          </button>
+          <p className="text-xs text-muted-foreground">
+            Type your email below first, then use the link button.
+          </p>
+        </div>
+
+        <form onSubmit={submit} className="hairline-card mt-6 space-y-4 p-6">
           {mode === "signup" && (
             <label className="block">
               <span className="text-xs font-medium text-muted-foreground">{t.auth.fullName}</span>
