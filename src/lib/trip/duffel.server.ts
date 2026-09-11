@@ -50,6 +50,19 @@ export function isTestKey(): boolean {
   return !key || key.includes("test");
 }
 
+/**
+ * Duffel test mode only has fake stay/car inventory at one fixed spot
+ * (Duffel Test Hotel / Duffel Test Drive). Real cities return nothing there,
+ * so we search these coordinates instead while a test key is in use and label
+ * the results as samples. A live key automatically uses the real destination.
+ */
+const TEST_LOCATION = { latitude: -24.38, longitude: -128.32, radius: 2 };
+
+function usesTestInventory(): boolean {
+  return (duffelKey() ?? "").startsWith("duffel_test_");
+}
+
+
 export function hasDuffelKey(): boolean {
   return Boolean(duffelKey());
 }
@@ -179,18 +192,28 @@ function nightsBetween(a: string, b: string): number {
 }
 
 export async function searchStay(req: TripRequest): Promise<StayResult | null> {
+  const sample = usesTestInventory();
   const json = await duffel<{ data?: { results?: DuffelStay[] } }>("/stays/search", {
     data: {
       check_in_date: req.departDate,
       check_out_date: req.returnDate,
       rooms: 1,
       guests: [{ type: "adult" }],
-      location: {
-        radius: 3,
-        geographic_coordinates: { latitude: req.lat, longitude: req.lon },
-      },
+      location: sample
+        ? {
+            radius: TEST_LOCATION.radius,
+            geographic_coordinates: {
+              latitude: TEST_LOCATION.latitude,
+              longitude: TEST_LOCATION.longitude,
+            },
+          }
+        : {
+            radius: 3,
+            geographic_coordinates: { latitude: req.lat, longitude: req.lon },
+          },
     },
   });
+
 
   const results = (json.data?.results ?? []).filter((r) =>
     Number.isFinite(Number(r.cheapest_rate_total_amount)),
@@ -214,9 +237,15 @@ export async function searchStay(req: TripRequest): Promise<StayResult | null> {
   const nights = nightsBetween(req.departDate, req.returnDate);
   const address = best.accommodation?.location?.address;
 
+  const name = best.accommodation?.name ?? "Hotel";
+  const realAddress = [address?.line_one, address?.city_name].filter(Boolean).join(", ");
+
   return {
-    name: best.accommodation?.name ?? "Hotel",
-    address: [address?.line_one, address?.city_name].filter(Boolean).join(", "),
+    name: sample ? `Test Hotel — sample data (${name})` : name,
+    address: sample
+      ? `Duffel test inventory — not ${req.destinationCity}`
+      : realAddress,
+
     rating: best.accommodation?.rating ?? null,
     nightlyAmount: round(amount / nights),
     amount: round(amount),
@@ -243,18 +272,29 @@ type DuffelCar = {
 };
 
 export async function searchCar(req: TripRequest): Promise<CarResult | null> {
+  const sample = usesTestInventory();
+  const location = sample
+    ? {
+        radius: TEST_LOCATION.radius,
+        geographic_coordinates: {
+          latitude: TEST_LOCATION.latitude,
+          longitude: TEST_LOCATION.longitude,
+        },
+      }
+    : { airport_iata_code: req.destinationIata };
   const json = await duffel<{ data?: { results?: DuffelCar[]; offers?: DuffelCar[] } }>(
     "/cars/search",
     {
       data: {
-        pick_up_location: { airport_iata_code: req.destinationIata },
-        drop_off_location: { airport_iata_code: req.destinationIata },
+        pick_up_location: location,
+        drop_off_location: location,
         pick_up_at: `${req.departDate}T10:00:00`,
         drop_off_at: `${req.returnDate}T18:00:00`,
         driver: { age: 30 },
       },
     },
   );
+
 
   const results = json.data?.results ?? json.data?.offers ?? [];
   const automatic = results.filter((r) =>
@@ -268,15 +308,17 @@ export async function searchCar(req: TripRequest): Promise<CarResult | null> {
 
   const amount = Number(best.total_amount ?? 0);
   const currency = best.total_currency ?? "EUR";
+  const vehicle = best.vehicle?.name ?? best.vehicle?.model ?? "Car";
   return {
     supplier: best.supplier?.name ?? "Car supplier",
-    vehicle: best.vehicle?.name ?? best.vehicle?.model ?? "Car",
+    vehicle: sample ? `Test Drive — sample data (${vehicle})` : vehicle,
     amount: round(amount),
     currency,
     ...toEur(amount, currency),
     transmission: best.transmission ?? best.vehicle?.transmission ?? "automatic",
   };
 }
+
 
 /* ------------------------------ orchestration --------------------------- */
 
