@@ -618,7 +618,13 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
     (dropped.flight ? 0 : parts.flight) +
     (dropped.hotel ? 0 : parts.hotel) +
     (dropped.car ? 0 : parts.car);
-  const totalLabel = anyDropped ? eur(keptTotal) : live ? eur(live.totalEur) : "€1,240";
+  const insuranceAdd = addInsurance && insurance ? insurance.grossEur : 0;
+  const travelTotal = anyDropped ? keptTotal : live ? live.totalEur : 1240;
+  const totalLabel = eur(Math.round((travelTotal + insuranceAdd) * 100) / 100);
+  // The saved estimate follows what is actually kept in the card.
+  const savedShown = live
+    ? Math.round(live.savedEur * (travelTotal > 0 ? Math.min(1, travelTotal / Math.max(1, live.totalEur)) : 0) * 100) / 100
+    : 0;
   const invoiceVisible = req ? req.invoiceToCompany : Boolean(parsed?.invoice);
 
   const reveal = (index: number) => (revealed >= index ? "animate-rise" : "hidden");
