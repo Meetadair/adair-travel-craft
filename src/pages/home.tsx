@@ -456,6 +456,13 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
     setLiveFailed(false);
     setCardId(null);
     setDropped({ flight: false, hotel: false, car: false });
+    if (signedIn) {
+      const named = parseTripSentence(text);
+      setRequestedNames({ hotel: named.hotelNameExact, car: named.carNameExact });
+    } else {
+      setRequestedNames({ hotel: null, car: null });
+    }
+
 
     // Kick the real search off immediately; the animation runs alongside it.
     const startedAt = Date.now();
