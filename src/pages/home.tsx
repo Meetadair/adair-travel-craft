@@ -981,7 +981,7 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                           title={d.savedNote}
                           className="cursor-help underline decoration-primary/30 decoration-dotted underline-offset-4"
                         >
-                          {fill(d.savedLive, { amount: eur(live.savedEur) })} ·{" "}
+                          {fill(d.savedLive, { amount: eur(savedShown) })} ·{" "}
                           {d.savedEstimate}
                         </span>
                       </p>
