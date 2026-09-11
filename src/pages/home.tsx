@@ -316,6 +316,8 @@ function TripRow({
   tags,
   price,
   extra,
+  onRemove,
+  removeLabel,
 }: {
   icon: React.ReactNode;
   title: string;
@@ -323,9 +325,11 @@ function TripRow({
   tags: React.ReactNode[];
   price: string;
   extra?: React.ReactNode;
+  onRemove?: () => void;
+  removeLabel?: string;
 }) {
   return (
-    <div className="flex items-start justify-between gap-4 px-5 py-4">
+    <div className="group flex items-start justify-between gap-4 px-5 py-4">
       <div className="flex min-w-0 items-start gap-3.5">
         <div className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg border border-border bg-background text-foreground">
           {icon}
@@ -337,7 +341,20 @@ function TripRow({
           {extra}
         </div>
       </div>
-      <p className="shrink-0 text-sm font-semibold text-foreground">{price}</p>
+      <div className="flex shrink-0 items-center gap-3">
+        <p className="text-sm font-semibold text-foreground">{price}</p>
+        {onRemove && (
+          <button
+            type="button"
+            onClick={onRemove}
+            aria-label={removeLabel}
+            title={removeLabel}
+            className="flex size-7 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground transition-colors hover:border-primary/30 hover:text-primary"
+          >
+            <X className="size-3.5" />
+          </button>
+        )}
+      </div>
     </div>
   );
 }
@@ -358,6 +375,10 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
   const [copied, setCopied] = useState(false);
   const [live, setLive] = useState<TripSearchResponse | null>(null);
   const [liveFailed, setLiveFailed] = useState(false);
+  const [dropped, setDropped] = useState({ flight: false, hotel: false, car: false });
+  const drop = (kind: "flight" | "hotel" | "car") =>
+    setDropped((prev) => ({ ...prev, [kind]: true }));
+  const anyDropped = dropped.flight || dropped.hotel || dropped.car;
 
   const runKey = submission?.key ?? 0;
   useEffect(() => {
@@ -373,6 +394,7 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
 
     setLive(null);
     setLiveFailed(false);
+    setDropped({ flight: false, hotel: false, car: false });
 
     // Kick the real search off immediately; the animation runs alongside it.
     const startedAt = Date.now();
@@ -486,7 +508,18 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
     ? `${req.destinationCity} · ${dayLabel(req.departDate, locale)} – ${dayLabel(req.returnDate, locale)}`
     : sampleCard.title;
 
-  const totalLabel = live ? eur(live.totalEur) : "€1,240";
+  const parts = live
+    ? {
+        flight: live.flight?.amountEur ?? 0,
+        hotel: live.stay?.amountEur ?? 0,
+        car: live.car?.amountEur ?? 0,
+      }
+    : { flight: 412, hotel: 610, car: 218 };
+  const keptTotal =
+    (dropped.flight ? 0 : parts.flight) +
+    (dropped.hotel ? 0 : parts.hotel) +
+    (dropped.car ? 0 : parts.car);
+  const totalLabel = anyDropped ? eur(keptTotal) : live ? eur(live.totalEur) : "€1,240";
   const invoiceVisible = req ? req.invoiceToCompany : Boolean(parsed?.invoice);
 
   const reveal = (index: number) => (revealed >= index ? "animate-rise" : "hidden");
@@ -556,7 +589,7 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                   </div>
 
                   <div className="divide-y divide-border">
-                    {live?.flight && req ? (
+                    {dropped.flight ? null : live?.flight && req ? (
                       <div className={reveal(1)}>
                         <TripRow
                           icon={<Plane className="size-4" />}
@@ -571,6 +604,8 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                             <Tag key="2">{live.flight.cabin.replace("_", " ")}</Tag>,
                           ]}
                           price={eur(live.flight.amountEur)}
+                          onRemove={() => drop("flight")}
+                          removeLabel={d.remove}
                         />
                       </div>
                     ) : live ? null : (
@@ -584,11 +619,13 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                             <Tag key="2">{d.flightTagClass}</Tag>,
                           ]}
                           price="€412"
+                          onRemove={() => drop("flight")}
+                          removeLabel={d.remove}
                         />
                       </div>
                     )}
 
-                    {live?.stay ? (
+                    {dropped.hotel ? null : live?.stay ? (
                       <div className={reveal(2)}>
                         <TripRow
                           icon={<BedDouble className="size-4" />}
@@ -601,6 +638,8 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                               : []),
                           ]}
                           price={eur(live.stay.amountEur)}
+                          onRemove={() => drop("hotel")}
+                          removeLabel={d.remove}
                           extra={
                             <HotelGallery
                               alt={live.stay.name}
@@ -621,12 +660,14 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                             </Tag>,
                           ]}
                           price="€610"
+                          onRemove={() => drop("hotel")}
+                          removeLabel={d.remove}
                           extra={<HotelGallery alt={sampleCard.hotelTitle} />}
                         />
                       </div>
                     )}
 
-                    {live?.car && req ? (
+                    {dropped.car ? null : live?.car && req ? (
                       <div className={reveal(3)}>
                         <TripRow
                           icon={<CarFront className="size-4" />}
@@ -637,6 +678,8 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                             <Tag key="2">{live.car.transmission}</Tag>,
                           ]}
                           price={eur(live.car.amountEur)}
+                          onRemove={() => drop("car")}
+                          removeLabel={d.remove}
                         />
                       </div>
                     ) : live ? null : (
@@ -647,9 +690,25 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                           subtitle={sampleCard.carDetail}
                           tags={[<Tag key="1">Sixt</Tag>, <Tag key="2">{d.carTag}</Tag>]}
                           price="€218"
+                          onRemove={() => drop("car")}
+                          removeLabel={d.remove}
                         />
                       </div>
                     )}
+
+                    {anyDropped && (
+                      <div className="flex flex-wrap items-center justify-between gap-2 px-5 py-3 text-xs text-muted-foreground">
+                        <span>{d.removedNote}</span>
+                        <button
+                          type="button"
+                          onClick={() => setDropped({ flight: false, hotel: false, car: false })}
+                          className="font-medium text-primary underline underline-offset-4"
+                        >
+                          {d.restoreAll}
+                        </button>
+                      </div>
+                    )}
+
 
                     {invoiceVisible && showTotal && (
                       <div className="animate-rise flex items-center gap-2 px-5 py-3 text-xs text-muted-foreground">

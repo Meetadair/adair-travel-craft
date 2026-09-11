@@ -2,7 +2,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
-import { Plane, BedDouble, CarFront, Sparkles, ChevronRight, Send } from "lucide-react";
+import { Plane, BedDouble, CarFront, Sparkles, ChevronRight, Send, X } from "lucide-react";
 import { SiteNav } from "@/components/site-nav";
 import { HotelGallery } from "@/components/hotel-gallery";
 import { composeTrip, saveTrip } from "@/lib/travel.functions";
@@ -32,6 +32,7 @@ export function AssistantPage() {
   const [saved, setSaved] = useState<string | null>(null);
   const [hotelRef, setHotelRef] = useState<string | null>(null);
   const [showAlts, setShowAlts] = useState(false);
+  const [removed, setRemoved] = useState<string[]>([]);
 
   const money = (amount: number, currency: string) =>
     `${amount.toLocaleString(locale, { maximumFractionDigits: 0 })} ${currency}`;
@@ -41,11 +42,13 @@ export function AssistantPage() {
   });
 
   const raw = search.data;
-  const offers = (raw?.offers ?? []).map((o) => {
-    if (o.kind !== "hotel" || !hotelRef) return o;
-    const alt = o.alternatives?.find((a) => a.offerReference === hotelRef);
-    return alt ? { ...alt, ...(o.alternatives ? { alternatives: o.alternatives } : {}) } : o;
-  });
+  const offers = (raw?.offers ?? [])
+    .filter((o) => !removed.includes(o.kind))
+    .map((o) => {
+      if (o.kind !== "hotel" || !hotelRef) return o;
+      const alt = o.alternatives?.find((a) => a.offerReference === hotelRef);
+      return alt ? { ...alt, ...(o.alternatives ? { alternatives: o.alternatives } : {}) } : o;
+    });
   const total = Math.round(offers.reduce((sum, o) => sum + o.amount, 0) * 100) / 100;
 
   const store = useMutation({
@@ -100,6 +103,7 @@ export function AssistantPage() {
             setSaved(null);
             setHotelRef(null);
             setShowAlts(false);
+            setRemoved([]);
             search.mutate(input.trim());
           }}
           className="hairline-card mt-8 flex items-end gap-3 p-4"
@@ -236,11 +240,34 @@ export function AssistantPage() {
                           </>
                         )}
                       </div>
-                      <p className="shrink-0 text-sm font-semibold text-primary">
-                        {money(o.amount, o.currency)}
-                      </p>
+                      <div className="flex shrink-0 items-center gap-3">
+                        <p className="text-sm font-semibold text-primary">
+                          {money(o.amount, o.currency)}
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => setRemoved((prev) => [...prev, o.kind])}
+                          aria-label={t.assistant.remove}
+                          title={t.assistant.remove}
+                          className="flex size-7 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground transition-colors hover:border-primary/30 hover:text-primary"
+                        >
+                          <X className="size-3.5" />
+                        </button>
+                      </div>
                     </div>
                   ))}
+                  {removed.length > 0 && (
+                    <div className="flex flex-wrap items-center justify-between gap-2 px-5 py-3 text-xs text-muted-foreground">
+                      <span>{t.assistant.removedNote}</span>
+                      <button
+                        type="button"
+                        onClick={() => setRemoved([])}
+                        className="font-medium text-primary underline underline-offset-4"
+                      >
+                        {t.assistant.restoreAll}
+                      </button>
+                    </div>
+                  )}
                 </div>
                 <div className="flex items-center justify-between border-t border-border bg-cream-deep px-5 py-4">
                   <div>
