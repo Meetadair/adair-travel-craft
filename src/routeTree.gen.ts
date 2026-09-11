@@ -22,6 +22,7 @@ import { Route as LangBusinessRouteImport } from './routes/$lang.business'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedTripsRouteImport } from './routes/_authenticated/trips'
+import { Route as AuthenticatedBookCardIdRouteImport } from './routes/_authenticated/book.$cardId'
 import { Route as ApiTripParseRouteImport } from './routes/api/trip/parse'
 import { Route as ApiTripSearchRouteImport } from './routes/api/trip/search'
 
@@ -89,6 +90,11 @@ const AuthenticatedTripsRoute = AuthenticatedTripsRouteImport.update({
   path: '/trips',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedBookCardIdRoute = AuthenticatedBookCardIdRouteImport.update({
+  id: '/book/$cardId',
+  path: '/book/$cardId',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const ApiTripParseRoute = ApiTripParseRouteImport.update({
   id: '/api/trip/parse',
   path: '/api/trip/parse',
@@ -113,6 +119,7 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/trips': typeof AuthenticatedTripsRoute
   '/$lang/': typeof LangIndexRoute
+  '/book/$cardId': typeof AuthenticatedBookCardIdRoute
   '/api/trip/parse': typeof ApiTripParseRoute
   '/api/trip/search': typeof ApiTripSearchRoute
 }
@@ -128,6 +135,7 @@ export interface FileRoutesByTo {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/trips': typeof AuthenticatedTripsRoute
   '/$lang': typeof LangIndexRoute
+  '/book/$cardId': typeof AuthenticatedBookCardIdRoute
   '/api/trip/parse': typeof ApiTripParseRoute
   '/api/trip/search': typeof ApiTripSearchRoute
 }
@@ -146,6 +154,7 @@ export interface FileRoutesById {
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/trips': typeof AuthenticatedTripsRoute
   '/$lang/': typeof LangIndexRoute
+  '/_authenticated/book/$cardId': typeof AuthenticatedBookCardIdRoute
   '/api/trip/parse': typeof ApiTripParseRoute
   '/api/trip/search': typeof ApiTripSearchRoute
 }
@@ -164,6 +173,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/trips'
     | '/$lang/'
+    | '/book/$cardId'
     | '/api/trip/parse'
     | '/api/trip/search'
   fileRoutesByTo: FileRoutesByTo
@@ -179,6 +189,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/trips'
     | '/$lang'
+    | '/book/$cardId'
     | '/api/trip/parse'
     | '/api/trip/search'
   id:
@@ -196,6 +207,7 @@ export interface FileRouteTypes {
     | '/_authenticated/onboarding'
     | '/_authenticated/trips'
     | '/$lang/'
+    | '/_authenticated/book/$cardId'
     | '/api/trip/parse'
     | '/api/trip/search'
   fileRoutesById: FileRoutesById
@@ -304,6 +316,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTripsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/book/$cardId': {
+      id: '/_authenticated/book/$cardId'
+      path: '/book/$cardId'
+      fullPath: '/book/$cardId'
+      preLoaderRoute: typeof AuthenticatedBookCardIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/api/trip/parse': {
       id: '/api/trip/parse'
       path: '/api/trip/parse'
@@ -325,12 +344,14 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedTripsRoute: typeof AuthenticatedTripsRoute
+  AuthenticatedBookCardIdRoute: typeof AuthenticatedBookCardIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedTripsRoute: AuthenticatedTripsRoute,
+  AuthenticatedBookCardIdRoute: AuthenticatedBookCardIdRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
