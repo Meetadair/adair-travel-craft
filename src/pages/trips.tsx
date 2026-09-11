@@ -148,6 +148,13 @@ export function TripsPage() {
                   </li>
                 ))}
               </ul>
+
+              {eventsFor(trip).length > 0 && (
+                <div className="border-t border-border px-5 py-4">
+                  <AddToCalendar events={eventsFor(trip)} title={trip.city ?? trip.title} />
+                </div>
+              )}
+
             </article>
           ))}
         </div>
