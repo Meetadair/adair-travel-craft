@@ -67,6 +67,15 @@ export function BookPage({ cardId }: { cardId: string }) {
     onSuccess: (data) => setResult(data),
   });
 
+  // Booked (fully or partly): show the confirmation, then move on to My trips.
+  useEffect(() => {
+    if (!result || result.status === "failed") return;
+    const timer = window.setTimeout(() => navigate({ to: "/trips" }), 3500);
+    return () => window.clearTimeout(timer);
+  }, [result, navigate]);
+
+
+
   const search = card.data?.search;
   const priced = card.data?.priced;
   const selectedTotal =
