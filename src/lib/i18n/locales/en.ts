@@ -88,6 +88,9 @@ export const en = {
       sourceCar: "Duffel Cars",
       testMode: "Test mode — sample airline data",
       bookTooltip: "Booking opens at launch",
+      remove: "Remove this item",
+      removedNote: "Removed from this trip",
+      restoreAll: "Add everything back",
       approx: "approx.",
       searchFailed:
         "We couldn't reach live availability right now — showing our sample trip instead.",
