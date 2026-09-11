@@ -419,11 +419,30 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
 
     setLive(null);
     setLiveFailed(false);
+    setCardId(null);
     setDropped({ flight: false, hotel: false, car: false });
 
     // Kick the real search off immediately; the animation runs alongside it.
     const startedAt = Date.now();
     const search = (async () => {
+      if (signedIn) {
+        // Signed in: real supplier results, priced with this traveller's plan,
+        // saved as a trip card that can then be booked.
+        const result = await runLiveSearch({ data: { sentence: text } });
+        const priced = result.search;
+        if (priced.flight && result.priced.flight != null) {
+          priced.flight.amountEur = result.priced.flight;
+        }
+        if (priced.stay && result.priced.stay != null) {
+          priced.stay.amountEur = result.priced.stay;
+        }
+        if (priced.car && result.priced.car != null) {
+          priced.car.amountEur = result.priced.car;
+        }
+        priced.totalEur = result.priced.total;
+        if (!cancelled) setCardId(result.cardId);
+        return priced;
+      }
       const request = await parseTrip(text);
       return searchTrip(request);
     })();
