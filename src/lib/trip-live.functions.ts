@@ -7,6 +7,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { TripRequest, TripSearchResponse } from "@/lib/trip/types";
 import type { InsuranceQuote } from "@/lib/trip/insurance";
+import type { SearchPrefs } from "@/lib/trip/rank";
 
 export type LiveTripResult = {
   cardId: string;
@@ -47,18 +48,37 @@ export const searchLiveTrip = createServerFn({ method: "POST" })
       supabase.from("profiles").select("plan, home_airport").eq("id", userId).maybeSingle(),
       supabase
         .from("preferences")
-        .select("cabin_class, max_connections")
+        .select(
+          "cabin_class, max_connections, seat, airlines, cabin_rule, hotel_chains, hotel_stars, hotel_min_rating, hotel_amenities, hotel_types, car_brands, car_companies, car_class, car_transmission",
+        )
         .eq("user_id", userId)
         .maybeSingle(),
     ]);
     const profile = profileRes.data as { plan: string; home_airport: string } | null;
-    const prefs = prefsRes.data as { cabin_class: string; max_connections: number } | null;
+    const row = (prefsRes.data ?? null) as Record<string, unknown> | null;
     const plan = profile?.plan ?? "free";
 
-    const parsed = parseTripSentence(data.sentence);
+    const list = (value: unknown): string[] =>
+      Array.isArray(value) ? value.filter((v): v is string => typeof v === "string") : [];
+    const searchPrefs: SearchPrefs = {
+      airlines: list(row?.["airlines"]),
+      seat: (row?.["seat"] as string) ?? "any",
+      cabinRule: (row?.["cabin_rule"] as string | null) ?? null,
+      hotelChains: list(row?.["hotel_chains"]),
+      hotelStars: list(row?.["hotel_stars"]),
+      hotelMinRating: Number(row?.["hotel_min_rating"] ?? 4),
+      hotelAmenities: list(row?.["hotel_amenities"]),
+      hotelTypes: list(row?.["hotel_types"]),
+      carBrands: list(row?.["car_brands"]),
+      carCompanies: list(row?.["car_companies"]),
+      carClass: (row?.["car_class"] as string | null) ?? null,
+      carTransmission: (row?.["car_transmission"] as string) ?? "automatic",
+    };
+
+    const parsed = parseTripSentence(data.sentence, new Date(), profile?.home_airport);
     const request: TripRequest = {
       ...parsed,
-      cabinClass: (prefs?.cabin_class as TripRequest["cabinClass"]) ?? parsed.cabinClass,
+      cabinClass: (row?.["cabin_class"] as TripRequest["cabinClass"]) ?? parsed.cabinClass,
     };
 
     const requestRow = await supabase
@@ -69,7 +89,7 @@ export const searchLiveTrip = createServerFn({ method: "POST" })
     if (requestRow.error) throw new Error(requestRow.error.message);
     const tripRequestId = (requestRow.data as { id: string }).id;
 
-    const search = await searchTripWithDuffel(request);
+    const search = await searchTripWithDuffel(request, searchPrefs);
 
     // Internal demand reporting: which named hotels we cannot source yet.
     if (search.hotelNotFound && search.hotelRequested) {
