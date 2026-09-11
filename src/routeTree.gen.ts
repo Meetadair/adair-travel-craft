@@ -14,9 +14,11 @@ import { Route as LangRouteImport } from './routes/$lang'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AssistantRouteImport } from './routes/assistant'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as BusinessRouteImport } from './routes/business'
 import { Route as LangIndexRouteImport } from './routes/$lang.index'
 import { Route as LangAssistantRouteImport } from './routes/$lang.assistant'
 import { Route as LangAuthRouteImport } from './routes/$lang.auth'
+import { Route as LangBusinessRouteImport } from './routes/$lang.business'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as ApiTripParseRouteImport } from './routes/api/trip/parse'
 import { Route as ApiTripSearchRouteImport } from './routes/api/trip/search'
@@ -45,6 +47,11 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BusinessRoute = BusinessRouteImport.update({
+  id: '/business',
+  path: '/business',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LangIndexRoute = LangIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -58,6 +65,11 @@ const LangAssistantRoute = LangAssistantRouteImport.update({
 const LangAuthRoute = LangAuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => LangRoute,
+} as any)
+const LangBusinessRoute = LangBusinessRouteImport.update({
+  id: '/business',
+  path: '/business',
   getParentRoute: () => LangRoute,
 } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
@@ -81,8 +93,10 @@ export interface FileRoutesByFullPath {
   '/$lang': typeof LangRouteWithChildren
   '/assistant': typeof AssistantRoute
   '/auth': typeof AuthRoute
+  '/business': typeof BusinessRoute
   '/$lang/assistant': typeof LangAssistantRoute
   '/$lang/auth': typeof LangAuthRoute
+  '/$lang/business': typeof LangBusinessRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/$lang/': typeof LangIndexRoute
   '/api/trip/parse': typeof ApiTripParseRoute
@@ -92,8 +106,10 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/assistant': typeof AssistantRoute
   '/auth': typeof AuthRoute
+  '/business': typeof BusinessRoute
   '/$lang/assistant': typeof LangAssistantRoute
   '/$lang/auth': typeof LangAuthRoute
+  '/$lang/business': typeof LangBusinessRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/$lang': typeof LangIndexRoute
   '/api/trip/parse': typeof ApiTripParseRoute
@@ -106,8 +122,10 @@ export interface FileRoutesById {
   '/$lang': typeof LangRouteWithChildren
   '/assistant': typeof AssistantRoute
   '/auth': typeof AuthRoute
+  '/business': typeof BusinessRoute
   '/$lang/assistant': typeof LangAssistantRoute
   '/$lang/auth': typeof LangAuthRoute
+  '/$lang/business': typeof LangBusinessRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/$lang/': typeof LangIndexRoute
   '/api/trip/parse': typeof ApiTripParseRoute
@@ -120,8 +138,10 @@ export interface FileRouteTypes {
     | '/$lang'
     | '/assistant'
     | '/auth'
+    | '/business'
     | '/$lang/assistant'
     | '/$lang/auth'
+    | '/$lang/business'
     | '/dashboard'
     | '/$lang/'
     | '/api/trip/parse'
@@ -131,8 +151,10 @@ export interface FileRouteTypes {
     | '/'
     | '/assistant'
     | '/auth'
+    | '/business'
     | '/$lang/assistant'
     | '/$lang/auth'
+    | '/$lang/business'
     | '/dashboard'
     | '/$lang'
     | '/api/trip/parse'
@@ -144,8 +166,10 @@ export interface FileRouteTypes {
     | '/$lang'
     | '/assistant'
     | '/auth'
+    | '/business'
     | '/$lang/assistant'
     | '/$lang/auth'
+    | '/$lang/business'
     | '/_authenticated/dashboard'
     | '/$lang/'
     | '/api/trip/parse'
@@ -158,6 +182,7 @@ export interface RootRouteChildren {
   LangRoute: typeof LangRouteWithChildren
   AssistantRoute: typeof AssistantRoute
   AuthRoute: typeof AuthRoute
+  BusinessRoute: typeof BusinessRoute
   ApiTripParseRoute: typeof ApiTripParseRoute
   ApiTripSearchRoute: typeof ApiTripSearchRoute
 }
@@ -199,6 +224,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/business': {
+      id: '/business'
+      path: '/business'
+      fullPath: '/business'
+      preLoaderRoute: typeof BusinessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/$lang/': {
       id: '/$lang/'
       path: '/'
@@ -218,6 +250,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/$lang/auth'
       preLoaderRoute: typeof LangAuthRouteImport
+      parentRoute: typeof LangRoute
+    }
+    '/$lang/business': {
+      id: '/$lang/business'
+      path: '/business'
+      fullPath: '/$lang/business'
+      preLoaderRoute: typeof LangBusinessRouteImport
       parentRoute: typeof LangRoute
     }
     '/_authenticated/dashboard': {
@@ -258,12 +297,14 @@ const AuthenticatedRouteRouteWithChildren =
 interface LangRouteChildren {
   LangAssistantRoute: typeof LangAssistantRoute
   LangAuthRoute: typeof LangAuthRoute
+  LangBusinessRoute: typeof LangBusinessRoute
   LangIndexRoute: typeof LangIndexRoute
 }
 
 const LangRouteChildren: LangRouteChildren = {
   LangAssistantRoute: LangAssistantRoute,
   LangAuthRoute: LangAuthRoute,
+  LangBusinessRoute: LangBusinessRoute,
   LangIndexRoute: LangIndexRoute,
 }
 
@@ -275,6 +316,7 @@ const rootRouteChildren: RootRouteChildren = {
   LangRoute: LangRouteWithChildren,
   AssistantRoute: AssistantRoute,
   AuthRoute: AuthRoute,
+  BusinessRoute: BusinessRoute,
   ApiTripParseRoute: ApiTripParseRoute,
   ApiTripSearchRoute: ApiTripSearchRoute,
 }

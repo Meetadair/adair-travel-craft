@@ -7,6 +7,7 @@ export const en = {
   nav: {
     assistant: "Assistant",
     trips: "My trips",
+    business: "For companies",
     investors: "For investors",
     account: "My account",
     signIn: "Sign in",
@@ -129,6 +130,7 @@ export const en = {
       teamsLine:
         "One travel policy, one invoice, one place for the whole team. Coming after launch.",
       teamsCta: "Join the Teams waitlist",
+      teamsMore: "See the offer for companies",
     },
     trips: {
       label: "My trips",
@@ -377,6 +379,201 @@ export const en = {
     paymentNote: "Payment: single company card transaction · 14-day term",
     hotelNote: "Hotel billed at negotiated rate",
     tagline: "Adair Travel · One request. The whole trip. · adair.travel",
+  },
+
+  business: {
+    meta: {
+      title: "Adair for companies — team travel, budgets, and analytics",
+      description:
+        "One window for the whole team: an assistant that books flight, hotel, and car, keeps travel inside budget, and turns every trip into one invoice and one report.",
+      ogTitle: "Adair for companies — team travel in one window",
+      ogDescription:
+        "Budgets, approvals, and travel analytics for teams. One conversation instead of five apps.",
+    },
+    badge: "For companies and teams",
+    titleLine1: "The whole team's travel",
+    titleLine2: "in one window.",
+    lead: "Adair composes each trip from one sentence, keeps it inside your travel policy, and returns one invoice and one clear report. Assistants stop juggling tabs, finance stops chasing receipts.",
+    ctaPrimary: "Talk to us about your team",
+    ctaSecondary: "See the packages",
+
+    rolesLabel: "Who it's for",
+    rolesTitle: "Three people, one window.",
+    roles: [
+      {
+        role: "Assistant / office manager",
+        title: "Book for someone else in one sentence",
+        items: [
+          "Book on behalf of any colleague",
+          "One shared inbox for every team trip",
+          "One VAT invoice instead of three documents",
+        ],
+      },
+      {
+        role: "Manager / finance",
+        title: "Costs visible before they happen",
+        items: [
+          "Budget caps per trip, per person, per month",
+          "Approval only above the threshold you set",
+          "Live spend, no month-end surprises",
+        ],
+      },
+      {
+        role: "Traveller",
+        title: "Preferences honoured every time",
+        items: [
+          "Personal travel profile set once",
+          "Flight, hotel, and car in one card",
+          "Confirmations in one place until the last day",
+        ],
+      },
+    ],
+
+    budgetLabel: "Costs and budgets",
+    budgetTitle: "Spending rules the assistant follows.",
+    budgetLead:
+      "You define the frame once. Every proposal Adair composes already respects it — nothing to police afterwards.",
+    budgets: [
+      {
+        title: "Cap per trip",
+        value: "€1,500",
+        note: "Adair never proposes a bundle above the cap",
+      },
+      {
+        title: "Monthly team budget",
+        value: "€28,000",
+        note: "Live usage visible to finance at any moment",
+      },
+      {
+        title: "Approval threshold",
+        value: "€900",
+        note: "Above it, a manager confirms before booking",
+      },
+      {
+        title: "Travel policy",
+        value: "Cabin, chains, radius",
+        note: "Premium Economy over 2 h, preferred chains only",
+      },
+    ],
+
+    dashLabel: "Company view",
+    dashTitle: "Everything finance asks for, on one screen.",
+    dashNote: "Preview only — sample data",
+    dash: {
+      budgetTitle: "September budget",
+      budgetOf: "of €28,000 used",
+      tripsTitle: "Recent team trips",
+      statusPaid: "paid",
+      statusPending: "awaiting approval",
+      peopleTitle: "Spend by person",
+      routesTitle: "Most frequent routes",
+      savedTitle: "Saved vs. public rates",
+      savedValue: "€2,340",
+      savedNote: "this quarter, across 21 trips",
+      tripsCount: "trips",
+      trips: [
+        { who: "Anna K.", route: "Warsaw → Milan", dates: "18–19 Sep", amount: "€1,240", paid: true },
+        { who: "Tomasz W.", route: "Warsaw → Berlin", dates: "22–23 Sep", amount: "€780", paid: true },
+        { who: "Kitti F.", route: "Budapest → London", dates: "25–27 Sep", amount: "€1,610", paid: false },
+      ],
+      people: [
+        { name: "Anna K.", amount: "€4,120", share: 78 },
+        { name: "Kitti F.", amount: "€3,480", share: 66 },
+        { name: "Tomasz W.", amount: "€2,260", share: 43 },
+        { name: "Marek D.", amount: "€1,180", share: 22 },
+      ],
+      routes: [
+        { route: "Warsaw → Milan", count: "7", amount: "€8,190" },
+        { route: "Budapest → London", count: "5", amount: "€7,340" },
+        { route: "Warsaw → Berlin", count: "4", amount: "€3,120" },
+      ],
+    },
+
+    analyticsLabel: "Travel analytics",
+    analyticsTitle: "What you get in the monthly report.",
+    analytics: [
+      {
+        title: "Cost per person",
+        text: "Who travels, how often, and what it costs — per person, team, or cost centre.",
+      },
+      {
+        title: "Route patterns",
+        text: "The routes you fly most, so we know where a negotiated rate is worth having.",
+      },
+      {
+        title: "Average night rate",
+        text: "What your team actually pays per night, and how it moves month to month.",
+      },
+      {
+        title: "Policy compliance",
+        text: "Which trips stayed inside the policy and which needed an approval.",
+      },
+      {
+        title: "Savings vs. public rates",
+        text: "The difference between what you paid and the public rate for the same trip.",
+      },
+      {
+        title: "Accounting export",
+        text: "One file per month with every invoice, reference, and VAT line already matched.",
+      },
+    ],
+
+    plansLabel: "Packages",
+    plansTitle: "Pick the frame, we'll price it for your team.",
+    plansNote: "Pricing depends on team size and how much of the policy you want us to run.",
+    quote: "Request a quote",
+    plans: [
+      {
+        name: "Starter",
+        forWho: "Up to 5 travellers",
+        features: [
+          "Travel profile per person",
+          "One invoice per trip",
+          "Trip archive and PDF trip cards",
+          "Email support",
+        ],
+      },
+      {
+        name: "Teams",
+        forWho: "5–50 travellers",
+        features: [
+          "Budgets and approval thresholds",
+          "Booking on behalf of colleagues",
+          "Monthly travel report",
+          "Shared team trip view",
+        ],
+      },
+      {
+        name: "Enterprise",
+        forWho: "50+ travellers",
+        features: [
+          "Cost centres and custom policy rules",
+          "Accounting export on your format",
+          "Negotiated rates on your key routes",
+          "Named account manager",
+        ],
+      },
+    ],
+
+    contactLabel: "Talk to us",
+    contactTitle: "Tell us about your team.",
+    contactLead:
+      "Leave your details and we'll come back with a quote and a walkthrough for your travel setup.",
+    form: {
+      email: "Work email",
+      emailPlaceholder: "you@company.com",
+      company: "Company",
+      companyPlaceholder: "Company name",
+      size: "Team size",
+      sizePlaceholder: "e.g. 12 travellers",
+      message: "Anything we should know? (optional)",
+      messagePlaceholder: "Routes you fly most, current tools, invoicing needs…",
+      submit: "Send request",
+      submitBusy: "Sending…",
+      success: "Thank you — we'll get back to you within one business day.",
+      error: "That didn't go through. Please try again.",
+    },
+    footer: "Product concept — sample data. Adair Travel, 2026.",
   },
 } as const;
 

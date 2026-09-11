@@ -25,7 +25,7 @@ import {
 import { useEffect, useState } from "react";
 import { downloadTripInvoice } from "@/lib/trip-pdf";
 import { SiteNav } from "@/components/site-nav";
-import { useLocale, useT, type Dict } from "@/lib/i18n";
+import { LocaleLink, useLocale, useT, type Dict } from "@/lib/i18n";
 import { parseDemoSentence, fill, referralCode } from "@/lib/demo-sentence";
 import { joinWaitlist } from "@/lib/waitlist.functions";
 import { parseTrip, searchTrip, eur, timeLabel, dayLabel } from "@/lib/trip/client";
@@ -964,6 +964,7 @@ function Principles({ t }: { t: Dict }) {
 
 function Teams({ t }: { t: Dict }) {
   const c = t.home.campaign;
+  const locale = useLocale();
   return (
     <section className="mx-auto max-w-5xl px-6 py-20">
       <SectionLabel>{c.teamsLabel}</SectionLabel>
@@ -977,8 +978,16 @@ function Teams({ t }: { t: Dict }) {
           </div>
           <p className="max-w-md text-sm leading-relaxed text-muted-foreground">{c.teamsLine}</p>
         </div>
-        <div className="sm:w-80 sm:shrink-0">
+        <div className="flex flex-col gap-3 sm:w-80 sm:shrink-0">
           <EarlyAccess t={t} type="teams" label={c.teamsCta} />
+          <LocaleLink
+            to="/business"
+            locale={locale}
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-primary transition-colors hover:text-primary/80"
+          >
+            {c.teamsMore}
+            <ArrowRight className="size-4" />
+          </LocaleLink>
         </div>
       </div>
     </section>

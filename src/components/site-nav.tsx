@@ -13,8 +13,9 @@ import {
   type SitePath,
 } from "@/lib/i18n";
 
-const NAV: Array<{ to: SitePath; key: "assistant" }> = [
+const NAV: Array<{ to: SitePath; key: "assistant" | "business" }> = [
   { to: "/assistant", key: "assistant" },
+  { to: "/business", key: "business" },
 ];
 
 function LanguageMenu() {
@@ -26,7 +27,7 @@ function LanguageMenu() {
   /** Same page in another language, when that page has a localized twin. */
   function hrefFor(next: string) {
     const stripped = pathname.replace(/^\/[a-z]{2}(?=\/|$)/, "") || "/";
-    const known: SitePath[] = ["/", "/assistant", "/auth"];
+    const known: SitePath[] = ["/", "/assistant", "/business", "/auth"];
     const target = (known.includes(stripped as SitePath) ? stripped : "/") as SitePath;
     return localeHref(next as (typeof locales)[number], target);
   }

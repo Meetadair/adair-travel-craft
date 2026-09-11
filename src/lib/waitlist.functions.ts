@@ -5,7 +5,7 @@ const joinSchema = z.object({
   email: z.string().email().max(200),
   sentence: z.string().max(1000).optional(),
   referralCode: z.string().min(4).max(24),
-  type: z.enum(["early_access", "teams"]),
+  type: z.enum(["early_access", "teams", "business"]),
 });
 
 /**
