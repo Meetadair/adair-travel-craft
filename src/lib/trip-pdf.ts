@@ -165,7 +165,7 @@ export async function downloadTripInvoice(data: InvoiceData) {
   y -= 26;
   page.drawText(L.item, { x: M, y, size: 7.5, font: bold, color: MUTED });
   page.drawText(L.reference, { x: M + 250, y, size: 7.5, font: bold, color: MUTED });
-  const netHead = L.net;
+  const netHead = vatMode ? L.net : L.totalDue;
   page.drawText(netHead, {
     x: M + W - bold.widthOfTextAtSize(netHead, 7.5),
     y,
@@ -188,7 +188,8 @@ export async function downloadTripInvoice(data: InvoiceData) {
       font: bold,
       color: INK,
     });
-    const value = money(itemNet, item.currency);
+    const value = money(vatMode ? itemNet : item.amount, item.currency);
+
     page.drawText(value, {
       x: M + W - font.widthOfTextAtSize(value, 9.5),
       y,
@@ -214,11 +215,14 @@ export async function downloadTripInvoice(data: InvoiceData) {
 
   // Totals
   y -= 22;
-  const rows: [string, string, boolean][] = [
-    [L.netTotal, money(net, data.currency), false],
-    [`${L.vat} ${Math.round(VAT_RATE * 100)}%`, money(vat, data.currency), false],
-    [L.totalDue, money(gross, data.currency), true],
-  ];
+  const rows: [string, string, boolean][] = vatMode
+    ? [
+        [L.netTotal, money(net, data.currency), false],
+        [`${L.vat} ${Math.round(VAT_RATE * 100)}%`, money(vat, data.currency), false],
+        [L.totalDue, money(gross, data.currency), true],
+      ]
+    : [[L.totalDue, money(gross, data.currency), true]];
+
   for (const [label, value, strong] of rows) {
     const size = strong ? 13 : 9.5;
     const f = strong ? bold : font;
