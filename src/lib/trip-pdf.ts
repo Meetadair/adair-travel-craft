@@ -92,7 +92,9 @@ export async function downloadTripInvoice(data: InvoiceData) {
 
   // Header
   page.drawText("Adair.", { x: M, y, size: 22, font: bold, color: INK });
-  const head = L.documentTitle;
+  const vatMode = data.variant !== "receipt";
+  const head = vatMode ? `VAT ${L.documentTitle}` : L.documentTitle;
+
   page.drawText(head, {
     x: width - M - bold.widthOfTextAtSize(head, 9),
     y: y + 7,
@@ -121,12 +123,13 @@ export async function downloadTripInvoice(data: InvoiceData) {
       L.buyer,
       [
         data.buyer.company || data.buyer.name || "—",
-        data.buyer.name && data.buyer.company ? data.buyer.name : data.buyer.email,
+        ...(data.buyer.addressLines ?? []),
         data.buyer.taxId ? `${L.vatId} ${data.buyer.taxId}` : `${L.vatId} —`,
         data.buyer.email,
-      ],
+      ].filter((line) => line && line.length),
     ],
   ];
+
   const partyH = 86;
   partyLines.forEach(([label, lines], index) => {
     const x = M + index * (colW + 16);
