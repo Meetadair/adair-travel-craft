@@ -638,6 +638,7 @@ export type Database = {
           end_date: string | null
           id: string
           origin: string | null
+          segments: Json
           start_date: string | null
           status: string
           title: string
@@ -657,6 +658,7 @@ export type Database = {
           end_date?: string | null
           id?: string
           origin?: string | null
+          segments?: Json
           start_date?: string | null
           status?: string
           title: string
@@ -676,6 +678,7 @@ export type Database = {
           end_date?: string | null
           id?: string
           origin?: string | null
+          segments?: Json
           start_date?: string | null
           status?: string
           title?: string
