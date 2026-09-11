@@ -265,6 +265,11 @@ function Packages({ t }: { t: Dict }) {
             <p className="mt-1 text-xs text-muted-foreground">{plan.forWho}</p>
             <p className="mt-5 font-display text-3xl font-semibold text-primary">{plan.price}</p>
             <p className="mt-1 text-xs text-muted-foreground">{plan.priceNote}</p>
+            {plan.name === b.plans[1]?.name ? (
+              <span className="mt-3 inline-flex w-fit rounded-full border border-primary/30 px-2.5 py-1 text-[11px] font-medium text-primary">
+                {b.plansTrial}
+              </span>
+            ) : null}
             <ul className="mt-6 flex-1 space-y-2.5">
               {plan.features.map((f) => (
                 <li key={f} className="flex items-start gap-2.5 text-sm text-muted-foreground">
