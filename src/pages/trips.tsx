@@ -1,9 +1,13 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { Plane, BedDouble, CarFront, X } from "lucide-react";
 import { SiteNav } from "@/components/site-nav";
-import { listMyTrips, cancelTripItem } from "@/lib/booking.functions";
+import { AddToCalendar } from "@/components/add-to-calendar";
+import { TripMonthCalendar } from "@/components/trip-month-calendar";
+import { listMyTrips, cancelTripItem, type MyTrip } from "@/lib/booking.functions";
+import { tripCalendarEvents } from "@/lib/calendar";
 import { eur } from "@/lib/trip/client";
 
 const ICONS: Record<string, React.ReactNode> = {
@@ -13,11 +17,31 @@ const ICONS: Record<string, React.ReactNode> = {
   car: <CarFront className="size-4" />,
 };
 
+function eventsFor(trip: MyTrip) {
+  return tripCalendarEvents({
+    id: trip.id,
+    title: trip.title,
+    city: trip.city,
+    startDate: trip.startDate,
+    endDate: trip.endDate,
+    reference: trip.reference,
+    items: trip.items.map((item) => ({
+      id: item.id,
+      kind: item.kind,
+      title: item.title,
+      status: item.status,
+      reference: item.reference,
+      payload: item.payload,
+    })),
+  });
+}
+
 export function TripsPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const fetchTrips = useServerFn(listMyTrips);
   const cancelItem = useServerFn(cancelTripItem);
+  const [view, setView] = useState<"list" | "calendar">("list");
 
   const trips = useQuery({ queryKey: ["my-trips"], queryFn: () => fetchTrips({}) });
 
@@ -25,6 +49,7 @@ export function TripsPage() {
     mutationFn: (itemId: string) => cancelItem({ data: { itemId } }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["my-trips"] }),
   });
+
 
   return (
     <div className="min-h-screen bg-background">
