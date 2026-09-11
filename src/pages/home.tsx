@@ -977,8 +977,16 @@ function Teams({ t }: { t: Dict }) {
           </div>
           <p className="max-w-md text-sm leading-relaxed text-muted-foreground">{c.teamsLine}</p>
         </div>
-        <div className="sm:w-80 sm:shrink-0">
+        <div className="flex flex-col gap-3 sm:w-80 sm:shrink-0">
           <EarlyAccess t={t} type="teams" label={c.teamsCta} />
+          <LocaleLink
+            to="/business"
+            locale={locale}
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-primary transition-colors hover:text-primary/80"
+          >
+            {c.teamsMore}
+            <ArrowRight className="size-4" />
+          </LocaleLink>
         </div>
       </div>
     </section>
