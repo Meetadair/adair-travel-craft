@@ -21,6 +21,7 @@ import { Route as LangAuthRouteImport } from './routes/$lang.auth'
 import { Route as LangBusinessRouteImport } from './routes/$lang.business'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
+import { Route as AuthenticatedPlanRouteImport } from './routes/_authenticated/plan'
 import { Route as AuthenticatedTripsRouteImport } from './routes/_authenticated/trips'
 import { Route as AuthenticatedBookCardIdRouteImport } from './routes/_authenticated/book.$cardId'
 import { Route as ApiTripParseRouteImport } from './routes/api/trip/parse'
@@ -85,6 +86,11 @@ const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
   path: '/onboarding',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedPlanRoute = AuthenticatedPlanRouteImport.update({
+  id: '/plan',
+  path: '/plan',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedTripsRoute = AuthenticatedTripsRouteImport.update({
   id: '/trips',
   path: '/trips',
@@ -117,6 +123,7 @@ export interface FileRoutesByFullPath {
   '/$lang/business': typeof LangBusinessRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/plan': typeof AuthenticatedPlanRoute
   '/trips': typeof AuthenticatedTripsRoute
   '/$lang/': typeof LangIndexRoute
   '/book/$cardId': typeof AuthenticatedBookCardIdRoute
@@ -133,6 +140,7 @@ export interface FileRoutesByTo {
   '/$lang/business': typeof LangBusinessRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/plan': typeof AuthenticatedPlanRoute
   '/trips': typeof AuthenticatedTripsRoute
   '/$lang': typeof LangIndexRoute
   '/book/$cardId': typeof AuthenticatedBookCardIdRoute
@@ -152,6 +160,7 @@ export interface FileRoutesById {
   '/$lang/business': typeof LangBusinessRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
+  '/_authenticated/plan': typeof AuthenticatedPlanRoute
   '/_authenticated/trips': typeof AuthenticatedTripsRoute
   '/$lang/': typeof LangIndexRoute
   '/_authenticated/book/$cardId': typeof AuthenticatedBookCardIdRoute
@@ -171,6 +180,7 @@ export interface FileRouteTypes {
     | '/$lang/business'
     | '/dashboard'
     | '/onboarding'
+    | '/plan'
     | '/trips'
     | '/$lang/'
     | '/book/$cardId'
@@ -187,6 +197,7 @@ export interface FileRouteTypes {
     | '/$lang/business'
     | '/dashboard'
     | '/onboarding'
+    | '/plan'
     | '/trips'
     | '/$lang'
     | '/book/$cardId'
@@ -205,6 +216,7 @@ export interface FileRouteTypes {
     | '/$lang/business'
     | '/_authenticated/dashboard'
     | '/_authenticated/onboarding'
+    | '/_authenticated/plan'
     | '/_authenticated/trips'
     | '/$lang/'
     | '/_authenticated/book/$cardId'
@@ -309,6 +321,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/plan': {
+      id: '/_authenticated/plan'
+      path: '/plan'
+      fullPath: '/plan'
+      preLoaderRoute: typeof AuthenticatedPlanRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/trips': {
       id: '/_authenticated/trips'
       path: '/trips'
@@ -343,6 +362,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
+  AuthenticatedPlanRoute: typeof AuthenticatedPlanRoute
   AuthenticatedTripsRoute: typeof AuthenticatedTripsRoute
   AuthenticatedBookCardIdRoute: typeof AuthenticatedBookCardIdRoute
 }
@@ -350,6 +370,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
+  AuthenticatedPlanRoute: AuthenticatedPlanRoute,
   AuthenticatedTripsRoute: AuthenticatedTripsRoute,
   AuthenticatedBookCardIdRoute: AuthenticatedBookCardIdRoute,
 }
