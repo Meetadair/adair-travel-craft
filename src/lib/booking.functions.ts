@@ -367,7 +367,9 @@ export type MyTrip = {
     status: string;
     amountEur: number;
     reference: string | null;
+    payload: ItemCalendarPayload | null;
   }>;
+
 };
 
 export const listMyTrips = createServerFn({ method: "GET" })
@@ -398,7 +400,9 @@ export const listMyTrips = createServerFn({ method: "GET" })
 
     const itemsRes = await supabase
       .from("trip_items")
-      .select("id, trip_id, kind, title, detail, status, amount, offer_reference, position")
+      .select(
+        "id, trip_id, kind, title, detail, status, amount, offer_reference, position, payload",
+      )
       .eq("user_id", userId)
       .in(
         "trip_id",
@@ -415,7 +419,9 @@ export const listMyTrips = createServerFn({ method: "GET" })
       status: string;
       amount: number;
       offer_reference: string | null;
+      payload: ItemCalendarPayload | null;
     }>;
+
 
     return trips.map((trip) => ({
       id: trip.id,
