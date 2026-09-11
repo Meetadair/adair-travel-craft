@@ -129,7 +129,15 @@ export const bookTripCard = createServerFn({ method: "POST" })
           amountEur: flightGross,
           reference: order.bookingReference,
           note: null,
+          payload: {
+            route: `${request.originIata} → ${request.destinationIata}`,
+            returnRoute: `${request.destinationIata} → ${request.originIata}`,
+            departAt: search.flight.departAt,
+            arriveAt: search.flight.arriveAt,
+            returnDepartAt: search.flight.returnDepartAt,
+          },
         });
+
       } catch (error) {
         failed = true;
         const message = error instanceof Error ? error.message : "unknown";
@@ -163,6 +171,11 @@ export const bookTripCard = createServerFn({ method: "POST" })
         amountEur: priced.stay ?? 0,
         reference: null,
         note: "supplier-not-enabled",
+        payload: {
+          checkin: request.departDate,
+          checkout: request.returnDate,
+          address: search.stay.address ?? request.destinationCity,
+        },
       });
     }
     if (data.include.car && search.car) {
@@ -173,8 +186,14 @@ export const bookTripCard = createServerFn({ method: "POST" })
         amountEur: priced.car ?? 0,
         reference: null,
         note: "supplier-not-enabled",
+        payload: {
+          pickup: request.departDate,
+          dropoff: request.returnDate,
+          location: request.destinationCity,
+        },
       });
     }
+
 
     if (!lines.length) throw new Error("nothing-selected");
 
