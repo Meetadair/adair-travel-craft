@@ -508,7 +508,18 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
     ? `${req.destinationCity} · ${dayLabel(req.departDate, locale)} – ${dayLabel(req.returnDate, locale)}`
     : sampleCard.title;
 
-  const totalLabel = live ? eur(live.totalEur) : "€1,240";
+  const parts = live
+    ? {
+        flight: live.flight?.amountEur ?? 0,
+        hotel: live.stay?.amountEur ?? 0,
+        car: live.car?.amountEur ?? 0,
+      }
+    : { flight: 412, hotel: 610, car: 218 };
+  const keptTotal =
+    (dropped.flight ? 0 : parts.flight) +
+    (dropped.hotel ? 0 : parts.hotel) +
+    (dropped.car ? 0 : parts.car);
+  const totalLabel = anyDropped ? eur(keptTotal) : live ? eur(live.totalEur) : "€1,240";
   const invoiceVisible = req ? req.invoiceToCompany : Boolean(parsed?.invoice);
 
   const reveal = (index: number) => (revealed >= index ? "animate-rise" : "hidden");
