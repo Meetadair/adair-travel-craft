@@ -3,6 +3,7 @@
  * /stays, cars via /cars when the account has it. Every part fails soft: a
  * failing part returns a short note instead of breaking the response.
  */
+import { findByName } from "./match";
 import type {
   CarResult,
   FlightResult,
@@ -10,6 +11,7 @@ import type {
   TripRequest,
   TripSearchResponse,
 } from "./types";
+
 
 const BASE = "https://api.duffel.com";
 
