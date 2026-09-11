@@ -237,9 +237,15 @@ export async function searchStay(req: TripRequest): Promise<StayResult | null> {
   const nights = nightsBetween(req.departDate, req.returnDate);
   const address = best.accommodation?.location?.address;
 
+  const name = best.accommodation?.name ?? "Hotel";
+  const realAddress = [address?.line_one, address?.city_name].filter(Boolean).join(", ");
+
   return {
-    name: best.accommodation?.name ?? "Hotel",
-    address: [address?.line_one, address?.city_name].filter(Boolean).join(", "),
+    name: sample ? `Test Hotel — sample data (${name})` : name,
+    address: sample
+      ? `Duffel test inventory — not ${req.destinationCity}`
+      : realAddress,
+
     rating: best.accommodation?.rating ?? null,
     nightlyAmount: round(amount / nights),
     amount: round(amount),
