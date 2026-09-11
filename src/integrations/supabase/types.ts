@@ -80,6 +80,30 @@ export type Database = {
         }
         Relationships: []
       }
+      hotel_requests_missed: {
+        Row: {
+          checkin_date: string | null
+          created_at: string
+          destination_iata: string | null
+          id: string
+          name_requested: string
+        }
+        Insert: {
+          checkin_date?: string | null
+          created_at?: string
+          destination_iata?: string | null
+          id?: string
+          name_requested: string
+        }
+        Update: {
+          checkin_date?: string | null
+          created_at?: string
+          destination_iata?: string | null
+          id?: string
+          name_requested?: string
+        }
+        Relationships: []
+      }
       payments: {
         Row: {
           amount_minor: number
