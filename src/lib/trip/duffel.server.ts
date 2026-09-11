@@ -191,7 +191,15 @@ function nightsBetween(a: string, b: string): number {
   return Math.max(1, Math.round((new Date(b).getTime() - new Date(a).getTime()) / 86_400_000));
 }
 
-export async function searchStay(req: TripRequest): Promise<StayResult | null> {
+export type StaySearchOutcome = {
+  stay: StayResult | null;
+  /** Up to 3 close options when the named hotel was not found. */
+  alternatives: StayResult[];
+  requested: string | null;
+  notFound: boolean;
+};
+
+export async function searchStay(req: TripRequest): Promise<StaySearchOutcome> {
   const sample = usesTestInventory();
   const json = await duffel<{ data?: { results?: DuffelStay[] } }>("/stays/search", {
     data: {
@@ -214,51 +222,69 @@ export async function searchStay(req: TripRequest): Promise<StayResult | null> {
     },
   });
 
+  const requested = req.hotelNameExact?.trim() || null;
 
   const results = (json.data?.results ?? []).filter((r) =>
     Number.isFinite(Number(r.cheapest_rate_total_amount)),
   );
-  if (!results.length) return null;
+  if (!results.length) {
+    return { stay: null, alternatives: [], requested, notFound: Boolean(requested) };
+  }
+
+  const nights = nightsBetween(req.departDate, req.returnDate);
+  const map = (raw: DuffelStay): { rawName: string; result: StayResult } => {
+    const amount = Number(raw.cheapest_rate_total_amount);
+    const currency = raw.cheapest_rate_currency ?? "EUR";
+    const address = raw.accommodation?.location?.address;
+    const rawName = raw.accommodation?.name ?? "Hotel";
+    const realAddress = [address?.line_one, address?.city_name].filter(Boolean).join(", ");
+    return {
+      rawName,
+      result: {
+        name: sample ? `Test Hotel — sample data (${rawName})` : rawName,
+        address: sample ? `Duffel test inventory — not ${req.destinationCity}` : realAddress,
+        rating: raw.accommodation?.rating ?? null,
+        nightlyAmount: round(amount / nights),
+        amount: round(amount),
+        currency,
+        ...toEur(amount, currency),
+        photoUrl: raw.accommodation?.photos?.[0]?.url ?? null,
+        rateId:
+          raw.cheapest_rate_id ?? raw.accommodation?.rooms?.[0]?.rates?.[0]?.id ?? raw.id ?? null,
+      },
+    };
+  };
+
+  const mapped = results.map(map);
+
+  // A named hotel overrides every preference-based pick.
+  if (requested) {
+    const hit = findByName(mapped, requested, (m) => m.rawName);
+    if (hit) {
+      return { stay: { ...hit.result, exact: true }, alternatives: [], requested, notFound: false };
+    }
+    const alternatives = mapped
+      .filter((m) => m !== hit)
+      .slice()
+      .sort((a, b) => a.result.amount - b.result.amount)
+      .slice(0, 3)
+      .map((m) => m.result);
+    return { stay: null, alternatives, requested, notFound: true };
+  }
 
   // Above the 25th price percentile, best rating — "premium but not silly".
   const prices = results.map((r) => Number(r.cheapest_rate_total_amount)).sort((a, b) => a - b);
   const floor = prices[Math.floor(prices.length * 0.25)] ?? prices[0]!;
-  const pool = results.filter((r) => Number(r.cheapest_rate_total_amount) >= floor);
-  const best = (pool.length ? pool : results)
+  const pool = mapped.filter((m) => m.result.amount >= floor);
+  const best = (pool.length ? pool : mapped)
     .slice()
     .sort(
-      (a, b) =>
-        (b.accommodation?.rating ?? 0) - (a.accommodation?.rating ?? 0) ||
-        Number(a.cheapest_rate_total_amount) - Number(b.cheapest_rate_total_amount),
+      (a, b) => (b.result.rating ?? 0) - (a.result.rating ?? 0) || a.result.amount - b.result.amount,
     )[0]!;
 
-  const amount = Number(best.cheapest_rate_total_amount);
-  const currency = best.cheapest_rate_currency ?? "EUR";
-  const nights = nightsBetween(req.departDate, req.returnDate);
-  const address = best.accommodation?.location?.address;
-
-  const name = best.accommodation?.name ?? "Hotel";
-  const realAddress = [address?.line_one, address?.city_name].filter(Boolean).join(", ");
-
-  return {
-    name: sample ? `Test Hotel — sample data (${name})` : name,
-    address: sample
-      ? `Duffel test inventory — not ${req.destinationCity}`
-      : realAddress,
-
-    rating: best.accommodation?.rating ?? null,
-    nightlyAmount: round(amount / nights),
-    amount: round(amount),
-    currency,
-    ...toEur(amount, currency),
-    photoUrl: best.accommodation?.photos?.[0]?.url ?? null,
-    rateId:
-      best.cheapest_rate_id ??
-      best.accommodation?.rooms?.[0]?.rates?.[0]?.id ??
-      best.id ??
-      null,
-  };
+  return { stay: best.result, alternatives: [], requested: null, notFound: false };
 }
+
 
 /* --------------------------------- cars -------------------------------- */
 
