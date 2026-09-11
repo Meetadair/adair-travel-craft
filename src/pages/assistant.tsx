@@ -32,6 +32,7 @@ export function AssistantPage() {
   const [saved, setSaved] = useState<string | null>(null);
   const [hotelRef, setHotelRef] = useState<string | null>(null);
   const [showAlts, setShowAlts] = useState(false);
+  const [removed, setRemoved] = useState<string[]>([]);
 
   const money = (amount: number, currency: string) =>
     `${amount.toLocaleString(locale, { maximumFractionDigits: 0 })} ${currency}`;
