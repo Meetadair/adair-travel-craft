@@ -394,6 +394,7 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
 
     setLive(null);
     setLiveFailed(false);
+    setDropped({ flight: false, hotel: false, car: false });
 
     // Kick the real search off immediately; the animation runs alongside it.
     const startedAt = Date.now();
