@@ -71,10 +71,11 @@ export function AuthPage() {
               setError(null);
               setMessage(null);
               try {
-                const { lovable } = await import("@/integrations/lovable");
-                await lovable.auth.signInWithOAuth("google", {
-                  redirect_uri: window.location.origin,
+                const { error: oauthError } = await supabase.auth.signInWithOAuth({
+                  provider: "google",
+                  options: { redirectTo: window.location.origin },
                 });
+                if (oauthError) throw oauthError;
               } catch (err) {
                 setError(err instanceof Error ? err.message : t.auth.genericError);
               }
