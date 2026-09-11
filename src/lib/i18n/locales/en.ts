@@ -244,6 +244,9 @@ export const en = {
     galleryPrev: "Previous photo",
     galleryNext: "Next photo",
     galleryGoTo: "Go to photo",
+    remove: "Remove this item",
+    removedNote: "Removed from this trip",
+    restoreAll: "Add everything back",
   },
 
   auth: {
