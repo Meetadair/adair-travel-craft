@@ -5,7 +5,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import type { TripSearchResponse } from "@/lib/trip/types";
+import type { TripSearchResponse, TripStop } from "@/lib/trip/types";
+import { CITIES } from "@/lib/trip/cities";
 import {
   tripCalendarEvents,
   type CalendarEvent,
