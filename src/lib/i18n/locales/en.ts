@@ -519,13 +519,15 @@ export const en = {
     ],
 
     plansLabel: "Packages",
-    plansTitle: "Pick the frame, we'll price it for your team.",
-    plansNote: "Pricing depends on team size and how much of the policy you want us to run.",
+    plansTitle: "Pick the frame that fits your team.",
+    plansNote: "Prices exclude VAT. Enterprise is priced on the size of your team and your policy.",
     quote: "Request a quote",
     plans: [
       {
         name: "Starter",
         forWho: "Up to 5 travellers",
+        price: "Free",
+        priceNote: "no card required",
         features: [
           "Travel profile per person",
           "One invoice per trip",
