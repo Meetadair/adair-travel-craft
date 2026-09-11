@@ -12,7 +12,7 @@ export type PricingRule = {
 export type PricingTable = Record<LineType, PricingRule>;
 
 const FALLBACK: PricingTable = {
-  flight: { markupBps: 400, discountBps: 0, changeFeeMinor: 2000 },
+  flight: { markupBps: 600, discountBps: 0, changeFeeMinor: 2000 },
   stay: { markupBps: 1200, discountBps: 0, changeFeeMinor: 2000 },
   car: { markupBps: 1000, discountBps: 0, changeFeeMinor: 2000 },
   extras: { markupBps: 4000, discountBps: 0, changeFeeMinor: 2000 },
