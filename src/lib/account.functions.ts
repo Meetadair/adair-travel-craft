@@ -369,10 +369,11 @@ export const savePreferences = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     if (data.fullName || data.homeAirport) {
-      const profile: Record<string, unknown> = { id: userId };
-      if (data.fullName) profile["full_name"] = data.fullName;
-      if (data.homeAirport) profile["home_airport"] = data.homeAirport.toUpperCase();
-      const up = await supabase.from("profiles").upsert(profile);
+      const up = await supabase.from("profiles").upsert({
+        id: userId,
+        ...(data.fullName ? { full_name: data.fullName } : {}),
+        ...(data.homeAirport ? { home_airport: data.homeAirport.toUpperCase() } : {}),
+      });
       if (up.error) throw new Error(up.error.message);
     }
     const res = await supabase.from("preferences").upsert(prefsToRow(userId, data.preferences));
