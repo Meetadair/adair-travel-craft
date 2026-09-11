@@ -301,6 +301,8 @@ export type MyTrip = {
   status: string;
   totalEur: number;
   reference: string | null;
+  /** True when the trip was created against the supplier's test environment. */
+  testMode: boolean;
   items: Array<{
     id: string;
     kind: string;
@@ -319,7 +321,7 @@ export const listMyTrips = createServerFn({ method: "GET" })
     const tripsRes = await supabase
       .from("trips")
       .select(
-        "id, title, city, start_date, end_date, status, total_amount, document_number, created_at",
+        "id, title, city, start_date, end_date, status, total_amount, document_number, data_source, created_at",
       )
       .eq("user_id", userId)
       .order("created_at", { ascending: false });
@@ -333,7 +335,9 @@ export const listMyTrips = createServerFn({ method: "GET" })
       status: string;
       total_amount: number;
       document_number: string | null;
+      data_source: string | null;
     }>;
+
     if (!trips.length) return [];
 
     const itemsRes = await supabase
