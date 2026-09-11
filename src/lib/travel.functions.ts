@@ -130,16 +130,7 @@ async function understand(message: string, locale = "en"): Promise<ParsedRequest
     body: JSON.stringify({
       model: "google/gemini-3.8-flash",
       messages: [
-        {
-          role: "system",
-          content:
-            `You are a travel request parser. Today is ${today}. Return ONLY JSON ` +
-            `with fields: originCity, originIata (IATA code of the origin city), destinationCity, destinationIata ` +
-            `(IATA code of the destination city), departDate (YYYY-MM-DD), returnDate (YYYY-MM-DD), ` +
-            `cabinClass (economy|premium_economy|business), needsCar (boolean), notes, ` +
-            `reply (one short sentence summarizing the understood request, written in ${REPLY_LANGUAGE[locale] ?? "English"}). ` +
-            `If the origin city is not given, use Warsaw (WAW).`,
-        },
+        { role: "system", content: systemPrompt(today, locale) },
         { role: "user", content: message },
       ],
       response_format: { type: "json_object" },
