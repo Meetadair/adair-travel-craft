@@ -16,3 +16,12 @@
 
 ## Done
 - Business card for Kitti Fodor in the chosen layout
+
+## Real product behind sign-in (done, preview only)
+- [x] Data model: preferences, companies, trip_requests, trip_cards, payments, pricing_rules, subscriptions, audit_log; owner-only access
+- [x] Sign in with Google + email link (password kept), 3-step first-login setup at /onboarding
+- [x] Signed-in hero search uses real supplier results, plan pricing and saves a trip card
+- [x] Test-mode booking at /book/:cardId, confirmation, reprice check, per-line cancel
+- [x] My trips at /trips with real bookings, /plan (paid plans Coming soon), /dev/status
+- [ ] Hotels and cars: supplier account returns not-authorised; stored as requested lines until enabled
+- [ ] Card payments: open at ~1000 active accounts

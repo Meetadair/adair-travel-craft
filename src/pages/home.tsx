@@ -23,6 +23,10 @@ import {
   Copy,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { supabase } from "@/integrations/supabase/client";
+import { searchLiveTrip } from "@/lib/trip-live.functions";
 import { downloadTripInvoice } from "@/lib/trip-pdf";
 import { SiteNav } from "@/components/site-nav";
 import { LocaleLink, useLocale, useT, type Dict } from "@/lib/i18n";
@@ -380,6 +384,27 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
     setDropped((prev) => ({ ...prev, [kind]: true }));
   const anyDropped = dropped.flight || dropped.hotel || dropped.car;
 
+  const navigate = useNavigate();
+  const [signedIn, setSignedIn] = useState(false);
+  const [cardId, setCardId] = useState<string | null>(null);
+  const runLiveSearch = useServerFn(searchLiveTrip);
+
+  useEffect(() => {
+    let active = true;
+    supabase.auth.getSession().then(({ data }) => {
+      if (active) setSignedIn(Boolean(data.session?.user));
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_IN" || event === "SIGNED_OUT" || event === "USER_UPDATED") {
+        setSignedIn(Boolean(session?.user));
+      }
+    });
+    return () => {
+      active = false;
+      sub.subscription.unsubscribe();
+    };
+  }, []);
+
   const runKey = submission?.key ?? 0;
   useEffect(() => {
     if (!submission) return;
@@ -394,11 +419,30 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
 
     setLive(null);
     setLiveFailed(false);
+    setCardId(null);
     setDropped({ flight: false, hotel: false, car: false });
 
     // Kick the real search off immediately; the animation runs alongside it.
     const startedAt = Date.now();
     const search = (async () => {
+      if (signedIn) {
+        // Signed in: real supplier results, priced with this traveller's plan,
+        // saved as a trip card that can then be booked.
+        const result = await runLiveSearch({ data: { sentence: text } });
+        const priced = result.search;
+        if (priced.flight && result.priced.flight != null) {
+          priced.flight.amountEur = result.priced.flight;
+        }
+        if (priced.stay && result.priced.stay != null) {
+          priced.stay.amountEur = result.priced.stay;
+        }
+        if (priced.car && result.priced.car != null) {
+          priced.car.amountEur = result.priced.car;
+        }
+        priced.totalEur = result.priced.total;
+        if (!cancelled) setCardId(result.cardId);
+        return priced;
+      }
       const request = await parseTrip(text);
       return searchTrip(request);
     })();
@@ -731,14 +775,26 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                           {totalLabel}
                         </p>
                       </div>
-                      <button
-                        type="button"
-                        disabled
-                        title={d.bookTooltip}
-                        className="inline-flex shrink-0 cursor-not-allowed items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground opacity-70"
-                      >
-                        {d.bookAll} <ChevronRight className="size-4" />
-                      </button>
+                      {cardId ? (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            navigate({ to: "/book/$cardId", params: { cardId } })
+                          }
+                          className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+                        >
+                          {d.bookAll} <ChevronRight className="size-4" />
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          disabled
+                          title={d.bookTooltip}
+                          className="inline-flex shrink-0 cursor-not-allowed items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground opacity-70"
+                        >
+                          {d.bookAll} <ChevronRight className="size-4" />
+                        </button>
+                      )}
                     </div>
                     {live ? (
                       <p

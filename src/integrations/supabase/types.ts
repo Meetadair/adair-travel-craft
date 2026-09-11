@@ -14,6 +14,194 @@ export type Database = {
   }
   public: {
     Tables: {
+      audit_log: {
+        Row: {
+          action: string
+          actor: string | null
+          after: Json | null
+          at: string
+          before: Json | null
+          entity: string
+          id: string
+        }
+        Insert: {
+          action: string
+          actor?: string | null
+          after?: Json | null
+          at?: string
+          before?: Json | null
+          entity: string
+          id?: string
+        }
+        Update: {
+          action?: string
+          actor?: string | null
+          after?: Json | null
+          at?: string
+          before?: Json | null
+          entity?: string
+          id?: string
+        }
+        Relationships: []
+      }
+      companies: {
+        Row: {
+          address: string | null
+          created_at: string
+          id: string
+          invoice_email: string | null
+          is_default: boolean
+          name: string
+          updated_at: string
+          user_id: string
+          vat_id: string | null
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          id?: string
+          invoice_email?: string | null
+          is_default?: boolean
+          name: string
+          updated_at?: string
+          user_id: string
+          vat_id?: string | null
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          id?: string
+          invoice_email?: string | null
+          is_default?: boolean
+          name?: string
+          updated_at?: string
+          user_id?: string
+          vat_id?: string | null
+        }
+        Relationships: []
+      }
+      payments: {
+        Row: {
+          amount_minor: number
+          created_at: string
+          currency: string
+          id: string
+          idempotency_key: string
+          provider: string
+          provider_ref: string | null
+          status: string
+          trip_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount_minor?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          idempotency_key: string
+          provider: string
+          provider_ref?: string | null
+          status?: string
+          trip_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount_minor?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          idempotency_key?: string
+          provider?: string
+          provider_ref?: string | null
+          status?: string
+          trip_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      preferences: {
+        Row: {
+          cabin_class: string
+          car_transmission: string
+          created_at: string
+          hotel_min_rating: number
+          hotel_rules: string | null
+          max_connections: number
+          seat: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cabin_class?: string
+          car_transmission?: string
+          created_at?: string
+          hotel_min_rating?: number
+          hotel_rules?: string | null
+          max_connections?: number
+          seat?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cabin_class?: string
+          car_transmission?: string
+          created_at?: string
+          hotel_min_rating?: number
+          hotel_rules?: string | null
+          max_connections?: number
+          seat?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      pricing_rules: {
+        Row: {
+          change_fee_minor: number
+          created_at: string
+          currency: string
+          discount_bps: number
+          effective_from: string
+          id: string
+          line_type: string
+          markup_bps: number
+          plan: string
+        }
+        Insert: {
+          change_fee_minor?: number
+          created_at?: string
+          currency?: string
+          discount_bps?: number
+          effective_from?: string
+          id?: string
+          line_type: string
+          markup_bps?: number
+          plan: string
+        }
+        Update: {
+          change_fee_minor?: number
+          created_at?: string
+          currency?: string
+          discount_bps?: number
+          effective_from?: string
+          id?: string
+          line_type?: string
+          markup_bps?: number
+          plan?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           budget_per_trip: number | null
@@ -23,8 +211,11 @@ export type Database = {
           currency: string
           diet: string | null
           full_name: string | null
+          home_airport: string
           hotel_chains: string | null
           id: string
+          onboarded: boolean
+          plan: string
           preferred_airlines: string | null
           seat_preference: string | null
           tax_id: string | null
@@ -38,8 +229,11 @@ export type Database = {
           currency?: string
           diet?: string | null
           full_name?: string | null
+          home_airport?: string
           hotel_chains?: string | null
           id: string
+          onboarded?: boolean
+          plan?: string
           preferred_airlines?: string | null
           seat_preference?: string | null
           tax_id?: string | null
@@ -53,8 +247,11 @@ export type Database = {
           currency?: string
           diet?: string | null
           full_name?: string | null
+          home_airport?: string
           hotel_chains?: string | null
           id?: string
+          onboarded?: boolean
+          plan?: string
           preferred_airlines?: string | null
           seat_preference?: string | null
           tax_id?: string | null
@@ -62,19 +259,113 @@ export type Database = {
         }
         Relationships: []
       }
+      subscriptions: {
+        Row: {
+          created_at: string
+          current_period_end: string | null
+          id: string
+          plan: string
+          status: string
+          stripe_subscription_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_period_end?: string | null
+          id?: string
+          plan?: string
+          status?: string
+          stripe_subscription_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_period_end?: string | null
+          id?: string
+          plan?: string
+          status?: string
+          stripe_subscription_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      trip_cards: {
+        Row: {
+          created_at: string
+          currency: string
+          expires_at: string | null
+          id: string
+          items: Json
+          markup_minor: number
+          saved_minor: number
+          saved_minutes: number
+          status: string
+          total_minor: number
+          trip_request_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          currency?: string
+          expires_at?: string | null
+          id?: string
+          items?: Json
+          markup_minor?: number
+          saved_minor?: number
+          saved_minutes?: number
+          status?: string
+          total_minor?: number
+          trip_request_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          currency?: string
+          expires_at?: string | null
+          id?: string
+          items?: Json
+          markup_minor?: number
+          saved_minor?: number
+          saved_minutes?: number
+          status?: string
+          total_minor?: number
+          trip_request_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trip_cards_trip_request_id_fkey"
+            columns: ["trip_request_id"]
+            isOneToOne: false
+            referencedRelation: "trip_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       trip_items: {
         Row: {
           amount: number
           created_at: string
           currency: string
           detail: string | null
+          documents: Json
+          gross_minor: number
           id: string
           kind: string
+          net_minor: number
           offer_reference: string | null
+          payload: Json
           position: number
           provider: string | null
+          status: string
+          supplier: string | null
+          supplier_order_id: string | null
           title: string
           trip_id: string
+          type: string | null
           user_id: string
         }
         Insert: {
@@ -82,13 +373,21 @@ export type Database = {
           created_at?: string
           currency?: string
           detail?: string | null
+          documents?: Json
+          gross_minor?: number
           id?: string
           kind: string
+          net_minor?: number
           offer_reference?: string | null
+          payload?: Json
           position?: number
           provider?: string | null
+          status?: string
+          supplier?: string | null
+          supplier_order_id?: string | null
           title: string
           trip_id: string
+          type?: string | null
           user_id: string
         }
         Update: {
@@ -96,13 +395,21 @@ export type Database = {
           created_at?: string
           currency?: string
           detail?: string | null
+          documents?: Json
+          gross_minor?: number
           id?: string
           kind?: string
+          net_minor?: number
           offer_reference?: string | null
+          payload?: Json
           position?: number
           provider?: string | null
+          status?: string
+          supplier?: string | null
+          supplier_order_id?: string | null
           title?: string
           trip_id?: string
+          type?: string | null
           user_id?: string
         }
         Relationships: [
@@ -115,9 +422,39 @@ export type Database = {
           },
         ]
       }
+      trip_requests: {
+        Row: {
+          created_at: string
+          id: string
+          parsed: Json
+          raw_sentence: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          parsed?: Json
+          raw_sentence: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          parsed?: Json
+          raw_sentence?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       trips: {
         Row: {
+          booked_at: string | null
+          card_id: string | null
           city: string | null
+          company_id: string | null
           created_at: string
           currency: string
           data_source: string
@@ -133,7 +470,10 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          booked_at?: string | null
+          card_id?: string | null
           city?: string | null
+          company_id?: string | null
           created_at?: string
           currency?: string
           data_source?: string
@@ -149,7 +489,10 @@ export type Database = {
           user_id: string
         }
         Update: {
+          booked_at?: string | null
+          card_id?: string | null
           city?: string | null
+          company_id?: string | null
           created_at?: string
           currency?: string
           data_source?: string
@@ -164,7 +507,22 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "trips_card_id_fkey"
+            columns: ["card_id"]
+            isOneToOne: false
+            referencedRelation: "trip_cards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trips_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       waitlist: {
         Row: {
