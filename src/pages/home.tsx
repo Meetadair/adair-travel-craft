@@ -316,6 +316,8 @@ function TripRow({
   tags,
   price,
   extra,
+  onRemove,
+  removeLabel,
 }: {
   icon: React.ReactNode;
   title: string;
@@ -323,9 +325,11 @@ function TripRow({
   tags: React.ReactNode[];
   price: string;
   extra?: React.ReactNode;
+  onRemove?: () => void;
+  removeLabel?: string;
 }) {
   return (
-    <div className="flex items-start justify-between gap-4 px-5 py-4">
+    <div className="group flex items-start justify-between gap-4 px-5 py-4">
       <div className="flex min-w-0 items-start gap-3.5">
         <div className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg border border-border bg-background text-foreground">
           {icon}
