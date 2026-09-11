@@ -103,6 +103,7 @@ export function AssistantPage() {
             setSaved(null);
             setHotelRef(null);
             setShowAlts(false);
+            setRemoved([]);
             search.mutate(input.trim());
           }}
           className="hairline-card mt-8 flex items-end gap-3 p-4"
