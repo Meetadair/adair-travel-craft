@@ -56,7 +56,15 @@ export function TripsPage() {
     <div className="min-h-screen bg-background">
       <SiteNav />
       <main className="mx-auto max-w-3xl px-6 py-16">
-        <h1 className="font-display text-3xl font-semibold tracking-tight">My trips</h1>
+        <div className="flex flex-wrap items-baseline justify-between gap-3">
+          <h1 className="font-display text-3xl font-semibold tracking-tight">My trips</h1>
+          <Link
+            to="/preferences"
+            className="text-sm text-muted-foreground underline decoration-border underline-offset-4 hover:text-foreground"
+          >
+            Travel preferences
+          </Link>
+        </div>
         <p className="mt-2 text-sm text-muted-foreground">
           Everything you booked, with its confirmation and status.
         </p>
