@@ -11,6 +11,11 @@ import {
   type CalendarEvent,
   type ItemCalendarPayload,
 } from "@/lib/calendar";
+import {
+  INSURANCE_NOTE,
+  INSURANCE_TITLE,
+  type InsuranceQuote,
+} from "@/lib/trip/insurance";
 
 const travellerSchema = z.object({
   givenName: z.string().trim().min(1).max(60),
@@ -24,7 +29,12 @@ const travellerSchema = z.object({
 
 const bookSchema = z.object({
   cardId: z.string().uuid(),
-  include: z.object({ flight: z.boolean(), stay: z.boolean(), car: z.boolean() }),
+  include: z.object({
+    flight: z.boolean(),
+    stay: z.boolean(),
+    car: z.boolean(),
+    insurance: z.boolean().optional(),
+  }),
   companyId: z.string().uuid().nullable(),
   traveller: travellerSchema,
 });
@@ -55,6 +65,7 @@ export type BookingResult = {
 type CardItems = {
   search: TripSearchResponse;
   priced: { flight: number | null; stay: number | null; car: number | null; total: number };
+  insurance?: InsuranceQuote | null;
 };
 
 
@@ -194,6 +205,23 @@ export const bookTripCard = createServerFn({ method: "POST" })
       });
     }
 
+    // In-app insurance offer: priced from our own rate table, no external order.
+    const insurance = card.items.insurance ?? null;
+    const insuranceOptedIn = Boolean(data.include.insurance && insurance);
+    if (insuranceOptedIn && insurance) {
+      lines.push({
+        kind: "insurance",
+        title: INSURANCE_TITLE,
+        status: "confirmed",
+        amountEur: insurance.grossEur,
+        reference: null,
+        note: INSURANCE_NOTE,
+        payload: { note: INSURANCE_NOTE },
+      });
+    }
+
+
+
 
     if (!lines.length) throw new Error("nothing-selected");
 
@@ -272,11 +300,16 @@ export const bookTripCard = createServerFn({ method: "POST" })
       title: line.title,
       detail: line.note,
       status: line.status,
-      supplier: "duffel",
+      supplier: line.kind === "insurance" ? "adair" : "duffel",
       supplier_order_id: line.kind === "flight" ? flightOrderId : null,
       offer_reference: line.reference,
       amount: line.amountEur,
-      net_minor: line.kind === "flight" ? Math.round(flightNet * 100) : 0,
+      net_minor:
+        line.kind === "flight"
+          ? Math.round(flightNet * 100)
+          : line.kind === "insurance"
+            ? Math.round((insurance?.netEur ?? 0) * 100)
+            : 0,
       gross_minor: Math.round(line.amountEur * 100),
       position: index,
       payload: (line.payload ?? {}) as never,

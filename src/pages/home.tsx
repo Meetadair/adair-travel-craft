@@ -21,12 +21,18 @@ import {
   Receipt,
   Users,
   Copy,
+  ShieldCheck,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { searchLiveTrip, swapCardAlternative } from "@/lib/trip-live.functions";
+import {
+  INSURANCE_DETAIL,
+  INSURANCE_TITLE,
+  type InsuranceQuote,
+} from "@/lib/trip/insurance";
 import { parseTripSentence } from "@/lib/trip/parse";
 
 import { downloadTripInvoice } from "@/lib/trip-pdf";
@@ -381,6 +387,9 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
   const [copied, setCopied] = useState(false);
   const [live, setLive] = useState<TripSearchResponse | null>(null);
   const [liveFailed, setLiveFailed] = useState(false);
+  // Optional in-app travel insurance offer (signed-in cards only).
+  const [insurance, setInsurance] = useState<InsuranceQuote | null>(null);
+  const [addInsurance, setAddInsurance] = useState(false);
   const [dropped, setDropped] = useState({ flight: false, hotel: false, car: false });
   const drop = (kind: "flight" | "hotel" | "car") =>
     setDropped((prev) => ({ ...prev, [kind]: true }));
@@ -455,6 +464,8 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
     setLive(null);
     setLiveFailed(false);
     setCardId(null);
+    setInsurance(null);
+    setAddInsurance(false);
     setDropped({ flight: false, hotel: false, car: false });
     if (signedIn) {
       const named = parseTripSentence(text);
@@ -482,7 +493,10 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
           priced.car.amountEur = result.priced.car;
         }
         priced.totalEur = result.priced.total;
-        if (!cancelled) setCardId(result.cardId);
+        if (!cancelled) {
+          setCardId(result.cardId);
+          setInsurance(result.insurance);
+        }
         return priced;
       }
       const request = await parseTrip(text);
@@ -605,7 +619,13 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
     (dropped.flight ? 0 : parts.flight) +
     (dropped.hotel ? 0 : parts.hotel) +
     (dropped.car ? 0 : parts.car);
-  const totalLabel = anyDropped ? eur(keptTotal) : live ? eur(live.totalEur) : "€1,240";
+  const insuranceAdd = addInsurance && insurance ? insurance.grossEur : 0;
+  const travelTotal = anyDropped ? keptTotal : live ? live.totalEur : 1240;
+  const totalLabel = eur(Math.round((travelTotal + insuranceAdd) * 100) / 100);
+  // The saved estimate follows what is actually kept in the card.
+  const savedShown = live
+    ? Math.round(live.savedEur * (travelTotal > 0 ? Math.min(1, travelTotal / Math.max(1, live.totalEur)) : 0) * 100) / 100
+    : 0;
   const invoiceVisible = req ? req.invoiceToCompany : Boolean(parsed?.invoice);
 
   const reveal = (index: number) => (revealed >= index ? "animate-rise" : "hidden");
@@ -870,6 +890,33 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                       </div>
                     )}
 
+                    {insurance && (
+                      <div className={`${reveal(3)} px-5 py-4`}>
+                        <div className="flex flex-wrap items-center gap-3">
+                          <button
+                            type="button"
+                            aria-pressed={addInsurance}
+                            onClick={() => setAddInsurance((v) => !v)}
+                            className={`inline-flex items-center gap-2 rounded-xl border px-3 py-1.5 text-xs font-medium transition-colors ${
+                              addInsurance
+                                ? "border-primary bg-primary text-primary-foreground"
+                                : "border-border text-foreground hover:border-primary"
+                            }`}
+                          >
+                            <ShieldCheck className="size-3.5" />
+                            {addInsurance ? INSURANCE_TITLE : `+ Add travel insurance`} ·{" "}
+                            {eur(insurance.grossEur)}
+                          </button>
+                          <Tag>Insurance</Tag>
+                        </div>
+                        <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+                          {INSURANCE_DETAIL}
+                        </p>
+                      </div>
+                    )}
+
+
+
                     {anyDropped && (
                       <div className="flex flex-wrap items-center justify-between gap-2 px-5 py-3 text-xs text-muted-foreground">
                         <span>{d.removedNote}</span>
@@ -934,7 +981,7 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                           title={d.savedNote}
                           className="cursor-help underline decoration-primary/30 decoration-dotted underline-offset-4"
                         >
-                          {fill(d.savedLive, { amount: eur(live.savedEur) })} ·{" "}
+                          {fill(d.savedLive, { amount: eur(savedShown) })} ·{" "}
                           {d.savedEstimate}
                         </span>
                       </p>

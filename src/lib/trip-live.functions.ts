@@ -6,6 +6,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { TripRequest, TripSearchResponse } from "@/lib/trip/types";
+import type { InsuranceQuote } from "@/lib/trip/insurance";
 
 export type LiveTripResult = {
   cardId: string;
@@ -18,6 +19,8 @@ export type LiveTripResult = {
     car: number | null;
     total: number;
   };
+  /** Optional travel-insurance offer; only counted when the traveller opts in. */
+  insurance: InsuranceQuote | null;
   expiresAt: string | null;
 };
 
@@ -94,6 +97,15 @@ export const searchLiveTrip = createServerFn({ method: "POST" })
     const total = Math.round(((flight ?? 0) + (stay ?? 0) + (car ?? 0)) * 100) / 100;
     const netTotal = search.totalEur;
 
+    const { insuranceQuoteFor } = await import("@/lib/insurance.server");
+    const insurance = await insuranceQuoteFor(
+      supabase,
+      table,
+      request.departDate,
+      request.returnDate,
+      request.passengers,
+    );
+
     const expiresAt =
       search.flight?.expiresAt ?? new Date(Date.now() + 20 * 60_000).toISOString();
 
@@ -107,7 +119,7 @@ export const searchLiveTrip = createServerFn({ method: "POST" })
         saved_minor: pricing.toMinor(search.savedEur),
         saved_minutes: search.savedMinutes,
         expires_at: expiresAt,
-        items: { search, priced: { flight, stay, car, total } },
+        items: { search, priced: { flight, stay, car, total }, insurance },
       })
       .select("id")
       .single();
@@ -118,6 +130,7 @@ export const searchLiveTrip = createServerFn({ method: "POST" })
       plan,
       search,
       priced: { flight, stay, car, total },
+      insurance,
       expiresAt,
     };
   });
@@ -137,7 +150,11 @@ export const getTripCard = createServerFn({ method: "POST" })
 
     const row = res.data as unknown as {
       id: string;
-      items: { search: TripSearchResponse; priced: LiveTripResult["priced"] };
+      items: {
+        search: TripSearchResponse;
+        priced: LiveTripResult["priced"];
+        insurance?: InsuranceQuote | null;
+      };
       total_minor: number;
       saved_minor: number;
       expires_at: string | null;
@@ -147,6 +164,7 @@ export const getTripCard = createServerFn({ method: "POST" })
       cardId: row.id,
       search: row.items.search,
       priced: row.items.priced,
+      insurance: row.items.insurance ?? null,
       totalEur: row.total_minor / 100,
       savedEur: row.saved_minor / 100,
       expiresAt: row.expires_at,
@@ -187,7 +205,11 @@ export const swapCardAlternative = createServerFn({ method: "POST" })
     if (!cardRes.data) throw new Error("card-not-found");
 
     const row = cardRes.data as unknown as {
-      items: { search: TripSearchResponse; priced: LiveTripResult["priced"] };
+      items: {
+        search: TripSearchResponse;
+        priced: LiveTripResult["priced"];
+        insurance?: InsuranceQuote | null;
+      };
       saved_minor: number;
       expires_at: string | null;
     };
@@ -228,12 +250,13 @@ export const swapCardAlternative = createServerFn({ method: "POST" })
     search.totalEur = netTotal;
 
     const priced = { flight, stay, car, total };
+    const insurance = row.items.insurance ?? null;
     const update = await supabase
       .from("trip_cards")
       .update({
         total_minor: pricing.toMinor(total),
         markup_minor: pricing.toMinor(Math.max(0, total - netTotal)),
-        items: { search, priced },
+        items: { search, priced, insurance },
       })
       .eq("user_id", userId)
       .eq("id", data.cardId);
@@ -244,6 +267,7 @@ export const swapCardAlternative = createServerFn({ method: "POST" })
       plan,
       search,
       priced,
+      insurance,
       expiresAt: row.expires_at,
     } satisfies LiveTripResult;
   });
