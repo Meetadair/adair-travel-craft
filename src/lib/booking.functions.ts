@@ -25,7 +25,7 @@ const bookSchema = z.object({
 });
 
 export type BookingResult = {
-  tripId: string;
+  tripId: string | null;
   status: "confirmed" | "partial" | "failed";
   reference: string | null;
   totalEur: number;
@@ -38,6 +38,8 @@ export type BookingResult = {
     note: string | null;
   }>;
   repriced: { from: number; to: number } | null;
+  /** Machine-readable failure reason, e.g. "offer-expired". */
+  reason: string | null;
   testMode: boolean;
 };
 
@@ -45,6 +47,7 @@ type CardItems = {
   search: TripSearchResponse;
   priced: { flight: number | null; stay: number | null; car: number | null; total: number };
 };
+
 
 export const bookTripCard = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
