@@ -775,14 +775,26 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                           {totalLabel}
                         </p>
                       </div>
-                      <button
-                        type="button"
-                        disabled
-                        title={d.bookTooltip}
-                        className="inline-flex shrink-0 cursor-not-allowed items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground opacity-70"
-                      >
-                        {d.bookAll} <ChevronRight className="size-4" />
-                      </button>
+                      {cardId ? (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            navigate({ to: "/book/$cardId", params: { cardId } })
+                          }
+                          className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+                        >
+                          {d.bookAll} <ChevronRight className="size-4" />
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          disabled
+                          title={d.bookTooltip}
+                          className="inline-flex shrink-0 cursor-not-allowed items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground opacity-70"
+                        >
+                          {d.bookAll} <ChevronRight className="size-4" />
+                        </button>
+                      )}
                     </div>
                     {live ? (
                       <p
