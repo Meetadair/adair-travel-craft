@@ -105,7 +105,11 @@ export function SiteNav() {
               {t.nav[l.key]}
             </LocaleLink>
           ))}
-          <Link to="/dashboard" className={linkClass} activeProps={{ className: "text-foreground" }}>
+          <Link
+            to={signedIn ? "/trips" : "/dashboard"}
+            className={linkClass}
+            activeProps={{ className: "text-foreground" }}
+          >
             {t.nav.trips}
           </Link>
           <LanguageMenu />
