@@ -57,12 +57,70 @@ function fallbackParse(message: string): ParsedRequest {
   };
 }
 
+function systemPrompt(today: string, locale: string) {
+  return (
+    `You are a travel request parser. Today is ${today}. Return ONLY JSON ` +
+    `with fields: originCity, originIata (IATA code of the origin city), destinationCity, destinationIata ` +
+    `(IATA code of the destination city), departDate (YYYY-MM-DD), returnDate (YYYY-MM-DD), ` +
+    `cabinClass (economy|premium_economy|business), needsCar (boolean), notes, ` +
+    `reply (one short sentence summarizing the understood request, written in ${REPLY_LANGUAGE[locale] ?? "English"}). ` +
+    `If the origin city is not given, use Warsaw (WAW).`
+  );
+}
+
+/** Parses the request with Claude; returns null so the caller can fall back. */
+async function understandWithClaude(
+  message: string,
+  locale: string,
+  today: string,
+): Promise<ParsedRequest | null> {
+  const apiKey = process.env["ANTHROPIC_API_KEY"];
+  if (!apiKey) return null;
+
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-5",
+        max_tokens: 700,
+        system: `${systemPrompt(today, locale)} Respond with raw JSON only, no markdown fences.`,
+        messages: [{ role: "user", content: message }],
+      }),
+    });
+    if (!res.ok) {
+      console.error(`Anthropic failed [${res.status}]: ${await res.text()}`);
+      return null;
+    }
+    const json = (await res.json()) as { content?: Array<{ type: string; text?: string }> };
+    const text = (json.content ?? [])
+      .filter((p) => p.type === "text")
+      .map((p) => p.text ?? "")
+      .join("")
+      .trim()
+      .replace(/^```(?:json)?/i, "")
+      .replace(/```$/, "");
+    return parsedSchema.parse(JSON.parse(text));
+  } catch (error) {
+    console.error("Anthropic parse failed", error);
+    return null;
+  }
+}
+
 /** Turns a free-form natural-language request into a structured trip search. */
 async function understand(message: string, locale = "en"): Promise<ParsedRequest> {
+  const today = new Date().toISOString().slice(0, 10);
+
+  const claude = await understandWithClaude(message, locale, today);
+  if (claude) return claude;
+
   const apiKey = process.env["LOVABLE_API_KEY"];
   if (!apiKey) return fallbackParse(message);
 
-  const today = new Date().toISOString().slice(0, 10);
   const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
     headers: {
@@ -72,16 +130,7 @@ async function understand(message: string, locale = "en"): Promise<ParsedRequest
     body: JSON.stringify({
       model: "google/gemini-3.8-flash",
       messages: [
-        {
-          role: "system",
-          content:
-            `You are a travel request parser. Today is ${today}. Return ONLY JSON ` +
-            `with fields: originCity, originIata (IATA code of the origin city), destinationCity, destinationIata ` +
-            `(IATA code of the destination city), departDate (YYYY-MM-DD), returnDate (YYYY-MM-DD), ` +
-            `cabinClass (economy|premium_economy|business), needsCar (boolean), notes, ` +
-            `reply (one short sentence summarizing the understood request, written in ${REPLY_LANGUAGE[locale] ?? "English"}). ` +
-            `If the origin city is not given, use Warsaw (WAW).`,
-        },
+        { role: "system", content: systemPrompt(today, locale) },
         { role: "user", content: message },
       ],
       response_format: { type: "json_object" },
