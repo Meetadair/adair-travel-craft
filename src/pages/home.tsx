@@ -889,6 +889,33 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                       </div>
                     )}
 
+                    {insurance && (
+                      <div className={`${reveal(3)} px-5 py-4`}>
+                        <div className="flex flex-wrap items-center gap-3">
+                          <button
+                            type="button"
+                            aria-pressed={addInsurance}
+                            onClick={() => setAddInsurance((v) => !v)}
+                            className={`inline-flex items-center gap-2 rounded-xl border px-3 py-1.5 text-xs font-medium transition-colors ${
+                              addInsurance
+                                ? "border-primary bg-primary text-primary-foreground"
+                                : "border-border text-foreground hover:border-primary"
+                            }`}
+                          >
+                            <ShieldCheck className="size-3.5" />
+                            {addInsurance ? INSURANCE_TITLE : `+ Add travel insurance`} ·{" "}
+                            {eur(insurance.grossEur)}
+                          </button>
+                          <Tag>Insurance</Tag>
+                        </div>
+                        <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+                          {INSURANCE_DETAIL}
+                        </p>
+                      </div>
+                    )}
+
+
+
                     {anyDropped && (
                       <div className="flex flex-wrap items-center justify-between gap-2 px-5 py-3 text-xs text-muted-foreground">
                         <span>{d.removedNote}</span>
