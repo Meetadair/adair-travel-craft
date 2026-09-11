@@ -796,22 +796,67 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                     )}
 
 
+                    {requestedNames.car && !dropped.car && (
+                      <p className="px-5 pt-3 text-xs text-muted-foreground">
+                        Requested: <span className="font-medium text-foreground">{requestedNames.car}</span>
+                      </p>
+                    )}
+
                     {dropped.car ? null : live?.car && req ? (
                       <div className={reveal(3)}>
                         <TripRow
                           icon={<CarFront className="size-4" />}
                           title={`${live.car.vehicle} · ${req.destinationIata}`}
                           subtitle={`${dayLabel(req.departDate, locale)} – ${dayLabel(req.returnDate, locale)} · ${live.car.supplier}`}
-                          tags={[
-                            <Tag key="1">{d.sourceCar}</Tag>,
-                            <Tag key="2">{live.car.transmission}</Tag>,
-                          ]}
+                          tags={
+                            live.car.exact
+                              ? [
+                                  <Tag key="1" accent>
+                                    Exact match
+                                  </Tag>,
+                                ]
+                              : [
+                                  <Tag key="1">{d.sourceCar}</Tag>,
+                                  <Tag key="2">{live.car.transmission}</Tag>,
+                                ]
+                          }
                           price={eur(live.car.amountEur)}
                           onRemove={() => drop("car")}
                           removeLabel={d.remove}
                         />
                       </div>
+                    ) : live?.carNotFound ? (
+                      <div className={`${reveal(3)} px-5 py-4`}>
+                        <p className="text-sm font-medium">
+                          We don&apos;t have &lsquo;{live.carRequested}&rsquo; in our inventory yet
+                        </p>
+                        {live.carAlternatives.length > 0 && (
+                          <>
+                            <p className="mt-1 text-xs text-muted-foreground">
+                              Closest options for the same dates:
+                            </p>
+                            <ul className="mt-3 space-y-2">
+                              {live.carAlternatives.map((alt, index) => (
+                                <li key={`${alt.vehicle}-${index}`}>
+                                  <button
+                                    type="button"
+                                    disabled={swapping}
+                                    onClick={() => void swapAlternative("car", index)}
+                                    className="flex w-full items-center justify-between gap-3 rounded-xl border border-border px-4 py-2.5 text-left text-sm hover:border-primary disabled:opacity-60"
+                                  >
+                                    <span className="min-w-0 truncate">
+                                      {alt.vehicle} · {alt.supplier}
+                                    </span>
+                                    <span className="shrink-0">{eur(alt.amountEur)}</span>
+                                  </button>
+                                </li>
+                              ))}
+                            </ul>
+                          </>
+                        )}
+                      </div>
                     ) : live ? null : (
+
                       <div className={reveal(3)}>
                         <TripRow
                           icon={<CarFront className="size-4" />}
