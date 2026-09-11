@@ -20,6 +20,7 @@ import { Route as LangAssistantRouteImport } from './routes/$lang.assistant'
 import { Route as LangAuthRouteImport } from './routes/$lang.auth'
 import { Route as LangBusinessRouteImport } from './routes/$lang.business'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedInvoicesRouteImport } from './routes/_authenticated/invoices'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedPlanRouteImport } from './routes/_authenticated/plan'
 import { Route as AuthenticatedPreferencesRouteImport } from './routes/_authenticated/preferences'
@@ -84,6 +85,11 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedInvoicesRoute = AuthenticatedInvoicesRouteImport.update({
+  id: '/invoices',
+  path: '/invoices',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
@@ -141,6 +147,7 @@ export interface FileRoutesByFullPath {
   '/$lang/auth': typeof LangAuthRoute
   '/$lang/business': typeof LangBusinessRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/invoices': typeof AuthenticatedInvoicesRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/plan': typeof AuthenticatedPlanRoute
   '/preferences': typeof AuthenticatedPreferencesRoute
@@ -161,6 +168,7 @@ export interface FileRoutesByTo {
   '/$lang/auth': typeof LangAuthRoute
   '/$lang/business': typeof LangBusinessRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/invoices': typeof AuthenticatedInvoicesRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/plan': typeof AuthenticatedPlanRoute
   '/preferences': typeof AuthenticatedPreferencesRoute
@@ -184,6 +192,7 @@ export interface FileRoutesById {
   '/$lang/auth': typeof LangAuthRoute
   '/$lang/business': typeof LangBusinessRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/invoices': typeof AuthenticatedInvoicesRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/plan': typeof AuthenticatedPlanRoute
   '/_authenticated/preferences': typeof AuthenticatedPreferencesRoute
@@ -207,6 +216,7 @@ export interface FileRouteTypes {
     | '/$lang/auth'
     | '/$lang/business'
     | '/dashboard'
+    | '/invoices'
     | '/onboarding'
     | '/plan'
     | '/preferences'
@@ -227,6 +237,7 @@ export interface FileRouteTypes {
     | '/$lang/auth'
     | '/$lang/business'
     | '/dashboard'
+    | '/invoices'
     | '/onboarding'
     | '/plan'
     | '/preferences'
@@ -249,6 +260,7 @@ export interface FileRouteTypes {
     | '/$lang/auth'
     | '/$lang/business'
     | '/_authenticated/dashboard'
+    | '/_authenticated/invoices'
     | '/_authenticated/onboarding'
     | '/_authenticated/plan'
     | '/_authenticated/preferences'
@@ -352,6 +364,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/invoices': {
+      id: '/_authenticated/invoices'
+      path: '/invoices'
+      fullPath: '/invoices'
+      preLoaderRoute: typeof AuthenticatedInvoicesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/onboarding': {
       id: '/_authenticated/onboarding'
       path: '/onboarding'
@@ -420,6 +439,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedInvoicesRoute: typeof AuthenticatedInvoicesRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedPlanRoute: typeof AuthenticatedPlanRoute
   AuthenticatedPreferencesRoute: typeof AuthenticatedPreferencesRoute
@@ -430,6 +450,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedInvoicesRoute: AuthenticatedInvoicesRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedPlanRoute: AuthenticatedPlanRoute,
   AuthenticatedPreferencesRoute: AuthenticatedPreferencesRoute,
