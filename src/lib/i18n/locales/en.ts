@@ -520,7 +520,8 @@ export const en = {
 
     plansLabel: "Packages",
     plansTitle: "Pick the frame that fits your team.",
-    plansNote: "Prices exclude VAT. Enterprise is priced on the size of your team and your policy.",
+    plansNote: "Teams starts with a 14-day trial, no card required. Prices exclude VAT. Enterprise is priced on the size of your team and your policy.",
+    plansTrial: "14 days free",
     quote: "Request a quote",
     plans: [
       {
