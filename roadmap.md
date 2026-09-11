@@ -32,8 +32,8 @@
 - [x] Part B: multi-city parsing into ordered stops, "Show on map" (OpenStreetMap, no key), drag/arrow reordering with re-search and re-pricing, total distance + detour hint, stops stored with each booking
 
 ## Round: user testing feedback (Sep 11)
-- [ ] Email text for supplier form (enable Stays/Cars on the account) — deliver in chat
-- [ ] Verify signed-in card really renders car, insurance and requested names
-- [ ] Verify onboarding/preferences show selectable lists: airlines, cabin, seat, hotel chains/amenities/stars/rating/distance, cars, cuisines, music, interests
-- [ ] Multi-city map + reordering: confirm it works for private trips (Warsaw>Paris>New York>London)
+- [x] Email text for supplier form (enable Stays/Cars on the account) — delivered in chat
+- [x] Verify signed-in card really renders car, insurance and requested names (present; only visible after sign-in)
+- [x] Verify onboarding/preferences show selectable lists: airlines, cabin, seat, hotel chains/amenities/stars/rating/distance, cars, cuisines, music, interests
+- [x] Multi-city map + reordering available for any trip, incl. private (Warsaw>Paris>New York>London)
 - [ ] Idea to consider: early-booking discounts for private trips (honeymoon/holidays)
