@@ -1,7 +1,7 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Plane, BedDouble, CarFront, Check, AlertTriangle } from "lucide-react";
 import { SiteNav } from "@/components/site-nav";
 import { getTripCard } from "@/lib/trip-live.functions";
@@ -11,6 +11,19 @@ import { eur } from "@/lib/trip/client";
 
 const inputClass =
   "mt-1 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary";
+
+/** Plain-language explanation for each supplier failure. */
+function failureMessage(reason: string | null): string {
+  switch (reason) {
+    case "offer-expired":
+      return "The airline released this fare while you were confirming. Nothing was charged — search again to get a fresh price.";
+    case "supplier-not-configured":
+      return "Live booking is not switched on yet. Nothing was charged.";
+    default:
+      return "The airline could not complete this booking. Nothing was charged — please search again.";
+  }
+}
+
 
 export function BookPage({ cardId }: { cardId: string }) {
   const navigate = useNavigate();
