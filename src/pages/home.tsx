@@ -384,6 +384,27 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
     setDropped((prev) => ({ ...prev, [kind]: true }));
   const anyDropped = dropped.flight || dropped.hotel || dropped.car;
 
+  const navigate = useNavigate();
+  const [signedIn, setSignedIn] = useState(false);
+  const [cardId, setCardId] = useState<string | null>(null);
+  const runLiveSearch = useServerFn(searchLiveTrip);
+
+  useEffect(() => {
+    let active = true;
+    supabase.auth.getSession().then(({ data }) => {
+      if (active) setSignedIn(Boolean(data.session?.user));
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_IN" || event === "SIGNED_OUT" || event === "USER_UPDATED") {
+        setSignedIn(Boolean(session?.user));
+      }
+    });
+    return () => {
+      active = false;
+      sub.subscription.unsubscribe();
+    };
+  }, []);
+
   const runKey = submission?.key ?? 0;
   useEffect(() => {
     if (!submission) return;
