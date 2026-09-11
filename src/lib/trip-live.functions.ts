@@ -154,3 +154,96 @@ export const getTripCard = createServerFn({ method: "POST" })
       expired: row.expires_at ? new Date(row.expires_at).getTime() < Date.now() : false,
     };
   });
+
+/**
+ * Swap one of the offered alternatives into the card when the hotel or car
+ * the traveller named is not in inventory. Reprices with the plan's rules.
+ */
+export const swapCardAlternative = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        cardId: z.string().uuid(),
+        kind: z.enum(["stay", "car"]),
+        index: z.number().int().min(0).max(2),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const pricing = await import("@/lib/pricing.server");
+
+    const [cardRes, profileRes] = await Promise.all([
+      supabase
+        .from("trip_cards")
+        .select("id, items, saved_minor, expires_at, status")
+        .eq("user_id", userId)
+        .eq("id", data.cardId)
+        .maybeSingle(),
+      supabase.from("profiles").select("plan").eq("id", userId).maybeSingle(),
+    ]);
+    if (cardRes.error) throw new Error(cardRes.error.message);
+    if (!cardRes.data) throw new Error("card-not-found");
+
+    const row = cardRes.data as unknown as {
+      items: { search: TripSearchResponse; priced: LiveTripResult["priced"] };
+      saved_minor: number;
+      expires_at: string | null;
+    };
+    const search = row.items.search;
+
+    if (data.kind === "stay") {
+      const pick = search.hotelAlternatives?.[data.index];
+      if (!pick) throw new Error("alternative-not-found");
+      search.stay = pick;
+      search.hotelAlternatives = [];
+      search.hotelNotFound = false;
+      delete search.errors.stays;
+    } else {
+      const pick = search.carAlternatives?.[data.index];
+      if (!pick) throw new Error("alternative-not-found");
+      search.car = pick;
+      search.carAlternatives = [];
+      search.carNotFound = false;
+      delete search.errors.cars;
+    }
+
+    const plan = (profileRes.data as { plan: string } | null)?.plan ?? "free";
+    const table = await pricing.loadPricing(supabase, plan);
+    const priceLine = (net: number | null | undefined, kind: "flight" | "stay" | "car") =>
+      net == null ? null : pricing.fromMinor(pricing.grossMinor(net, table[kind]));
+
+    const flight = priceLine(search.flight?.amountEur ?? null, "flight");
+    const stay = priceLine(search.stay?.amountEur ?? null, "stay");
+    const car = priceLine(search.car?.amountEur ?? null, "car");
+    const total = Math.round(((flight ?? 0) + (stay ?? 0) + (car ?? 0)) * 100) / 100;
+    const netTotal =
+      Math.round(
+        ((search.flight?.amountEur ?? 0) +
+          (search.stay?.amountEur ?? 0) +
+          (search.car?.amountEur ?? 0)) *
+          100,
+      ) / 100;
+    search.totalEur = netTotal;
+
+    const priced = { flight, stay, car, total };
+    const update = await supabase
+      .from("trip_cards")
+      .update({
+        total_minor: pricing.toMinor(total),
+        markup_minor: pricing.toMinor(Math.max(0, total - netTotal)),
+        items: { search, priced },
+      })
+      .eq("user_id", userId)
+      .eq("id", data.cardId);
+    if (update.error) throw new Error(update.error.message);
+
+    return {
+      cardId: data.cardId,
+      plan,
+      search,
+      priced,
+      expiresAt: row.expires_at,
+    } satisfies LiveTripResult;
+  });
