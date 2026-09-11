@@ -711,18 +711,32 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                       </div>
                     )}
 
+                    {requestedNames.hotel && !dropped.hotel && (
+                      <p className="px-5 pt-3 text-xs text-muted-foreground">
+                        Requested: <span className="font-medium text-foreground">{requestedNames.hotel}</span>
+                      </p>
+                    )}
+
                     {dropped.hotel ? null : live?.stay ? (
                       <div className={reveal(2)}>
                         <TripRow
                           icon={<BedDouble className="size-4" />}
                           title={live.stay.name}
                           subtitle={`${nightsLabel}${live.stay.address ? ` · ${live.stay.address}` : ""}`}
-                          tags={[
-                            <Tag key="1">{d.sourceStay}</Tag>,
-                            ...(live.stay.rating
-                              ? [<Tag key="2">{`★ ${live.stay.rating}`}</Tag>]
-                              : []),
-                          ]}
+                          tags={
+                            live.stay.exact
+                              ? [
+                                  <Tag key="1" accent>
+                                    Exact match
+                                  </Tag>,
+                                ]
+                              : [
+                                  <Tag key="1">{d.sourceStay}</Tag>,
+                                  ...(live.stay.rating
+                                    ? [<Tag key="2">{`★ ${live.stay.rating}`}</Tag>]
+                                    : []),
+                                ]
+                          }
                           price={eur(live.stay.amountEur)}
                           onRemove={() => drop("hotel")}
                           removeLabel={d.remove}
@@ -733,6 +747,34 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                             />
                           }
                         />
+                      </div>
+                    ) : live?.hotelNotFound ? (
+                      <div className={`${reveal(2)} px-5 py-4`}>
+                        <p className="text-sm font-medium">
+                          We don&apos;t have &lsquo;{live.hotelRequested}&rsquo; in our inventory yet
+                        </p>
+                        {live.hotelAlternatives.length > 0 && (
+                          <>
+                            <p className="mt-1 text-xs text-muted-foreground">
+                              Closest options for the same dates:
+                            </p>
+                            <ul className="mt-3 space-y-2">
+                              {live.hotelAlternatives.map((alt, index) => (
+                                <li key={`${alt.name}-${index}`}>
+                                  <button
+                                    type="button"
+                                    disabled={swapping}
+                                    onClick={() => void swapAlternative("stay", index)}
+                                    className="flex w-full items-center justify-between gap-3 rounded-xl border border-border px-4 py-2.5 text-left text-sm hover:border-primary disabled:opacity-60"
+                                  >
+                                    <span className="min-w-0 truncate">{alt.name}</span>
+                                    <span className="shrink-0">{eur(alt.amountEur)}</span>
+                                  </button>
+                                </li>
+                              ))}
+                            </ul>
+                          </>
+                        )}
                       </div>
                     ) : live ? null : (
                       <div className={reveal(2)}>
@@ -752,6 +794,7 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                         />
                       </div>
                     )}
+
 
                     {dropped.car ? null : live?.car && req ? (
                       <div className={reveal(3)}>
