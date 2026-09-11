@@ -272,18 +272,29 @@ type DuffelCar = {
 };
 
 export async function searchCar(req: TripRequest): Promise<CarResult | null> {
+  const sample = usesTestInventory();
+  const location = sample
+    ? {
+        radius: TEST_LOCATION.radius,
+        geographic_coordinates: {
+          latitude: TEST_LOCATION.latitude,
+          longitude: TEST_LOCATION.longitude,
+        },
+      }
+    : { airport_iata_code: req.destinationIata };
   const json = await duffel<{ data?: { results?: DuffelCar[]; offers?: DuffelCar[] } }>(
     "/cars/search",
     {
       data: {
-        pick_up_location: { airport_iata_code: req.destinationIata },
-        drop_off_location: { airport_iata_code: req.destinationIata },
+        pick_up_location: location,
+        drop_off_location: location,
         pick_up_at: `${req.departDate}T10:00:00`,
         drop_off_at: `${req.returnDate}T18:00:00`,
         driver: { age: 30 },
       },
     },
   );
+
 
   const results = json.data?.results ?? json.data?.offers ?? [];
   const automatic = results.filter((r) =>
