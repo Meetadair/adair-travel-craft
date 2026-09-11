@@ -2,7 +2,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { Plane, BedDouble, CarFront, X } from "lucide-react";
+import { Plane, BedDouble, CarFront, ShieldCheck, X } from "lucide-react";
 import { SiteNav } from "@/components/site-nav";
 import { AddToCalendar } from "@/components/add-to-calendar";
 import { TripMonthCalendar } from "@/components/trip-month-calendar";
@@ -15,6 +15,7 @@ const ICONS: Record<string, React.ReactNode> = {
   stay: <BedDouble className="size-4" />,
   hotel: <BedDouble className="size-4" />,
   car: <CarFront className="size-4" />,
+  insurance: <ShieldCheck className="size-4" />,
 };
 
 function eventsFor(trip: MyTrip) {

@@ -21,6 +21,7 @@ import {
   Receipt,
   Users,
   Copy,
+  ShieldCheck,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
