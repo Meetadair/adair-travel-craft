@@ -5,6 +5,8 @@ import { useState } from "react";
 import { Plane, BedDouble, CarFront, ShieldCheck, X } from "lucide-react";
 import { SiteNav } from "@/components/site-nav";
 import { AddToCalendar } from "@/components/add-to-calendar";
+import { TripRoute } from "@/components/trip-route";
+import { MapPin } from "lucide-react";
 import { TripMonthCalendar } from "@/components/trip-month-calendar";
 import { listMyTrips, cancelTripItem, type MyTrip } from "@/lib/booking.functions";
 import { tripCalendarEvents } from "@/lib/calendar";
@@ -43,6 +45,7 @@ export function TripsPage() {
   const fetchTrips = useServerFn(listMyTrips);
   const cancelItem = useServerFn(cancelTripItem);
   const [view, setView] = useState<"list" | "calendar">("list");
+  const [mapFor, setMapFor] = useState<string | null>(null);
 
   const trips = useQuery({ queryKey: ["my-trips"], queryFn: () => fetchTrips({}) });
 
@@ -157,6 +160,24 @@ export function TripsPage() {
                   </li>
                 ))}
               </ul>
+
+              {trip.stops.length > 1 && (
+                <div className="border-t border-border px-5 py-4">
+                  <button
+                    type="button"
+                    onClick={() => setMapFor(mapFor === trip.id ? null : trip.id)}
+                    className="inline-flex items-center gap-2 rounded-xl border border-border px-3 py-2 text-sm hover:bg-secondary"
+                  >
+                    <MapPin className="size-4 text-primary" />
+                    {mapFor === trip.id ? "Hide map" : "Show on map"}
+                  </button>
+                  {mapFor === trip.id && (
+                    <div className="mt-4">
+                      <TripRoute stops={trip.stops} />
+                    </div>
+                  )}
+                </div>
+              )}
 
               {eventsFor(trip).length > 0 && (
                 <div className="border-t border-border px-5 py-4">
