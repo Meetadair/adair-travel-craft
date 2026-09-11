@@ -237,7 +237,9 @@ export const bookTripCard = createServerFn({ method: "POST" })
         repriced,
         reason,
         testMode: isTestKey(),
+        calendar: [],
       };
+
     }
 
     const tripRow = await supabase
@@ -277,11 +279,18 @@ export const bookTripCard = createServerFn({ method: "POST" })
       net_minor: line.kind === "flight" ? Math.round(flightNet * 100) : 0,
       gross_minor: Math.round(line.amountEur * 100),
       position: index,
-      payload: {},
+      payload: (line.payload ?? {}) as never,
       documents: [],
     }));
-    const itemsRes = await supabase.from("trip_items").insert(itemsInsert);
+    const itemsRes = await supabase.from("trip_items").insert(itemsInsert).select("id, position");
     if (itemsRes.error) throw new Error(itemsRes.error.message);
+    const insertedIds = new Map(
+      ((itemsRes.data ?? []) as Array<{ id: string; position: number }>).map((r) => [
+        r.position,
+        r.id,
+      ]),
+    );
+
 
     await supabase
       .from("trip_cards")
