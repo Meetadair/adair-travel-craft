@@ -27,6 +27,11 @@ import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { searchLiveTrip, swapCardAlternative } from "@/lib/trip-live.functions";
+import {
+  INSURANCE_DETAIL,
+  INSURANCE_TITLE,
+  type InsuranceQuote,
+} from "@/lib/trip/insurance";
 import { parseTripSentence } from "@/lib/trip/parse";
 
 import { downloadTripInvoice } from "@/lib/trip-pdf";
