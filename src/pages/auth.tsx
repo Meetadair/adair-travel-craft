@@ -46,7 +46,7 @@ export function AuthPage() {
         });
         if (signUpError) throw signUpError;
         if (data.session) {
-          navigate({ to: "/dashboard" });
+          await continueAfterSignIn();
           return;
         }
         setMessage(t.auth.confirmSent);
@@ -56,7 +56,7 @@ export function AuthPage() {
           password,
         });
         if (signInError) throw signInError;
-        navigate({ to: "/dashboard" });
+        await continueAfterSignIn();
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : t.auth.genericError);
