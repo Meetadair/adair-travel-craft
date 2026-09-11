@@ -205,6 +205,23 @@ export const bookTripCard = createServerFn({ method: "POST" })
       });
     }
 
+    // In-app insurance offer: priced from our own rate table, no external order.
+    const insurance = card.items.insurance ?? null;
+    const insuranceOptedIn = Boolean(data.include.insurance && insurance);
+    if (insuranceOptedIn && insurance) {
+      lines.push({
+        kind: "insurance",
+        title: INSURANCE_TITLE,
+        status: "confirmed",
+        amountEur: insurance.grossEur,
+        reference: null,
+        note: INSURANCE_NOTE,
+        payload: { note: INSURANCE_NOTE },
+      });
+    }
+
+
+
 
     if (!lines.length) throw new Error("nothing-selected");
 
