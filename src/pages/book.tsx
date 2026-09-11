@@ -297,6 +297,14 @@ export function BookPage({ cardId }: { cardId: string }) {
                 </li>
               ))}
             </ul>
+            {result.calendar.length > 0 && (
+              <AddToCalendar
+                events={result.calendar}
+                title={card.data?.search?.request.destinationCity ?? "Adair trip"}
+                className="mt-5"
+              />
+            )}
+
             {result.status === "failed" ? (
               <button
                 onClick={() => navigate({ to: "/" })}
