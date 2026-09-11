@@ -39,7 +39,12 @@ export function BookPage({ cardId }: { cardId: string }) {
   });
   const account = useQuery({ queryKey: ["account"], queryFn: () => fetchAccount({}) });
 
-  const [include, setInclude] = useState({ flight: true, stay: true, car: true });
+  const [include, setInclude] = useState({
+    flight: true,
+    stay: true,
+    car: true,
+    insurance: false,
+  });
   const [companyId, setCompanyId] = useState<string>("");
   const [traveller, setTraveller] = useState({
     givenName: "",
