@@ -155,6 +155,12 @@ export function parseTripSentence(sentence: string, today = new Date()): TripReq
     back = addDays(depart, nights);
   }
 
+  const namedHotel = hotelNameExactOf(sentence);
+  const isCityName = (value: string) =>
+    [destination.city, origin.city, destination.iata, origin.iata].some(
+      (c) => c.toLowerCase() === value.toLowerCase(),
+    );
+
   return {
     originCity: origin.city,
     originIata: origin.iata,
@@ -167,7 +173,10 @@ export function parseTripSentence(sentence: string, today = new Date()): TripReq
     cabinClass: cabinOf(text),
     passengers: passengersOf(text),
     hotelWish: hotelWishOf(sentence),
+    hotelNameExact: namedHotel && !isCityName(namedHotel) ? namedHotel : null,
+    carNameExact: carNameExactOf(sentence),
     needsCar: /\bcar\b|auto|samoch|rental|mietwagen|voiture/.test(text) && !/no car|without a car|bez auta|bez samoch/.test(text),
     invoiceToCompany: /invoice|company|vat|faktur|firm|rechnung|societ|empresa/.test(text),
   };
+
 }
