@@ -58,6 +58,48 @@ function hotelWishOf(sentence: string): string | null {
   return match?.[1]?.trim() ?? null;
 }
 
+/** Known rental brands and car makes we accept as an exact car request. */
+const CAR_BRANDS =
+  /\b(sixt|hertz|avis|europcar|enterprise|budget|alamo|thrifty|national|dollar|tesla|bmw|audi|mercedes|volvo|toyota|skoda|škoda|volkswagen|renault|peugeot|ford|fiat|kia|hyundai|nissan|opel|seat|cupra|polestar)\b/i;
+
+/**
+ * A specific property the traveller named: quoted, or a capitalised
+ * multi-word proper noun after "at" / "hotel" / "w hotelu" / "stay at".
+ */
+function hotelNameExactOf(sentence: string): string | null {
+  const mentionsHotel = /hotel|stay|nocleg|hotelu|apartament|resort|guesthouse|pensjonat/i.test(
+    sentence,
+  );
+
+  const quoted = /["“„']([^"“”„']{3,60})["”“'"]/.exec(sentence);
+  if (quoted?.[1] && mentionsHotel) return quoted[1].trim();
+
+  const proper =
+    /(?:stay(?:ing)?\s+at|check\s+in\s+at|hotel(?:u)?|w\s+hotelu|nocleg\s+w|at\s+the|at)\s+((?:[A-ZÀ-ŸŁŚŻŹĆŃÓĘĄ][\p{L}&'’.-]*)(?:\s+(?:[A-ZÀ-ŸŁŚŻŹĆŃÓĘĄ][\p{L}&'’.-]*|de|del|della|di|la|le|du|of|the|and|&))*)/u.exec(
+      sentence,
+    );
+  const name = proper?.[1]?.trim();
+  if (!name) return null;
+  // A single short word ("Milan", "Tuesday") is not a venue name.
+  if (!/\s/.test(name) && name.length < 6) return null;
+  return name;
+}
+
+/** "from Sixt", "a Tesla", "Sixt automatic". */
+function carNameExactOf(sentence: string): string | null {
+  const explicit = /(?:from|with|z|od|u)\s+(sixt|hertz|avis|europcar|enterprise|budget|alamo|thrifty|national|dollar)\b/i.exec(
+    sentence,
+  );
+  if (explicit?.[1]) return explicit[1];
+  const brand = CAR_BRANDS.exec(sentence);
+  if (!brand?.[1]) return null;
+  const after = sentence.slice((brand.index ?? 0) + brand[1].length).match(/^\s+([\p{L}\d-]{2,14})/u);
+  return after?.[1] && /^[a-z0-9]/i.test(after[1])
+    ? `${brand[1]} ${after[1]}`.trim()
+    : brand[1];
+}
+
+
 function originOf(text: string, destination: CityEntry): CityEntry {
   // "from Berlin", "z Warszawy" — otherwise default to Warsaw.
   const fromMatch = /\b(?:from|out of|z|ze)\s+([\p{L}\s-]{3,24})/u.exec(text);
@@ -113,6 +155,12 @@ export function parseTripSentence(sentence: string, today = new Date()): TripReq
     back = addDays(depart, nights);
   }
 
+  const namedHotel = hotelNameExactOf(sentence);
+  const isCityName = (value: string) =>
+    [destination.city, origin.city, destination.iata, origin.iata].some(
+      (c) => c.toLowerCase() === value.toLowerCase(),
+    );
+
   return {
     originCity: origin.city,
     originIata: origin.iata,
@@ -125,7 +173,10 @@ export function parseTripSentence(sentence: string, today = new Date()): TripReq
     cabinClass: cabinOf(text),
     passengers: passengersOf(text),
     hotelWish: hotelWishOf(sentence),
+    hotelNameExact: namedHotel && !isCityName(namedHotel) ? namedHotel : null,
+    carNameExact: carNameExactOf(sentence),
     needsCar: /\bcar\b|auto|samoch|rental|mietwagen|voiture/.test(text) && !/no car|without a car|bez auta|bez samoch/.test(text),
     invoiceToCompany: /invoice|company|vat|faktur|firm|rechnung|societ|empresa/.test(text),
   };
+
 }

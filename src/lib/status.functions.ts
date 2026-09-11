@@ -34,15 +34,18 @@ export const getSystemStatus = createServerFn({ method: "GET" })
         cabinClass: "economy" as const,
         passengers: 1,
         hotelWish: null,
+        hotelNameExact: null,
+        carNameExact: null,
         needsCar: true,
         invoiceToCompany: false,
       };
 
       const [flight, stay, car] = await Promise.allSettled([
         searchFlight(probe),
-        searchStay(probe),
-        searchCar(probe),
+        searchStay(probe).then((r) => r.stay),
+        searchCar(probe).then((r) => r.car),
       ]);
+
 
       const describe = (name: string, result: PromiseSettledResult<unknown>): CapabilityStatus => {
         if (result.status === "fulfilled") {

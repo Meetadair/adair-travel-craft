@@ -15,6 +15,9 @@ const requestSchema = z.object({
   cabinClass: z.enum(["economy", "premium_economy", "business", "first"]),
   passengers: z.number().int().min(1).max(9),
   hotelWish: z.string().max(200).nullable(),
+  hotelNameExact: z.string().max(120).nullable().default(null),
+  carNameExact: z.string().max(120).nullable().default(null),
+
   needsCar: z.boolean(),
   invoiceToCompany: z.boolean(),
 });
@@ -37,7 +40,10 @@ function cacheKey(req: TripRequest): string {
     req.cabinClass,
     req.passengers,
     req.needsCar ? "car" : "nocar",
+    req.hotelNameExact ?? "",
+    req.carNameExact ?? "",
   ].join("|");
+
 }
 
 function clientIp(request: Request): string {
@@ -106,8 +112,15 @@ export const Route = createFileRoute("/api/trip/search")({
               savedEur: 0,
               savedMinutes: 160,
               testMode: true,
+              hotelRequested: tripRequest.hotelNameExact,
+              hotelNotFound: false,
+              hotelAlternatives: [],
+              carRequested: tripRequest.carNameExact,
+              carNotFound: false,
+              carAlternatives: [],
               errors: { flights: "unavailable", stays: "unavailable" },
             } satisfies TripSearchResponse,
+
             { headers: { "cache-control": "no-store" } },
           );
         }

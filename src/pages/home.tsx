@@ -26,7 +26,9 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
-import { searchLiveTrip } from "@/lib/trip-live.functions";
+import { searchLiveTrip, swapCardAlternative } from "@/lib/trip-live.functions";
+import { parseTripSentence } from "@/lib/trip/parse";
+
 import { downloadTripInvoice } from "@/lib/trip-pdf";
 import { SiteNav } from "@/components/site-nav";
 import { LocaleLink, useLocale, useT, type Dict } from "@/lib/i18n";
@@ -388,6 +390,39 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
   const [signedIn, setSignedIn] = useState(false);
   const [cardId, setCardId] = useState<string | null>(null);
   const runLiveSearch = useServerFn(searchLiveTrip);
+  const runSwap = useServerFn(swapCardAlternative);
+  // The exact hotel / car the traveller named, shown while search is running.
+  const [requestedNames, setRequestedNames] = useState<{
+    hotel: string | null;
+    car: string | null;
+  }>({ hotel: null, car: null });
+  const [swapping, setSwapping] = useState(false);
+
+  const applyPriced = (result: {
+    search: TripSearchResponse;
+    priced: { flight: number | null; stay: number | null; car: number | null; total: number };
+  }): TripSearchResponse => {
+    const next = result.search;
+    if (next.flight && result.priced.flight != null) next.flight.amountEur = result.priced.flight;
+    if (next.stay && result.priced.stay != null) next.stay.amountEur = result.priced.stay;
+    if (next.car && result.priced.car != null) next.car.amountEur = result.priced.car;
+    next.totalEur = result.priced.total;
+    return next;
+  };
+
+  const swapAlternative = async (kind: "stay" | "car", index: number) => {
+    if (!cardId || swapping) return;
+    setSwapping(true);
+    try {
+      const result = await runSwap({ data: { cardId, kind, index } });
+      setLive(applyPriced(result));
+    } catch {
+      /* leave the current card in place; the traveller can search again */
+    } finally {
+      setSwapping(false);
+    }
+  };
+
 
   useEffect(() => {
     let active = true;
@@ -421,6 +456,13 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
     setLiveFailed(false);
     setCardId(null);
     setDropped({ flight: false, hotel: false, car: false });
+    if (signedIn) {
+      const named = parseTripSentence(text);
+      setRequestedNames({ hotel: named.hotelNameExact, car: named.carNameExact });
+    } else {
+      setRequestedNames({ hotel: null, car: null });
+    }
+
 
     // Kick the real search off immediately; the animation runs alongside it.
     const startedAt = Date.now();
@@ -669,18 +711,32 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                       </div>
                     )}
 
+                    {requestedNames.hotel && !dropped.hotel && (
+                      <p className="px-5 pt-3 text-xs text-muted-foreground">
+                        Requested: <span className="font-medium text-foreground">{requestedNames.hotel}</span>
+                      </p>
+                    )}
+
                     {dropped.hotel ? null : live?.stay ? (
                       <div className={reveal(2)}>
                         <TripRow
                           icon={<BedDouble className="size-4" />}
                           title={live.stay.name}
                           subtitle={`${nightsLabel}${live.stay.address ? ` · ${live.stay.address}` : ""}`}
-                          tags={[
-                            <Tag key="1">{d.sourceStay}</Tag>,
-                            ...(live.stay.rating
-                              ? [<Tag key="2">{`★ ${live.stay.rating}`}</Tag>]
-                              : []),
-                          ]}
+                          tags={
+                            live.stay.exact
+                              ? [
+                                  <Tag key="1" accent>
+                                    Exact match
+                                  </Tag>,
+                                ]
+                              : [
+                                  <Tag key="1">{d.sourceStay}</Tag>,
+                                  ...(live.stay.rating
+                                    ? [<Tag key="2">{`★ ${live.stay.rating}`}</Tag>]
+                                    : []),
+                                ]
+                          }
                           price={eur(live.stay.amountEur)}
                           onRemove={() => drop("hotel")}
                           removeLabel={d.remove}
@@ -691,6 +747,34 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                             />
                           }
                         />
+                      </div>
+                    ) : live?.hotelNotFound ? (
+                      <div className={`${reveal(2)} px-5 py-4`}>
+                        <p className="text-sm font-medium">
+                          We don&apos;t have &lsquo;{live.hotelRequested}&rsquo; in our inventory yet
+                        </p>
+                        {live.hotelAlternatives.length > 0 && (
+                          <>
+                            <p className="mt-1 text-xs text-muted-foreground">
+                              Closest options for the same dates:
+                            </p>
+                            <ul className="mt-3 space-y-2">
+                              {live.hotelAlternatives.map((alt, index) => (
+                                <li key={`${alt.name}-${index}`}>
+                                  <button
+                                    type="button"
+                                    disabled={swapping}
+                                    onClick={() => void swapAlternative("stay", index)}
+                                    className="flex w-full items-center justify-between gap-3 rounded-xl border border-border px-4 py-2.5 text-left text-sm hover:border-primary disabled:opacity-60"
+                                  >
+                                    <span className="min-w-0 truncate">{alt.name}</span>
+                                    <span className="shrink-0">{eur(alt.amountEur)}</span>
+                                  </button>
+                                </li>
+                              ))}
+                            </ul>
+                          </>
+                        )}
                       </div>
                     ) : live ? null : (
                       <div className={reveal(2)}>
@@ -711,22 +795,68 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                       </div>
                     )}
 
+
+                    {requestedNames.car && !dropped.car && (
+                      <p className="px-5 pt-3 text-xs text-muted-foreground">
+                        Requested: <span className="font-medium text-foreground">{requestedNames.car}</span>
+                      </p>
+                    )}
+
                     {dropped.car ? null : live?.car && req ? (
                       <div className={reveal(3)}>
                         <TripRow
                           icon={<CarFront className="size-4" />}
                           title={`${live.car.vehicle} · ${req.destinationIata}`}
                           subtitle={`${dayLabel(req.departDate, locale)} – ${dayLabel(req.returnDate, locale)} · ${live.car.supplier}`}
-                          tags={[
-                            <Tag key="1">{d.sourceCar}</Tag>,
-                            <Tag key="2">{live.car.transmission}</Tag>,
-                          ]}
+                          tags={
+                            live.car.exact
+                              ? [
+                                  <Tag key="1" accent>
+                                    Exact match
+                                  </Tag>,
+                                ]
+                              : [
+                                  <Tag key="1">{d.sourceCar}</Tag>,
+                                  <Tag key="2">{live.car.transmission}</Tag>,
+                                ]
+                          }
                           price={eur(live.car.amountEur)}
                           onRemove={() => drop("car")}
                           removeLabel={d.remove}
                         />
                       </div>
+                    ) : live?.carNotFound ? (
+                      <div className={`${reveal(3)} px-5 py-4`}>
+                        <p className="text-sm font-medium">
+                          We don&apos;t have &lsquo;{live.carRequested}&rsquo; in our inventory yet
+                        </p>
+                        {live.carAlternatives.length > 0 && (
+                          <>
+                            <p className="mt-1 text-xs text-muted-foreground">
+                              Closest options for the same dates:
+                            </p>
+                            <ul className="mt-3 space-y-2">
+                              {live.carAlternatives.map((alt, index) => (
+                                <li key={`${alt.vehicle}-${index}`}>
+                                  <button
+                                    type="button"
+                                    disabled={swapping}
+                                    onClick={() => void swapAlternative("car", index)}
+                                    className="flex w-full items-center justify-between gap-3 rounded-xl border border-border px-4 py-2.5 text-left text-sm hover:border-primary disabled:opacity-60"
+                                  >
+                                    <span className="min-w-0 truncate">
+                                      {alt.vehicle} · {alt.supplier}
+                                    </span>
+                                    <span className="shrink-0">{eur(alt.amountEur)}</span>
+                                  </button>
+                                </li>
+                              ))}
+                            </ul>
+                          </>
+                        )}
+                      </div>
                     ) : live ? null : (
+
                       <div className={reveal(3)}>
                         <TripRow
                           icon={<CarFront className="size-4" />}
