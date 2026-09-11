@@ -7,6 +7,7 @@ export const en = {
   nav: {
     assistant: "Assistant",
     trips: "My trips",
+    business: "For companies",
     investors: "For investors",
     account: "My account",
     signIn: "Sign in",
@@ -129,6 +130,7 @@ export const en = {
       teamsLine:
         "One travel policy, one invoice, one place for the whole team. Coming after launch.",
       teamsCta: "Join the Teams waitlist",
+      teamsMore: "See the offer for companies",
     },
     trips: {
       label: "My trips",
