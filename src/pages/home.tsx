@@ -381,6 +381,9 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
   const [copied, setCopied] = useState(false);
   const [live, setLive] = useState<TripSearchResponse | null>(null);
   const [liveFailed, setLiveFailed] = useState(false);
+  // Optional in-app travel insurance offer (signed-in cards only).
+  const [insurance, setInsurance] = useState<InsuranceQuote | null>(null);
+  const [addInsurance, setAddInsurance] = useState(false);
   const [dropped, setDropped] = useState({ flight: false, hotel: false, car: false });
   const drop = (kind: "flight" | "hotel" | "car") =>
     setDropped((prev) => ({ ...prev, [kind]: true }));
