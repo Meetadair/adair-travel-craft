@@ -20,26 +20,38 @@ export type SavedCard = {
 
 export type PaymentSession = {
   clientKey: string | null;
-  /** Set when the payment step cannot run, e.g. the supplier key is missing. */
+  /** Set when the payment step cannot run, e.g. the provider key is missing. */
   unavailable: "supplier-not-configured" | "card-payments-not-enabled" | null;
   testMode: boolean;
   currency: string;
   /** Duffel offer the 3-D Secure session must be created against. */
   offerId: string | null;
   savedCards: SavedCard[];
+  /** Active provider, straight from the adapter — nothing is assumed here. */
+  provider: string;
+  providerLabel: string;
+  settlementModel: SettlementModel;
+  /** Only these methods may ever be offered at checkout. */
+  methods: PaymentMethodKind[];
+  /** Reference the payment row is keyed by. */
+  intentRef: string | null;
+  amountMinor: number;
+  /** Browser SDK handles, when the active provider needs them. */
+  publishableKey: string | null;
+  clientSecret: string | null;
 };
 
-/** Mints a client key for the hosted card form and lists the traveller's saved cards. */
+/** Opens a payment intent with the active provider and lists saved cards. */
 export const getPaymentSession = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => z.object({ cardId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }): Promise<PaymentSession> => {
     const { supabase, userId } = context;
-    const { isTestKey } = await import("@/lib/trip/duffel.server");
+    const { paymentProvider } = await import("@/lib/payments/registry.server");
 
     const cardRes = await supabase
       .from("trip_cards")
-      .select("items, currency")
+      .select("items, currency, total_minor")
       .eq("user_id", userId)
       .eq("id", data.cardId)
       .maybeSingle();
