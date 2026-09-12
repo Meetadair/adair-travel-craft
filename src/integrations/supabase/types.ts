@@ -358,6 +358,39 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_providers: {
+        Row: {
+          created_at: string
+          enabled: boolean
+          id: string
+          label: string
+          priority: number
+          provider: string
+          settlement_model: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          label: string
+          priority?: number
+          provider: string
+          settlement_model?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          label?: string
+          priority?: number
+          provider?: string
+          settlement_model?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       payments: {
         Row: {
           amount_minor: number
@@ -371,6 +404,7 @@ export type Database = {
           method: string | null
           provider: string
           provider_ref: string | null
+          settlement_model: string | null
           status: string
           three_ds_status: string | null
           trip_id: string | null
@@ -389,6 +423,7 @@ export type Database = {
           method?: string | null
           provider: string
           provider_ref?: string | null
+          settlement_model?: string | null
           status?: string
           three_ds_status?: string | null
           trip_id?: string | null
@@ -407,6 +442,7 @@ export type Database = {
           method?: string | null
           provider?: string
           provider_ref?: string | null
+          settlement_model?: string | null
           status?: string
           three_ds_status?: string | null
           trip_id?: string | null
