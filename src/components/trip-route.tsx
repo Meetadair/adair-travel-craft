@@ -30,16 +30,44 @@ export function TripRoute({
   reordering?: boolean;
 }) {
   const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const [overIndex, setOverIndex] = useState<number | null>(null);
   const distance = routeDistanceKm(stops);
   const shortest = bestOrderDistanceKm(stops);
   const detour = distance - shortest;
 
   const move = (from: number, to: number) => {
-    if (!onReorder || to < 0 || to >= stops.length) return;
+    if (!onReorder || to < 0 || to >= stops.length || from === to) return;
     const next = [...stops];
     const [item] = next.splice(from, 1);
     next.splice(to, 0, item!);
     onReorder(next);
+  };
+
+  /** Finger/pen dragging: find the stop under the pointer and drop there. */
+  const indexUnderPointer = (x: number, y: number) => {
+    const node = document.elementFromPoint(x, y)?.closest("[data-stop-index]");
+    const raw = node?.getAttribute("data-stop-index");
+    return raw === null || raw === undefined ? null : Number(raw);
+  };
+
+  const handlePointerDown = (index: number) => (event: React.PointerEvent) => {
+    if (!onReorder) return;
+    event.preventDefault();
+    (event.target as HTMLElement).setPointerCapture?.(event.pointerId);
+    setDragIndex(index);
+    setOverIndex(index);
+  };
+
+  const handlePointerMove = (event: React.PointerEvent) => {
+    if (dragIndex === null) return;
+    const target = indexUnderPointer(event.clientX, event.clientY);
+    if (target !== null) setOverIndex(target);
+  };
+
+  const handlePointerUp = () => {
+    if (dragIndex !== null && overIndex !== null) move(dragIndex, overIndex);
+    setDragIndex(null);
+    setOverIndex(null);
   };
 
   return (
@@ -54,6 +82,7 @@ export function TripRoute({
         {stops.map((stop, index) => (
           <li
             key={`${stop.iata}-${index}`}
+            data-stop-index={index}
             draggable={Boolean(onReorder)}
             onDragStart={() => setDragIndex(index)}
             onDragOver={(e) => onReorder && e.preventDefault()}
@@ -61,10 +90,24 @@ export function TripRoute({
               if (dragIndex !== null) move(dragIndex, index);
               setDragIndex(null);
             }}
-            className="flex items-center gap-3 rounded-xl border border-border bg-background px-3 py-2.5"
+            className={`flex items-center gap-3 rounded-xl border bg-background px-3 py-2.5 transition-colors ${
+              overIndex === index && dragIndex !== null
+                ? "border-primary"
+                : "border-border"
+            } ${dragIndex === index ? "opacity-60" : ""}`}
           >
             {onReorder && (
-              <GripVertical className="hidden size-4 shrink-0 cursor-grab text-muted-foreground sm:block" />
+              <button
+                type="button"
+                aria-label={`Przesuń ${stop.city}`}
+                onPointerDown={handlePointerDown(index)}
+                onPointerMove={handlePointerMove}
+                onPointerUp={handlePointerUp}
+                onPointerCancel={handlePointerUp}
+                className="shrink-0 cursor-grab touch-none text-muted-foreground"
+              >
+                <GripVertical className="size-4" />
+              </button>
             )}
             <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-primary text-[11px] font-semibold text-primary-foreground">
               {index + 1}
