@@ -88,9 +88,19 @@ export function BookPage({ cardId }: { cardId: string }) {
     title: "mr",
   });
   const [result, setResult] = useState<BookingResult | null>(null);
+  /** "review" = traveller + invoice details, "pay" = card entry. */
+  const [step, setStep] = useState<"review" | "pay">("review");
+
+  const fetchPayment = useServerFn(getPaymentSession);
+  const payment = useQuery({
+    queryKey: ["payment-session", cardId],
+    queryFn: () => fetchPayment({ data: { cardId } }),
+    enabled: step === "pay",
+    staleTime: 10 * 60 * 1000,
+  });
 
   const mutation = useMutation({
-    mutationFn: () =>
+    mutationFn: (authorised: AuthorisedPayment | null) =>
       book({
         data: {
           cardId,
@@ -101,10 +111,18 @@ export function BookPage({ cardId }: { cardId: string }) {
             gender: traveller.gender as "m" | "f",
             title: traveller.title as "mr" | "ms" | "mrs",
           },
+          payment: authorised,
         },
       }),
     onSuccess: (data) => setResult(data),
   });
+
+  const travellerReady =
+    traveller.givenName.trim().length > 0 &&
+    traveller.familyName.trim().length > 0 &&
+    /.+@.+\..+/.test(traveller.email) &&
+    traveller.phone.trim().length >= 6 &&
+    /^\d{4}-\d{2}-\d{2}$/.test(traveller.bornOn);
 
   // Booked (fully or partly): show the confirmation, then move on to My trips.
   useEffect(() => {
