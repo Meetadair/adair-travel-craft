@@ -10,24 +10,36 @@
 export const MAX_PASSENGERS = 9;
 
 /** Written numbers we accept, English and Polish, 1–9. */
+const W = String.raw`(?<![\p{L}])`;
+const WE = String.raw`(?![\p{L}])`;
+const word = (body: string) => new RegExp(`${W}(?:${body})${WE}`, "u");
+
 const WORD_NUMBERS: Array<[RegExp, number]> = [
-  [/\b(?:one|jedn[aey]|jedna\s+osoba|solo|myself|sam|sama)\b/, 1],
-  [/\b(?:two|both\s+of\s+us|dwie|dwa|dw[oó]ch|dwoje|dwojga|we\s+dwoje|we\s+dw[oó]jk[eę])\b/, 2],
-  [/\b(?:three|trzy|trzech|troje|we\s+tr[oó]jk[eę]|w\s+tr[oó]jk[eę])\b/, 3],
-  [/\b(?:four|cztery|czterech|czworo|we\s+czw[oó]rk[eę])\b/, 4],
-  [/\b(?:five|pi[eę][cć]|pi[eę]ciu|pi[eę]cioro)\b/, 5],
-  [/\b(?:six|sze[sś][cć]|sze[sś]ciu)\b/, 6],
-  [/\b(?:seven|siedem|siedmiu)\b/, 7],
-  [/\b(?:eight|osiem|o[sś]miu)\b/, 8],
-  [/\b(?:nine|dziewi[eę][cć]|dziewi[eę]ciu)\b/, 9],
+  [word(String.raw`one|jedn[aey]|solo|myself|sam|sama`), 1],
+  [
+    word(
+      String.raw`two|both\s+of\s+us|dwie|dwa|dw[oó]ch|dwoje|dwojga|we\s+dwoje|we\s+dw[oó]jk[eę]`,
+    ),
+    2,
+  ],
+  [word(String.raw`three|trzy|trzech|troje|w?e?\s*tr[oó]jk[eę]`), 3],
+  [word(String.raw`four|cztery|czterech|czworo|we\s+czw[oó]rk[eę]`), 4],
+  [word(String.raw`five|pi[eę][cć]|pi[eę]ciu|pi[eę]cioro`), 5],
+  [word(String.raw`six|sze[sś][cć]|sze[sś]ciu`), 6],
+  [word(String.raw`seven|siedem|siedmiu`), 7],
+  [word(String.raw`eight|osiem|o[sś]miu`), 8],
+  [word(String.raw`nine|dziewi[eę][cć]|dziewi[eę]ciu`), 9],
 ];
 
 /** A named companion implies at least two people. */
-const ONE_COMPANION =
-  /\b(?:with\s+my\s+(?:wife|husband|partner|girlfriend|boyfriend|spouse|son|daughter|mother|father|mum|mom|dad|colleague|assistant|friend)|z\s+(?:[zż]on[aą]|m[eę][zż]em|partner(?:k[aą]|em)|dziewczyn[aą]|ch[lł]opakiem|synem|c[oó]rk[aą]|mam[aą]|tat[aą]|koleg[aą]|kole[zż]ank[aą]|asystentk[aą]))\b/;
+const ONE_COMPANION = word(
+  String.raw`with\s+my\s+(?:wife|husband|partner|girlfriend|boyfriend|spouse|son|daughter|mother|father|mum|mom|dad|colleague|assistant|friend)|z\s+(?:[zż]on[aą]|m[eę][zż]em|partner(?:k[aą]|em)|dziewczyn[aą]|ch[lł]opakiem|synem|c[oó]rk[aą]|mam[aą]|tat[aą]|koleg[aą]|kole[zż]ank[aą]|asystentk[aą])`,
+);
 
 /** Explicit plural companions without a number, e.g. "with my family". */
-const MANY_COMPANIONS = /\b(?:with\s+(?:my\s+)?(?:family|kids|children|team)|z\s+rodzin[aą]|z\s+dzie[cć]mi)\b/;
+const MANY_COMPANIONS = word(
+  String.raw`with\s+(?:my\s+)?(?:family|kids|children|team)|z\s+rodzin[aą]|z\s+dzie[cć]mi`,
+);
 
 /**
  * Passenger count read from a free-text sentence. Defaults to 1: we never
