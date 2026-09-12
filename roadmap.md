@@ -198,3 +198,16 @@
 - [x] Hotels deliberately have no pictures until the hotel supplier is enabled and its
       own property photos are available.
 - [x] UNSPLASH_ACCESS_KEY shown on /dev/status.
+
+## Creator programme (built)
+- [x] `creators` accounts with handle, short code, platform links, statuses (applied/approved/paused/rejected) and encrypted payout details (only last 4 of the IBAN ever shown)
+- [x] Application at /creators/apply, approval only from /admin/creators, creator page at /creator
+- [x] Attribution: /c/:handle link and short code, 90 days to sign up, then a 12-month earning window (editable per rule)
+- [x] `creator_commission_rules` editable in admin — share of OUR margin, seeded 30% stay/car, 20% flight/extras, €10 Select, €25 Signature signup
+- [x] Commission accrues on confirmed bookings only, pending until the 14-day free-cancellation window passes, reversed when a trip is cancelled or refunded
+- [x] Creator dashboard: real click/sign-up/booking counts, earnings by month, CSV statement, payouts; no customer names anywhere
+- [x] Payouts monthly from €50, drawn and marked paid with a reference in admin (we do not move the money)
+- [x] Creator-submitted places stay hidden until editorial approval; approved ones show "Recommended by …" plus a plain "Creator partner" label and link to /c/:handle
+- [x] Bookings of a creator-recommended place earn that creator, even without their link
+- [x] Content licence acceptance stored with a timestamp; licence wording is a placeholder for counsel
+- [ ] Flat subscription commission (€10/€25) pays out when paid plans go live
