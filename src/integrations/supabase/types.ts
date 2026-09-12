@@ -46,39 +46,45 @@ export type Database = {
       }
       choice_feedback: {
         Row: {
-          card_id: string | null
-          chosen: Json
+          chosen: Json | null
+          chosen_reference: string | null
           created_at: string
           id: string
-          line_type: string
+          item_kind: string
           reason: string | null
-          recommended: Json
+          recommended: Json | null
+          rejected_reference: string | null
+          trip_card_id: string | null
           user_id: string
         }
         Insert: {
-          card_id?: string | null
-          chosen?: Json
+          chosen?: Json | null
+          chosen_reference?: string | null
           created_at?: string
           id?: string
-          line_type: string
+          item_kind: string
           reason?: string | null
-          recommended?: Json
+          recommended?: Json | null
+          rejected_reference?: string | null
+          trip_card_id?: string | null
           user_id: string
         }
         Update: {
-          card_id?: string | null
-          chosen?: Json
+          chosen?: Json | null
+          chosen_reference?: string | null
           created_at?: string
           id?: string
-          line_type?: string
+          item_kind?: string
           reason?: string | null
-          recommended?: Json
+          recommended?: Json | null
+          rejected_reference?: string | null
+          trip_card_id?: string | null
           user_id?: string
         }
         Relationships: [
           {
             foreignKeyName: "choice_feedback_card_id_fkey"
-            columns: ["card_id"]
+            columns: ["trip_card_id"]
             isOneToOne: false
             referencedRelation: "trip_cards"
             referencedColumns: ["id"]
