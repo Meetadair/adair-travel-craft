@@ -129,17 +129,16 @@ async function run(): Promise<Response> {
       : "";
     const html = `<p>${subject}</p><ul>${itineraryLines(items.filter((i) => i.trip_id === trip.id))}</ul>${tipBlock}<p>Adair</p>`;
 
-    const res = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        from: process.env['RESEND_FROM'] ?? "Adair <onboarding@resend.dev>",
-        to: [email],
-        subject,
-        html,
-      }),
+    const { loadChannel, notifyTraveller } = await import("@/lib/notifications/send.server");
+    const channel = await loadChannel(supabaseAdmin as never, trip.user_id);
+    const outcome = await notifyTraveller(supabaseAdmin as never, {
+      userId: trip.user_id,
+      kind: "trip_reminder",
+      params: [trip.city ?? trip.title, trip.start_date, airportTip ?? ""],
+      email: { to: email, subject, html },
+      ...channel,
     });
-    if (!res.ok) continue;
+    if (!outcome.whatsapp && !outcome.email) continue;
 
     await supabaseAdmin.from("trip_reminders").insert({ trip_id: trip.id, kind });
     sent += 1;
