@@ -532,14 +532,17 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
     }
   };
 
+  const [amendBase, setAmendBase] = useState("");
+
   /** "Make it business class" — same trip, changed by one extra sentence. */
   const amendTrip = async () => {
     const change = amendText.trim();
     if (!change || amending) return;
     setAmending(true);
     try {
-      const base = submission?.sentence.trim() || d.userMessage;
-      const sentence = `${base}. ${change}`;
+      // Everything they said before, plus the change — later wording wins.
+      const base = amendBase || submission?.sentence.trim() || d.userMessage;
+      const sentence = `${base}. Change: ${change}`;
       if (signedIn) {
         const result = await runLiveSearch({ data: { sentence } });
         setCardId(result.cardId);
@@ -550,6 +553,7 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
       } else {
         setLive(await searchTrip(await parseTrip(sentence)));
       }
+      setAmendBase(sentence);
       setAmendText("");
     } catch {
       /* keep the current card on screen */
