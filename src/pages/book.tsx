@@ -16,6 +16,7 @@ import { listCompanions } from "@/lib/companions.functions";
 import { getPaymentSession } from "@/lib/payment.functions";
 import { PaymentStep, type AuthorisedPayment } from "@/components/payment-step";
 import { eur } from "@/lib/trip/client";
+import { isSchengen } from "@/lib/trip/backwards";
 
 const inputClass =
   "mt-1 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary";
@@ -145,11 +146,8 @@ export function BookPage({ cardId }: { cardId: string }) {
   ) =>
     setCompanions((current) => current.map((c, i) => (i === index ? { ...c, ...patch } : c)));
 
-  /** Passports are collected when the two cities sit in different countries. */
-  const passportNeeded =
-    !!search &&
-    search.request.originCountry !== undefined &&
-    search.request.originCountry !== search.request.destinationCountry;
+  /** Passports are only asked for on routes that leave the Schengen area. */
+  const passportNeeded = !!search && !isSchengen(search.request.destinationIata);
 
   const travellerReady =
     traveller.givenName.trim().length > 0 &&
