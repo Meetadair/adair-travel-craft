@@ -56,6 +56,8 @@ export function PreferencesPage() {
   const queryClient = useQueryClient();
 
   const account = useQuery({ queryKey: ["account"], queryFn: () => fetchAccount() });
+  const fetchReferral = useServerFn(getMyReferral);
+  const referral = useQuery({ queryKey: ["my-referral"], queryFn: () => fetchReferral({}) });
 
   const [fullName, setFullName] = useState("");
   const [homeAirport, setHomeAirport] = useState("WAW");
