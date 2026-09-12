@@ -30,6 +30,7 @@ import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authe
 import { Route as AuthenticatedAdminPaymentsRouteImport } from './routes/_authenticated/admin.payments'
 import { Route as AuthenticatedBookCardIdRouteImport } from './routes/_authenticated/book.$cardId'
 import { Route as AuthenticatedDevStatusRouteImport } from './routes/_authenticated/dev.status'
+import { Route as ApiPublicGetawayPricesRouteImport } from './routes/api/public/getaway-prices'
 import { Route as ApiPublicTripRemindersRouteImport } from './routes/api/public/trip-reminders'
 import { Route as ApiTripParseRouteImport } from './routes/api/trip/parse'
 import { Route as ApiTripPriceContextRouteImport } from './routes/api/trip/price-context'
@@ -144,6 +145,11 @@ const AuthenticatedDevStatusRoute = AuthenticatedDevStatusRouteImport.update({
   path: '/dev/status',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiPublicGetawayPricesRoute = ApiPublicGetawayPricesRouteImport.update({
+  id: '/api/public/getaway-prices',
+  path: '/api/public/getaway-prices',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicTripRemindersRoute = ApiPublicTripRemindersRouteImport.update({
   id: '/api/public/trip-reminders',
   path: '/api/public/trip-reminders',
@@ -197,6 +203,7 @@ export interface FileRoutesByFullPath {
   '/admin/payments': typeof AuthenticatedAdminPaymentsRoute
   '/book/$cardId': typeof AuthenticatedBookCardIdRoute
   '/dev/status': typeof AuthenticatedDevStatusRoute
+  '/api/public/getaway-prices': typeof ApiPublicGetawayPricesRoute
   '/api/public/trip-reminders': typeof ApiPublicTripRemindersRoute
   '/api/trip/parse': typeof ApiTripParseRoute
   '/api/trip/price-context': typeof ApiTripPriceContextRoute
@@ -224,6 +231,7 @@ export interface FileRoutesByTo {
   '/admin/payments': typeof AuthenticatedAdminPaymentsRoute
   '/book/$cardId': typeof AuthenticatedBookCardIdRoute
   '/dev/status': typeof AuthenticatedDevStatusRoute
+  '/api/public/getaway-prices': typeof ApiPublicGetawayPricesRoute
   '/api/public/trip-reminders': typeof ApiPublicTripRemindersRoute
   '/api/trip/parse': typeof ApiTripParseRoute
   '/api/trip/price-context': typeof ApiTripPriceContextRoute
@@ -254,6 +262,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/payments': typeof AuthenticatedAdminPaymentsRoute
   '/_authenticated/book/$cardId': typeof AuthenticatedBookCardIdRoute
   '/_authenticated/dev/status': typeof AuthenticatedDevStatusRoute
+  '/api/public/getaway-prices': typeof ApiPublicGetawayPricesRoute
   '/api/public/trip-reminders': typeof ApiPublicTripRemindersRoute
   '/api/trip/parse': typeof ApiTripParseRoute
   '/api/trip/price-context': typeof ApiTripPriceContextRoute
@@ -284,6 +293,7 @@ export interface FileRouteTypes {
     | '/admin/payments'
     | '/book/$cardId'
     | '/dev/status'
+    | '/api/public/getaway-prices'
     | '/api/public/trip-reminders'
     | '/api/trip/parse'
     | '/api/trip/price-context'
@@ -311,6 +321,7 @@ export interface FileRouteTypes {
     | '/admin/payments'
     | '/book/$cardId'
     | '/dev/status'
+    | '/api/public/getaway-prices'
     | '/api/public/trip-reminders'
     | '/api/trip/parse'
     | '/api/trip/price-context'
@@ -340,6 +351,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/payments'
     | '/_authenticated/book/$cardId'
     | '/_authenticated/dev/status'
+    | '/api/public/getaway-prices'
     | '/api/public/trip-reminders'
     | '/api/trip/parse'
     | '/api/trip/price-context'
@@ -356,6 +368,7 @@ export interface RootRouteChildren {
   AssistantRoute: typeof AssistantRoute
   AuthRoute: typeof AuthRoute
   BusinessRoute: typeof BusinessRoute
+  ApiPublicGetawayPricesRoute: typeof ApiPublicGetawayPricesRoute
   ApiPublicTripRemindersRoute: typeof ApiPublicTripRemindersRoute
   ApiTripParseRoute: typeof ApiTripParseRoute
   ApiTripPriceContextRoute: typeof ApiTripPriceContextRoute
@@ -513,6 +526,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDevStatusRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/getaway-prices': {
+      id: '/api/public/getaway-prices'
+      path: '/api/public/getaway-prices'
+      fullPath: '/api/public/getaway-prices'
+      preLoaderRoute: typeof ApiPublicGetawayPricesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/trip-reminders': {
       id: '/api/public/trip-reminders'
       path: '/api/public/trip-reminders'
@@ -612,6 +632,7 @@ const rootRouteChildren: RootRouteChildren = {
   AssistantRoute: AssistantRoute,
   AuthRoute: AuthRoute,
   BusinessRoute: BusinessRoute,
+  ApiPublicGetawayPricesRoute: ApiPublicGetawayPricesRoute,
   ApiPublicTripRemindersRoute: ApiPublicTripRemindersRoute,
   ApiTripParseRoute: ApiTripParseRoute,
   ApiTripPriceContextRoute: ApiTripPriceContextRoute,
