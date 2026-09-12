@@ -46,6 +46,7 @@ export function TripsPage() {
   const cancelItem = useServerFn(cancelTripItem);
   const [view, setView] = useState<"list" | "calendar">("list");
   const [mapFor, setMapFor] = useState<string | null>(null);
+  const [order, setOrder] = useState<Record<string, MyTrip["stops"]>>({});
 
   const trips = useQuery({ queryKey: ["my-trips"], queryFn: () => fetchTrips({}) });
 
