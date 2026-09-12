@@ -29,7 +29,7 @@ export type PaymentUnavailableReason =
 export type PaymentUnavailable = {
   status: "unavailable";
   reason: PaymentUnavailableReason;
-  note?: string;
+  note?: string | undefined;
 };
 export type PaymentOk<T> = { status: "ok"; data: T };
 export type PaymentResult<T> = PaymentOk<T> | PaymentUnavailable;
