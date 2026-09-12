@@ -22,6 +22,7 @@ import { cleanCompany, type CompanyDraft } from "@/lib/prefs/company-draft";
 import { AirportPicker } from "@/components/prefs/airport-picker";
 import { CompanyEditor } from "@/components/prefs/company-editor";
 import { MultiField, SingleField, ToggleRow } from "@/components/prefs/option-chips";
+import { track } from "@/lib/track";
 
 const primaryBtn =
   "inline-flex min-h-12 items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-60";
@@ -206,7 +207,10 @@ export function OnboardingPage() {
               {question?.skippable && (
                 <button
                   type="button"
-                  onClick={() => setStep((s) => s + 1)}
+                  onClick={() => {
+                    track("onboarding_skip", { question: question?.id ?? String(step), step });
+                    setStep((s) => s + 1);
+                  }}
                   className="text-sm text-muted-foreground underline decoration-border underline-offset-4"
                 >
                   Skip
@@ -225,7 +229,10 @@ export function OnboardingPage() {
               ) : (
                 <button
                   type="button"
-                  onClick={() => setStep((s) => s + 1)}
+                  onClick={() => {
+                    track("onboarding_step", { question: question?.id ?? String(step), step });
+                    setStep((s) => s + 1);
+                  }}
                   disabled={!canContinue}
                   className={primaryBtn}
                 >
