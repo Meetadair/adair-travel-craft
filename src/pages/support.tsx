@@ -24,8 +24,8 @@ export function SupportPage() {
   const trips = useQuery({ queryKey: ["my-trips"], queryFn: () => fetchTrips({}) });
   const requests = useQuery({ queryKey: ["support-requests"], queryFn: () => fetchRequests() });
 
-  const [tripId, setTripId] = useState<string>(search.trip ?? "");
-  const [category, setCategory] = useState<string>(search.category ?? "other");
+  const [tripId, setTripId] = useState<string>(search.trip);
+  const [category, setCategory] = useState<string>(search.category);
   const [urgency, setUrgency] = useState("normal");
   const [description, setDescription] = useState("");
   const [done, setDone] = useState(false);
