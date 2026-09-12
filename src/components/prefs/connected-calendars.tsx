@@ -9,6 +9,8 @@ import { Calendar, Check, Copy, Link2, Trash2 } from "lucide-react";
 import {
   disconnectCalendar,
   getCalendarSettings,
+  scanCalendarHints,
+  setCalendarRead,
   startCalendarConnect,
   syncMyTripsToCalendars,
   type CalendarProviderName,
@@ -24,6 +26,8 @@ export function ConnectedCalendars() {
   const beginConnect = useServerFn(startCalendarConnect);
   const removeConnection = useServerFn(disconnectCalendar);
   const syncTrips = useServerFn(syncMyTripsToCalendars);
+  const changeRead = useServerFn(setCalendarRead);
+  const scanHints = useServerFn(scanCalendarHints);
   const queryClient = useQueryClient();
 
   const [notice, setNotice] = useState<string | null>(null);
@@ -47,17 +51,22 @@ export function ConnectedCalendars() {
     );
     if (status === "connected") {
       void syncTrips().catch(() => undefined);
+      void scanHints()
+        .then(() => queryClient.invalidateQueries({ queryKey: ["trip-hints"] }))
+        .catch(() => undefined);
       void queryClient.invalidateQueries({ queryKey: ["calendar-settings"] });
     }
     window.history.replaceState({}, "", window.location.pathname);
-  }, [queryClient, syncTrips]);
+  }, [queryClient, syncTrips, scanHints]);
 
   const connect = useMutation({
-    mutationFn: async (provider: CalendarProviderName) => {
+    mutationFn: async (input: CalendarProviderName | { provider: CalendarProviderName; read: boolean }) => {
+      const provider = typeof input === "string" ? input : input.provider;
+      const read = typeof input === "string" ? false : input.read;
       const timeZone =
         typeof Intl !== "undefined" ? Intl.DateTimeFormat().resolvedOptions().timeZone : "UTC";
       const result = await beginConnect({
-        data: { provider, origin: window.location.origin, timeZone },
+        data: { provider, origin: window.location.origin, timeZone, read },
       });
       window.location.href = result.url;
     },
@@ -69,6 +78,21 @@ export function ConnectedCalendars() {
     onSuccess: async () => {
       setNotice("Disconnected. The stored access was deleted.");
       await queryClient.invalidateQueries({ queryKey: ["calendar-settings"] });
+    },
+  });
+
+  // Read access is a separate, optional consent — never bundled into connect.
+  const readAccess = useMutation({
+    mutationFn: async (input: { provider: CalendarProviderName; enabled: boolean }) => {
+      if (input.enabled) {
+        // Needs a fresh consent screen for the read permission.
+        await connect.mutateAsync({ provider: input.provider, read: true });
+        return;
+      }
+      await changeRead({ data: { provider: input.provider, enabled: false } });
+      setNotice("Trip spotting is off, and what we stored from your calendar was deleted.");
+      await queryClient.invalidateQueries({ queryKey: ["calendar-settings"] });
+      await queryClient.invalidateQueries({ queryKey: ["trip-hints"] });
     },
   });
 
@@ -130,6 +154,24 @@ export function ConnectedCalendars() {
               >
                 <Trash2 className="size-4" /> Disconnect
               </button>
+            )}
+            {available && link && (
+              <label className="flex items-start gap-2 text-xs text-muted-foreground sm:max-w-[16rem]">
+                <input
+                  type="checkbox"
+                  checked={link.readEnabled}
+                  onChange={(e) =>
+                    readAccess.mutate({ provider, enabled: e.currentTarget.checked })
+                  }
+                  disabled={readAccess.isPending}
+                  className="mt-0.5 size-4 shrink-0 accent-[hsl(var(--primary))]"
+                />
+                <span>
+                  Let Adair spot trips you’ll need to book — we only look for events with a location
+                  away from home, and never read anything else. Optional, and you can turn it off
+                  any time.
+                </span>
+              </label>
             )}
             {available && !link && (
               <button
