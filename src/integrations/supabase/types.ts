@@ -451,6 +451,12 @@ export type Database = {
           created_at: string
           drivable_from: string[]
           editorial_note: string | null
+          hero_image_credit: string | null
+          hero_image_credit_url: string | null
+          hero_image_email_url: string | null
+          hero_image_fallback_url: string | null
+          hero_image_source: string | null
+          hero_image_url: string | null
           id: string
           latitude: number
           longitude: number
@@ -468,6 +474,12 @@ export type Database = {
           created_at?: string
           drivable_from?: string[]
           editorial_note?: string | null
+          hero_image_credit?: string | null
+          hero_image_credit_url?: string | null
+          hero_image_email_url?: string | null
+          hero_image_fallback_url?: string | null
+          hero_image_source?: string | null
+          hero_image_url?: string | null
           id?: string
           latitude: number
           longitude: number
@@ -485,6 +497,12 @@ export type Database = {
           created_at?: string
           drivable_from?: string[]
           editorial_note?: string | null
+          hero_image_credit?: string | null
+          hero_image_credit_url?: string | null
+          hero_image_email_url?: string | null
+          hero_image_fallback_url?: string | null
+          hero_image_source?: string | null
+          hero_image_url?: string | null
           id?: string
           latitude?: number
           longitude?: number
@@ -544,6 +562,11 @@ export type Database = {
           day_number: number
           evening: string | null
           id: string
+          image_credit: string | null
+          image_credit_url: string | null
+          image_fallback_url: string | null
+          image_source: string | null
+          image_url: string | null
           itinerary_id: string
           meal_place_ids: string[]
           morning: string | null
@@ -555,6 +578,11 @@ export type Database = {
           day_number: number
           evening?: string | null
           id?: string
+          image_credit?: string | null
+          image_credit_url?: string | null
+          image_fallback_url?: string | null
+          image_source?: string | null
+          image_url?: string | null
           itinerary_id: string
           meal_place_ids?: string[]
           morning?: string | null
@@ -566,6 +594,11 @@ export type Database = {
           day_number?: number
           evening?: string | null
           id?: string
+          image_credit?: string | null
+          image_credit_url?: string | null
+          image_fallback_url?: string | null
+          image_source?: string | null
+          image_url?: string | null
           itinerary_id?: string
           meal_place_ids?: string[]
           morning?: string | null
