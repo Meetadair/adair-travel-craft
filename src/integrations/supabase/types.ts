@@ -295,6 +295,326 @@ export type Database = {
         }
         Relationships: []
       }
+      creator_attributions: {
+        Row: {
+          attributed_at: string
+          attribution_expires_at: string
+          code: string
+          created_at: string
+          creator_id: string
+          earning_until: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          attributed_at?: string
+          attribution_expires_at?: string
+          code: string
+          created_at?: string
+          creator_id: string
+          earning_until?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          attributed_at?: string
+          attribution_expires_at?: string
+          code?: string
+          created_at?: string
+          creator_id?: string
+          earning_until?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_attributions_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      creator_clicks: {
+        Row: {
+          created_at: string
+          creator_id: string
+          id: string
+          source: string
+        }
+        Insert: {
+          created_at?: string
+          creator_id: string
+          id?: string
+          source?: string
+        }
+        Update: {
+          created_at?: string
+          creator_id?: string
+          id?: string
+          source?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_clicks_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      creator_commission_rules: {
+        Row: {
+          active: boolean
+          created_at: string
+          currency: string
+          earning_window_months: number
+          flat_minor: number
+          id: string
+          kind: string
+          line_type: string | null
+          plan: string | null
+          share_bps: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          currency?: string
+          earning_window_months?: number
+          flat_minor?: number
+          id?: string
+          kind: string
+          line_type?: string | null
+          plan?: string | null
+          share_bps?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          currency?: string
+          earning_window_months?: number
+          flat_minor?: number
+          id?: string
+          kind?: string
+          line_type?: string | null
+          plan?: string | null
+          share_bps?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      creator_earnings: {
+        Row: {
+          amount_minor: number
+          basis: string
+          confirmable_at: string | null
+          created_at: string
+          creator_id: string
+          currency: string
+          id: string
+          kind: string
+          line_type: string | null
+          margin_minor: number
+          note: string | null
+          payout_id: string | null
+          share_bps: number
+          status: string
+          trip_id: string | null
+          trip_item_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount_minor?: number
+          basis?: string
+          confirmable_at?: string | null
+          created_at?: string
+          creator_id: string
+          currency?: string
+          id?: string
+          kind?: string
+          line_type?: string | null
+          margin_minor?: number
+          note?: string | null
+          payout_id?: string | null
+          share_bps?: number
+          status?: string
+          trip_id?: string | null
+          trip_item_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount_minor?: number
+          basis?: string
+          confirmable_at?: string | null
+          created_at?: string
+          creator_id?: string
+          currency?: string
+          id?: string
+          kind?: string
+          line_type?: string | null
+          margin_minor?: number
+          note?: string | null
+          payout_id?: string | null
+          share_bps?: number
+          status?: string
+          trip_id?: string | null
+          trip_item_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_earnings_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "creator_earnings_payout_id_fkey"
+            columns: ["payout_id"]
+            isOneToOne: false
+            referencedRelation: "creator_payouts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "creator_earnings_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "creator_earnings_trip_item_id_fkey"
+            columns: ["trip_item_id"]
+            isOneToOne: false
+            referencedRelation: "trip_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      creator_payouts: {
+        Row: {
+          amount_minor: number
+          created_at: string
+          creator_id: string
+          currency: string
+          id: string
+          paid_at: string | null
+          paid_by: string | null
+          period_month: string
+          reference: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount_minor?: number
+          created_at?: string
+          creator_id: string
+          currency?: string
+          id?: string
+          paid_at?: string | null
+          paid_by?: string | null
+          period_month: string
+          reference?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount_minor?: number
+          created_at?: string
+          creator_id?: string
+          currency?: string
+          id?: string
+          paid_at?: string | null
+          paid_by?: string | null
+          period_month?: string
+          reference?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_payouts_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      creators: {
+        Row: {
+          applied_at: string
+          approved_at: string | null
+          approved_by: string | null
+          avatar_url: string | null
+          bio: string | null
+          created_at: string
+          display_name: string
+          handle: string
+          id: string
+          licence_accepted_at: string | null
+          payout_entity: string | null
+          payout_iban_encrypted: string | null
+          payout_iban_last4: string | null
+          payout_vat_status: string | null
+          platforms: Json
+          review_note: string | null
+          short_code: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          applied_at?: string
+          approved_at?: string | null
+          approved_by?: string | null
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          display_name: string
+          handle: string
+          id?: string
+          licence_accepted_at?: string | null
+          payout_entity?: string | null
+          payout_iban_encrypted?: string | null
+          payout_iban_last4?: string | null
+          payout_vat_status?: string | null
+          platforms?: Json
+          review_note?: string | null
+          short_code: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          applied_at?: string
+          approved_at?: string | null
+          approved_by?: string | null
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          display_name?: string
+          handle?: string
+          id?: string
+          licence_accepted_at?: string | null
+          payout_entity?: string | null
+          payout_iban_encrypted?: string | null
+          payout_iban_last4?: string | null
+          payout_vat_status?: string | null
+          platforms?: Json
+          review_note?: string | null
+          short_code?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       credits: {
         Row: {
           amount_minor: number
@@ -632,10 +952,17 @@ export type Database = {
           id: string
           kind: string
           latitude: number | null
+          licence_accepted_at: string | null
           longitude: number | null
           name: string
+          photos: Json
+          post_url: string | null
           price_band: string | null
+          review_note: string | null
+          review_status: string
+          submitted_by_creator_id: string | null
           updated_at: string
+          visited_on: string | null
           why_this_one: string | null
         }
         Insert: {
@@ -648,10 +975,17 @@ export type Database = {
           id?: string
           kind: string
           latitude?: number | null
+          licence_accepted_at?: string | null
           longitude?: number | null
           name: string
+          photos?: Json
+          post_url?: string | null
           price_band?: string | null
+          review_note?: string | null
+          review_status?: string
+          submitted_by_creator_id?: string | null
           updated_at?: string
+          visited_on?: string | null
           why_this_one?: string | null
         }
         Update: {
@@ -664,10 +998,17 @@ export type Database = {
           id?: string
           kind?: string
           latitude?: number | null
+          licence_accepted_at?: string | null
           longitude?: number | null
           name?: string
+          photos?: Json
+          post_url?: string | null
           price_band?: string | null
+          review_note?: string | null
+          review_status?: string
+          submitted_by_creator_id?: string | null
           updated_at?: string
+          visited_on?: string | null
           why_this_one?: string | null
         }
         Relationships: [
@@ -676,6 +1017,13 @@ export type Database = {
             columns: ["destination_id"]
             isOneToOne: false
             referencedRelation: "getaway_destinations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "getaway_places_submitted_by_creator_id_fkey"
+            columns: ["submitted_by_creator_id"]
+            isOneToOne: false
+            referencedRelation: "creators"
             referencedColumns: ["id"]
           },
         ]
@@ -1949,6 +2297,7 @@ export type Database = {
     Functions: {
       admin_analytics: { Args: never; Returns: Json }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
+      owns_creator: { Args: { _creator_id: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
