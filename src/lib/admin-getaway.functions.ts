@@ -44,6 +44,10 @@ export type AdminDestination = {
   travel_tips: TravelTips;
   typical_nights: number;
   active: boolean;
+  /** Our own photo wins; Unsplash is only the fallback. */
+  hero_image_url: string | null;
+  hero_image_credit: string | null;
+  hero_image_source: string | null;
   /** Theme assignments, each with its own season window. */
   themes: Array<{ id: string; theme_id: string; season_months: number[]; editorial_angle: string | null }>;
   places: Array<{ id: string; kind: string; name: string; active: boolean; why_this_one: string | null }>;
@@ -76,6 +80,9 @@ export const getGetawayContent = createServerFn({ method: "GET" })
         best_for: (d['best_for'] as string | null) ?? null,
         avoid_when: (d['avoid_when'] as string | null) ?? null,
         travel_tips: parseTravelTips(d['travel_tips']),
+        hero_image_url: (d['hero_image_url'] as string | null) ?? null,
+        hero_image_credit: (d['hero_image_credit'] as string | null) ?? null,
+        hero_image_source: (d['hero_image_source'] as string | null) ?? null,
         typical_nights: Number(d['typical_nights']),
         active: Boolean(d['active']),
         themes: ((joins.data ?? []) as Array<Record<string, unknown>>)
@@ -294,7 +301,9 @@ export const getGetawayItineraryDays = createServerFn({ method: "GET" })
     await assertAdmin(context.supabase, context.userId);
     const res = await context.supabase
       .from("getaway_itinerary_days")
-      .select("id, day_number, morning, afternoon, evening, sleep_place_id, meal_place_ids")
+      .select(
+        "id, day_number, morning, afternoon, evening, sleep_place_id, meal_place_ids, image_url, image_credit, image_source",
+      )
       .eq("itinerary_id", data.itineraryId)
       .order("day_number");
     if (res.error) throw new Error(res.error.message);
@@ -306,6 +315,9 @@ export const getGetawayItineraryDays = createServerFn({ method: "GET" })
       evening: string | null;
       sleep_place_id: string | null;
       meal_place_ids: string[] | null;
+      image_url: string | null;
+      image_credit: string | null;
+      image_source: string | null;
     }>;
   });
 

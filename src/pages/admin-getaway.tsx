@@ -9,6 +9,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { TIP_CATEGORIES } from "@/lib/trip/tips";
 import { SiteNav } from "@/components/site-nav";
+import { GetawayImageEditor } from "@/components/admin/getaway-image-editor";
 import {
   getGetawayContent,
   saveGetawayDestination,
@@ -157,6 +158,7 @@ export function AdminGetawayPage() {
                 </button>
                 {openDest === dest.id && (
                   <DestinationEditor
+                    onRefresh={refresh}
                     dest={dest}
                     themes={themes}
                     onSaveDest={(data) => destMutation.mutate(data)}
@@ -297,6 +299,7 @@ function DestinationEditor({
   dest,
   themes,
   onSaveDest,
+  onRefresh,
   onSaveAssignment,
   onSavePlace,
   onSaveItinerary,
@@ -304,6 +307,7 @@ function DestinationEditor({
   dest: AdminDestination;
   themes: AdminTheme[];
   onSaveDest: (data: Record<string, unknown>) => void;
+  onRefresh: () => void;
   onSaveAssignment: (data: Record<string, unknown>) => void;
   onSavePlace: (data: Record<string, unknown>) => void;
   onSaveItinerary: (data: Record<string, unknown>) => void;
@@ -336,6 +340,22 @@ function DestinationEditor({
         >
           {dest.active ? "Active — switch off" : "Draft — make active"}
         </button>
+      </div>
+
+      <div>
+        <p className="text-sm font-medium">Hero picture</p>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Our own photo from a real trip beats stock. Shown across the page top and at the top of the
+          weekly email.
+        </p>
+        <GetawayImageEditor
+          target={{ kind: "destination", id: dest.id }}
+          query={`${dest.name} ${dest.country}`}
+          imageUrl={dest.hero_image_url}
+          credit={dest.hero_image_credit}
+          source={dest.hero_image_source}
+          onChanged={onRefresh}
+        />
       </div>
 
       <div>
@@ -600,7 +620,12 @@ function DestinationEditor({
                   Delete
                 </button>
               </div>
-              <ItineraryDays itineraryId={i.id} nights={i.nights} places={dest.places} />
+              <ItineraryDays
+                itineraryId={i.id}
+                nights={i.nights}
+                places={dest.places}
+                destinationName={dest.name}
+              />
             </li>
           ))}
         </ul>
@@ -634,10 +659,12 @@ function ItineraryDays({
   itineraryId,
   nights,
   places,
+  destinationName,
 }: {
   itineraryId: string;
   nights: number;
   places: AdminDestination["places"];
+  destinationName: string;
 }) {
   const fetchDays = useServerFn(getGetawayItineraryDays);
   const persistDay = useServerFn(saveGetawayItineraryDay);
@@ -690,6 +717,23 @@ function ItineraryDays({
                   </option>
                 ))}
             </select>
+            {row ? (
+              <GetawayImageEditor
+                compact
+                target={{ kind: "day", id: row.id }}
+                query={`${destinationName} ${row.morning ?? row.afternoon ?? ""}`.trim()}
+                imageUrl={row.image_url}
+                credit={row.image_credit}
+                source={row.image_source}
+                onChanged={() =>
+                  queryClient.invalidateQueries({ queryKey: ["getaway-days", itineraryId] })
+                }
+              />
+            ) : (
+              <p className="mt-2 text-xs text-muted-foreground">
+                Save something for this day to add a picture.
+              </p>
+            )}
           </div>
         );
       })}

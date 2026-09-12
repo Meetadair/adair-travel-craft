@@ -88,6 +88,13 @@ export const getSystemStatus = createServerFn({ method: "GET" })
         : "Falling back to rules only",
     });
     capabilities.push({
+      name: "Getaway pictures (UNSPLASH_ACCESS_KEY)",
+      state: process.env["UNSPLASH_ACCESS_KEY"] ? "ok" : "off",
+      note: process.env["UNSPLASH_ACCESS_KEY"]
+        ? "Stock fallback available when no own photo is uploaded"
+        : "Own uploads only — destinations without a photo show a typographic header",
+    });
+    capabilities.push({
       name: "Booking & payment",
       state: "ok",
       note: "Test-mode booking live — supplier test payment, no real charge",

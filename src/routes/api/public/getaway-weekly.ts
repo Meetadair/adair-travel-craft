@@ -35,13 +35,25 @@ async function run(request: Request): Promise<Response> {
 
   const destRes = await supabaseAdmin
     .from("getaway_destinations")
-    .select("id, name, country, editorial_note")
+    .select(
+      "id, name, country, editorial_note, hero_image_url, hero_image_fallback_url, hero_image_email_url, hero_image_credit, hero_image_credit_url, hero_image_source",
+    )
     .in("id", proposals.map((p) => p.destination_id));
-  const dests = new Map(
-    ((destRes.data ?? []) as Array<{ id: string; name: string; country: string; editorial_note: string | null }>).map(
-      (d) => [d.id, d],
-    ),
-  );
+  type DestRow = {
+    id: string;
+    name: string;
+    country: string;
+    editorial_note: string | null;
+    hero_image_url: string | null;
+    hero_image_fallback_url: string | null;
+    hero_image_email_url: string | null;
+    hero_image_credit: string | null;
+    hero_image_credit_url: string | null;
+    hero_image_source: string | null;
+  };
+  const dests = new Map(((destRes.data ?? []) as DestRow[]).map((d) => [d.id, d]));
+  const { ensureDestinationImage } = await import("@/lib/getaway/images.server");
+  const siteOrigin = new URL(request.url).origin;
 
   let sent = 0;
   for (const proposal of proposals) {
@@ -52,9 +64,24 @@ async function run(request: Request): Promise<Response> {
     if (!email) continue;
 
     const reasons = (proposal.reasons ?? []).map((r) => `<li>${r}</li>`).join("");
-    const html = `<p>This week we would go to <strong>${dest.name}</strong>, ${dest.country}.</p>${
+
+    // Picture first, then the note, then the price — same order as the app.
+    // 560px wide and a small JPEG, so it stays light and shows everywhere.
+    const image = await ensureDestinationImage(supabaseAdmin as never, dest).catch(() => null);
+    const emailImageUrl = image
+      ? (image.emailUrl.startsWith("/") ? `${siteOrigin}${image.emailUrl}` : image.emailUrl)
+      : null;
+    const imageBlock = emailImageUrl
+      ? `<img src="${emailImageUrl}" width="560" alt="${dest.name}" style="display:block;width:100%;max-width:560px;height:auto;border-radius:12px" />${
+          image?.credit
+            ? `<p style="margin:6px 0 0;font-size:11px;color:#8a8378">${image.credit}</p>`
+            : ""
+        }`
+      : `<h1 style="margin:0;font-size:28px;line-height:1.15">${dest.name}</h1>`;
+
+    const html = `<div style="max-width:600px;margin:0 auto;font-family:Helvetica,Arial,sans-serif;color:#1c1a17">${imageBlock}<p>This week we would go to <strong>${dest.name}</strong>, ${dest.country}.</p>${
       dest.editorial_note ? `<p>${dest.editorial_note}</p>` : ""
-    }<ul>${reasons}</ul><p>Open Adair to see the price and plan it.</p>`;
+    }<ul>${reasons}</ul><p>Open Adair to see the price and plan it.</p></div>`;
 
     const { loadChannel, notifyTraveller } = await import("@/lib/notifications/send.server");
     const channel = await loadChannel(supabaseAdmin as never, proposal.user_id);
