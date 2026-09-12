@@ -118,21 +118,7 @@ export function SiteNav() {
               >
                 Getaway
               </Link>
-              <Link
-                to="/invoices"
-                className={`hidden sm:inline-block ${linkClass}`}
-                activeProps={{ className: "text-foreground" }}
-              >
-                Invoices
-              </Link>
-              <Link
-                to="/credit"
-                className={`hidden sm:inline-block ${linkClass}`}
-                activeProps={{ className: "text-foreground" }}
-              >
-                Credit
-              </Link>
-              {/* Help lives in the signed-in footer beside Privacy and Terms. */}
+              {/* Help, Invoices and Credit live in the signed-in footer. */}
 
               <Link
                 to="/preferences"
