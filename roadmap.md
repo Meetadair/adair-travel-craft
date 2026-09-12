@@ -66,3 +66,11 @@
 - [ ] /admin panel: pricing rules, bookings, users, providers, secrets status, recent errors
 - [ ] Event logging from the app (typed sentence, search, card, booking start/finish, onboarding steps, cheaper-dates outcome, match scores, failures)
 - [ ] Global error boundary writing to error_log
+
+## Connected calendars (this round)
+- [x] `calendar_connections` (owner-only, tokens encrypted with CALENDAR_TOKEN_KEY), `calendar_feeds`, `calendar_oauth_states`; `trip_items.calendar_event_ids`
+- [x] Google Calendar (scope `calendar.events`) and Microsoft Graph (`Calendars.ReadWrite`) OAuth, callback at `/api/public/calendar/callback/:provider`, disconnect deletes the tokens
+- [x] Apple: private webcal feed at `/api/public/calendar/feed/:token.ics` — subscribe once, refreshes automatically (no credentials needed)
+- [x] Booking writes events to every connected calendar and stores provider event ids, so changes update and cancellations delete instead of duplicating; reminders 24 h + 2 h (Graph supports one reminder: 2 h)
+- [x] "Add to calendar" .ics download kept as the always-available fallback
+- [ ] Add GOOGLE_CALENDAR_CLIENT_ID/SECRET and MS_GRAPH_CLIENT_ID/SECRET to switch those two options on (hidden with a short note until then)
