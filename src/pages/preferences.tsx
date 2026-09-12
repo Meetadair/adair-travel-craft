@@ -158,6 +158,8 @@ export function PreferencesPage() {
               </section>
             ))}
 
+            <ConnectedCalendars />
+
             <section className="hairline-card space-y-4 p-5 sm:p-6">
               <h2 className="font-display text-lg font-semibold">Companies for invoicing</h2>
               <CompanyEditor companies={companies} onChange={setCompanies} />
