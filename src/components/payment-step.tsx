@@ -39,8 +39,7 @@ export function PaymentStep(props: {
           <Checkout {...props} />
           {session.methods.length > 0 && wallets.length === 0 && (
             <p className="text-xs text-muted-foreground">
-              {session.providerLabel} accepts cards only — Apple Pay and Google Pay are not
-              available here.
+              Cards only for now — Apple Pay and Google Pay are not available here.
             </p>
           )}
         </div>

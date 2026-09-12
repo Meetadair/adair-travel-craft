@@ -868,10 +868,7 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                               ? ` · ${timeLabel(live.flight.returnDepartAt, locale)}`
                               : ""
                           }`}
-                          tags={[
-                            <Tag key="1">{d.sourceFlight}</Tag>,
-                            <Tag key="2">{live.flight.cabin.replace("_", " ")}</Tag>,
-                          ]}
+                          tags={[<Tag key="1">{live.flight.cabin.replace("_", " ")}</Tag>]}
                           price={eur(live.flight.amountEur)}
                           onRemove={() => drop("flight")}
                           removeLabel={d.remove}
@@ -938,12 +935,9 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                                     Exact match
                                   </Tag>,
                                 ]
-                              : [
-                                  <Tag key="1">{d.sourceStay}</Tag>,
-                                  ...(live.stay.rating
-                                    ? [<Tag key="2">{`★ ${live.stay.rating}`}</Tag>]
-                                    : []),
-                                ]
+                              : live.stay.rating
+                                ? [<Tag key="1">{`★ ${live.stay.rating}`}</Tag>]
+                                : []
                           }
                           price={eur(live.stay.amountEur)}
                           onRemove={() => drop("hotel")}
@@ -1048,10 +1042,7 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                                     Exact match
                                   </Tag>,
                                 ]
-                              : [
-                                  <Tag key="1">{d.sourceCar}</Tag>,
-                                  <Tag key="2">{live.car.transmission}</Tag>,
-                                ]
+                              : [<Tag key="1">{live.car.transmission}</Tag>]
                           }
                           price={eur(live.car.amountEur)}
                           onRemove={() => drop("car")}

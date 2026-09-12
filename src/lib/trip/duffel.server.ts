@@ -323,7 +323,7 @@ export async function searchStay(
       rawName,
       result: {
         name: sample ? `Test Hotel — sample data (${rawName})` : rawName,
-        address: sample ? `Duffel test inventory — not ${req.destinationCity}` : realAddress,
+        address: sample ? `Test inventory — not ${req.destinationCity}` : realAddress,
         rating: raw.accommodation?.rating ?? null,
         nightlyAmount: round(amount / nights),
         amount: round(amount),

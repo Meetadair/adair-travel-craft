@@ -90,7 +90,6 @@ export function TripExtras({
                       <span className="font-medium text-foreground">{option.label}</span>
                     )}
                     <Chip>{when(option.pickupAt)}</Chip>
-                    {quote ? <Chip>{quote.providerLabel}</Chip> : null}
                     {quote?.etaMinutes != null ? <Chip>{quote.etaMinutes} min wait</Chip> : null}
                   </div>
                   <p className="mt-1 leading-relaxed text-muted-foreground">
