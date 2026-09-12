@@ -6,9 +6,10 @@
  * only when the invited traveller's first booking confirms — signing up alone
  * earns nothing, which is what keeps this honest.
  */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-type AnyDb = SupabaseClient<never>;
+type AnyDb = SupabaseClient<any, any, any>;
 
 export const REFERRER_REWARD_MINOR = 4000; // €40
 export const FRIEND_REWARD_MINOR = 2000; // €20
