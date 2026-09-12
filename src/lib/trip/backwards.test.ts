@@ -82,7 +82,7 @@ describe("planning backwards from a fixed arrival", () => {
   it("offers a calmer flight only when the pick is tight", () => {
     const tight = planBackwards({
       ...base,
-      candidates: [flight("2026-03-10T13:20:00Z", 200), flight("2026-03-10T09:00:00Z", 150)],
+      candidates: [flight("2026-03-10T13:00:00Z", 200), flight("2026-03-10T09:00:00Z", 150)],
     });
     expect(tight.plan.tight).toBe(true);
     expect(tight.plan.saferOption?.landAt).toBe("2026-03-10T09:00:00Z");
@@ -103,7 +103,7 @@ describe("planning backwards from a fixed arrival", () => {
   });
 
   it("a non-Schengen arrival can fail where the same time inside Schengen works", () => {
-    const candidates = [flight("2026-03-10T13:10:00Z", 180)];
+    const candidates = [flight("2026-03-10T13:00:00Z", 180)];
     expect(planBackwards({ ...base, candidates }).plan.feasible).toBe(true);
     expect(
       planBackwards({ ...base, destinationIata: "LHR", candidates }).plan.feasible,

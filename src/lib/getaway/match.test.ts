@@ -30,9 +30,9 @@ describe("reach filtering", () => {
   });
 
   it("prefers driving only where the destination is genuinely drivable", () => {
-    const krakow = { lat: 50.06, lon: 19.94 };
-    expect(reachFrom(WARSAW, "WAW", krakow, ["WAW"])?.mode).toBe("drive");
-    expect(reachFrom(WARSAW, "WAW", krakow, [])?.mode).toBe("fly");
+    const lublin = { lat: 51.25, lon: 22.57 };
+    expect(reachFrom(WARSAW, "WAW", lublin, ["WAW"])?.mode).toBe("drive");
+    expect(reachFrom(WARSAW, "WAW", lublin, [])?.mode).toBe("fly");
   });
 
   it("reports an unknown origin rather than guessing", () => {
