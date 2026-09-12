@@ -328,23 +328,48 @@ export function BookPage({ cardId }: { cardId: string }) {
 
               {mutation.isError && (
                 <p className="text-sm text-primary">
-                  {failureMessage(
-                    mutation.error instanceof Error && mutation.error.message.includes("offer")
-                      ? "offer-expired"
-                      : null,
-                  )}
+                  {failureMessage(reasonFromError(mutation.error))}
                 </p>
               )}
 
-
-              <button
-                onClick={() => mutation.mutate()}
-                disabled={mutation.isPending || card.data?.expired}
-                className="w-full rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
-              >
-                {mutation.isPending ? "Booking…" : `Book it all · ${eur(selectedTotal)}`}
-              </button>
+              {step === "review" && (
+                <button
+                  onClick={() => setStep("pay")}
+                  disabled={!travellerReady || card.data?.expired}
+                  className="w-full rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
+                >
+                  {`Continue to payment · ${eur(selectedTotal)}`}
+                </button>
+              )}
+              {step === "review" && !travellerReady && (
+                <p className="text-center text-xs text-muted-foreground">
+                  Fill in the traveller details to continue.
+                </p>
+              )}
             </div>
+
+            {step === "pay" && (
+              <div className="hairline-card mt-6 space-y-4 p-6">
+                {payment.isLoading && (
+                  <p className="text-sm text-muted-foreground">Opening the secure card form…</p>
+                )}
+                {payment.data && (
+                  <PaymentStep
+                    session={payment.data}
+                    amountEur={selectedTotal}
+                    disabled={mutation.isPending || card.data?.expired}
+                    payingLabel={mutation.isPending ? "Payment approved — booking your trip…" : null}
+                    onAuthorised={(authorised) => mutation.mutate(authorised)}
+                  />
+                )}
+                <button
+                  onClick={() => setStep("review")}
+                  className="w-full text-center text-xs text-muted-foreground underline"
+                >
+                  Back to traveller details
+                </button>
+              </div>
+            )}
           </>
         )}
 
