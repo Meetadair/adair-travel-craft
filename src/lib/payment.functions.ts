@@ -74,24 +74,73 @@ export const getPaymentSession = createServerFn({ method: "POST" })
       expYear: (row["exp_year"] as number | null) ?? null,
     }));
 
-    let clientKey: string | null = null;
-    let unavailable: PaymentSession["unavailable"] = null;
-    try {
-      const { createComponentClientKey } = await import("@/lib/trip/duffel-cards.server");
-      clientKey = await createComponentClientKey();
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "unknown";
-      unavailable = message === "missing-key" ? "supplier-not-configured" : "card-payments-not-enabled";
-      console.error("payment session unavailable", message);
+    const row = cardRes.data as { currency?: string; total_minor?: number } | null;
+    const currency = row?.currency ?? "EUR";
+    const amountMinor = row?.total_minor ?? 0;
+
+    const chosen = await paymentProvider(supabase);
+    if (chosen.status !== "ok") {
+      return {
+        clientKey: null,
+        unavailable:
+          chosen.reason === "missing-key" || chosen.reason === "no-provider"
+            ? "supplier-not-configured"
+            : "card-payments-not-enabled",
+        testMode: false,
+        currency,
+        offerId,
+        savedCards,
+        provider: "none",
+        providerLabel: "No payment provider",
+        settlementModel: "supplier-of-record",
+        methods: [],
+        intentRef: null,
+        amountMinor,
+        publishableKey: null,
+        clientSecret: null,
+      };
+    }
+
+    const adapter = chosen.data;
+    const intent = await adapter.createIntent(amountMinor, currency, `${data.cardId}-payment`, {
+      card_id: data.cardId,
+      user_id: userId,
+    });
+
+    const base = {
+      currency,
+      offerId,
+      savedCards,
+      provider: adapter.id,
+      providerLabel: adapter.label,
+      settlementModel: adapter.settlementModel,
+      amountMinor,
+      testMode: adapter.isTestMode(),
+    };
+
+    if (intent.status !== "ok") {
+      console.error(`payment intent unavailable: ${intent.reason} ${intent.note ?? ""}`);
+      return {
+        ...base,
+        clientKey: null,
+        unavailable:
+          intent.reason === "missing-key" ? "supplier-not-configured" : "card-payments-not-enabled",
+        methods: [],
+        intentRef: null,
+        publishableKey: null,
+        clientSecret: null,
+      };
     }
 
     return {
-      clientKey,
-      unavailable,
-      testMode: isTestKey(),
-      currency: (cardRes.data as { currency?: string } | null)?.currency ?? "EUR",
-      offerId,
-      savedCards,
+      ...base,
+      clientKey: intent.data.client.clientKey,
+      unavailable: null,
+      // The adapter decides which methods checkout may render.
+      methods: adapter.supportedMethods(),
+      intentRef: intent.data.intentRef,
+      publishableKey: intent.data.client.publishableKey ?? null,
+      clientSecret: intent.data.client.clientSecret ?? null,
     };
   });
 
