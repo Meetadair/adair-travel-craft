@@ -36,7 +36,16 @@ const sentenceSchema = z.object({
   sentence: z.string().trim().min(3).max(400),
   /** Reordered stop list from the map view: search the new first leg instead. */
   stops: z.array(stopSchema).min(2).max(8).optional(),
+  /** Shift the parsed dates by this many days (cheaper nearby dates). */
+  dateShiftDays: z.number().int().min(-60).max(60).optional(),
 });
+
+/** Same date, moved by whole days. */
+function shiftIsoDate(iso: string, days: number): string {
+  return new Date(Date.parse(`${iso}T12:00:00Z`) + days * 86_400_000)
+    .toISOString()
+    .slice(0, 10);
+}
 
 export const searchLiveTrip = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -91,6 +100,12 @@ export const searchLiveTrip = createServerFn({ method: "POST" })
     const request: TripRequest = {
       ...parsed,
       cabinClass: (row?.["cabin_class"] as TripRequest["cabinClass"]) ?? parsed.cabinClass,
+      ...(data.dateShiftDays
+        ? {
+            departDate: shiftIsoDate(parsed.departDate, data.dateShiftDays),
+            returnDate: shiftIsoDate(parsed.returnDate, data.dateShiftDays),
+          }
+        : {}),
       ...(reordered && origin && firstStop
         ? {
             originCity: origin.city,
