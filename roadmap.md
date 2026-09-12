@@ -144,3 +144,12 @@
 - [x] Member numbers encrypted at rest (TRAVELLER_DATA_KEY), shown masked, full on tap.
 - [x] Passed at booking: frequent-flyer accounts on the flight order, hotel number stored on the stay, car membership on the car line; confirmation lists applied vs not applied.
 - [x] Part 2 questionnaire reduced to one light-touch yes/no pointing to Settings.
+
+## Final feature pass
+
+### 1. Early-booking discount (leisure only) — done
+- [x] Configuration, not code: `pricing_rules` rows `lead_time_90` (200 bps) and `lead_time_60` (100 bps) per plan, editable in /admin like every other rule. No existing rule value changed.
+- [x] `src/lib/pricing.server.ts`: `loadLeadTimeTiers`, `daysUntilDeparture`, `leadTimeDiscountBps`, `withLeadTimeDiscount` — lowers OUR markup on every line, floored at zero markup (a commission-only line gives nothing away).
+- [x] Applied in `trip-live.functions.ts` only when the trip is leisure (purpose not business); survives a line swap, savings recalculated. Stored on the card as `items.earlyBooking`.
+- [x] Card line worded honestly ("you're booking N days ahead, so our fee is lower"), never as a supplier discount. Analytics event `early_booking_discount`.
+- Build clean: tsgo clean, 112 tests pass, `/`, `/trips`, `/preferences` 200.
