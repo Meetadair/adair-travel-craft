@@ -25,6 +25,7 @@ import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authentic
 import { Route as AuthenticatedPlanRouteImport } from './routes/_authenticated/plan'
 import { Route as AuthenticatedPreferencesRouteImport } from './routes/_authenticated/preferences'
 import { Route as AuthenticatedTripsRouteImport } from './routes/_authenticated/trips'
+import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authenticated/admin.analytics'
 import { Route as AuthenticatedAdminPaymentsRouteImport } from './routes/_authenticated/admin.payments'
 import { Route as AuthenticatedBookCardIdRouteImport } from './routes/_authenticated/book.$cardId'
@@ -116,6 +117,11 @@ const AuthenticatedTripsRoute = AuthenticatedTripsRouteImport.update({
   path: '/trips',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
+  id: '/admin/',
+  path: '/admin/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAdminAnalyticsRoute =
   AuthenticatedAdminAnalyticsRouteImport.update({
     id: '/admin/analytics',
@@ -195,6 +201,7 @@ export interface FileRoutesByFullPath {
   '/api/trip/parse': typeof ApiTripParseRoute
   '/api/trip/price-context': typeof ApiTripPriceContextRoute
   '/api/trip/search': typeof ApiTripSearchRoute
+  '/admin/': typeof AuthenticatedAdminIndexRoute
   '/api/public/calendar/callback/$provider': typeof ApiPublicCalendarCallbackProviderRoute
   '/api/public/calendar/feed/$token': typeof ApiPublicCalendarFeedTokenRoute
 }
@@ -221,6 +228,7 @@ export interface FileRoutesByTo {
   '/api/trip/parse': typeof ApiTripParseRoute
   '/api/trip/price-context': typeof ApiTripPriceContextRoute
   '/api/trip/search': typeof ApiTripSearchRoute
+  '/admin': typeof AuthenticatedAdminIndexRoute
   '/api/public/calendar/callback/$provider': typeof ApiPublicCalendarCallbackProviderRoute
   '/api/public/calendar/feed/$token': typeof ApiPublicCalendarFeedTokenRoute
 }
@@ -250,6 +258,7 @@ export interface FileRoutesById {
   '/api/trip/parse': typeof ApiTripParseRoute
   '/api/trip/price-context': typeof ApiTripPriceContextRoute
   '/api/trip/search': typeof ApiTripSearchRoute
+  '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/api/public/calendar/callback/$provider': typeof ApiPublicCalendarCallbackProviderRoute
   '/api/public/calendar/feed/$token': typeof ApiPublicCalendarFeedTokenRoute
 }
@@ -279,6 +288,7 @@ export interface FileRouteTypes {
     | '/api/trip/parse'
     | '/api/trip/price-context'
     | '/api/trip/search'
+    | '/admin/'
     | '/api/public/calendar/callback/$provider'
     | '/api/public/calendar/feed/$token'
   fileRoutesByTo: FileRoutesByTo
@@ -305,6 +315,7 @@ export interface FileRouteTypes {
     | '/api/trip/parse'
     | '/api/trip/price-context'
     | '/api/trip/search'
+    | '/admin'
     | '/api/public/calendar/callback/$provider'
     | '/api/public/calendar/feed/$token'
   id:
@@ -333,6 +344,7 @@ export interface FileRouteTypes {
     | '/api/trip/parse'
     | '/api/trip/price-context'
     | '/api/trip/search'
+    | '/_authenticated/admin/'
     | '/api/public/calendar/callback/$provider'
     | '/api/public/calendar/feed/$token'
   fileRoutesById: FileRoutesById
@@ -466,6 +478,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTripsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/': {
+      id: '/_authenticated/admin/'
+      path: '/admin'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/analytics': {
       id: '/_authenticated/admin/analytics'
       path: '/admin/analytics'
@@ -550,6 +569,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminPaymentsRoute: typeof AuthenticatedAdminPaymentsRoute
   AuthenticatedBookCardIdRoute: typeof AuthenticatedBookCardIdRoute
   AuthenticatedDevStatusRoute: typeof AuthenticatedDevStatusRoute
+  AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -563,6 +583,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminPaymentsRoute: AuthenticatedAdminPaymentsRoute,
   AuthenticatedBookCardIdRoute: AuthenticatedBookCardIdRoute,
   AuthenticatedDevStatusRoute: AuthenticatedDevStatusRoute,
+  AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
