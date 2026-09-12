@@ -21,7 +21,7 @@ import { airportByIata, airportLabel } from "@/lib/prefs/airports";
 import { cleanCompany, type CompanyDraft } from "@/lib/prefs/company-draft";
 import { AirportPicker } from "@/components/prefs/airport-picker";
 import { CompanyEditor } from "@/components/prefs/company-editor";
-import { MultiField, SingleField, ToggleRow } from "@/components/prefs/option-chips";
+import { MultiField, SingleField, TextField, ToggleRow } from "@/components/prefs/option-chips";
 import { track } from "@/lib/track";
 
 const primaryBtn =
@@ -150,6 +150,14 @@ export function OnboardingPage() {
                   def={def}
                   value={answers[def.field] ?? []}
                   onChange={(next) => setAnswer(def.field, next)}
+                />
+              ))}
+              {question.texts?.map((def) => (
+                <TextField
+                  key={def.field}
+                  def={def}
+                  value={answers[def.field]?.[0] ?? ""}
+                  onChange={(next) => setAnswer(def.field, next.trim() ? [next] : [])}
                 />
               ))}
               {question.toggles?.length ? (
