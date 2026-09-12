@@ -207,6 +207,15 @@ export function PreferencesPage() {
 
             <section className="hairline-card space-y-4 p-5 sm:p-6">
               <h2 className="font-display text-lg font-semibold">Companies for invoicing</h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                <Link
+                  to="/invoices"
+                  className="underline decoration-border underline-offset-4 hover:text-foreground"
+                >
+                  Invoices
+                </Link>{" "}
+                — every booked trip and its PDF documents.
+              </p>
               <CompanyEditor companies={companies} onChange={setCompanies} />
             </section>
 

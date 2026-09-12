@@ -10,6 +10,8 @@ import {
   ShieldCheck,
   UtensilsCrossed,
   X,
+  FileText,
+  FileDown,
 } from "lucide-react";
 import { AddReservation } from "@/components/add-reservation";
 import { SiteNav } from "@/components/site-nav";
@@ -19,6 +21,9 @@ import { TripRoute } from "@/components/trip-route";
 import { MapPin } from "lucide-react";
 import { TripMonthCalendar } from "@/components/trip-month-calendar";
 import { listMyTrips, cancelTripItem, type MyTrip } from "@/lib/booking.functions";
+import { listMyInvoices } from "@/lib/invoices.functions";
+import { downloadInvoiceFor } from "@/lib/invoice-download";
+import { useLocale } from "@/lib/i18n";
 import { tripCalendarEvents } from "@/lib/calendar";
 import { eur } from "@/lib/trip/client";
 
@@ -54,7 +59,10 @@ function eventsFor(trip: MyTrip) {
 export function TripsPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const locale = useLocale();
   const fetchTrips = useServerFn(listMyTrips);
+  const fetchInvoices = useServerFn(listMyInvoices);
+  const invoices = useQuery({ queryKey: ["my-invoices"], queryFn: () => fetchInvoices({}) });
   const cancelItem = useServerFn(cancelTripItem);
   const [view, setView] = useState<"list" | "calendar">("list");
   const [mapFor, setMapFor] = useState<string | null>(null);
@@ -223,6 +231,42 @@ export function TripsPage() {
                   </dl>
                 </div>
               )}
+
+              {(() => {
+                const invoice = invoices.data?.find((row) => row.tripId === trip.id);
+                if (!invoice) return null;
+                return (
+                  <div className="border-t border-border px-5 py-4">
+                    <p className="text-sm font-medium">Invoice</p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      {invoice.documentNumber} · {invoice.issueDate}
+                      {invoice.company ? ` · billed to ${invoice.company.name}` : ""}
+                    </p>
+                    <div className="mt-3 flex flex-wrap items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => downloadInvoiceFor(invoice, "receipt", locale)}
+                        className="inline-flex items-center gap-2 rounded-xl border border-border px-3 py-2 text-sm font-semibold hover:bg-secondary"
+                      >
+                        <FileText className="size-4" /> PDF
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => downloadInvoiceFor(invoice, "vat", locale)}
+                        className="inline-flex items-center gap-2 rounded-xl bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+                      >
+                        <FileDown className="size-4" /> VAT invoice PDF
+                      </button>
+                      <Link
+                        to="/invoices"
+                        className="text-sm text-muted-foreground underline decoration-border underline-offset-4 hover:text-foreground"
+                      >
+                        All invoices
+                      </Link>
+                    </div>
+                  </div>
+                );
+              })()}
 
               <div className="border-t border-border px-5 py-4">
                 <Link
