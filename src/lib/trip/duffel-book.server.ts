@@ -2,6 +2,14 @@
  * Server-only Duffel order handling (test mode).
  * Reprices an offer before booking and creates the order with balance payment.
  */
+import {
+  bagLabel,
+  customerPriceEur,
+  seatLabel,
+  type AncillaryOption,
+  type AncillarySelection,
+} from "./ancillaries";
+
 const BASE = "https://api.duffel.com";
 
 function key(): string {
@@ -60,6 +68,124 @@ export async function getOffer(offerId: string): Promise<OfferSnapshot> {
   };
 }
 
+
+/**
+ * The airline's own extras for this fare: checked bags from the offer's
+ * available services, seats from the seat map when one is published. Returns
+ * an empty list when the fare carries nothing — never a made-up option.
+ */
+export async function getOfferAncillaries(
+  offerId: string,
+  rule: { markupBps: number; discountBps: number },
+): Promise<{ options: AncillaryOption[]; seatMapPublished: boolean }> {
+  const options: AncillaryOption[] = [];
+
+  const offer = await call<{
+    data?: {
+      total_currency?: string;
+      available_services?: Array<{
+        id: string;
+        type: string;
+        total_amount: string;
+        total_currency: string;
+        maximum_quantity?: number;
+        metadata?: { maximum_weight_kg?: number | null; maximum_depth_cm?: number | null };
+      }>;
+    };
+  }>(`/air/offers/${offerId}?return_available_services=true`, { method: "GET" });
+
+  for (const service of offer.data?.available_services ?? []) {
+    if (service.type !== "baggage") continue;
+    const netEur = Number(service.total_amount);
+    if (!Number.isFinite(netEur)) continue;
+    const weight = service.metadata?.maximum_weight_kg ?? null;
+    options.push({
+      id: service.id,
+      kind: "bag",
+      label: bagLabel(weight),
+      detail: null,
+      netEur,
+      priceEur: customerPriceEur(netEur, rule),
+      currency: service.total_currency,
+      maxQuantity: Math.max(1, service.maximum_quantity ?? 1),
+      bag: { weightKg: weight },
+    });
+  }
+
+  let seatMapPublished = false;
+  try {
+    const maps = await call<{
+      data?: Array<{
+        cabins?: Array<{
+          rows?: Array<{
+            sections?: Array<{
+              elements?: Array<{
+                type?: string;
+                designator?: string;
+                disclosures?: string[];
+                available_services?: Array<{
+                  id: string;
+                  total_amount: string;
+                  total_currency: string;
+                }>;
+              }>;
+            }>;
+          }>;
+        }>;
+      }>;
+    }>(`/air/seat_maps?offer_id=${encodeURIComponent(offerId)}`, { method: "GET" });
+
+    const seen = new Set<string>();
+    for (const map of maps.data ?? []) {
+      for (const cabin of map.cabins ?? []) {
+        for (const row of cabin.rows ?? []) {
+          for (const section of row.sections ?? []) {
+            const elements = section.elements ?? [];
+            const seats = elements.filter((e) => e.type === "seat");
+            seats.forEach((element, indexInSection) => {
+              seatMapPublished = true;
+              const service = element.available_services?.[0];
+              if (!service) return;
+              const netEur = Number(service.total_amount);
+              if (!Number.isFinite(netEur)) return;
+              const disclosures = (element.disclosures ?? []).join(" ").toLowerCase();
+              const position =
+                indexInSection === 0
+                  ? "window"
+                  : indexInSection === seats.length - 1
+                    ? "aisle"
+                    : "middle";
+              const id = service.id;
+              if (seen.has(id)) return;
+              seen.add(id);
+              options.push({
+                id,
+                kind: "seat",
+                label: seatLabel(element.designator ?? null),
+                detail: null,
+                netEur,
+                priceEur: customerPriceEur(netEur, rule),
+                currency: service.total_currency,
+                maxQuantity: 1,
+                seat: {
+                  position,
+                  extraLegroom:
+                    disclosures.includes("legroom") || disclosures.includes("extra space"),
+                },
+              });
+            });
+          }
+        }
+      }
+    }
+  } catch (error) {
+    // Many fares publish no seat map at all; that is not a booking failure.
+    console.error("seat map unavailable", error);
+  }
+
+  return { options, seatMapPublished };
+}
+
 export type OrderResult = {
   id: string;
   bookingReference: string | null;
@@ -102,6 +228,8 @@ export async function createFlightOrder(input: {
    * otherwise the Duffel balance is used.
    */
   cardPayment?: { threeDSecureSessionId: string } | null;
+  /** Bags and seats the customer chose, as supplier service ids. */
+  services?: AncillarySelection[];
   /** Frequent-flyer accounts the supplier accepts on the order. */
   loyaltyAccounts?: Array<{ airlineIataCode: string; accountNumber: string }>;
 }): Promise<OrderResult> {
@@ -120,6 +248,11 @@ export async function createFlightOrder(input: {
       data: {
         type: "instant",
         selected_offers: [input.offerId],
+        ...(input.services?.length
+          ? {
+              services: input.services.map((s) => ({ id: s.id, quantity: s.quantity })),
+            }
+          : {}),
         payments: [
           input.cardPayment
             ? {
