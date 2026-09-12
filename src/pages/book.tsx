@@ -228,7 +228,8 @@ export function BookPage({ cardId }: { cardId: string }) {
       ((include.flight ? (priced?.flight ?? 0) : 0) +
         (include.stay ? (priced?.stay ?? 0) : 0) +
         (include.car ? (priced?.car ?? 0) : 0) +
-        (include.insurance && insurance ? insurance.grossEur : 0)) *
+        (include.insurance && insurance ? insurance.grossEur : 0) +
+        (include.flight ? extrasTotal : 0)) *
         100,
     ) / 100;
 
