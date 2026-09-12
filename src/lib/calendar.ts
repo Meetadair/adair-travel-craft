@@ -42,6 +42,9 @@ export type ItemCalendarPayload = {
   loyaltyMemberMasked?: string | null;
   /** Free-text note stored with the line (e.g. the insurance offer wording). */
   note?: string | null;
+  /** Flight extras: the supplier service booked and how many. */
+  serviceId?: string | null;
+  quantity?: number | null;
 };
 
 type TripLike = {
