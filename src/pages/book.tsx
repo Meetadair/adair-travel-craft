@@ -13,6 +13,9 @@ import { getTripCard } from "@/lib/trip-live.functions";
 import { bookTripCard, type BookingResult } from "@/lib/booking.functions";
 import { getAccount } from "@/lib/account.functions";
 import { listCompanions } from "@/lib/companions.functions";
+import { getFlightAncillaries } from "@/lib/ancillaries.functions";
+import { FlightExtras } from "@/components/flight-extras";
+import { ancillariesTotalEur, type AncillarySelection } from "@/lib/trip/ancillaries";
 import { getPaymentSession } from "@/lib/payment.functions";
 import { PaymentStep, type AuthorisedPayment } from "@/components/payment-step";
 import { eur } from "@/lib/trip/client";
@@ -101,6 +104,8 @@ export function BookPage({ cardId }: { cardId: string }) {
       remember: boolean;
     }>
   >([]);
+  const [extras, setExtras] = useState<AncillarySelection[]>([]);
+  const [extrasTouched, setExtrasTouched] = useState(false);
   const [result, setResult] = useState<BookingResult | null>(null);
   /** "review" = traveller + invoice details, "pay" = card entry. */
   const [step, setStep] = useState<"review" | "pay">("review");
@@ -134,6 +139,7 @@ export function BookPage({ cardId }: { cardId: string }) {
             passportNumber: c.passportNumber.trim() || null,
             remember: c.remember,
           })),
+          ancillaries: include.flight ? extras : [],
           payment: authorised,
         },
       }),
@@ -175,6 +181,23 @@ export function BookPage({ cardId }: { cardId: string }) {
   const search = card.data?.search;
   const paxCount = Math.max(1, search?.request.passengers ?? 1);
   const fetchCompanions = useServerFn(listCompanions);
+  const fetchExtras = useServerFn(getFlightAncillaries);
+  const flightExtras = useQuery({
+    queryKey: ["flight-extras", cardId],
+    queryFn: () => fetchExtras({ data: { cardId } }),
+    enabled: include.flight,
+    staleTime: 10 * 60 * 1000,
+  });
+
+  // Pre-tick the airline's extras from the stored preferences, once.
+  useEffect(() => {
+    if (extrasTouched || !flightExtras.data) return;
+    setExtras(flightExtras.data.preselected);
+  }, [flightExtras.data, extrasTouched]);
+
+  const extrasTotal = flightExtras.data
+    ? ancillariesTotalEur(flightExtras.data.options, extras)
+    : 0;
   const saved = useQuery({ queryKey: ["companions"], queryFn: () => fetchCompanions({}) });
 
   // Match the number of forms to the seats booked, pre-filling saved people.
@@ -490,6 +513,17 @@ export function BookPage({ cardId }: { cardId: string }) {
                 </p>
               )}
             </div>
+
+            {include.flight && flightExtras.data && (
+              <FlightExtras
+                data={flightExtras.data}
+                selection={extras}
+                onChange={(next) => {
+                  setExtrasTouched(true);
+                  setExtras(next);
+                }}
+              />
+            )}
 
             {step === "pay" && (
               <div className="hairline-card mt-6 space-y-4 p-6">
