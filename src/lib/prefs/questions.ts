@@ -452,7 +452,7 @@ export const QUESTIONS: QuestionDef[] = [
     kind: "fields",
     skippable: true,
     title: "Anything we should never book?",
-    hint: "These are hard rules. Anything you switch on here is filtered out before we even compare options.",
+    hint: "Hard rules, not preferences. We filter these out before comparing options — and where a supplier does not publish the detail, we tell you rather than guess.",
     toggles: [
       { field: "dbStars4", label: "Never below 4 stars" },
       { field: "dbLift", label: "Never without a lift" },
