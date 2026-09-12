@@ -11,8 +11,10 @@ async function run(request: Request): Promise<Response> {
   const denied = await authenticateCronRequest(request);
   if (denied) return denied;
 
-  const apiKey = process.env['RESEND_API_KEY'];
-  if (!apiKey) return Response.json({ ok: true, skipped: "no-email-key", sent: 0 });
+  const { hasWhatsAppKeys } = await import("@/lib/notifications/whatsapp");
+  if (!process.env['RESEND_API_KEY'] && !hasWhatsAppKeys()) {
+    return Response.json({ ok: true, skipped: "no-message-channel", sent: 0 });
+  }
 
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const weekStart = weekStartIso();
@@ -54,17 +56,16 @@ async function run(request: Request): Promise<Response> {
       dest.editorial_note ? `<p>${dest.editorial_note}</p>` : ""
     }<ul>${reasons}</ul><p>Open Adair to see the price and plan it.</p>`;
 
-    const res = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        from: process.env['RESEND_FROM'] ?? "Adair <onboarding@resend.dev>",
-        to: [email],
-        subject: `This week: ${dest.name}`,
-        html,
-      }),
+    const { loadChannel, notifyTraveller } = await import("@/lib/notifications/send.server");
+    const channel = await loadChannel(supabaseAdmin as never, proposal.user_id);
+    const outcome = await notifyTraveller(supabaseAdmin as never, {
+      userId: proposal.user_id,
+      kind: "getaway_weekly",
+      params: [dest.name, dest.country],
+      email: { to: email, subject: `This week: ${dest.name}`, html },
+      ...channel,
     });
-    if (!res.ok) continue;
+    if (!outcome.whatsapp && !outcome.email) continue;
 
     await supabaseAdmin
       .from("getaway_proposals")

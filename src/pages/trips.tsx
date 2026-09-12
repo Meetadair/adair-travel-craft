@@ -210,6 +210,20 @@ export function TripsPage() {
                 </div>
               )}
 
+              {trip.tips.length > 0 && (
+                <div className="border-t border-border px-5 py-4">
+                  <p className="text-sm font-medium">Good to know in {trip.city}</p>
+                  <dl className="mt-3 space-y-3">
+                    {trip.tips.map((tip) => (
+                      <div key={tip.key}>
+                        <dt className="text-xs font-medium text-muted-foreground">{tip.label}</dt>
+                        <dd className="mt-0.5 text-sm">{tip.text}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
+              )}
+
               <div className="border-t border-border px-5 py-4">
                 <Link
                   to="/support"

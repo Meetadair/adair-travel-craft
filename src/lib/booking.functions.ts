@@ -659,6 +659,33 @@ export const bookTripCard = createServerFn({ method: "POST" })
       console.error("calendar sync failed", error);
     }
 
+    // Confirmation on the traveller's chosen channel. Never blocks the booking.
+    try {
+      const { loadChannel, notifyTraveller } = await import("@/lib/notifications/send.server");
+      const channel = await loadChannel(supabase, userId);
+      const email = context.claims?.['email'];
+      await notifyTraveller(supabase, {
+        userId,
+        kind: "booking_confirmation",
+        params: [
+          request.destinationCity,
+          `${request.departDate} – ${request.returnDate}`,
+          flightReference ?? tripId,
+        ],
+        email:
+          typeof email === "string" && email
+            ? {
+                to: email,
+                subject: `Your trip to ${request.destinationCity} is confirmed`,
+                html: `<p>Your trip to ${request.destinationCity}, ${request.departDate} – ${request.returnDate}, is confirmed.</p><p>Reference ${flightReference ?? tripId}.</p><p>Adair</p>`,
+              }
+            : null,
+        ...channel,
+      });
+    } catch (error) {
+      console.error("booking notification failed", error);
+    }
+
     const calendar = tripCalendarEvents({
       id: tripId,
       title: `${request.destinationCity} · ${request.departDate} – ${request.returnDate}`,
@@ -739,6 +766,9 @@ export type MyTrip = {
     reference: string | null;
     payload: ItemCalendarPayload | null;
   }>;
+  /** Editorial notes for the destination; empty when the team hasn't written any. */
+  tips: Array<{ key: string; label: string; text: string }>;
+
 
 };
 
@@ -795,6 +825,24 @@ export const listMyTrips = createServerFn({ method: "GET" })
     }>;
 
 
+    // Destination notes, shown once a trip is booked. Nothing is generated:
+    // a destination with no editorial tips simply has none.
+    const cities = Array.from(
+      new Set(trips.map((t) => (t.city ?? "").trim()).filter((c) => c.length > 0)),
+    );
+    const tipsByCity = new Map<string, Array<{ key: string; label: string; text: string }>>();
+    if (cities.length) {
+      const { listTravelTips } = await import("@/lib/trip/tips");
+      const destRes = await supabase
+        .from("getaway_destinations")
+        .select("name, travel_tips")
+        .in("name", cities);
+      for (const row of (destRes.data ?? []) as Array<{ name: string; travel_tips: unknown }>) {
+        const tips = listTravelTips(row.travel_tips);
+        if (tips.length) tipsByCity.set(row.name.toLowerCase(), tips);
+      }
+    }
+
     return trips.map((trip) => ({
       id: trip.id,
       title: trip.title,
@@ -820,6 +868,10 @@ export const listMyTrips = createServerFn({ method: "GET" })
           payload: (i.payload ?? null) as ItemCalendarPayload | null,
 
         })),
+      tips:
+        trip.status === "cancelled" || !trip.city
+          ? []
+          : (tipsByCity.get(trip.city.trim().toLowerCase()) ?? []),
     }));
   });
 

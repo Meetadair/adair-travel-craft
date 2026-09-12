@@ -424,6 +424,10 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
   // against the traveller's usual budget (signed-in cards only).
   const [match, setMatch] = useState<MatchSummary | null>(null);
   const [budget, setBudget] = useState<BudgetStatus | null>(null);
+  // Set when booking far ahead lowered our own fee (leisure trips only).
+  const [earlyBooking, setEarlyBooking] = useState<
+    { daysAhead: number; discountBps: number; savedEur: number } | null
+  >(null);
   const [amendText, setAmendText] = useState("");
   const [amending, setAmending] = useState(false);
 
@@ -451,6 +455,7 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
       const result = await runSwap({ data: { cardId, kind, index, ...(reason ? { reason } : {}) } });
       setMatch(result.match ?? null);
       setBudget(result.budget ?? null);
+      setEarlyBooking(result.earlyBooking ?? null);
       setLive(applyPriced(result));
     } catch {
       /* leave the current card in place; the traveller can search again */
@@ -517,6 +522,7 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
         setInsurance(result.insurance);
         setMatch(result.match ?? null);
         setBudget(result.budget ?? null);
+      setEarlyBooking(result.earlyBooking ?? null);
         setLive(applyPriced(result));
       } else {
         const request = await parseTrip(sentence);
@@ -554,6 +560,7 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
         setInsurance(result.insurance);
         setMatch(result.match ?? null);
         setBudget(result.budget ?? null);
+      setEarlyBooking(result.earlyBooking ?? null);
         setLive(applyPriced(result));
       } else {
         setLive(await searchTrip(await parseTrip(sentence)));
@@ -584,6 +591,7 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
       setInsurance(result.insurance);
       setMatch(result.match ?? null);
       setBudget(result.budget ?? null);
+      setEarlyBooking(result.earlyBooking ?? null);
       setLive(priced);
       setRouteStops(priced.request.stops ?? next);
     } catch {
@@ -648,6 +656,7 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
           setInsurance(result.insurance);
           setMatch(result.match ?? null);
           setBudget(result.budget ?? null);
+      setEarlyBooking(result.earlyBooking ?? null);
         }
         return priced;
       }
@@ -1162,6 +1171,13 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                     )}
 
 
+
+                    {earlyBooking && showTotal && (
+                      <p className="px-5 py-3 text-xs text-muted-foreground">
+                        Early-booking price: you&rsquo;re booking {earlyBooking.daysAhead} days
+                        ahead, so our fee is lower — {eur(earlyBooking.savedEur)} off this trip.
+                      </p>
+                    )}
 
                     {budget && budget.state !== "unknown" && showTotal && (
                       <p className="px-5 py-3 text-xs text-muted-foreground">

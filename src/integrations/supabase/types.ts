@@ -456,6 +456,7 @@ export type Database = {
           longitude: number
           name: string
           nearest_airport_iata: string
+          travel_tips: Json
           typical_nights: number
           updated_at: string
         }
@@ -472,6 +473,7 @@ export type Database = {
           longitude: number
           name: string
           nearest_airport_iata: string
+          travel_tips?: Json
           typical_nights?: number
           updated_at?: string
         }
@@ -488,6 +490,7 @@ export type Database = {
           longitude?: number
           name?: string
           nearest_airport_iata?: string
+          travel_tips?: Json
           typical_nights?: number
           updated_at?: string
         }
@@ -906,6 +909,39 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_log: {
+        Row: {
+          channel: string
+          created_at: string
+          detail: string | null
+          id: string
+          kind: string
+          status: string
+          template: string
+          user_id: string | null
+        }
+        Insert: {
+          channel: string
+          created_at?: string
+          detail?: string | null
+          id?: string
+          kind: string
+          status: string
+          template: string
+          user_id?: string | null
+        }
+        Update: {
+          channel?: string
+          created_at?: string
+          detail?: string | null
+          id?: string
+          kind?: string
+          status?: string
+          template?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       payment_providers: {
         Row: {
           created_at: string
@@ -1209,12 +1245,15 @@ export type Database = {
           hotel_chains: string | null
           id: string
           is_admin: boolean
+          notify_channel: string
           onboarded: boolean
           plan: string
           preferred_airlines: string | null
           seat_preference: string | null
           tax_id: string | null
           updated_at: string
+          whatsapp_phone: string | null
+          whatsapp_verified_at: string | null
         }
         Insert: {
           budget_per_trip?: number | null
@@ -1228,12 +1267,15 @@ export type Database = {
           hotel_chains?: string | null
           id: string
           is_admin?: boolean
+          notify_channel?: string
           onboarded?: boolean
           plan?: string
           preferred_airlines?: string | null
           seat_preference?: string | null
           tax_id?: string | null
           updated_at?: string
+          whatsapp_phone?: string | null
+          whatsapp_verified_at?: string | null
         }
         Update: {
           budget_per_trip?: number | null
@@ -1247,12 +1289,15 @@ export type Database = {
           hotel_chains?: string | null
           id?: string
           is_admin?: boolean
+          notify_channel?: string
           onboarded?: boolean
           plan?: string
           preferred_airlines?: string | null
           seat_preference?: string | null
           tax_id?: string | null
           updated_at?: string
+          whatsapp_phone?: string | null
+          whatsapp_verified_at?: string | null
         }
         Relationships: []
       }
@@ -1801,6 +1846,36 @@ export type Database = {
           sentence?: string | null
           type?: string
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      whatsapp_verifications: {
+        Row: {
+          attempts: number
+          code_hash: string
+          created_at: string
+          expires_at: string
+          phone: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          attempts?: number
+          code_hash: string
+          created_at?: string
+          expires_at: string
+          phone: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          attempts?: number
+          code_hash?: string
+          created_at?: string
+          expires_at?: string
+          phone?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }

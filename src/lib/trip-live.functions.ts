@@ -27,6 +27,8 @@ export type LiveTripResult = {
   match?: MatchSummary | null;
   /** Where the total sits against their usual budget. */
   budget?: BudgetStatus | null;
+  /** Set when booking far ahead lowered our own fee. */
+  earlyBooking?: { daysAhead: number; discountBps: number; savedEur: number } | null;
   expiresAt: string | null;
 };
 
@@ -205,15 +207,42 @@ export const searchLiveTrip = createServerFn({ method: "POST" })
 
 
 
-    const table = await pricing.loadPricing(supabase, plan);
+    const baseTable = await pricing.loadPricing(supabase, plan);
+
+    // Early-booking reward: leisure trips booked far ahead pay a smaller Adair
+    // fee. Business trips (invoiced) keep the standard fee.
+    const daysAhead = pricing.daysUntilDeparture(request.departDate);
+    const leadTimeBps = business
+      ? 0
+      : pricing.leadTimeDiscountBps(await pricing.loadLeadTimeTiers(supabase, plan), daysAhead);
+    const table = pricing.withLeadTimeDiscount(baseTable, leadTimeBps);
+
     const priceLine = (net: number | null | undefined, kind: "flight" | "stay" | "car") =>
       net == null ? null : pricing.fromMinor(pricing.grossMinor(net, table[kind]));
+    const priceLineBase = (net: number | null | undefined, kind: "flight" | "stay" | "car") =>
+      net == null ? 0 : pricing.fromMinor(pricing.grossMinor(net, baseTable[kind]));
 
     const flight = priceLine(search.flight?.amountEur ?? null, "flight");
     const stay = priceLine(search.stay?.amountEur ?? null, "stay");
     const car = priceLine(search.car?.amountEur ?? null, "car");
     const total = Math.round(((flight ?? 0) + (stay ?? 0) + (car ?? 0)) * 100) / 100;
     const netTotal = search.totalEur;
+
+    const baseTotal =
+      Math.round(
+        (priceLineBase(search.flight?.amountEur ?? null, "flight") +
+          priceLineBase(search.stay?.amountEur ?? null, "stay") +
+          priceLineBase(search.car?.amountEur ?? null, "car")) *
+          100,
+      ) / 100;
+    const earlyBooking =
+      leadTimeBps > 0 && baseTotal > total
+        ? {
+            daysAhead,
+            discountBps: leadTimeBps,
+            savedEur: Math.round((baseTotal - total) * 100) / 100,
+          }
+        : null;
 
     const { insuranceQuoteFor } = await import("@/lib/insurance.server");
     const insurance = await insuranceQuoteFor(
@@ -258,7 +287,14 @@ export const searchLiveTrip = createServerFn({ method: "POST" })
         saved_minor: pricing.toMinor(search.savedEur),
         saved_minutes: search.savedMinutes,
         expires_at: expiresAt,
-        items: { search, priced: { flight, stay, car, total }, insurance, match, budget },
+        items: {
+          search,
+          priced: { flight, stay, car, total },
+          insurance,
+          match,
+          budget,
+          earlyBooking,
+        },
       })
       .select("id")
       .single();
@@ -270,6 +306,14 @@ export const searchLiveTrip = createServerFn({ method: "POST" })
       total_eur: total,
       peak: Boolean((search as { peak?: unknown }).peak),
     });
+    if (earlyBooking) {
+      void record(userId, "early_booking_discount", {
+        days_ahead: earlyBooking.daysAhead,
+        discount_bps: earlyBooking.discountBps,
+        saved_eur: earlyBooking.savedEur,
+        total_eur: total,
+      });
+    }
     void record(userId, "card_created", { total_eur: total, has_stay: Boolean(search.stay) });
     for (const kind of ["flight", "stay", "car"] as const) {
       const line = match[kind];
@@ -289,6 +333,7 @@ export const searchLiveTrip = createServerFn({ method: "POST" })
       insurance,
       match,
       budget,
+      earlyBooking,
       expiresAt,
     };
   });
@@ -374,6 +419,7 @@ export const swapCardAlternative = createServerFn({ method: "POST" })
         insurance?: InsuranceQuote | null;
         match?: MatchSummary | null;
         budget?: BudgetStatus | null;
+        earlyBooking?: LiveTripResult["earlyBooking"];
       };
       saved_minor: number;
       expires_at: string | null;
@@ -438,9 +484,15 @@ export const swapCardAlternative = createServerFn({ method: "POST" })
     if (feedbackError) console.error("Could not log choice feedback", feedbackError);
 
     const plan = (profileRes.data as { plan: string } | null)?.plan ?? "free";
-    const table = await pricing.loadPricing(supabase, plan);
+    const baseTable = await pricing.loadPricing(supabase, plan);
+    // The early-booking reward was earned by the departure date, so it survives
+    // a swap; only the amount it saves is recalculated.
+    const earlyBps = row.items.earlyBooking?.discountBps ?? 0;
+    const table = pricing.withLeadTimeDiscount(baseTable, earlyBps);
     const priceLine = (net: number | null | undefined, kind: "flight" | "stay" | "car") =>
       net == null ? null : pricing.fromMinor(pricing.grossMinor(net, table[kind]));
+    const priceLineBase = (net: number | null | undefined, kind: "flight" | "stay" | "car") =>
+      net == null ? 0 : pricing.fromMinor(pricing.grossMinor(net, baseTable[kind]));
 
     const flight = priceLine(search.flight?.amountEur ?? null, "flight");
     const stay = priceLine(search.stay?.amountEur ?? null, "stay");
@@ -457,6 +509,18 @@ export const swapCardAlternative = createServerFn({ method: "POST" })
 
     const priced = { flight, stay, car, total };
     const insurance = row.items.insurance ?? null;
+
+    const baseTotal =
+      Math.round(
+        (priceLineBase(search.flight?.amountEur ?? null, "flight") +
+          priceLineBase(search.stay?.amountEur ?? null, "stay") +
+          priceLineBase(search.car?.amountEur ?? null, "car")) *
+          100,
+      ) / 100;
+    const earlyBooking =
+      row.items.earlyBooking && baseTotal > total
+        ? { ...row.items.earlyBooking, savedEur: Math.round((baseTotal - total) * 100) / 100 }
+        : null;
 
     const prefsRes = await supabase
       .from("preferences")
@@ -511,7 +575,7 @@ export const swapCardAlternative = createServerFn({ method: "POST" })
       .update({
         total_minor: pricing.toMinor(total),
         markup_minor: pricing.toMinor(Math.max(0, total - netTotal)),
-        items: { search, priced, insurance, match, budget },
+        items: { search, priced, insurance, match, budget, earlyBooking },
       })
       .eq("user_id", userId)
       .eq("id", data.cardId);
@@ -525,6 +589,7 @@ export const swapCardAlternative = createServerFn({ method: "POST" })
       insurance,
       match,
       budget,
+      earlyBooking,
       expiresAt: row.expires_at,
     } satisfies LiveTripResult;
   });

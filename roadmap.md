@@ -144,3 +144,32 @@
 - [x] Member numbers encrypted at rest (TRAVELLER_DATA_KEY), shown masked, full on tap.
 - [x] Passed at booking: frequent-flyer accounts on the flight order, hotel number stored on the stay, car membership on the car line; confirmation lists applied vs not applied.
 - [x] Part 2 questionnaire reduced to one light-touch yes/no pointing to Settings.
+
+## Final feature pass
+
+### 1. Early-booking discount (leisure only) — done
+- [x] Configuration, not code: `pricing_rules` rows `lead_time_90` (200 bps) and `lead_time_60` (100 bps) per plan, editable in /admin like every other rule. No existing rule value changed.
+- [x] `src/lib/pricing.server.ts`: `loadLeadTimeTiers`, `daysUntilDeparture`, `leadTimeDiscountBps`, `withLeadTimeDiscount` — lowers OUR markup on every line, floored at zero markup (a commission-only line gives nothing away).
+- [x] Applied in `trip-live.functions.ts` only when the trip is leisure (purpose not business); survives a line swap, savings recalculated. Stored on the card as `items.earlyBooking`.
+- [x] Card line worded honestly ("you're booking N days ahead, so our fee is lower"), never as a supplier discount. Analytics event `early_booking_discount`.
+- Build clean: tsgo clean, 112 tests pass, `/`, `/trips`, `/preferences` 200.
+
+### 2. Travel tips per destination — done
+- [x] `getaway_destinations.travel_tips` (jsonb, empty by default) with five editorial categories: getting from the airport, local payment and tipping, transport, one thing worth knowing, when to avoid.
+- [x] Editable at /admin/getaway alongside the other editorial content; `src/lib/trip/tips.ts` is the single parser/renderer. 3 unit tests.
+- [x] Shown in My trips as "Good to know in <city>" for booked trips only; the day-before reminder email carries the "getting from the airport" note.
+- [x] Nothing written yet means nothing shown — no generated filler. Content stays for the team to write.
+
+## WhatsApp notifications (built behind a key, off by default)
+- [x] Adapter `src/lib/notifications/whatsapp.ts` — approved templates with ordered
+      parameters, Graph v21.0, reports `unavailable` without
+      `WHATSAPP_API_TOKEN` + `WHATSAPP_PHONE_NUMBER_ID`.
+- [x] Router `src/lib/notifications/send.server.ts` — WhatsApp only when chosen,
+      number verified and keys present; silent email fallback; every attempt in
+      `notification_log`.
+- [x] Settings channel picker (email / WhatsApp / both). WhatsApp controls only
+      render when the channel is configured; number collected with country code
+      and confirmed by a one-time code (hashed, 10 min, 5 attempts).
+- [x] Wired into booking confirmation, day-before reminder, supplier schedule
+      change and the weekly Getaway.
+- Remaining external setup: Meta business verification and template approval.

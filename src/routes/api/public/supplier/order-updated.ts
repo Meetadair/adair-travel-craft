@@ -41,25 +41,25 @@ function signatureMatches(raw: string, header: string | null, secret: string): b
 }
 
 async function notify(
+  supabase: unknown,
+  userId: string,
   email: string | undefined,
   subject: string,
   body: string,
+  params: string[],
 ): Promise<void> {
-  const apiKey = process.env['RESEND_API_KEY'];
-  if (!apiKey || !email) return;
   try {
-    await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        from: process.env['RESEND_FROM'] ?? "Adair <onboarding@resend.dev>",
-        to: [email],
-        subject,
-        html: `<p>${body}</p><p>Adair</p>`,
-      }),
+    const { loadChannel, notifyTraveller } = await import("@/lib/notifications/send.server");
+    const channel = await loadChannel(supabase as never, userId);
+    await notifyTraveller(supabase as never, {
+      userId,
+      kind: "schedule_change",
+      params,
+      email: email ? { to: email, subject, html: `<p>${body}</p><p>Adair</p>` } : null,
+      ...channel,
     });
   } catch {
-    // A failed email never fails the update.
+    // A failed message never fails the update.
   }
 }
 
@@ -205,11 +205,14 @@ async function handle(request: Request): Promise<Response> {
 
   const userRes = await supabaseAdmin.auth.admin.getUserById(items[0]!.user_id);
   await notify(
+    supabaseAdmin,
+    items[0]!.user_id,
     userRes.data.user?.email,
     cancelled ? "Your booking has been cancelled" : "A change to your trip",
     cancelled
       ? `${items[0]!.title} has been cancelled by the operator.${event.message ? ` ${event.message}` : ""} We will be in touch with the options.`
       : `The times for ${items[0]!.title} have changed.${event.message ? ` ${event.message}` : ""} Your trip in Adair is already up to date.`,
+    [items[0]!.title, event.message ?? (cancelled ? "cancelled" : "times changed")],
   );
 
   return Response.json({ ok: true, matched: items.length, changed: changedItems, cancelled });
