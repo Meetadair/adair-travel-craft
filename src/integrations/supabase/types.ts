@@ -1406,6 +1406,59 @@ export type Database = {
         }
         Relationships: []
       }
+      support_requests: {
+        Row: {
+          admin_note: string | null
+          category: string
+          contact_email: string | null
+          created_at: string
+          description: string
+          id: string
+          status: string
+          trip_id: string | null
+          trip_reference: string | null
+          updated_at: string
+          urgency: string
+          user_id: string
+        }
+        Insert: {
+          admin_note?: string | null
+          category?: string
+          contact_email?: string | null
+          created_at?: string
+          description: string
+          id?: string
+          status?: string
+          trip_id?: string | null
+          trip_reference?: string | null
+          updated_at?: string
+          urgency?: string
+          user_id: string
+        }
+        Update: {
+          admin_note?: string | null
+          category?: string
+          contact_email?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          status?: string
+          trip_id?: string | null
+          trip_reference?: string | null
+          updated_at?: string
+          urgency?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_requests_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       trip_cards: {
         Row: {
           created_at: string
