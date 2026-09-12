@@ -858,6 +858,32 @@ export function countKnownPreferences(prefs: TravelPrefs): number {
   return lists.reduce((sum, l) => sum + l.length, 0) + singles.reduce((a, b) => a + b, 0);
 }
 
+/**
+ * How much of the optional "Refine your profile" part is filled in, 0–100.
+ * Shown on Preferences and in the prompt after the essentials.
+ */
+export function part2Completion(prefs: TravelPrefs, companyCount = 0): number {
+  const filled = [
+    prefs.airlines.length,
+    prefs.hotelTypes.length,
+    prefs.hotelChains.length,
+    prefs.hotelAmenities.length,
+    prefs.hotelMaxKm ? 1 : 0,
+    prefs.carBrands.length,
+    prefs.carCompanies.length,
+    prefs.cuisines.length,
+    prefs.diets.length,
+    prefs.interests.length,
+    prefs.music.length,
+    ...EXTRA_ANSWER_FIELDS.map((field) => (prefs.extraAnswers[field]?.length ? 1 : 0)),
+    prefs.accessibilityNote ? 1 : 0,
+    prefs.avoidNote ? 1 : 0,
+    companyCount,
+  ].filter((count) => count > 0).length;
+  const total = 11 + EXTRA_ANSWER_FIELDS.length + 3;
+  return Math.min(100, Math.round((filled / total) * 100));
+}
+
 /** Label lookup for the summary and Preferences page. */
 export function labelFor(field: string, value: string): string {
   for (const q of QUESTIONS) {
