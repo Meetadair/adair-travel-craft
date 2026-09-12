@@ -56,16 +56,17 @@ function Inner({
         payment_method?: { card?: { wallet?: { type?: string } } };
       }
     ).payment_method?.card?.wallet?.type;
+    const paymentMethodId =
+      typeof intent?.payment_method === "string"
+        ? intent.payment_method
+        : (intent?.payment_method?.id ?? "");
+    void wallet;
     onAuthorised({
-      providerCardId: intent?.payment_method
-        ? String(
-            typeof intent.payment_method === "string" ? intent.payment_method : intent.payment_method,
-          )
-        : "",
+      providerCardId: paymentMethodId,
       threeDSecureSessionId: intent?.id ?? "",
       brand: null,
       last4: null,
-      method: wallet === "apple_pay" || wallet === "google_pay" ? "card" : "card",
+      method: "card",
     });
   };
 
