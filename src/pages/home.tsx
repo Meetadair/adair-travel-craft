@@ -559,6 +559,8 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
     setInsurance(null);
     setAddInsurance(false);
     setDropped({ flight: false, hotel: false, car: false });
+    setPriceContext(null);
+    setDatesKept(false);
     if (signedIn) {
       const named = parseTripSentence(text);
       setRequestedNames({ hotel: named.hotelNameExact, car: named.carNameExact });
@@ -1106,6 +1108,45 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                     )}
                   </div>
                 </div>
+
+                {priceContext?.peak && !datesKept && showActions && (
+                  <div className="animate-rise mt-4 rounded-2xl border border-border bg-background p-4">
+                    <p className="text-sm leading-relaxed text-foreground">
+                      {priceContext.eventName
+                        ? `There's a big event in ${priceContext.city} (probably ${priceContext.eventName}) — that's why this trip is about ${priceContext.ratio}\u00d7 more expensive than usual.`
+                        : `Prices are unusually high on these dates in ${priceContext.city} — about ${priceContext.ratio}\u00d7 more than usual.`}
+                      {priceContext.offsetDays != null && (
+                        <>
+                          {" "}
+                          {priceContext.offsetDays > 0
+                            ? `Leaving ${priceContext.offsetDays} days later`
+                            : `Leaving ${Math.abs(priceContext.offsetDays)} days earlier`}{" "}
+                          would be {eur(priceContext.savingEur)} less.
+                        </>
+                      )}
+                      {!live?.request?.invoiceToCompany && " Shall I check those dates?"}
+                    </p>
+                    {!live?.request?.invoiceToCompany && (
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          onClick={moveDates}
+                          disabled={movingDates}
+                          className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground disabled:opacity-60"
+                        >
+                          {movingDates ? "Checking…" : "Yes, show me"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setDatesKept(true)}
+                          className="inline-flex min-h-11 items-center rounded-xl border border-border px-4 py-2 text-sm font-medium"
+                        >
+                          Keep my dates
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {routeStops && routeStops.length > 2 && showActions && (
                   <div className="animate-rise mt-4 rounded-2xl border border-border bg-background p-4">
