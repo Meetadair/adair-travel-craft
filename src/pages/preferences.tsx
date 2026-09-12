@@ -166,7 +166,8 @@ export function PreferencesPage() {
                   </div>
                 ) : null}
               </section>
-            ))}
+                </div>
+              ))}
 
             <ConnectedCalendars />
 
