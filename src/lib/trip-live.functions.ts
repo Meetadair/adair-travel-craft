@@ -291,15 +291,15 @@ export const swapCardAlternative = createServerFn({ method: "POST" })
     };
     const search = row.items.search;
 
-    let recommended: unknown = null;
-    let chosen: unknown = null;
+    let recommended: Record<string, unknown> | null = null;
+    let chosen: Record<string, unknown> | null = null;
 
     if (data.kind === "stay") {
       const pick = search.hotelAlternatives?.[data.index];
       if (!pick) throw new Error("alternative-not-found");
       const previous = search.stay;
-      recommended = previous;
-      chosen = pick;
+      recommended = previous ? { ...previous } : null;
+      chosen = { ...pick };
       search.stay = pick;
       // Keep the rest swappable, with the earlier pick back on the list.
       search.hotelAlternatives = [
@@ -312,8 +312,8 @@ export const swapCardAlternative = createServerFn({ method: "POST" })
       const pick = search.carAlternatives?.[data.index];
       if (!pick) throw new Error("alternative-not-found");
       const previous = search.car;
-      recommended = previous;
-      chosen = pick;
+      recommended = previous ? { ...previous } : null;
+      chosen = { ...pick };
       search.car = pick;
       search.carAlternatives = [
         ...(previous ? [previous] : []),
@@ -328,8 +328,8 @@ export const swapCardAlternative = createServerFn({ method: "POST" })
       user_id: userId,
       card_id: data.cardId,
       line_type: data.kind,
-      recommended: recommended ?? {},
-      chosen: chosen ?? {},
+      recommended: (recommended ?? {}) as never,
+      chosen: (chosen ?? {}) as never,
       ...(data.reason ? { reason: data.reason } : {}),
     });
     if (feedbackError) console.error("Could not log choice feedback", feedbackError);
