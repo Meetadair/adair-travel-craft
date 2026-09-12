@@ -76,6 +76,11 @@ export type BookingResult = {
   testMode: boolean;
   /** Calendar events for the booked legs, ready for .ics / Google Calendar. */
   calendar: CalendarEvent[];
+  /** Loyalty numbers we passed to the suppliers, and any they could not take. */
+  loyalty: {
+    applied: Array<{ programme: string; masked: string; tier: string | null; where: string }>;
+    notApplied: Array<{ programme: string; masked: string; note: string }>;
+  };
   /** What was charged and how, for the receipt. */
   payment: {
     method: "card" | "saved-card" | "balance";
@@ -178,6 +183,25 @@ export const bookTripCard = createServerFn({ method: "POST" })
     const priced = card.items.priced;
     const request = search.request;
 
+    // Loyalty numbers from the traveller's wallet, decrypted server-side only.
+    const { loadMemberships } = await import("@/lib/loyalty/booking.server");
+    const memberships = await loadMemberships(userId);
+    const mask = (last4: string) => `•••• ${last4}`;
+    const loyaltyApplied: BookingResult["loyalty"]["applied"] = [];
+    const loyaltyNotApplied: BookingResult["loyalty"]["notApplied"] = [];
+    const flightAccounts = memberships
+      .filter((m) => m.category === "airline" && m.airlineIata)
+      .map((m) => ({ airlineIataCode: m.airlineIata as string, accountNumber: m.memberNumber }));
+    for (const m of memberships.filter((m) => m.category === "airline" && !m.airlineIata)) {
+      loyaltyNotApplied.push({
+        programme: m.programmeLabel,
+        masked: mask(m.last4),
+        note: "the airline needs this programme's carrier code — quote it at check-in",
+      });
+    }
+    const hotelMembership = memberships.find((m) => m.category === "hotel") ?? null;
+    const carMembership = memberships.find((m) => m.category === "car") ?? null;
+
     const lines: BookingResult["lines"] = [];
     let repriced: BookingResult["repriced"] = null;
     let flightOrderId: string | null = null;
@@ -205,7 +229,16 @@ export const bookTripCard = createServerFn({ method: "POST" })
           traveller: data.traveller,
           idempotencyKey: `${card.id}-flight`,
           cardPayment,
+          loyaltyAccounts: flightAccounts,
         });
+        for (const m of memberships.filter((m) => m.category === "airline" && m.airlineIata)) {
+          loyaltyApplied.push({
+            programme: m.programmeLabel,
+            masked: mask(m.last4),
+            tier: m.tier,
+            where: "sent to the airline on this ticket",
+          });
+        }
         flightOrderId = order.id;
         flightReference = order.bookingReference;
         flightNet = search.flight.amountEur;
@@ -265,6 +298,8 @@ export const bookTripCard = createServerFn({ method: "POST" })
           checkin: request.departDate,
           checkout: request.returnDate,
           address: search.stay.address ?? request.destinationCity,
+          loyaltyProgramme: hotelMembership?.programmeLabel ?? null,
+          loyaltyMemberMasked: hotelMembership ? mask(hotelMembership.last4) : null,
         },
       });
     }
@@ -280,6 +315,8 @@ export const bookTripCard = createServerFn({ method: "POST" })
           pickup: request.departDate,
           dropoff: request.returnDate,
           location: request.destinationCity,
+          loyaltyProgramme: carMembership?.programmeLabel ?? null,
+          loyaltyMemberMasked: carMembership ? mask(carMembership.last4) : null,
         },
       });
     }
