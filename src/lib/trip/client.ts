@@ -1,5 +1,5 @@
 /** Browser-side calls to the trip parse + search routes. */
-import type { TripRequest, TripSearchResponse } from "./types";
+import type { PriceContext, TripRequest, TripSearchResponse } from "./types";
 
 export async function parseTrip(sentence: string): Promise<TripRequest> {
   const res = await fetch("/api/trip/parse", {
@@ -24,7 +24,7 @@ export async function searchTrip(request: TripRequest): Promise<TripSearchRespon
 /** Nearby-date comparison for the same trip; safe to call after the card renders. */
 export async function fetchPriceContext(
   request: TripRequest,
-): Promise<import("./price-context.server").PriceContext | null> {
+): Promise<PriceContext | null> {
   try {
     const res = await fetch("/api/trip/price-context", {
       method: "POST",
@@ -32,7 +32,7 @@ export async function fetchPriceContext(
       body: JSON.stringify(request),
     });
     if (!res.ok) return null;
-    return (await res.json()) as import("./price-context.server").PriceContext;
+    return (await res.json()) as PriceContext;
   } catch {
     return null;
   }

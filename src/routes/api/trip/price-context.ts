@@ -1,8 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 
-import type { TripRequest } from "@/lib/trip/types";
-import type { PriceContext } from "@/lib/trip/price-context.server";
+import type { PriceContext, TripRequest } from "@/lib/trip/types";
 
 const requestSchema = z.object({
   originCity: z.string().min(1).max(60),

@@ -4,7 +4,7 @@
  * above the cheapest nearby date we ask Claude whether a big event is likely.
  * Nothing here ever invents a spike or states an event as fact.
  */
-import type { TripRequest } from "./types";
+import type { PriceContext, TripRequest } from "./types";
 
 /** Days we compare against, including the requested dates themselves (0). */
 const OFFSETS = [-14, -7, -3, 0, 3, 7, 14] as const;
@@ -13,24 +13,6 @@ const OFFSETS = [-14, -7, -3, 0, 3, 7, 14] as const;
 const PEAK_THRESHOLD = 1.25;
 
 const CACHE_TTL_MS = 6 * 60 * 60 * 1000;
-
-export type PriceContext = {
-  /** True only when a real comparison search found a clearly cheaper date. */
-  peak: boolean;
-  /** requested / cheapest, e.g. 2.4 */
-  ratio: number;
-  requestedTotalEur: number;
-  cheapestTotalEur: number;
-  cheapestDepartDate: string | null;
-  cheapestReturnDate: string | null;
-  /** How many days the cheapest option is shifted by (negative = earlier). */
-  offsetDays: number | null;
-  /** Real euro difference between the requested dates and the cheapest date. */
-  savingEur: number;
-  /** Hedged event name from Claude, or null when unknown / key missing. */
-  eventName: string | null;
-  city: string;
-};
 
 const cache = new Map<string, { at: number; value: PriceContext }>();
 
