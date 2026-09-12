@@ -138,3 +138,9 @@
 - [ ] Change a booked trip (dates, hotel) with price difference and change conditions.
 - [ ] One clarifying question at search time when the sentence is genuinely ambiguous.
 - [ ] Ranking that learns from `choice_feedback`, surfaced and resettable on Preferences.
+
+## Loyalty programmes (amended item 4)
+- [x] Wallet in Settings ("Saved details"): airlines, hotels, car rental; several per category; programme list + free text; optional tier.
+- [x] Member numbers encrypted at rest (TRAVELLER_DATA_KEY), shown masked, full on tap.
+- [x] Passed at booking: frequent-flyer accounts on the flight order, hotel number stored on the stay, car membership on the car line; confirmation lists applied vs not applied.
+- [x] Part 2 questionnaire reduced to one light-touch yes/no pointing to Settings.
