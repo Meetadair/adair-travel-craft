@@ -5,6 +5,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { Check } from "lucide-react";
 import { SiteNav } from "@/components/site-nav";
+import { getMyReferral } from "@/lib/referrals.functions";
+import { eur } from "@/lib/trip/client";
 import {
   addCompany,
   deleteCompany,
@@ -129,6 +131,15 @@ export function PreferencesPage() {
                 <p className="mb-2 text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
                   Home airport
                 </p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                <Link
+                  to="/credit"
+                  className="underline decoration-border underline-offset-4 hover:text-foreground"
+                >
+                  Credit &amp; referrals
+                </Link>{" "}
+                — {referral.data ? `${eur(referral.data.balanceMinor / 100)} available` : "invite friends and earn travel credit"}.
+              </p>
                 <AirportPicker value={homeAirport} onChange={setHomeAirport} />
               </div>
             </section>

@@ -606,7 +606,7 @@ export function BookPage({ cardId }: { cardId: string }) {
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Credit applied</span>
                     <span>
-                      {eur(result.credit!.appliedEur)} credit applied
+                      −{eur(result.credit!.appliedEur)}
                       {result.credit!.remainingEur > 0
                         ? ` · ${eur(result.credit!.remainingEur)} left`
                         : ""}
