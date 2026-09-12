@@ -147,7 +147,8 @@ export function BookPage({ cardId }: { cardId: string }) {
     setCompanions((current) => current.map((c, i) => (i === index ? { ...c, ...patch } : c)));
 
   /** Passports are only asked for on routes that leave the Schengen area. */
-  const passportNeeded = !!search && !isSchengen(search.request.destinationIata);
+  const destinationIata = card.data?.search?.request.destinationIata;
+  const passportNeeded = !!destinationIata && !isSchengen(destinationIata);
 
   const travellerReady =
     traveller.givenName.trim().length > 0 &&
