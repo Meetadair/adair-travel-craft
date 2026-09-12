@@ -1223,6 +1223,33 @@ export type Database = {
         }
         Relationships: []
       }
+      supplier_events: {
+        Row: {
+          event_id: string
+          event_kind: string
+          id: string
+          order_reference: string | null
+          provider: string
+          received_at: string
+        }
+        Insert: {
+          event_id: string
+          event_kind: string
+          id?: string
+          order_reference?: string | null
+          provider?: string
+          received_at?: string
+        }
+        Update: {
+          event_id?: string
+          event_kind?: string
+          id?: string
+          order_reference?: string | null
+          provider?: string
+          received_at?: string
+        }
+        Relationships: []
+      }
       trip_cards: {
         Row: {
           created_at: string
