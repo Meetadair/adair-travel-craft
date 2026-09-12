@@ -867,14 +867,44 @@ export type Database = {
         }
         Relationships: []
       }
+      loyalty_earning_rules: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          matcher: string
+          note: string | null
+          programme_code: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          id?: string
+          matcher: string
+          note?: string | null
+          programme_code: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          matcher?: string
+          note?: string | null
+          programme_code?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       loyalty_memberships: {
         Row: {
           airline_iata: string | null
           category: string
           created_at: string
           id: string
-          member_number_encrypted: string
-          member_number_last4: string
+          member_number_encrypted: string | null
+          member_number_last4: string | null
           programme_code: string
           programme_label: string
           tier: string | null
@@ -886,8 +916,8 @@ export type Database = {
           category: string
           created_at?: string
           id?: string
-          member_number_encrypted: string
-          member_number_last4: string
+          member_number_encrypted?: string | null
+          member_number_last4?: string | null
           programme_code: string
           programme_label: string
           tier?: string | null
@@ -899,8 +929,8 @@ export type Database = {
           category?: string
           created_at?: string
           id?: string
-          member_number_encrypted?: string
-          member_number_last4?: string
+          member_number_encrypted?: string | null
+          member_number_last4?: string | null
           programme_code?: string
           programme_label?: string
           tier?: string | null
