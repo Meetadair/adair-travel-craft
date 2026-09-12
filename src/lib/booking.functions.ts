@@ -321,6 +321,23 @@ export const bookTripCard = createServerFn({ method: "POST" })
       });
     }
 
+    if (hotelMembership && lines.some((l) => l.kind === "stay")) {
+      loyaltyApplied.push({
+        programme: hotelMembership.programmeLabel,
+        masked: mask(hotelMembership.last4),
+        tier: hotelMembership.tier,
+        where: "stored on the stay, quote it at check-in",
+      });
+    }
+    if (carMembership && lines.some((l) => l.kind === "car")) {
+      loyaltyApplied.push({
+        programme: carMembership.programmeLabel,
+        masked: mask(carMembership.last4),
+        tier: carMembership.tier,
+        where: "sent with the car booking",
+      });
+    }
+
     // In-app insurance offer: priced from our own rate table, no external order.
     const insurance = card.items.insurance ?? null;
     const insuranceOptedIn = Boolean(data.include.insurance && insurance);
@@ -443,6 +460,7 @@ export const bookTripCard = createServerFn({ method: "POST" })
         reason,
         testMode: isTestKey(),
         calendar: [],
+        loyalty: { applied: [], notApplied: loyaltyNotApplied },
         payment: {
           method: paymentMethod,
           brand: data.payment?.brand ?? null,
