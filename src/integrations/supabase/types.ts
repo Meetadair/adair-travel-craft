@@ -214,39 +214,54 @@ export type Database = {
       payments: {
         Row: {
           amount_minor: number
+          card_brand: string | null
+          card_last4: string | null
           created_at: string
           currency: string
+          failure_note: string | null
           id: string
           idempotency_key: string
+          method: string | null
           provider: string
           provider_ref: string | null
           status: string
+          three_ds_status: string | null
           trip_id: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
           amount_minor?: number
+          card_brand?: string | null
+          card_last4?: string | null
           created_at?: string
           currency?: string
+          failure_note?: string | null
           id?: string
           idempotency_key: string
+          method?: string | null
           provider: string
           provider_ref?: string | null
           status?: string
+          three_ds_status?: string | null
           trip_id?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
           amount_minor?: number
+          card_brand?: string | null
+          card_last4?: string | null
           created_at?: string
           currency?: string
+          failure_note?: string | null
           id?: string
           idempotency_key?: string
+          method?: string | null
           provider?: string
           provider_ref?: string | null
           status?: string
+          three_ds_status?: string | null
           trip_id?: string | null
           updated_at?: string
           user_id?: string
@@ -483,6 +498,51 @@ export type Database = {
           priority?: number
           provider?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      saved_cards: {
+        Row: {
+          brand: string | null
+          cardholder_name: string | null
+          created_at: string
+          exp_month: number | null
+          exp_year: number | null
+          id: string
+          is_default: boolean
+          last4: string | null
+          provider: string
+          provider_card_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          brand?: string | null
+          cardholder_name?: string | null
+          created_at?: string
+          exp_month?: number | null
+          exp_year?: number | null
+          id?: string
+          is_default?: boolean
+          last4?: string | null
+          provider?: string
+          provider_card_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          brand?: string | null
+          cardholder_name?: string | null
+          created_at?: string
+          exp_month?: number | null
+          exp_year?: number | null
+          id?: string
+          is_default?: boolean
+          last4?: string | null
+          provider?: string
+          provider_card_id?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }

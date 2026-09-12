@@ -40,6 +40,19 @@ const bookSchema = z.object({
   }),
   companyId: z.string().uuid().nullable(),
   traveller: travellerSchema,
+  /**
+   * Result of the hosted card step. Only provider tokens — never card data.
+   */
+  payment: z
+    .object({
+      providerCardId: z.string().trim().min(3).max(120),
+      threeDSecureSessionId: z.string().trim().max(120),
+      brand: z.string().trim().max(40).nullable(),
+      last4: z.string().trim().regex(/^\d{4}$/).nullable(),
+      method: z.enum(["card", "saved-card"]),
+    })
+    .nullable()
+    .optional(),
 });
 
 export type BookingResult = {
@@ -62,6 +75,14 @@ export type BookingResult = {
   testMode: boolean;
   /** Calendar events for the booked legs, ready for .ics / Google Calendar. */
   calendar: CalendarEvent[];
+  /** What was charged and how, for the receipt. */
+  payment: {
+    method: "card" | "saved-card" | "balance";
+    brand: string | null;
+    last4: string | null;
+    amountEur: number;
+    status: string;
+  } | null;
 };
 
 
@@ -99,6 +120,31 @@ export const bookTripCard = createServerFn({ method: "POST" })
     };
     if (card.status === "booked") throw new Error("already-booked");
 
+    // A settled payment already exists for this card: a retry must never charge
+    // twice, so stop before touching the supplier.
+    const idempotencyKey = `${card.id}-payment`;
+    const earlier = await supabase
+      .from("payments")
+      .select("status")
+      .eq("user_id", userId)
+      .eq("idempotency_key", idempotencyKey)
+      .maybeSingle();
+    if ((earlier.data as { status?: string } | null)?.status === "test_settled") {
+      throw new Error("already-booked");
+    }
+
+    const paymentMethod: "card" | "saved-card" | "balance" = data.payment?.method ?? "balance";
+    const cardPayment =
+      data.payment && data.payment.threeDSecureSessionId
+        ? { threeDSecureSessionId: data.payment.threeDSecureSessionId }
+        : null;
+    const paymentDetails = {
+      method: paymentMethod,
+      card_brand: data.payment?.brand ?? null,
+      card_last4: data.payment?.last4 ?? null,
+      three_ds_status: cardPayment ? "authenticated" : null,
+    };
+
     const search = card.items.search;
     const priced = card.items.priced;
     const request = search.request;
@@ -129,6 +175,7 @@ export const bookTripCard = createServerFn({ method: "POST" })
           passengerIds: offer.passengerIds,
           traveller: data.traveller,
           idempotencyKey: `${card.id}-flight`,
+          cardPayment,
         });
         flightOrderId = order.id;
         flightReference = order.bookingReference;
@@ -307,13 +354,18 @@ export const bookTripCard = createServerFn({ method: "POST" })
     // Nothing at all could be booked: keep the card open so the traveller can
     // simply search again instead of ending up with an empty trip.
     if (status === "failed") {
-      await supabase.from("payments").insert({
-        user_id: userId,
-        provider: "duffel-test",
-        amount_minor: Math.round(priced.total * 100),
-        status: "failed",
-        idempotency_key: `${card.id}-payment`,
-      });
+      await supabase.from("payments").upsert(
+        {
+          user_id: userId,
+          provider: "duffel-test",
+          amount_minor: Math.round(priced.total * 100),
+          status: "failed",
+          idempotency_key: idempotencyKey,
+          failure_note: reason,
+          ...paymentDetails,
+        },
+        { onConflict: "user_id,idempotency_key" },
+      );
       await audit("booking_failed", { cardId: card.id, reason });
       return {
         tripId: null,
@@ -325,6 +377,13 @@ export const bookTripCard = createServerFn({ method: "POST" })
         reason,
         testMode: isTestKey(),
         calendar: [],
+        payment: {
+          method: paymentMethod,
+          brand: data.payment?.brand ?? null,
+          last4: data.payment?.last4 ?? null,
+          amountEur: 0,
+          status: "failed",
+        },
       };
 
     }
@@ -396,15 +455,20 @@ export const bookTripCard = createServerFn({ method: "POST" })
       .eq("id", card.id)
       .eq("user_id", userId);
 
-    await supabase.from("payments").insert({
-      user_id: userId,
-      trip_id: tripId,
-      provider: "duffel-test",
-      provider_ref: flightOrderId,
-      amount_minor: Math.round(confirmedTotal * 100),
-      status: "test_settled",
-      idempotency_key: `${card.id}-payment`,
-    });
+    await supabase.from("payments").upsert(
+      {
+        user_id: userId,
+        trip_id: tripId,
+        provider: "duffel-test",
+        provider_ref: flightOrderId,
+        amount_minor: Math.round(confirmedTotal * 100),
+        status: "test_settled",
+        idempotency_key: idempotencyKey,
+        failure_note: status === "partial" ? reason : null,
+        ...paymentDetails,
+      },
+      { onConflict: "user_id,idempotency_key" },
+    );
 
     await audit("booking_created", {
       cardId: card.id,
@@ -494,6 +558,13 @@ export const bookTripCard = createServerFn({ method: "POST" })
       reason,
       testMode: isTestKey(),
       calendar,
+      payment: {
+        method: paymentMethod,
+        brand: data.payment?.brand ?? null,
+        last4: data.payment?.last4 ?? null,
+        amountEur: confirmedTotal,
+        status: "test_settled",
+      },
     };
 
 

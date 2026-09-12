@@ -12,6 +12,8 @@ import type { RideLeg } from "@/lib/suppliers/types";
 import { getTripCard } from "@/lib/trip-live.functions";
 import { bookTripCard, type BookingResult } from "@/lib/booking.functions";
 import { getAccount } from "@/lib/account.functions";
+import { getPaymentSession } from "@/lib/payment.functions";
+import { PaymentStep, type AuthorisedPayment } from "@/components/payment-step";
 import { eur } from "@/lib/trip/client";
 
 const inputClass =
@@ -21,12 +23,33 @@ const inputClass =
 function failureMessage(reason: string | null): string {
   switch (reason) {
     case "offer-expired":
-      return "The airline released this fare while you were confirming. Nothing was charged — search again to get a fresh price.";
+      return "The airline released this fare while you were confirming. Your card was not charged — search again to get a fresh price.";
     case "supplier-not-configured":
       return "Live booking is not switched on yet. Nothing was charged.";
+    case "card-declined":
+      return "Your card was declined, so nothing was charged. Try another card or ask your bank.";
+    case "already-booked":
+      return "This trip is already paid for — we did not charge you again. You will find it in My trips.";
     default:
-      return "The airline could not complete this booking. Nothing was charged — please search again.";
+      return "The airline could not complete this booking. Your card was not charged — please search again.";
   }
+}
+
+/** Turns a thrown booking error into one of the reasons above. */
+function reasonFromError(error: unknown): string | null {
+  const message = error instanceof Error ? error.message : "";
+  if (message.includes("already-booked")) return "already-booked";
+  if (message.includes("offer")) return "offer-expired";
+  if (message.includes("card")) return "card-declined";
+  return null;
+}
+
+/** How the traveller paid, for the receipt. */
+function methodLabel(payment: BookingResult["payment"]): string {
+  if (!payment) return "Duffel balance";
+  if (payment.method === "balance") return "Duffel balance";
+  const brand = payment.brand ? payment.brand.replace(/_/g, " ") : "Card";
+  return payment.last4 ? `${brand} ···· ${payment.last4}` : brand;
 }
 
 
@@ -65,9 +88,19 @@ export function BookPage({ cardId }: { cardId: string }) {
     title: "mr",
   });
   const [result, setResult] = useState<BookingResult | null>(null);
+  /** "review" = traveller + invoice details, "pay" = card entry. */
+  const [step, setStep] = useState<"review" | "pay">("review");
+
+  const fetchPayment = useServerFn(getPaymentSession);
+  const payment = useQuery({
+    queryKey: ["payment-session", cardId],
+    queryFn: () => fetchPayment({ data: { cardId } }),
+    enabled: step === "pay",
+    staleTime: 10 * 60 * 1000,
+  });
 
   const mutation = useMutation({
-    mutationFn: () =>
+    mutationFn: (authorised: AuthorisedPayment | null) =>
       book({
         data: {
           cardId,
@@ -78,10 +111,18 @@ export function BookPage({ cardId }: { cardId: string }) {
             gender: traveller.gender as "m" | "f",
             title: traveller.title as "mr" | "ms" | "mrs",
           },
+          payment: authorised,
         },
       }),
     onSuccess: (data) => setResult(data),
   });
+
+  const travellerReady =
+    traveller.givenName.trim().length > 0 &&
+    traveller.familyName.trim().length > 0 &&
+    /.+@.+\..+/.test(traveller.email) &&
+    traveller.phone.trim().length >= 6 &&
+    /^\d{4}-\d{2}-\d{2}$/.test(traveller.bornOn);
 
   // Booked (fully or partly): show the confirmation, then move on to My trips.
   useEffect(() => {
@@ -287,23 +328,48 @@ export function BookPage({ cardId }: { cardId: string }) {
 
               {mutation.isError && (
                 <p className="text-sm text-primary">
-                  {failureMessage(
-                    mutation.error instanceof Error && mutation.error.message.includes("offer")
-                      ? "offer-expired"
-                      : null,
-                  )}
+                  {failureMessage(reasonFromError(mutation.error))}
                 </p>
               )}
 
-
-              <button
-                onClick={() => mutation.mutate()}
-                disabled={mutation.isPending || card.data?.expired}
-                className="w-full rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
-              >
-                {mutation.isPending ? "Booking…" : `Book it all · ${eur(selectedTotal)}`}
-              </button>
+              {step === "review" && (
+                <button
+                  onClick={() => setStep("pay")}
+                  disabled={!travellerReady || card.data?.expired}
+                  className="w-full rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
+                >
+                  {`Continue to payment · ${eur(selectedTotal)}`}
+                </button>
+              )}
+              {step === "review" && !travellerReady && (
+                <p className="text-center text-xs text-muted-foreground">
+                  Fill in the traveller details to continue.
+                </p>
+              )}
             </div>
+
+            {step === "pay" && (
+              <div className="hairline-card mt-6 space-y-4 p-6">
+                {payment.isLoading && (
+                  <p className="text-sm text-muted-foreground">Opening the secure card form…</p>
+                )}
+                {payment.data && (
+                  <PaymentStep
+                    session={payment.data}
+                    amountEur={selectedTotal}
+                    disabled={mutation.isPending || card.data?.expired === true}
+                    payingLabel={mutation.isPending ? "Payment approved — booking your trip…" : null}
+                    onAuthorised={(authorised) => mutation.mutate(authorised)}
+                  />
+                )}
+                <button
+                  onClick={() => setStep("review")}
+                  className="w-full text-center text-xs text-muted-foreground underline"
+                >
+                  Back to traveller details
+                </button>
+              </div>
+            )}
           </>
         )}
 
@@ -351,6 +417,32 @@ export function BookPage({ cardId }: { cardId: string }) {
                 </li>
               ))}
             </ul>
+
+            {result.status !== "failed" && (
+              <div className="mt-5 space-y-1 border-t border-border pt-4 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Charged</span>
+                  <span className="font-semibold">{eur(result.payment?.amountEur ?? result.totalEur)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Paid with</span>
+                  <span className="capitalize">{methodLabel(result.payment)}</span>
+                </div>
+                {result.status === "partial" && (
+                  <p className="pt-2 text-xs text-muted-foreground">
+                    One part of this trip could not be confirmed, so you were only charged for what
+                    was booked.
+                  </p>
+                )}
+                <button
+                  onClick={() => navigate({ to: "/invoices" })}
+                  className="pt-2 text-xs text-primary underline"
+                >
+                  View the invoice
+                </button>
+              </div>
+            )}
+
             {result.calendar.length > 0 && (
               <AddToCalendar
                 events={result.calendar}

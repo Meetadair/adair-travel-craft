@@ -83,6 +83,12 @@ export async function createFlightOrder(input: {
     title: "mr" | "ms" | "mrs";
   };
   idempotencyKey: string;
+  /**
+   * Customer card payment. When present the airline is paid with the card the
+   * traveller entered in Duffel's hosted form (via its 3-D Secure session);
+   * otherwise the Duffel balance is used.
+   */
+  cardPayment?: { threeDSecureSessionId: string } | null;
 }): Promise<OrderResult> {
   const json = await call<{
     data?: {
@@ -100,7 +106,14 @@ export async function createFlightOrder(input: {
         type: "instant",
         selected_offers: [input.offerId],
         payments: [
-          { type: "balance", amount: input.amount.toFixed(2), currency: input.currency },
+          input.cardPayment
+            ? {
+                type: "card",
+                amount: input.amount.toFixed(2),
+                currency: input.currency,
+                three_d_secure_session_id: input.cardPayment.threeDSecureSessionId,
+              }
+            : { type: "balance", amount: input.amount.toFixed(2), currency: input.currency },
         ],
         passengers: input.passengerIds.map((id) => ({
           id,
