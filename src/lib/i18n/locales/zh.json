@@ -51,11 +51,11 @@
           "detail": "单独预订租车"
         },
         {
-          "name": "Uber",
+          "name": "打车应用",
           "detail": "安排本地出行"
         },
         {
-          "name": "OpenTable",
+          "name": "餐厅预订应用",
           "detail": "分开预订餐厅"
         }
       ]
@@ -85,9 +85,6 @@
       "invoiceLine": "发票 → 您的企业",
       "share": "分享此行程卡片",
       "shareCopied": "已复制",
-      "sourceFlight": "Duffel · NDC/GDS",
-      "sourceStay": "Duffel Stays",
-      "sourceCar": "Duffel Cars",
       "testMode": "测试模式 — 航司示例数据",
       "bookTooltip": "预订功能将在上线时开放",
       "remove": "移除此项",

@@ -51,11 +51,11 @@
           "detail": "レンタカーの個別予約"
         },
         {
-          "name": "Uber",
+          "name": "配車アプリ",
           "detail": "現地での移動手配"
         },
         {
-          "name": "OpenTable",
+          "name": "レストラン予約アプリ",
           "detail": "レストランを個別に検索"
         }
       ]
@@ -85,9 +85,6 @@
       "invoiceLine": "請求書宛名 → ご指定の法人",
       "share": "このプランを共有",
       "shareCopied": "コピーしました",
-      "sourceFlight": "Duffel · NDC/GDS",
-      "sourceStay": "Duffel Stays",
-      "sourceCar": "Duffel Cars",
       "testMode": "テストモード — サンプル航空データ",
       "bookTooltip": "サービス開始時に予約可能になります",
       "remove": "この項目を削除",

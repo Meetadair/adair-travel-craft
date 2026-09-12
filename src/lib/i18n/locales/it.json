@@ -51,11 +51,11 @@
           "detail": "prenotazione auto separata"
         },
         {
-          "name": "Uber",
+          "name": "App per le corse",
           "detail": "spostamenti in città"
         },
         {
-          "name": "OpenTable",
+          "name": "App per i ristoranti",
           "detail": "ristoranti, a parte"
         }
       ]
@@ -85,9 +85,6 @@
       "invoiceLine": "Fattura → alla tua azienda",
       "share": "Condividi questa scheda viaggio",
       "shareCopied": "Copiato",
-      "sourceFlight": "Duffel · NDC/GDS",
-      "sourceStay": "Duffel Stays",
-      "sourceCar": "Duffel Cars",
       "testMode": "Modalità di test — dati di esempio delle compagnie",
       "bookTooltip": "Prenotazioni disponibili al lancio",
       "remove": "Rimuovi questa voce",
