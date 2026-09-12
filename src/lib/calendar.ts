@@ -28,6 +28,15 @@ export type ItemCalendarPayload = {
   dropoff?: string | null;
   address?: string | null;
   location?: string | null;
+  /** Rides: local pickup time and the two addresses. */
+  pickupAt?: string | null;
+  pickupAddress?: string | null;
+  dropoffAddress?: string | null;
+  /** Restaurants: local reservation time, party size and venue. */
+  reservationAt?: string | null;
+  partySize?: number | null;
+  venueName?: string | null;
+  cuisine?: string | null;
   /** Free-text note stored with the line (e.g. the insurance offer wording). */
   note?: string | null;
 };
@@ -143,6 +152,40 @@ export function tripCalendarEvents(trip: TripLike): CalendarEvent[] {
           location,
           start: outAt,
           end: plusHours(outAt, 1),
+          allDay: false,
+        });
+      }
+      continue;
+    }
+
+    if (item.kind === "ride") {
+      const start = p.pickupAt ? p.pickupAt.slice(0, 16) : null;
+      if (start) {
+        const route = [p.pickupAddress, p.dropoffAddress].filter(Boolean).join(" → ");
+        events.push({
+          uid: `${item.id}-ride`,
+          title: `Transfer · ${item.title}`,
+          description: [detail, route].filter(Boolean).join("\n"),
+          location: p.pickupAddress ?? trip.city ?? "",
+          start,
+          end: plusHours(start, 1),
+          allDay: false,
+        });
+      }
+      continue;
+    }
+
+    if (item.kind === "restaurant") {
+      const start = p.reservationAt ? p.reservationAt.slice(0, 16) : null;
+      if (start) {
+        const party = p.partySize ? `Table for ${p.partySize}` : null;
+        events.push({
+          uid: `${item.id}-table`,
+          title: `Dinner · ${p.venueName ?? item.title}`,
+          description: [detail, party, p.cuisine].filter(Boolean).join("\n"),
+          location: p.address ?? trip.city ?? "",
+          start,
+          end: plusHours(start, 2),
           allDay: false,
         });
       }

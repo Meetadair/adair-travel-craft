@@ -28,6 +28,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { LineOptions, MatchNote } from "@/components/trip-line-options";
+import { TripExtras } from "@/components/trip-extras";
 import { searchLiveTrip, swapCardAlternative } from "@/lib/trip-live.functions";
 import type { BudgetStatus, MatchSummary } from "@/lib/trip/match";
 import {
@@ -1129,6 +1130,8 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                     )}
 
 
+
+                    {signedIn && cardId && <TripExtras cardId={cardId} />}
 
                     {anyDropped && (
                       <div className="flex flex-wrap items-center justify-between gap-2 px-5 py-3 text-xs text-muted-foreground">
