@@ -7,6 +7,7 @@
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { TIP_CATEGORIES } from "@/lib/trip/tips";
 import { SiteNav } from "@/components/site-nav";
 import {
   getGetawayContent,
@@ -279,6 +280,7 @@ function NewDestination({ onSave }: { onSave: (data: Record<string, unknown>) =>
             editorial_note: null,
             best_for: null,
             avoid_when: null,
+            travel_tips: {},
             typical_nights: Number(d.nights) || 3,
             active: false,
           })
@@ -317,6 +319,7 @@ function DestinationEditor({
     editorial_note: dest.editorial_note,
     best_for: dest.best_for,
     avoid_when: dest.avoid_when,
+    travel_tips: dest.travel_tips,
     typical_nights: dest.typical_nights,
     active: dest.active,
   };
@@ -388,6 +391,31 @@ function DestinationEditor({
               className={inputClass}
             />
           </label>
+        </div>
+      </div>
+
+      <div>
+        <p className="text-sm font-medium">Travel tips</p>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Shown on the traveller&rsquo;s booked trip. Leave a box empty and nothing is shown.
+        </p>
+        <div className="mt-3 grid gap-3">
+          {TIP_CATEGORIES.map((category) => (
+            <label key={category.key} className="block">
+              <span className="text-xs font-medium text-muted-foreground">{category.label}</span>
+              <textarea
+                defaultValue={dest.travel_tips[category.key] ?? ""}
+                onBlur={(e) => {
+                  const text = e.target.value.trim();
+                  const next = { ...dest.travel_tips };
+                  if (text) next[category.key] = text;
+                  else delete next[category.key];
+                  onSaveDest({ ...base, travel_tips: next });
+                }}
+                className={`${inputClass} min-h-20`}
+              />
+            </label>
+          ))}
         </div>
       </div>
 
