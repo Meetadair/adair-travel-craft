@@ -26,6 +26,7 @@ import { MultiField, SingleField, TextField, ToggleRow } from "@/components/pref
 import { cleanCompany, type CompanyDraft } from "@/lib/prefs/company-draft";
 import { ConnectedCalendars } from "@/components/prefs/connected-calendars";
 import { MyData } from "@/components/prefs/my-data";
+import { WalletLoyalty } from "@/components/prefs/wallet-loyalty";
 import { AppFooter } from "@/components/app-footer";
 
 const toDraft = (company: Company): CompanyDraft => ({
