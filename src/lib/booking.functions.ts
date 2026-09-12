@@ -489,12 +489,28 @@ export const bookTripCard = createServerFn({ method: "POST" })
       .eq("id", card.id)
       .eq("user_id", userId);
 
+    // Travel credit comes off this trip, and a referral pays out on the
+    // invited traveller's first confirmed booking. Never block the booking.
+    let creditAppliedMinor = 0;
+    try {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { availableCreditMinor, creditToApply, spendCredit, grantReferralRewards } =
+        await import("@/lib/referrals.server");
+      const balance = await availableCreditMinor(supabase as never, userId);
+      creditAppliedMinor = creditToApply(balance, Math.round(confirmedTotal * 100));
+      await spendCredit(supabaseAdmin as never, userId, tripId, creditAppliedMinor);
+      await grantReferralRewards(supabaseAdmin as never, userId, tripId);
+    } catch (error) {
+      console.error("credit/referral step failed", error);
+      creditAppliedMinor = 0;
+    }
+
     await supabase.from("payments").upsert(
       {
         user_id: userId,
         trip_id: tripId,
         provider_ref: flightOrderId,
-        amount_minor: Math.round(confirmedTotal * 100),
+        amount_minor: Math.max(0, Math.round(confirmedTotal * 100) - creditAppliedMinor),
         status: settledStatus,
         idempotency_key: idempotencyKey,
         failure_note: status === "partial" ? reason : null,
