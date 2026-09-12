@@ -42,8 +42,15 @@ import { SiteNav } from "@/components/site-nav";
 import { LocaleLink, useLocale, useT, type Dict } from "@/lib/i18n";
 import { parseDemoSentence, fill, referralCode } from "@/lib/demo-sentence";
 import { joinWaitlist } from "@/lib/waitlist.functions";
-import { parseTrip, searchTrip, eur, timeLabel, dayLabel } from "@/lib/trip/client";
-import type { TripSearchResponse } from "@/lib/trip/types";
+import {
+  parseTrip,
+  searchTrip,
+  fetchPriceContext,
+  eur,
+  timeLabel,
+  dayLabel,
+} from "@/lib/trip/client";
+import type { PriceContext, TripSearchResponse } from "@/lib/trip/types";
 
 type Submission = { sentence: string; key: number };
 
@@ -454,6 +461,61 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
   const [routeStops, setRouteStops] = useState<TripStop[] | null>(null);
   const [rerouting, setRerouting] = useState(false);
 
+  // Why is this trip pricey? Real comparison searches on nearby dates.
+  const [priceContext, setPriceContext] = useState<PriceContext | null>(null);
+  const [datesKept, setDatesKept] = useState(false);
+  const [movingDates, setMovingDates] = useState(false);
+
+  const contextKey = live?.request
+    ? `${live.request.destinationIata}|${live.request.departDate}|${live.request.returnDate}`
+    : null;
+
+  useEffect(() => {
+    const request = live?.request;
+    if (!request) return;
+    let active = true;
+    void fetchPriceContext(request).then((ctx) => {
+      if (active && ctx?.peak) setPriceContext(ctx);
+    });
+    return () => {
+      active = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contextKey]);
+
+  /** Re-run the same trip on the genuinely cheapest date we found. */
+  const moveDates = async () => {
+    const ctx = priceContext;
+    if (!ctx?.offsetDays || !ctx.cheapestDepartDate || !ctx.cheapestReturnDate) return;
+    setMovingDates(true);
+    try {
+      const sentence = submission?.sentence.trim() || d.userMessage;
+      if (signedIn) {
+        const result = await runLiveSearch({
+          data: { sentence, dateShiftDays: ctx.offsetDays },
+        });
+        setCardId(result.cardId);
+        setInsurance(result.insurance);
+        setLive(applyPriced(result));
+      } else {
+        const request = await parseTrip(sentence);
+        setLive(
+          await searchTrip({
+            ...request,
+            departDate: ctx.cheapestDepartDate,
+            returnDate: ctx.cheapestReturnDate,
+          }),
+        );
+      }
+      setPriceContext(null);
+      setDatesKept(true);
+    } catch {
+      /* keep the current card on screen */
+    } finally {
+      setMovingDates(false);
+    }
+  };
+
   /** Same sentence, new stop order: re-search and re-price the first leg. */
   const reorderStops = async (next: TripStop[]) => {
     setRouteStops(next);
@@ -497,6 +559,8 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
     setInsurance(null);
     setAddInsurance(false);
     setDropped({ flight: false, hotel: false, car: false });
+    setPriceContext(null);
+    setDatesKept(false);
     if (signedIn) {
       const named = parseTripSentence(text);
       setRequestedNames({ hotel: named.hotelNameExact, car: named.carNameExact });
@@ -1044,6 +1108,45 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                     )}
                   </div>
                 </div>
+
+                {priceContext?.peak && !datesKept && showActions && (
+                  <div className="animate-rise mt-4 rounded-2xl border border-border bg-background p-4">
+                    <p className="text-sm leading-relaxed text-foreground">
+                      {priceContext.eventName
+                        ? `There's a big event in ${priceContext.city} (probably ${priceContext.eventName}) — that's why this trip is about ${priceContext.ratio}\u00d7 more expensive than usual.`
+                        : `Prices are unusually high on these dates in ${priceContext.city} — about ${priceContext.ratio}\u00d7 more than usual.`}
+                      {priceContext.offsetDays != null && (
+                        <>
+                          {" "}
+                          {priceContext.offsetDays > 0
+                            ? `Leaving ${priceContext.offsetDays} days later`
+                            : `Leaving ${Math.abs(priceContext.offsetDays)} days earlier`}{" "}
+                          would be {eur(priceContext.savingEur)} less.
+                        </>
+                      )}
+                      {!live?.request?.invoiceToCompany && " Shall I check those dates?"}
+                    </p>
+                    {!live?.request?.invoiceToCompany && (
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          onClick={moveDates}
+                          disabled={movingDates}
+                          className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground disabled:opacity-60"
+                        >
+                          {movingDates ? "Checking…" : "Yes, show me"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setDatesKept(true)}
+                          className="inline-flex min-h-11 items-center rounded-xl border border-border px-4 py-2 text-sm font-medium"
+                        >
+                          Keep my dates
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {routeStops && routeStops.length > 2 && showActions && (
                   <div className="animate-rise mt-4 rounded-2xl border border-border bg-background p-4">

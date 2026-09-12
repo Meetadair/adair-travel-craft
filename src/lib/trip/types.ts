@@ -97,3 +97,17 @@ export type TripSearchResponse = {
   errors: Partial<Record<"flights" | "stays" | "cars", string>>;
 };
 
+
+/** Nearby-date price comparison for the same trip (real searches only). */
+export type PriceContext = {
+  peak: boolean;
+  ratio: number;
+  requestedTotalEur: number;
+  cheapestTotalEur: number;
+  cheapestDepartDate: string | null;
+  cheapestReturnDate: string | null;
+  offsetDays: number | null;
+  savingEur: number;
+  eventName: string | null;
+  city: string;
+};
