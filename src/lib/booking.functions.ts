@@ -739,6 +739,9 @@ export type MyTrip = {
     reference: string | null;
     payload: ItemCalendarPayload | null;
   }>;
+  /** Editorial notes for the destination; empty when the team hasn't written any. */
+  tips: Array<{ key: string; label: string; text: string }>;
+
 
 };
 
