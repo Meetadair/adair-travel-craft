@@ -205,15 +205,42 @@ export const searchLiveTrip = createServerFn({ method: "POST" })
 
 
 
-    const table = await pricing.loadPricing(supabase, plan);
+    const baseTable = await pricing.loadPricing(supabase, plan);
+
+    // Early-booking reward: leisure trips booked far ahead pay a smaller Adair
+    // fee. Business trips (invoiced) keep the standard fee.
+    const daysAhead = pricing.daysUntilDeparture(request.departDate);
+    const leadTimeBps = business
+      ? 0
+      : pricing.leadTimeDiscountBps(await pricing.loadLeadTimeTiers(supabase, plan), daysAhead);
+    const table = pricing.withLeadTimeDiscount(baseTable, leadTimeBps);
+
     const priceLine = (net: number | null | undefined, kind: "flight" | "stay" | "car") =>
       net == null ? null : pricing.fromMinor(pricing.grossMinor(net, table[kind]));
+    const priceLineBase = (net: number | null | undefined, kind: "flight" | "stay" | "car") =>
+      net == null ? 0 : pricing.fromMinor(pricing.grossMinor(net, baseTable[kind]));
 
     const flight = priceLine(search.flight?.amountEur ?? null, "flight");
     const stay = priceLine(search.stay?.amountEur ?? null, "stay");
     const car = priceLine(search.car?.amountEur ?? null, "car");
     const total = Math.round(((flight ?? 0) + (stay ?? 0) + (car ?? 0)) * 100) / 100;
     const netTotal = search.totalEur;
+
+    const baseTotal =
+      Math.round(
+        (priceLineBase(search.flight?.amountEur ?? null, "flight") +
+          priceLineBase(search.stay?.amountEur ?? null, "stay") +
+          priceLineBase(search.car?.amountEur ?? null, "car")) *
+          100,
+      ) / 100;
+    const earlyBooking =
+      leadTimeBps > 0 && baseTotal > total
+        ? {
+            daysAhead,
+            discountBps: leadTimeBps,
+            savedEur: Math.round((baseTotal - total) * 100) / 100,
+          }
+        : null;
 
     const { insuranceQuoteFor } = await import("@/lib/insurance.server");
     const insurance = await insuranceQuoteFor(
