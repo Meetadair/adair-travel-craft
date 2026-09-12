@@ -1,11 +1,13 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Plane, BedDouble, CarFront, Sparkles, ChevronRight, Send, X } from "lucide-react";
 import { SiteNav } from "@/components/site-nav";
 import { HotelGallery } from "@/components/hotel-gallery";
 import { VoiceInput } from "@/components/voice-input";
+import { CalendarTripHints } from "@/components/calendar-trip-hints";
+import { getPromptSuggestions } from "@/lib/suggestions.functions";
 import { composeTrip, saveTrip } from "@/lib/travel.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { localeHref, useLocale, useT } from "@/lib/i18n";
@@ -37,6 +39,16 @@ export function AssistantPage() {
 
   const money = (amount: number, currency: string) =>
     `${amount.toLocaleString(locale, { maximumFractionDigits: 0 })} ${currency}`;
+
+  // Examples built from the customer's own profile, falling back to generic ones.
+  const fetchSuggestions = useServerFn(getPromptSuggestions);
+  const suggestions = useQuery({
+    queryKey: ["prompt-suggestions"],
+    queryFn: () => fetchSuggestions(),
+    retry: false,
+  });
+  const personal = suggestions.data?.suggestions ?? [];
+  const examples = personal.length ? personal.map((s) => s.text) : t.assistant.examples;
 
   const search = useMutation({
     mutationFn: (message: string) => compose({ data: { message, locale } }),
