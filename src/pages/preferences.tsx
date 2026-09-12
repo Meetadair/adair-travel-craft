@@ -209,6 +209,8 @@ export function PreferencesPage() {
               <CompanyEditor companies={companies} onChange={setCompanies} />
             </section>
 
+            <WalletLoyalty />
+
             <MyData />
 
             <div className="sticky bottom-4 flex items-center gap-3">
