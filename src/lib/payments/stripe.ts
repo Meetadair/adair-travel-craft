@@ -62,7 +62,7 @@ function mapStatus(status: string | undefined): IntentStatus {
       return "requires_payment_method";
     case "requires_action":
     case "requires_confirmation":
-ậ      return "requires_action";
+return "requires_action";
     case "requires_capture":
       return "authorised";
     case "succeeded":
