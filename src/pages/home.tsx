@@ -871,6 +871,15 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                       </div>
                     )}
 
+
+                    {match?.flight && match.flight.score != null && (
+                      <p className="px-5 pb-3 text-xs text-muted-foreground">
+                        {match.flight.score}% match to your preferences
+                        {match.flight.reasons.length > 0 ? ` · ${match.flight.reasons.join(" · ")}` : ""}
+                        {match.flight.misses.length > 0 ? ` · ${match.flight.misses.join(" · ")}` : ""}
+                      </p>
+                    )}
+
                     {requestedNames.hotel && !dropped.hotel && (
                       <p className="px-5 pt-3 text-xs text-muted-foreground">
                         Requested: <span className="font-medium text-foreground">{requestedNames.hotel}</span>
@@ -967,6 +976,36 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                     )}
 
 
+
+                    {match?.stay && match.stay.score != null && (
+                      <p className="px-5 pb-3 text-xs text-muted-foreground">
+                        {match.stay.score}% match to your preferences
+                        {match.stay.reasons.length > 0 ? ` · ${match.stay.reasons.join(" · ")}` : ""}
+                        {match.stay.misses.length > 0 ? ` · ${match.stay.misses.join(" · ")}` : ""}
+                      </p>
+                    )}
+
+                    {live?.stay && live.hotelAlternatives.length > 0 && (
+                      <div className="px-5 pb-4">
+                        <p className="text-xs text-muted-foreground">Other hotels for the same dates:</p>
+                        <ul className="mt-2 space-y-2">
+                          {live.hotelAlternatives.map((alt, index) => (
+                            <li key={`alt-stay-${index}`}>
+                              <button
+                                type="button"
+                                disabled={swapping}
+                                onClick={() => void swapAlternative("stay", index)}
+                                className="flex w-full items-center justify-between gap-3 rounded-xl border border-border px-4 py-2.5 text-left text-sm hover:border-primary disabled:opacity-60"
+                              >
+                                <span className="min-w-0 truncate">{alt.name}</span>
+                                <span className="shrink-0">{eur(alt.amountEur)}</span>
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
                     {requestedNames.car && !dropped.car && (
                       <p className="px-5 pt-3 text-xs text-muted-foreground">
                         Requested: <span className="font-medium text-foreground">{requestedNames.car}</span>
@@ -1052,6 +1091,36 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                       </div>
                     )}
 
+
+                    {match?.car && match.car.score != null && (
+                      <p className="px-5 pb-3 text-xs text-muted-foreground">
+                        {match.car.score}% match to your preferences
+                        {match.car.reasons.length > 0 ? ` · ${match.car.reasons.join(" · ")}` : ""}
+                        {match.car.misses.length > 0 ? ` · ${match.car.misses.join(" · ")}` : ""}
+                      </p>
+                    )}
+
+                    {live?.car && live.carAlternatives.length > 0 && (
+                      <div className="px-5 pb-4">
+                        <p className="text-xs text-muted-foreground">Other cars for the same dates:</p>
+                        <ul className="mt-2 space-y-2">
+                          {live.carAlternatives.map((alt, index) => (
+                            <li key={`alt-car-${index}`}>
+                              <button
+                                type="button"
+                                disabled={swapping}
+                                onClick={() => void swapAlternative("car", index)}
+                                className="flex w-full items-center justify-between gap-3 rounded-xl border border-border px-4 py-2.5 text-left text-sm hover:border-primary disabled:opacity-60"
+                              >
+                                <span className="min-w-0 truncate">{alt.vehicle + " · " + alt.supplier}</span>
+                                <span className="shrink-0">{eur(alt.amountEur)}</span>
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
                     {insurance && (
                       <div className={`${reveal(3)} px-5 py-4`}>
                         <div className="flex flex-wrap items-center gap-3">
@@ -1092,6 +1161,42 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                       </div>
                     )}
 
+
+
+                    {budget && budget.state !== "unknown" && showTotal && (
+                      <p className="px-5 py-3 text-xs text-muted-foreground">
+                        {budget.state === "within"
+                          ? `Within your usual budget (${budget.label}).`
+                          : budget.state === "near"
+                            ? `Close to the top of your usual budget (${budget.label}).`
+                            : `Above your usual budget (${budget.label}).`}
+                      </p>
+                    )}
+
+                    {live && showActions && (
+                      <div className="px-5 py-3">
+                        <label htmlFor="amend" className="text-xs text-muted-foreground">
+                          Change something? Just say it.
+                        </label>
+                        <div className="mt-2 flex gap-2">
+                          <input
+                            id="amend"
+                            value={amendText}
+                            onChange={(event) => setAmendText(event.target.value)}
+                            placeholder="business class, one night later"
+                            className="min-w-0 flex-1 rounded-xl border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => void amendTrip()}
+                            disabled={amending || !amendText.trim()}
+                            className="shrink-0 rounded-xl border border-border px-3 py-2 text-sm font-medium hover:border-primary disabled:opacity-60"
+                          >
+                            {amending ? "Updating…" : "Update"}
+                          </button>
+                        </div>
+                      </div>
+                    )}
 
                     {invoiceVisible && showTotal && (
                       <div className="animate-rise flex items-center gap-2 px-5 py-3 text-xs text-muted-foreground">
