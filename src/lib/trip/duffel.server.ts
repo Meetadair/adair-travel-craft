@@ -486,8 +486,10 @@ export async function searchTripWithDuffel(
   ]);
 
   let flight: FlightResult | null = null;
+  let flightAlternatives: FlightResult[] = [];
   if (flightRes.status === "fulfilled") {
-    flight = flightRes.value;
+    flight = flightRes.value?.flight ?? null;
+    flightAlternatives = flightRes.value?.alternatives ?? [];
     if (!flight) errors.flights = "no-availability";
   } else {
     errors.flights = noteFor(flightRes.reason);
@@ -531,6 +533,7 @@ export async function searchTripWithDuffel(
   return {
     request: req,
     flight,
+    flightAlternatives,
     stay,
     car,
     totalEur,
