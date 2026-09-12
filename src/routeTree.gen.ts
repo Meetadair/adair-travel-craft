@@ -31,6 +31,7 @@ import { Route as ApiPublicTripRemindersRouteImport } from './routes/api/public/
 import { Route as ApiTripParseRouteImport } from './routes/api/trip/parse'
 import { Route as ApiTripPriceContextRouteImport } from './routes/api/trip/price-context'
 import { Route as ApiTripSearchRouteImport } from './routes/api/trip/search'
+import { Route as ApiPublicCalendarCallbackProviderRouteImport } from './routes/api/public/calendar/callback.$provider'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -142,6 +143,12 @@ const ApiTripSearchRoute = ApiTripSearchRouteImport.update({
   path: '/api/trip/search',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicCalendarCallbackProviderRoute =
+  ApiPublicCalendarCallbackProviderRouteImport.update({
+    id: '/api/public/calendar/callback/$provider',
+    path: '/api/public/calendar/callback/$provider',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -165,6 +172,7 @@ export interface FileRoutesByFullPath {
   '/api/trip/parse': typeof ApiTripParseRoute
   '/api/trip/price-context': typeof ApiTripPriceContextRoute
   '/api/trip/search': typeof ApiTripSearchRoute
+  '/api/public/calendar/callback/$provider': typeof ApiPublicCalendarCallbackProviderRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -187,6 +195,7 @@ export interface FileRoutesByTo {
   '/api/trip/parse': typeof ApiTripParseRoute
   '/api/trip/price-context': typeof ApiTripPriceContextRoute
   '/api/trip/search': typeof ApiTripSearchRoute
+  '/api/public/calendar/callback/$provider': typeof ApiPublicCalendarCallbackProviderRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -212,6 +221,7 @@ export interface FileRoutesById {
   '/api/trip/parse': typeof ApiTripParseRoute
   '/api/trip/price-context': typeof ApiTripPriceContextRoute
   '/api/trip/search': typeof ApiTripSearchRoute
+  '/api/public/calendar/callback/$provider': typeof ApiPublicCalendarCallbackProviderRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -237,6 +247,7 @@ export interface FileRouteTypes {
     | '/api/trip/parse'
     | '/api/trip/price-context'
     | '/api/trip/search'
+    | '/api/public/calendar/callback/$provider'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -259,6 +270,7 @@ export interface FileRouteTypes {
     | '/api/trip/parse'
     | '/api/trip/price-context'
     | '/api/trip/search'
+    | '/api/public/calendar/callback/$provider'
   id:
     | '__root__'
     | '/'
@@ -283,6 +295,7 @@ export interface FileRouteTypes {
     | '/api/trip/parse'
     | '/api/trip/price-context'
     | '/api/trip/search'
+    | '/api/public/calendar/callback/$provider'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -296,6 +309,7 @@ export interface RootRouteChildren {
   ApiTripParseRoute: typeof ApiTripParseRoute
   ApiTripPriceContextRoute: typeof ApiTripPriceContextRoute
   ApiTripSearchRoute: typeof ApiTripSearchRoute
+  ApiPublicCalendarCallbackProviderRoute: typeof ApiPublicCalendarCallbackProviderRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -454,6 +468,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiTripSearchRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/calendar/callback/$provider': {
+      id: '/api/public/calendar/callback/$provider'
+      path: '/api/public/calendar/callback/$provider'
+      fullPath: '/api/public/calendar/callback/$provider'
+      preLoaderRoute: typeof ApiPublicCalendarCallbackProviderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -509,6 +530,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiTripParseRoute: ApiTripParseRoute,
   ApiTripPriceContextRoute: ApiTripPriceContextRoute,
   ApiTripSearchRoute: ApiTripSearchRoute,
+  ApiPublicCalendarCallbackProviderRoute:
+    ApiPublicCalendarCallbackProviderRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
