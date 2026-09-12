@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Plane, BedDouble, CarFront, Sparkles, ChevronRight, Send, X } from "lucide-react";
 import { SiteNav } from "@/components/site-nav";
 import { HotelGallery } from "@/components/hotel-gallery";
+import { VoiceInput } from "@/components/voice-input";
 import { composeTrip, saveTrip } from "@/lib/travel.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { localeHref, useLocale, useT } from "@/lib/i18n";
@@ -115,6 +116,7 @@ export function AssistantPage() {
             placeholder={t.assistant.placeholder}
             className="min-h-[56px] w-full resize-none bg-transparent px-2 py-2 text-sm outline-none"
           />
+          <VoiceInput locale={locale} onTranscript={setInput} />
           <button
             type="submit"
             disabled={search.isPending}
