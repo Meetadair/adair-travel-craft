@@ -10,6 +10,12 @@ export function AppFooter() {
         <Link to="/support" className={cls}>
           Help
         </Link>
+        <Link to="/invoices" className={cls}>
+          Invoices
+        </Link>
+        <Link to="/credit" className={cls}>
+          Credit
+        </Link>
         <Link to="/privacy" className={cls}>
           Privacy
         </Link>
