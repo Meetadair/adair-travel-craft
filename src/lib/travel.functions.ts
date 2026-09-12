@@ -64,7 +64,10 @@ function systemPrompt(today: string, locale: string) {
     `(IATA code of the destination city), departDate (YYYY-MM-DD), returnDate (YYYY-MM-DD), ` +
     `cabinClass (economy|premium_economy|business), needsCar (boolean), notes, ` +
     `reply (one short sentence summarizing the understood request, written in ${REPLY_LANGUAGE[locale] ?? "English"}). ` +
-    `If the origin city is not given, use Warsaw (WAW).`
+    `If the origin city is not given, use Warsaw (WAW). ` +
+    `The text may be dictated speech: it can contain filler words ("erm", "you know"), ` +
+    `repetitions and self-corrections ("Milan — no, sorry, Rome"). Ignore filler, and when the ` +
+    `speaker corrects themselves the later statement always wins.`
   );
 }
 
