@@ -7,6 +7,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { CITIES } from "@/lib/trip/cities";
+import { toDayImage, type GetawayImage } from "@/lib/getaway/images";
 import {
   applyPriceTieBreak,
   dealVerdict,
@@ -33,6 +34,8 @@ export type GetawayPlace = {
 
 export type GetawayDay = {
   dayNumber: number;
+  /** Optional — a day without a picture simply shows its text. */
+  image: GetawayImage | null;
   morning: string | null;
   afternoon: string | null;
   evening: string | null;
@@ -53,6 +56,8 @@ export type GetawayProposal = {
     bestFor: string | null;
     avoidWhen: string | null;
     typicalNights: number;
+    /** Own photo, else Unsplash, else nothing at all. */
+    image: GetawayImage | null;
   };
   theme: { id: string; name: string; slug: string } | null;
   /** "Chosen because …" — the same spirit as the match score on a trip card. */
@@ -97,6 +102,12 @@ type DestRow = {
   best_for: string | null;
   avoid_when: string | null;
   typical_nights: number;
+  hero_image_url: string | null;
+  hero_image_fallback_url: string | null;
+  hero_image_email_url: string | null;
+  hero_image_credit: string | null;
+  hero_image_credit_url: string | null;
+  hero_image_source: string | null;
 };
 
 type JoinRow = {
@@ -146,7 +157,7 @@ export const getWeeklyGetaway = createServerFn({ method: "GET" })
     const joinRes = await supabase
       .from("getaway_destination_themes")
       .select(
-        "destination_id, theme_id, season_months, editorial_angle, getaway_destinations!inner(id, name, country, nearest_airport_iata, latitude, longitude, drivable_from, editorial_note, best_for, avoid_when, typical_nights, active), getaway_themes!inner(id, slug, name, interest_tags, active)",
+        "destination_id, theme_id, season_months, editorial_angle, getaway_destinations!inner(id, name, country, nearest_airport_iata, latitude, longitude, drivable_from, editorial_note, best_for, avoid_when, typical_nights, active, hero_image_url, hero_image_fallback_url, hero_image_email_url, hero_image_credit, hero_image_credit_url, hero_image_source), getaway_themes!inner(id, slug, name, interest_tags, active)",
       )
       .contains("season_months", [month])
       .eq("getaway_destinations.active", true)
@@ -295,7 +306,7 @@ export const getWeeklyGetaway = createServerFn({ method: "GET" })
     if (itinRes.data) {
       const daysRes = await supabase
         .from("getaway_itinerary_days")
-        .select("day_number, morning, afternoon, evening, sleep_place_id, meal_place_ids")
+        .select("day_number, morning, afternoon, evening, sleep_place_id, meal_place_ids, image_url, image_fallback_url, image_credit, image_credit_url, image_source")
         .eq("itinerary_id", itinRes.data.id)
         .order("day_number");
       const nameOf = (id: string | null) => places.find((p) => p.id === id)?.name ?? null;
@@ -305,6 +316,7 @@ export const getWeeklyGetaway = createServerFn({ method: "GET" })
         summary: itinRes.data.summary ?? null,
         days: ((daysRes.data ?? []) as Array<Record<string, unknown>>).map((d) => ({
           dayNumber: Number(d['day_number']),
+          image: toDayImage(d as never),
           morning: (d['morning'] as string | null) ?? null,
           afternoon: (d['afternoon'] as string | null) ?? null,
           evening: (d['evening'] as string | null) ?? null,
@@ -314,6 +326,25 @@ export const getWeeklyGetaway = createServerFn({ method: "GET" })
             .filter((n): n is string => Boolean(n)),
         })),
       };
+    }
+
+    // Own photo wins; otherwise ask Unsplash once and remember the result.
+    let heroImage: GetawayImage | null = null;
+    try {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { ensureDestinationImage } = await import("@/lib/getaway/images.server");
+      const stored = await ensureDestinationImage(supabaseAdmin as never, destRow as never);
+      heroImage = stored
+        ? {
+            url: stored.url,
+            fallbackUrl: stored.fallbackUrl,
+            credit: stored.credit,
+            creditUrl: stored.creditUrl,
+            source: stored.source,
+          }
+        : null;
+    } catch {
+      heroImage = null; // A missing picture never breaks the proposal.
     }
 
     const priceRow = latest.get(destRow.id) ?? null;
@@ -338,6 +369,7 @@ export const getWeeklyGetaway = createServerFn({ method: "GET" })
           bestFor: destRow.best_for,
           avoidWhen: destRow.avoid_when,
           typicalNights: destRow.typical_nights,
+          image: heroImage,
         },
         theme: themeRow ? { id: themeRow.id, name: themeRow.name, slug: themeRow.slug } : null,
         reasons: chosen.reasons,
