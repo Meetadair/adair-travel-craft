@@ -325,6 +325,8 @@ export const cancelTripAsAdmin = createServerFn({ method: "POST" })
       user_id: context.userId,
       props: { reason: data.reason ?? "", trip_id: data.tripId } as never,
     });
+    const { reverseCreatorEarnings } = await import("@/lib/creators.server");
+    await reverseCreatorEarnings(sb as never, data.tripId);
     await writeAudit(sb, context.userId, "trip.cancel", `trips:${data.tripId}`, before.data, {
       status: "cancelled",
       reason: data.reason ?? "",

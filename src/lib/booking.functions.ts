@@ -1029,5 +1029,16 @@ export const cancelTripItem = createServerFn({ method: "POST" })
       .eq("id", item.trip_id)
       .eq("user_id", userId);
 
+    // A cancelled trip takes any creator commission with it.
+    if (!active.length) {
+      try {
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const { reverseCreatorEarnings } = await import("@/lib/creators.server");
+        await reverseCreatorEarnings(supabaseAdmin as never, item.trip_id);
+      } catch (error) {
+        console.error("creator reversal failed", error);
+      }
+    }
+
     return { status };
   });
