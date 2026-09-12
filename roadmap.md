@@ -59,3 +59,10 @@
 - Duffel hosted card form + 3-D Secure on the booking screen (test mode), card data never touches our backend
 - Saved cards (provider token only), payment outcomes + idempotency key recorded in payments
 - No Apple Pay / Google Pay: Duffel Cards does not support digital wallets. Add Stripe alongside if wallets are wanted.
+
+## Analytics & admin (in progress)
+- [x] Database groundwork: admin flag on profiles (self-promotion blocked), events table, error_log table, admin-only report query, admin-editable pricing rules + providers
+- [ ] /admin/analytics page reading the report
+- [ ] /admin panel: pricing rules, bookings, users, providers, secrets status, recent errors
+- [ ] Event logging from the app (typed sentence, search, card, booking start/finish, onboarding steps, cheaper-dates outcome, match scores, failures)
+- [ ] Global error boundary writing to error_log
