@@ -67,7 +67,7 @@ export const searchLiveTrip = createServerFn({ method: "POST" })
       supabase
         .from("preferences")
         .select(
-          "cabin_class, max_connections, seat, airlines, cabin_rule, hotel_chains, hotel_stars, hotel_min_rating, hotel_amenities, hotel_types, car_brands, car_companies, car_class, car_transmission",
+          "cabin_class, max_connections, seat, airlines, cabin_rule, hotel_chains, hotel_stars, hotel_min_rating, hotel_amenities, hotel_types, car_brands, car_companies, car_class, car_transmission, budget_band",
         )
         .eq("user_id", userId)
         .maybeSingle(),
@@ -164,6 +164,10 @@ export const searchLiveTrip = createServerFn({ method: "POST" })
       request.passengers,
     );
 
+    const { matchSummary, budgetStatus } = await import("@/lib/trip/match");
+    const match = matchSummary(search, searchPrefs);
+    const budget = budgetStatus(total, (row?.["budget_band"] as string | null) ?? null);
+
     const expiresAt =
       search.flight?.expiresAt ?? new Date(Date.now() + 20 * 60_000).toISOString();
 
@@ -177,7 +181,7 @@ export const searchLiveTrip = createServerFn({ method: "POST" })
         saved_minor: pricing.toMinor(search.savedEur),
         saved_minutes: search.savedMinutes,
         expires_at: expiresAt,
-        items: { search, priced: { flight, stay, car, total }, insurance },
+        items: { search, priced: { flight, stay, car, total }, insurance, match, budget },
       })
       .select("id")
       .single();
@@ -189,6 +193,8 @@ export const searchLiveTrip = createServerFn({ method: "POST" })
       search,
       priced: { flight, stay, car, total },
       insurance,
+      match,
+      budget,
       expiresAt,
     };
   });
