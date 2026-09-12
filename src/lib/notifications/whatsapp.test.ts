@@ -56,7 +56,7 @@ describe("sendWhatsAppTemplate", () => {
     });
 
     expect(result).toEqual({ status: "sent", id: "wamid.1" });
-    const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+    const [url, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
     expect(url).toBe("https://graph.facebook.com/v21.0/555/messages");
     const body = JSON.parse(String(init.body)) as Record<string, unknown>;
     expect(body['to']).toBe("48601234567");
