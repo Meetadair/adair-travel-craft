@@ -88,7 +88,7 @@ export function SiteNav() {
     <header className="sticky top-0 z-30 border-b border-border bg-background/85 backdrop-blur">
       <nav className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
         <LocaleLink to="/" locale={locale} className="flex items-center gap-2">
-          <img src={logoMark} alt="Adair" className="h-7 w-auto" loading="lazy" />
+          <img src={logoMark} alt="Adair" className="h-7 w-auto" loading="eager" />
         </LocaleLink>
         <div className="flex items-center gap-1 sm:gap-2">
           {NAV.map((l) => (
