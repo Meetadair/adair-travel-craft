@@ -14,6 +14,8 @@ import {
   setUserAdmin,
   listWaitlist,
   inviteWaitlist,
+  listSupportRequests,
+  setSupportStatus,
   type PricingRuleRow,
 } from "@/lib/admin.functions";
 
@@ -74,6 +76,64 @@ function RuleRow({ rule, onSaved }: { rule: PricingRuleRow; onSaved: () => void 
       </button>
       {mutation.isError && <span className="text-xs text-primary">Could not save.</span>}
     </div>
+  );
+}
+
+function SupportCard() {
+  const fetchRequests = useServerFn(listSupportRequests);
+  const setStatus = useServerFn(setSupportStatus);
+  const queryClient = useQueryClient();
+  const rows = useQuery({ queryKey: ["admin-support"], queryFn: () => fetchRequests() });
+  const mutation = useMutation({
+    mutationFn: (input: { id: string; status: "open" | "in progress" | "resolved" }) =>
+      setStatus({ data: { ...input, adminNote: null } }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin-support"] }),
+  });
+
+  return (
+    <Card title="Help requests" hint="The booking context is attached to each request.">
+      <div className="hairline-card divide-y divide-border">
+        {rows.isLoading && <p className="p-4 text-sm text-muted-foreground">Loading…</p>}
+        {rows.data?.length === 0 && (
+          <p className="p-4 text-sm text-muted-foreground">No requests yet.</p>
+        )}
+        {rows.data?.map((row) => (
+          <div key={row.id} className="space-y-2 p-4 text-sm">
+            <p>
+              <span className="font-medium">{row.category}</span>
+              <span className="text-muted-foreground">
+                {" "}
+                · {row.urgency} · {row.status} · {new Date(row.createdAt).toLocaleString()}
+                {row.contactEmail ? ` · ${row.contactEmail}` : ""}
+              </span>
+            </p>
+            {row.tripId && (
+              <p className="text-xs text-muted-foreground">
+                {row.tripTitle ?? "Trip"}
+                {row.tripReference ? ` · ${row.tripReference}` : ""}
+                {row.tripDates ? ` · ${row.tripDates}` : ""}
+                {row.tripStatus ? ` · ${row.tripStatus}` : ""}
+                {row.tripTotalEur == null ? "" : ` · ${row.tripTotalEur.toFixed(2)} EUR`}
+              </p>
+            )}
+            <p className="text-muted-foreground">{row.description}</p>
+            <div className="flex flex-wrap gap-2">
+              {(["open", "in progress", "resolved"] as const).map((status) => (
+                <button
+                  key={status}
+                  type="button"
+                  onClick={() => mutation.mutate({ id: row.id, status })}
+                  disabled={mutation.isPending || row.status === status}
+                  className="rounded-xl border border-border px-3 py-1.5 text-xs font-medium hover:border-primary disabled:opacity-60"
+                >
+                  {status}
+                </button>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </Card>
   );
 }
 
@@ -330,6 +390,8 @@ export function AdminPage() {
                 ))}
               </div>
             </Card>
+
+            <SupportCard />
 
             <WaitlistCard />
 
