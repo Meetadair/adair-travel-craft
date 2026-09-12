@@ -133,6 +133,13 @@ export function SiteNav() {
                 Credit
               </Link>
               <Link
+                to="/support"
+                className={linkClass}
+                activeProps={{ className: "text-foreground" }}
+              >
+                Help
+              </Link>
+              <Link
                 to="/preferences"
                 className={linkClass}
                 activeProps={{ className: "text-foreground" }}

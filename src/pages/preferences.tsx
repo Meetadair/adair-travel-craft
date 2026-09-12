@@ -25,6 +25,8 @@ import { CompanyEditor } from "@/components/prefs/company-editor";
 import { MultiField, SingleField, TextField, ToggleRow } from "@/components/prefs/option-chips";
 import { cleanCompany, type CompanyDraft } from "@/lib/prefs/company-draft";
 import { ConnectedCalendars } from "@/components/prefs/connected-calendars";
+import { MyData } from "@/components/prefs/my-data";
+import { AppFooter } from "@/components/app-footer";
 
 const toDraft = (company: Company): CompanyDraft => ({
   name: company.name,
@@ -206,6 +208,8 @@ export function PreferencesPage() {
               <CompanyEditor companies={companies} onChange={setCompanies} />
             </section>
 
+            <MyData />
+
             <div className="sticky bottom-4 flex items-center gap-3">
               <button
                 type="button"
@@ -225,6 +229,7 @@ export function PreferencesPage() {
           </div>
         )}
       </main>
+      <AppFooter />
     </div>
   );
 }
