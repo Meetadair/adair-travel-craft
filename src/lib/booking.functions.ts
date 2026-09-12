@@ -351,6 +351,59 @@ export const bookTripCard = createServerFn({ method: "POST" })
       testMode: isTestKey(),
     });
 
+    // Invoice by email to the chosen company. Never block the booking result.
+    try {
+      const company = data.companyId
+        ? (
+            await supabase
+              .from("companies")
+              .select(
+                "name, legal_form, vat_id, country, city, postcode, street, building, address_extra, invoice_email, invoice_emails",
+              )
+              .eq("id", data.companyId)
+              .eq("user_id", userId)
+              .maybeSingle()
+          ).data
+        : null;
+      if (company) {
+        const c = company as Record<string, unknown>;
+        const raw = Array.isArray(c["invoice_emails"]) ? (c["invoice_emails"] as string[]) : [];
+        const emails = [...raw, (c["invoice_email"] as string | null) ?? ""].filter(
+          (e): e is string => typeof e === "string" && e.trim().length > 0,
+        );
+        const line = (key: string) => (c[key] as string | null) ?? null;
+        const address = [
+          [line("street"), line("building")].filter(Boolean).join(" "),
+          line("address_extra"),
+          [line("postcode"), line("city")].filter(Boolean).join(" "),
+          line("country"),
+        ].filter((v): v is string => Boolean(v && v.trim()));
+        const { sendInvoiceEmail } = await import("@/lib/invoice-email.server");
+        await sendInvoiceEmail({
+          to: Array.from(new Set(emails)),
+          documentNumber: flightReference ?? tripId,
+          companyName: [line("name"), line("legal_form")].filter(Boolean).join(" ") || null,
+          companyVatId: line("vat_id"),
+          companyAddress: address,
+          origin: request.originCity,
+          destination: request.destinationCity,
+          startDate: request.departDate,
+          endDate: request.returnDate,
+          totalEur: confirmedTotal,
+          testMode: isTestKey(),
+          lines: lines.map((l) => ({
+            kind: l.kind,
+            title: l.title,
+            detail: l.note ?? null,
+            reference: l.reference,
+            amountEur: l.amountEur,
+          })),
+        });
+      }
+    } catch (error) {
+      console.error("invoice email failed", error);
+    }
+
     const calendar = tripCalendarEvents({
       id: tripId,
       title: `${request.destinationCity} · ${request.departDate} – ${request.returnDate}`,
