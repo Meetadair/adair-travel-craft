@@ -1248,6 +1248,33 @@ export type Database = {
         }
         Relationships: []
       }
+      learned_overrides: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          kind: string
+          subject: string
+          user_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: string
+          kind: string
+          subject: string
+          user_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          kind?: string
+          subject?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       loyalty_earning_rules: {
         Row: {
           category: string
@@ -1957,6 +1984,45 @@ export type Database = {
           },
         ]
       }
+      travel_companions: {
+        Row: {
+          born_on_encrypted: string | null
+          created_at: string
+          family_name_encrypted: string
+          given_name_encrypted: string
+          id: string
+          label: string
+          passport_last4: string | null
+          passport_number_encrypted: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          born_on_encrypted?: string | null
+          created_at?: string
+          family_name_encrypted: string
+          given_name_encrypted: string
+          id?: string
+          label: string
+          passport_last4?: string | null
+          passport_number_encrypted?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          born_on_encrypted?: string | null
+          created_at?: string
+          family_name_encrypted?: string
+          given_name_encrypted?: string
+          id?: string
+          label?: string
+          passport_last4?: string | null
+          passport_number_encrypted?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       trip_cards: {
         Row: {
           created_at: string
@@ -2010,9 +2076,69 @@ export type Database = {
           },
         ]
       }
+      trip_changes: {
+        Row: {
+          after: Json
+          before: Json
+          created_at: string
+          currency: string
+          difference_minor: number
+          fee_minor: number
+          id: string
+          kind: string
+          method: string
+          note: string | null
+          status: string
+          trip_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          after?: Json
+          before?: Json
+          created_at?: string
+          currency?: string
+          difference_minor?: number
+          fee_minor?: number
+          id?: string
+          kind: string
+          method: string
+          note?: string | null
+          status?: string
+          trip_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          after?: Json
+          before?: Json
+          created_at?: string
+          currency?: string
+          difference_minor?: number
+          fee_minor?: number
+          id?: string
+          kind?: string
+          method?: string
+          note?: string | null
+          status?: string
+          trip_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trip_changes_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       trip_items: {
         Row: {
           amount: number
+          ancillaries: Json
           calendar_event_ids: Json
           created_at: string
           currency: string
@@ -2036,6 +2162,7 @@ export type Database = {
         }
         Insert: {
           amount?: number
+          ancillaries?: Json
           calendar_event_ids?: Json
           created_at?: string
           currency?: string
@@ -2059,6 +2186,7 @@ export type Database = {
         }
         Update: {
           amount?: number
+          ancillaries?: Json
           calendar_event_ids?: Json
           created_at?: string
           currency?: string
