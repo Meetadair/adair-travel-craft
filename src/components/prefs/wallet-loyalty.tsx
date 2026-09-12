@@ -53,7 +53,7 @@ export function WalletLoyalty() {
     mutationFn: async (category: LoyaltyCategory) => {
       const option = programmeByCode(category, draft.programmeCode);
       const label = option?.label ?? draft.customLabel.trim();
-      if (!label || draft.memberNumber.trim().length < 4) throw new Error("incomplete");
+      if (!label) throw new Error("incomplete");
       await save({
         data: {
           category,
@@ -111,12 +111,17 @@ export function WalletLoyalty() {
               <div className="min-w-0">
                 <p className="truncate text-sm font-medium">{m.programmeLabel}</p>
                 <p className="text-xs text-muted-foreground">
-                  {revealed[m.id] ?? maskNumber(m.last4)}
+                  {m.hasNumber ? (revealed[m.id] ?? maskNumber(m.last4)) : "No member number"}
                   {m.tier ? ` · ${m.tier}` : ""}
                 </p>
+                {!m.hasNumber && (
+                  <p className="mt-1 text-xs text-primary">
+                    Incomplete — without your member number, miles won't be credited.
+                  </p>
+                )}
               </div>
               <div className="flex items-center gap-3">
-                {!revealed[m.id] && (
+                {m.hasNumber && !revealed[m.id] && (
                   <button
                     type="button"
                     onClick={() => revealMutation.mutate(m.id)}
@@ -176,6 +181,11 @@ export function WalletLoyalty() {
                   autoComplete="off"
                   className={inputClass}
                 />
+                {draft.memberNumber.trim().length < 4 && (
+                  <span className="mt-1 block text-xs text-primary">
+                    Without your member number, miles won't be credited.
+                  </span>
+                )}
               </label>
 
               <label className="block">
@@ -192,7 +202,7 @@ export function WalletLoyalty() {
 
               {addMutation.isError && (
                 <p className="text-sm text-primary">
-                  Please choose a programme and enter the member number.
+                  Please choose a programme or type its name.
                 </p>
               )}
 
