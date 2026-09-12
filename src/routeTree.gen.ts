@@ -20,6 +20,7 @@ import { Route as LangAssistantRouteImport } from './routes/$lang.assistant'
 import { Route as LangAuthRouteImport } from './routes/$lang.auth'
 import { Route as LangBusinessRouteImport } from './routes/$lang.business'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedGetawayRouteImport } from './routes/_authenticated/getaway'
 import { Route as AuthenticatedInvoicesRouteImport } from './routes/_authenticated/invoices'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedPlanRouteImport } from './routes/_authenticated/plan'
@@ -27,9 +28,12 @@ import { Route as AuthenticatedPreferencesRouteImport } from './routes/_authenti
 import { Route as AuthenticatedTripsRouteImport } from './routes/_authenticated/trips'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authenticated/admin.analytics'
+import { Route as AuthenticatedAdminGetawayRouteImport } from './routes/_authenticated/admin.getaway'
 import { Route as AuthenticatedAdminPaymentsRouteImport } from './routes/_authenticated/admin.payments'
 import { Route as AuthenticatedBookCardIdRouteImport } from './routes/_authenticated/book.$cardId'
 import { Route as AuthenticatedDevStatusRouteImport } from './routes/_authenticated/dev.status'
+import { Route as ApiPublicGetawayPricesRouteImport } from './routes/api/public/getaway-prices'
+import { Route as ApiPublicGetawayWeeklyRouteImport } from './routes/api/public/getaway-weekly'
 import { Route as ApiPublicTripRemindersRouteImport } from './routes/api/public/trip-reminders'
 import { Route as ApiTripParseRouteImport } from './routes/api/trip/parse'
 import { Route as ApiTripPriceContextRouteImport } from './routes/api/trip/price-context'
@@ -91,6 +95,11 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedGetawayRoute = AuthenticatedGetawayRouteImport.update({
+  id: '/getaway',
+  path: '/getaway',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedInvoicesRoute = AuthenticatedInvoicesRouteImport.update({
   id: '/invoices',
   path: '/invoices',
@@ -128,6 +137,12 @@ const AuthenticatedAdminAnalyticsRoute =
     path: '/admin/analytics',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminGetawayRoute =
+  AuthenticatedAdminGetawayRouteImport.update({
+    id: '/admin/getaway',
+    path: '/admin/getaway',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminPaymentsRoute =
   AuthenticatedAdminPaymentsRouteImport.update({
     id: '/admin/payments',
@@ -143,6 +158,16 @@ const AuthenticatedDevStatusRoute = AuthenticatedDevStatusRouteImport.update({
   id: '/dev/status',
   path: '/dev/status',
   getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const ApiPublicGetawayPricesRoute = ApiPublicGetawayPricesRouteImport.update({
+  id: '/api/public/getaway-prices',
+  path: '/api/public/getaway-prices',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicGetawayWeeklyRoute = ApiPublicGetawayWeeklyRouteImport.update({
+  id: '/api/public/getaway-weekly',
+  path: '/api/public/getaway-weekly',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicTripRemindersRoute = ApiPublicTripRemindersRouteImport.update({
   id: '/api/public/trip-reminders',
@@ -187,6 +212,7 @@ export interface FileRoutesByFullPath {
   '/$lang/auth': typeof LangAuthRoute
   '/$lang/business': typeof LangBusinessRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/getaway': typeof AuthenticatedGetawayRoute
   '/invoices': typeof AuthenticatedInvoicesRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/plan': typeof AuthenticatedPlanRoute
@@ -194,9 +220,12 @@ export interface FileRoutesByFullPath {
   '/trips': typeof AuthenticatedTripsRoute
   '/$lang/': typeof LangIndexRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
+  '/admin/getaway': typeof AuthenticatedAdminGetawayRoute
   '/admin/payments': typeof AuthenticatedAdminPaymentsRoute
   '/book/$cardId': typeof AuthenticatedBookCardIdRoute
   '/dev/status': typeof AuthenticatedDevStatusRoute
+  '/api/public/getaway-prices': typeof ApiPublicGetawayPricesRoute
+  '/api/public/getaway-weekly': typeof ApiPublicGetawayWeeklyRoute
   '/api/public/trip-reminders': typeof ApiPublicTripRemindersRoute
   '/api/trip/parse': typeof ApiTripParseRoute
   '/api/trip/price-context': typeof ApiTripPriceContextRoute
@@ -214,6 +243,7 @@ export interface FileRoutesByTo {
   '/$lang/auth': typeof LangAuthRoute
   '/$lang/business': typeof LangBusinessRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/getaway': typeof AuthenticatedGetawayRoute
   '/invoices': typeof AuthenticatedInvoicesRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/plan': typeof AuthenticatedPlanRoute
@@ -221,9 +251,12 @@ export interface FileRoutesByTo {
   '/trips': typeof AuthenticatedTripsRoute
   '/$lang': typeof LangIndexRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
+  '/admin/getaway': typeof AuthenticatedAdminGetawayRoute
   '/admin/payments': typeof AuthenticatedAdminPaymentsRoute
   '/book/$cardId': typeof AuthenticatedBookCardIdRoute
   '/dev/status': typeof AuthenticatedDevStatusRoute
+  '/api/public/getaway-prices': typeof ApiPublicGetawayPricesRoute
+  '/api/public/getaway-weekly': typeof ApiPublicGetawayWeeklyRoute
   '/api/public/trip-reminders': typeof ApiPublicTripRemindersRoute
   '/api/trip/parse': typeof ApiTripParseRoute
   '/api/trip/price-context': typeof ApiTripPriceContextRoute
@@ -244,6 +277,7 @@ export interface FileRoutesById {
   '/$lang/auth': typeof LangAuthRoute
   '/$lang/business': typeof LangBusinessRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/getaway': typeof AuthenticatedGetawayRoute
   '/_authenticated/invoices': typeof AuthenticatedInvoicesRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/plan': typeof AuthenticatedPlanRoute
@@ -251,9 +285,12 @@ export interface FileRoutesById {
   '/_authenticated/trips': typeof AuthenticatedTripsRoute
   '/$lang/': typeof LangIndexRoute
   '/_authenticated/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
+  '/_authenticated/admin/getaway': typeof AuthenticatedAdminGetawayRoute
   '/_authenticated/admin/payments': typeof AuthenticatedAdminPaymentsRoute
   '/_authenticated/book/$cardId': typeof AuthenticatedBookCardIdRoute
   '/_authenticated/dev/status': typeof AuthenticatedDevStatusRoute
+  '/api/public/getaway-prices': typeof ApiPublicGetawayPricesRoute
+  '/api/public/getaway-weekly': typeof ApiPublicGetawayWeeklyRoute
   '/api/public/trip-reminders': typeof ApiPublicTripRemindersRoute
   '/api/trip/parse': typeof ApiTripParseRoute
   '/api/trip/price-context': typeof ApiTripPriceContextRoute
@@ -274,6 +311,7 @@ export interface FileRouteTypes {
     | '/$lang/auth'
     | '/$lang/business'
     | '/dashboard'
+    | '/getaway'
     | '/invoices'
     | '/onboarding'
     | '/plan'
@@ -281,9 +319,12 @@ export interface FileRouteTypes {
     | '/trips'
     | '/$lang/'
     | '/admin/analytics'
+    | '/admin/getaway'
     | '/admin/payments'
     | '/book/$cardId'
     | '/dev/status'
+    | '/api/public/getaway-prices'
+    | '/api/public/getaway-weekly'
     | '/api/public/trip-reminders'
     | '/api/trip/parse'
     | '/api/trip/price-context'
@@ -301,6 +342,7 @@ export interface FileRouteTypes {
     | '/$lang/auth'
     | '/$lang/business'
     | '/dashboard'
+    | '/getaway'
     | '/invoices'
     | '/onboarding'
     | '/plan'
@@ -308,9 +350,12 @@ export interface FileRouteTypes {
     | '/trips'
     | '/$lang'
     | '/admin/analytics'
+    | '/admin/getaway'
     | '/admin/payments'
     | '/book/$cardId'
     | '/dev/status'
+    | '/api/public/getaway-prices'
+    | '/api/public/getaway-weekly'
     | '/api/public/trip-reminders'
     | '/api/trip/parse'
     | '/api/trip/price-context'
@@ -330,6 +375,7 @@ export interface FileRouteTypes {
     | '/$lang/auth'
     | '/$lang/business'
     | '/_authenticated/dashboard'
+    | '/_authenticated/getaway'
     | '/_authenticated/invoices'
     | '/_authenticated/onboarding'
     | '/_authenticated/plan'
@@ -337,9 +383,12 @@ export interface FileRouteTypes {
     | '/_authenticated/trips'
     | '/$lang/'
     | '/_authenticated/admin/analytics'
+    | '/_authenticated/admin/getaway'
     | '/_authenticated/admin/payments'
     | '/_authenticated/book/$cardId'
     | '/_authenticated/dev/status'
+    | '/api/public/getaway-prices'
+    | '/api/public/getaway-weekly'
     | '/api/public/trip-reminders'
     | '/api/trip/parse'
     | '/api/trip/price-context'
@@ -356,6 +405,8 @@ export interface RootRouteChildren {
   AssistantRoute: typeof AssistantRoute
   AuthRoute: typeof AuthRoute
   BusinessRoute: typeof BusinessRoute
+  ApiPublicGetawayPricesRoute: typeof ApiPublicGetawayPricesRoute
+  ApiPublicGetawayWeeklyRoute: typeof ApiPublicGetawayWeeklyRoute
   ApiPublicTripRemindersRoute: typeof ApiPublicTripRemindersRoute
   ApiTripParseRoute: typeof ApiTripParseRoute
   ApiTripPriceContextRoute: typeof ApiTripPriceContextRoute
@@ -443,6 +494,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/getaway': {
+      id: '/_authenticated/getaway'
+      path: '/getaway'
+      fullPath: '/getaway'
+      preLoaderRoute: typeof AuthenticatedGetawayRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/invoices': {
       id: '/_authenticated/invoices'
       path: '/invoices'
@@ -492,6 +550,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminAnalyticsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/getaway': {
+      id: '/_authenticated/admin/getaway'
+      path: '/admin/getaway'
+      fullPath: '/admin/getaway'
+      preLoaderRoute: typeof AuthenticatedAdminGetawayRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/payments': {
       id: '/_authenticated/admin/payments'
       path: '/admin/payments'
@@ -512,6 +577,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/dev/status'
       preLoaderRoute: typeof AuthenticatedDevStatusRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/api/public/getaway-prices': {
+      id: '/api/public/getaway-prices'
+      path: '/api/public/getaway-prices'
+      fullPath: '/api/public/getaway-prices'
+      preLoaderRoute: typeof ApiPublicGetawayPricesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/getaway-weekly': {
+      id: '/api/public/getaway-weekly'
+      path: '/api/public/getaway-weekly'
+      fullPath: '/api/public/getaway-weekly'
+      preLoaderRoute: typeof ApiPublicGetawayWeeklyRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/public/trip-reminders': {
       id: '/api/public/trip-reminders'
@@ -560,12 +639,14 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedGetawayRoute: typeof AuthenticatedGetawayRoute
   AuthenticatedInvoicesRoute: typeof AuthenticatedInvoicesRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedPlanRoute: typeof AuthenticatedPlanRoute
   AuthenticatedPreferencesRoute: typeof AuthenticatedPreferencesRoute
   AuthenticatedTripsRoute: typeof AuthenticatedTripsRoute
   AuthenticatedAdminAnalyticsRoute: typeof AuthenticatedAdminAnalyticsRoute
+  AuthenticatedAdminGetawayRoute: typeof AuthenticatedAdminGetawayRoute
   AuthenticatedAdminPaymentsRoute: typeof AuthenticatedAdminPaymentsRoute
   AuthenticatedBookCardIdRoute: typeof AuthenticatedBookCardIdRoute
   AuthenticatedDevStatusRoute: typeof AuthenticatedDevStatusRoute
@@ -574,12 +655,14 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedGetawayRoute: AuthenticatedGetawayRoute,
   AuthenticatedInvoicesRoute: AuthenticatedInvoicesRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedPlanRoute: AuthenticatedPlanRoute,
   AuthenticatedPreferencesRoute: AuthenticatedPreferencesRoute,
   AuthenticatedTripsRoute: AuthenticatedTripsRoute,
   AuthenticatedAdminAnalyticsRoute: AuthenticatedAdminAnalyticsRoute,
+  AuthenticatedAdminGetawayRoute: AuthenticatedAdminGetawayRoute,
   AuthenticatedAdminPaymentsRoute: AuthenticatedAdminPaymentsRoute,
   AuthenticatedBookCardIdRoute: AuthenticatedBookCardIdRoute,
   AuthenticatedDevStatusRoute: AuthenticatedDevStatusRoute,
@@ -612,6 +695,8 @@ const rootRouteChildren: RootRouteChildren = {
   AssistantRoute: AssistantRoute,
   AuthRoute: AuthRoute,
   BusinessRoute: BusinessRoute,
+  ApiPublicGetawayPricesRoute: ApiPublicGetawayPricesRoute,
+  ApiPublicGetawayWeeklyRoute: ApiPublicGetawayWeeklyRoute,
   ApiPublicTripRemindersRoute: ApiPublicTripRemindersRoute,
   ApiTripParseRoute: ApiTripParseRoute,
   ApiTripPriceContextRoute: ApiTripPriceContextRoute,

@@ -298,6 +298,410 @@ export type Database = {
         }
         Relationships: []
       }
+      getaway_destination_themes: {
+        Row: {
+          created_at: string
+          destination_id: string
+          editorial_angle: string | null
+          id: string
+          season_months: number[]
+          theme_id: string
+        }
+        Insert: {
+          created_at?: string
+          destination_id: string
+          editorial_angle?: string | null
+          id?: string
+          season_months?: number[]
+          theme_id: string
+        }
+        Update: {
+          created_at?: string
+          destination_id?: string
+          editorial_angle?: string | null
+          id?: string
+          season_months?: number[]
+          theme_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "getaway_destination_themes_destination_id_fkey"
+            columns: ["destination_id"]
+            isOneToOne: false
+            referencedRelation: "getaway_destinations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "getaway_destination_themes_theme_id_fkey"
+            columns: ["theme_id"]
+            isOneToOne: false
+            referencedRelation: "getaway_themes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      getaway_destinations: {
+        Row: {
+          active: boolean
+          avoid_when: string | null
+          best_for: string | null
+          country: string
+          created_at: string
+          drivable_from: string[]
+          editorial_note: string | null
+          id: string
+          latitude: number
+          longitude: number
+          name: string
+          nearest_airport_iata: string
+          typical_nights: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          avoid_when?: string | null
+          best_for?: string | null
+          country: string
+          created_at?: string
+          drivable_from?: string[]
+          editorial_note?: string | null
+          id?: string
+          latitude: number
+          longitude: number
+          name: string
+          nearest_airport_iata: string
+          typical_nights?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          avoid_when?: string | null
+          best_for?: string | null
+          country?: string
+          created_at?: string
+          drivable_from?: string[]
+          editorial_note?: string | null
+          id?: string
+          latitude?: number
+          longitude?: number
+          name?: string
+          nearest_airport_iata?: string
+          typical_nights?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      getaway_itineraries: {
+        Row: {
+          active: boolean
+          created_at: string
+          destination_id: string
+          id: string
+          nights: number
+          summary: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          destination_id: string
+          id?: string
+          nights?: number
+          summary?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          destination_id?: string
+          id?: string
+          nights?: number
+          summary?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "getaway_itineraries_destination_id_fkey"
+            columns: ["destination_id"]
+            isOneToOne: false
+            referencedRelation: "getaway_destinations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      getaway_itinerary_days: {
+        Row: {
+          afternoon: string | null
+          created_at: string
+          day_number: number
+          evening: string | null
+          id: string
+          itinerary_id: string
+          meal_place_ids: string[]
+          morning: string | null
+          sleep_place_id: string | null
+        }
+        Insert: {
+          afternoon?: string | null
+          created_at?: string
+          day_number: number
+          evening?: string | null
+          id?: string
+          itinerary_id: string
+          meal_place_ids?: string[]
+          morning?: string | null
+          sleep_place_id?: string | null
+        }
+        Update: {
+          afternoon?: string | null
+          created_at?: string
+          day_number?: number
+          evening?: string | null
+          id?: string
+          itinerary_id?: string
+          meal_place_ids?: string[]
+          morning?: string | null
+          sleep_place_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "getaway_itinerary_days_itinerary_id_fkey"
+            columns: ["itinerary_id"]
+            isOneToOne: false
+            referencedRelation: "getaway_itineraries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "getaway_itinerary_days_sleep_place_id_fkey"
+            columns: ["sleep_place_id"]
+            isOneToOne: false
+            referencedRelation: "getaway_places"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      getaway_places: {
+        Row: {
+          active: boolean
+          address: string | null
+          created_at: string
+          destination_id: string
+          editorial_note: string | null
+          family_friendly: boolean
+          id: string
+          kind: string
+          latitude: number | null
+          longitude: number | null
+          name: string
+          price_band: string | null
+          updated_at: string
+          why_this_one: string | null
+        }
+        Insert: {
+          active?: boolean
+          address?: string | null
+          created_at?: string
+          destination_id: string
+          editorial_note?: string | null
+          family_friendly?: boolean
+          id?: string
+          kind: string
+          latitude?: number | null
+          longitude?: number | null
+          name: string
+          price_band?: string | null
+          updated_at?: string
+          why_this_one?: string | null
+        }
+        Update: {
+          active?: boolean
+          address?: string | null
+          created_at?: string
+          destination_id?: string
+          editorial_note?: string | null
+          family_friendly?: boolean
+          id?: string
+          kind?: string
+          latitude?: number | null
+          longitude?: number | null
+          name?: string
+          price_band?: string | null
+          updated_at?: string
+          why_this_one?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "getaway_places_destination_id_fkey"
+            columns: ["destination_id"]
+            isOneToOne: false
+            referencedRelation: "getaway_destinations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      getaway_prices: {
+        Row: {
+          checked_at: string
+          currency: string
+          depart_date: string
+          destination_id: string
+          flight_minor: number | null
+          id: string
+          origin_iata: string
+          return_date: string
+          stay_minor: number | null
+        }
+        Insert: {
+          checked_at?: string
+          currency?: string
+          depart_date: string
+          destination_id: string
+          flight_minor?: number | null
+          id?: string
+          origin_iata: string
+          return_date: string
+          stay_minor?: number | null
+        }
+        Update: {
+          checked_at?: string
+          currency?: string
+          depart_date?: string
+          destination_id?: string
+          flight_minor?: number | null
+          id?: string
+          origin_iata?: string
+          return_date?: string
+          stay_minor?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "getaway_prices_destination_id_fkey"
+            columns: ["destination_id"]
+            isOneToOne: false
+            referencedRelation: "getaway_destinations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      getaway_proposals: {
+        Row: {
+          created_at: string
+          destination_id: string
+          emailed_at: string | null
+          id: string
+          reasons: Json
+          theme_id: string | null
+          user_id: string
+          week_start: string
+        }
+        Insert: {
+          created_at?: string
+          destination_id: string
+          emailed_at?: string | null
+          id?: string
+          reasons?: Json
+          theme_id?: string | null
+          user_id: string
+          week_start: string
+        }
+        Update: {
+          created_at?: string
+          destination_id?: string
+          emailed_at?: string | null
+          id?: string
+          reasons?: Json
+          theme_id?: string | null
+          user_id?: string
+          week_start?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "getaway_proposals_destination_id_fkey"
+            columns: ["destination_id"]
+            isOneToOne: false
+            referencedRelation: "getaway_destinations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "getaway_proposals_theme_id_fkey"
+            columns: ["theme_id"]
+            isOneToOne: false
+            referencedRelation: "getaway_themes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      getaway_theme_optouts: {
+        Row: {
+          created_at: string
+          id: string
+          theme_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          theme_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          theme_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "getaway_theme_optouts_theme_id_fkey"
+            columns: ["theme_id"]
+            isOneToOne: false
+            referencedRelation: "getaway_themes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      getaway_themes: {
+        Row: {
+          active: boolean
+          created_at: string
+          description: string | null
+          id: string
+          interest_tags: string[]
+          name: string
+          season_months: number[]
+          slug: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          id?: string
+          interest_tags?: string[]
+          name: string
+          season_months?: number[]
+          slug: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          id?: string
+          interest_tags?: string[]
+          name?: string
+          season_months?: number[]
+          slug?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       hotel_requests_missed: {
         Row: {
           checkin_date: string | null
