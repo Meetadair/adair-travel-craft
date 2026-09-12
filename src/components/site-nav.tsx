@@ -13,10 +13,7 @@ import {
   type SitePath,
 } from "@/lib/i18n";
 
-const NAV: Array<{ to: SitePath; key: "assistant" | "business" }> = [
-  { to: "/assistant", key: "assistant" },
-  { to: "/business", key: "business" },
-];
+const NAV: Array<{ to: SitePath; key: "assistant" }> = [{ to: "/assistant", key: "assistant" }];
 
 function LanguageMenu() {
   const locale = useLocale();

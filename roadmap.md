@@ -37,3 +37,11 @@
 - [x] Verify onboarding/preferences show selectable lists: airlines, cabin, seat, hotel chains/amenities/stars/rating/distance, cars, cuisines, music, interests
 - [x] Multi-city map + reordering available for any trip, incl. private (Warsaw>Paris>New York>London)
 - [ ] Idea to consider: early-booking discounts for private trips (honeymoon/holidays)
+
+## Round: Sep 12 task list
+- [x] Task 0: move "For companies" out of the top nav to the footer (it is an offer page, not the user panel)
+- [x] Task 1: verify typecheck + preview, Invoices/Settings in nav, invoice email after booking
+- [ ] Task 2: peak-pricing baseline comparison (±3/7/14 days), Claude event naming, ask-to-move-dates prompt (leisure only)
+- [ ] Task 3: swap a line from stored alternatives, choice_feedback table, per-line match score, trip budget status, amend-by-sentence
+- [ ] Task 4: split questionnaire into Part 1 essentials + dealbreakers (hard filters) and Part 2 optional refinement with completion %
+- [ ] Task 5: smaller logo in the top bar (~70-75%)

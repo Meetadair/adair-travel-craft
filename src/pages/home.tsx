@@ -1353,6 +1353,7 @@ function Teams({ t }: { t: Dict }) {
 
 export function HomePage() {
   const t = useT();
+  const locale = useLocale();
   const [submission, setSubmission] = useState<Submission | null>(null);
   const reduced = usePrefersReducedMotion();
   const divider = (
@@ -1393,7 +1394,16 @@ export function HomePage() {
           <span className="font-display text-lg font-semibold tracking-tight text-foreground">
             Adair<span className="text-primary">.</span>
           </span>
-          <p className="text-xs text-muted-foreground">{t.home.footer}</p>
+          <div className="flex flex-wrap items-center gap-4">
+            <LocaleLink
+              to="/business"
+              locale={locale}
+              className="text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+            >
+              {t.nav.business}
+            </LocaleLink>
+            <p className="text-xs text-muted-foreground">{t.home.footer}</p>
+          </div>
         </div>
       </footer>
     </div>
