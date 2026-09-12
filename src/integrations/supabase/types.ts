@@ -244,6 +244,57 @@ export type Database = {
         }
         Relationships: []
       }
+      credits: {
+        Row: {
+          amount_minor: number
+          created_at: string
+          currency: string
+          id: string
+          kind: string
+          reason: string
+          referral_id: string | null
+          trip_id: string | null
+          user_id: string
+        }
+        Insert: {
+          amount_minor: number
+          created_at?: string
+          currency?: string
+          id?: string
+          kind: string
+          reason: string
+          referral_id?: string | null
+          trip_id?: string | null
+          user_id: string
+        }
+        Update: {
+          amount_minor?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          kind?: string
+          reason?: string
+          referral_id?: string | null
+          trip_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "credits_referral_id_fkey"
+            columns: ["referral_id"]
+            isOneToOne: false
+            referencedRelation: "referrals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "credits_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       error_log: {
         Row: {
           created_at: string
@@ -1145,6 +1196,60 @@ export type Database = {
         }
         Relationships: []
       }
+      referral_codes: {
+        Row: {
+          code: string
+          created_at: string
+          user_id: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          user_id: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      referrals: {
+        Row: {
+          code: string
+          created_at: string
+          granted_at: string | null
+          id: string
+          referred_email: string | null
+          referred_user_id: string | null
+          referrer_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          granted_at?: string | null
+          id?: string
+          referred_email?: string | null
+          referred_user_id?: string | null
+          referrer_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          granted_at?: string | null
+          id?: string
+          referred_email?: string | null
+          referred_user_id?: string | null
+          referrer_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       saved_cards: {
         Row: {
           brand: string | null
@@ -1220,6 +1325,33 @@ export type Database = {
           stripe_subscription_id?: string | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      supplier_events: {
+        Row: {
+          event_id: string
+          event_kind: string
+          id: string
+          order_reference: string | null
+          provider: string
+          received_at: string
+        }
+        Insert: {
+          event_id: string
+          event_kind: string
+          id?: string
+          order_reference?: string | null
+          provider?: string
+          received_at?: string
+        }
+        Update: {
+          event_id?: string
+          event_kind?: string
+          id?: string
+          order_reference?: string | null
+          provider?: string
+          received_at?: string
         }
         Relationships: []
       }
@@ -1495,25 +1627,34 @@ export type Database = {
           created_at: string
           email: string
           id: string
+          invite_error: string | null
+          invited_at: string | null
           referral_code: string
           sentence: string | null
           type: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string
           email: string
           id?: string
+          invite_error?: string | null
+          invited_at?: string | null
           referral_code: string
           sentence?: string | null
           type?: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string
           email?: string
           id?: string
+          invite_error?: string | null
+          invited_at?: string | null
           referral_code?: string
           sentence?: string | null
           type?: string
+          user_id?: string | null
         }
         Relationships: []
       }

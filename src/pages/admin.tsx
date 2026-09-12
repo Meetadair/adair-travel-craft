@@ -12,6 +12,8 @@ import {
   savePricingRule,
   setProviderEnabled,
   setUserAdmin,
+  listWaitlist,
+  inviteWaitlist,
   type PricingRuleRow,
 } from "@/lib/admin.functions";
 
@@ -72,6 +74,63 @@ function RuleRow({ rule, onSaved }: { rule: PricingRuleRow; onSaved: () => void 
       </button>
       {mutation.isError && <span className="text-xs text-primary">Could not save.</span>}
     </div>
+  );
+}
+
+function WaitlistCard() {
+  const fetchWaitlist = useServerFn(listWaitlist);
+  const invite = useServerFn(inviteWaitlist);
+  const queryClient = useQueryClient();
+  const rows = useQuery({ queryKey: ["admin-waitlist"], queryFn: () => fetchWaitlist() });
+  const [note, setNote] = useState("");
+
+  const send = useMutation({
+    mutationFn: (ids: string[]) => invite({ data: { ids } }),
+    onSuccess: (result) => {
+      setNote(`${result.invited} invited · ${result.skipped} already done · ${result.failed} failed`);
+      void queryClient.invalidateQueries({ queryKey: ["admin-waitlist"] });
+    },
+    onError: () => setNote("Invitations could not be sent just now."),
+  });
+
+  const pending = (rows.data ?? []).filter((row) => !row.invitedAt && !row.hasAccount);
+
+  return (
+    <Card
+      title="Waitlist"
+      hint="Turn sign-ups into real account invitations so both lists stay in step."
+    >
+      <div className="flex flex-wrap items-center gap-3">
+        <button
+          disabled={!pending.length || send.isPending}
+          onClick={() => send.mutate(pending.slice(0, 50).map((row) => row.id))}
+          className="rounded-xl border border-border px-4 py-2 text-sm font-medium transition-colors hover:bg-secondary disabled:opacity-50"
+        >
+          {send.isPending ? "Inviting…" : `Invite ${Math.min(pending.length, 50)} waiting`}
+        </button>
+        {note && <span className="text-xs text-muted-foreground">{note}</span>}
+      </div>
+      <div className="hairline-card mt-4 divide-y divide-border">
+        {(rows.data ?? []).length === 0 && (
+          <p className="p-4 text-sm text-muted-foreground">Nobody on the waitlist yet.</p>
+        )}
+        {(rows.data ?? []).slice(0, 40).map((row) => (
+          <p key={row.id} className="flex flex-wrap items-baseline justify-between gap-2 p-3 text-sm">
+            <span className="min-w-0 truncate">{row.email}</span>
+            <span className="text-xs text-muted-foreground">
+              {row.type} ·{" "}
+              {row.hasAccount
+                ? "account"
+                : row.invitedAt
+                  ? "invited"
+                  : row.inviteError
+                    ? `failed: ${row.inviteError}`
+                    : "waiting"}
+            </span>
+          </p>
+        ))}
+      </div>
+    </Card>
   );
 }
 
@@ -271,6 +330,8 @@ export function AdminPage() {
                 ))}
               </div>
             </Card>
+
+            <WaitlistCard />
 
             <Card title="Recent errors">
               <div className="hairline-card divide-y divide-border">

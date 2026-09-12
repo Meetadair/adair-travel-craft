@@ -87,6 +87,14 @@ export function reachFrom(
   };
 }
 
+/**
+ * SEASON as a hard rule: a destination is only ever proposed inside the season
+ * window on its theme join row. Enforced in the query and re-checked here.
+ */
+export function inSeason(seasonMonths: number[] | null | undefined, month: number): boolean {
+  return Array.isArray(seasonMonths) && seasonMonths.includes(month);
+}
+
 /** Profile interests → the tags used on themes. */
 const INTEREST_TAGS: Record<string, string[]> = {
   ski: ["skiing", "snowboarding", "mountains"],

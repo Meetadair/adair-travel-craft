@@ -126,6 +126,13 @@ export function SiteNav() {
                 Invoices
               </Link>
               <Link
+                to="/credit"
+                className={`hidden sm:inline-block ${linkClass}`}
+                activeProps={{ className: "text-foreground" }}
+              >
+                Credit
+              </Link>
+              <Link
                 to="/preferences"
                 className={linkClass}
                 activeProps={{ className: "text-foreground" }}

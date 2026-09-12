@@ -7,6 +7,8 @@ import { SiteNav } from "@/components/site-nav";
 import { RefineProfilePrompt } from "@/components/prefs/refine-prompt";
 import { supabase } from "@/integrations/supabase/client";
 import { listTrips, deleteTrip, getProfile, saveProfile } from "@/lib/travel.functions";
+import { attributeReferral } from "@/lib/referrals.functions";
+import { REFERRAL_STORAGE_KEY } from "@/routes/r.$code";
 import { downloadTripInvoice } from "@/lib/trip-pdf";
 import { useLocale, useT } from "@/lib/i18n";
 
@@ -30,9 +32,29 @@ export function DashboardPage() {
   const money = (amount: number, currency: string) =>
     `${Number(amount).toLocaleString(locale, { maximumFractionDigits: 2 })} ${currency}`;
 
+  const claimReferral = useServerFn(attributeReferral);
+
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setEmail(data.user?.email ?? ""));
   }, []);
+
+  // An invitation the visitor arrived with, claimed once they are signed in.
+  useEffect(() => {
+    let code = "";
+    try {
+      code = window.localStorage.getItem(REFERRAL_STORAGE_KEY) ?? "";
+    } catch {
+      code = "";
+    }
+    if (!code) return;
+    void claimReferral({ data: { code } }).finally(() => {
+      try {
+        window.localStorage.removeItem(REFERRAL_STORAGE_KEY);
+      } catch {
+        // Nothing to clean up when storage is unavailable.
+      }
+    });
+  }, [claimReferral]);
 
   const trips = useQuery({ queryKey: ["trips"], queryFn: () => fetchTrips({}) });
   const profile = useQuery({ queryKey: ["profile"], queryFn: () => fetchProfile({}) });

@@ -19,6 +19,7 @@ import { Route as LangIndexRouteImport } from './routes/$lang.index'
 import { Route as LangAssistantRouteImport } from './routes/$lang.assistant'
 import { Route as LangAuthRouteImport } from './routes/$lang.auth'
 import { Route as LangBusinessRouteImport } from './routes/$lang.business'
+import { Route as AuthenticatedCreditRouteImport } from './routes/_authenticated/credit'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedGetawayRouteImport } from './routes/_authenticated/getaway'
 import { Route as AuthenticatedInvoicesRouteImport } from './routes/_authenticated/invoices'
@@ -26,6 +27,7 @@ import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authentic
 import { Route as AuthenticatedPlanRouteImport } from './routes/_authenticated/plan'
 import { Route as AuthenticatedPreferencesRouteImport } from './routes/_authenticated/preferences'
 import { Route as AuthenticatedTripsRouteImport } from './routes/_authenticated/trips'
+import { Route as RCodeRouteImport } from './routes/r.$code'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authenticated/admin.analytics'
 import { Route as AuthenticatedAdminGetawayRouteImport } from './routes/_authenticated/admin.getaway'
@@ -38,6 +40,7 @@ import { Route as ApiPublicTripRemindersRouteImport } from './routes/api/public/
 import { Route as ApiTripParseRouteImport } from './routes/api/trip/parse'
 import { Route as ApiTripPriceContextRouteImport } from './routes/api/trip/price-context'
 import { Route as ApiTripSearchRouteImport } from './routes/api/trip/search'
+import { Route as ApiPublicSupplierOrderUpdatedRouteImport } from './routes/api/public/supplier/order-updated'
 import { Route as ApiPublicCalendarCallbackProviderRouteImport } from './routes/api/public/calendar/callback.$provider'
 import { Route as ApiPublicCalendarFeedTokenRouteImport } from './routes/api/public/calendar/feed.$token'
 
@@ -90,6 +93,11 @@ const LangBusinessRoute = LangBusinessRouteImport.update({
   path: '/business',
   getParentRoute: () => LangRoute,
 } as any)
+const AuthenticatedCreditRoute = AuthenticatedCreditRouteImport.update({
+  id: '/credit',
+  path: '/credit',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -125,6 +133,11 @@ const AuthenticatedTripsRoute = AuthenticatedTripsRouteImport.update({
   id: '/trips',
   path: '/trips',
   getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const RCodeRoute = RCodeRouteImport.update({
+  id: '/r/$code',
+  path: '/r/$code',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/admin/',
@@ -189,6 +202,12 @@ const ApiTripSearchRoute = ApiTripSearchRouteImport.update({
   path: '/api/trip/search',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicSupplierOrderUpdatedRoute =
+  ApiPublicSupplierOrderUpdatedRouteImport.update({
+    id: '/api/public/supplier/order-updated',
+    path: '/api/public/supplier/order-updated',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicCalendarCallbackProviderRoute =
   ApiPublicCalendarCallbackProviderRouteImport.update({
     id: '/api/public/calendar/callback/$provider',
@@ -211,6 +230,7 @@ export interface FileRoutesByFullPath {
   '/$lang/assistant': typeof LangAssistantRoute
   '/$lang/auth': typeof LangAuthRoute
   '/$lang/business': typeof LangBusinessRoute
+  '/credit': typeof AuthenticatedCreditRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/getaway': typeof AuthenticatedGetawayRoute
   '/invoices': typeof AuthenticatedInvoicesRoute
@@ -218,6 +238,7 @@ export interface FileRoutesByFullPath {
   '/plan': typeof AuthenticatedPlanRoute
   '/preferences': typeof AuthenticatedPreferencesRoute
   '/trips': typeof AuthenticatedTripsRoute
+  '/r/$code': typeof RCodeRoute
   '/$lang/': typeof LangIndexRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/getaway': typeof AuthenticatedAdminGetawayRoute
@@ -231,6 +252,7 @@ export interface FileRoutesByFullPath {
   '/api/trip/price-context': typeof ApiTripPriceContextRoute
   '/api/trip/search': typeof ApiTripSearchRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/api/public/supplier/order-updated': typeof ApiPublicSupplierOrderUpdatedRoute
   '/api/public/calendar/callback/$provider': typeof ApiPublicCalendarCallbackProviderRoute
   '/api/public/calendar/feed/$token': typeof ApiPublicCalendarFeedTokenRoute
 }
@@ -242,6 +264,7 @@ export interface FileRoutesByTo {
   '/$lang/assistant': typeof LangAssistantRoute
   '/$lang/auth': typeof LangAuthRoute
   '/$lang/business': typeof LangBusinessRoute
+  '/credit': typeof AuthenticatedCreditRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/getaway': typeof AuthenticatedGetawayRoute
   '/invoices': typeof AuthenticatedInvoicesRoute
@@ -249,6 +272,7 @@ export interface FileRoutesByTo {
   '/plan': typeof AuthenticatedPlanRoute
   '/preferences': typeof AuthenticatedPreferencesRoute
   '/trips': typeof AuthenticatedTripsRoute
+  '/r/$code': typeof RCodeRoute
   '/$lang': typeof LangIndexRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/getaway': typeof AuthenticatedAdminGetawayRoute
@@ -262,6 +286,7 @@ export interface FileRoutesByTo {
   '/api/trip/price-context': typeof ApiTripPriceContextRoute
   '/api/trip/search': typeof ApiTripSearchRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/api/public/supplier/order-updated': typeof ApiPublicSupplierOrderUpdatedRoute
   '/api/public/calendar/callback/$provider': typeof ApiPublicCalendarCallbackProviderRoute
   '/api/public/calendar/feed/$token': typeof ApiPublicCalendarFeedTokenRoute
 }
@@ -276,6 +301,7 @@ export interface FileRoutesById {
   '/$lang/assistant': typeof LangAssistantRoute
   '/$lang/auth': typeof LangAuthRoute
   '/$lang/business': typeof LangBusinessRoute
+  '/_authenticated/credit': typeof AuthenticatedCreditRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/getaway': typeof AuthenticatedGetawayRoute
   '/_authenticated/invoices': typeof AuthenticatedInvoicesRoute
@@ -283,6 +309,7 @@ export interface FileRoutesById {
   '/_authenticated/plan': typeof AuthenticatedPlanRoute
   '/_authenticated/preferences': typeof AuthenticatedPreferencesRoute
   '/_authenticated/trips': typeof AuthenticatedTripsRoute
+  '/r/$code': typeof RCodeRoute
   '/$lang/': typeof LangIndexRoute
   '/_authenticated/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/_authenticated/admin/getaway': typeof AuthenticatedAdminGetawayRoute
@@ -296,6 +323,7 @@ export interface FileRoutesById {
   '/api/trip/price-context': typeof ApiTripPriceContextRoute
   '/api/trip/search': typeof ApiTripSearchRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/api/public/supplier/order-updated': typeof ApiPublicSupplierOrderUpdatedRoute
   '/api/public/calendar/callback/$provider': typeof ApiPublicCalendarCallbackProviderRoute
   '/api/public/calendar/feed/$token': typeof ApiPublicCalendarFeedTokenRoute
 }
@@ -310,6 +338,7 @@ export interface FileRouteTypes {
     | '/$lang/assistant'
     | '/$lang/auth'
     | '/$lang/business'
+    | '/credit'
     | '/dashboard'
     | '/getaway'
     | '/invoices'
@@ -317,6 +346,7 @@ export interface FileRouteTypes {
     | '/plan'
     | '/preferences'
     | '/trips'
+    | '/r/$code'
     | '/$lang/'
     | '/admin/analytics'
     | '/admin/getaway'
@@ -330,6 +360,7 @@ export interface FileRouteTypes {
     | '/api/trip/price-context'
     | '/api/trip/search'
     | '/admin/'
+    | '/api/public/supplier/order-updated'
     | '/api/public/calendar/callback/$provider'
     | '/api/public/calendar/feed/$token'
   fileRoutesByTo: FileRoutesByTo
@@ -341,6 +372,7 @@ export interface FileRouteTypes {
     | '/$lang/assistant'
     | '/$lang/auth'
     | '/$lang/business'
+    | '/credit'
     | '/dashboard'
     | '/getaway'
     | '/invoices'
@@ -348,6 +380,7 @@ export interface FileRouteTypes {
     | '/plan'
     | '/preferences'
     | '/trips'
+    | '/r/$code'
     | '/$lang'
     | '/admin/analytics'
     | '/admin/getaway'
@@ -361,6 +394,7 @@ export interface FileRouteTypes {
     | '/api/trip/price-context'
     | '/api/trip/search'
     | '/admin'
+    | '/api/public/supplier/order-updated'
     | '/api/public/calendar/callback/$provider'
     | '/api/public/calendar/feed/$token'
   id:
@@ -374,6 +408,7 @@ export interface FileRouteTypes {
     | '/$lang/assistant'
     | '/$lang/auth'
     | '/$lang/business'
+    | '/_authenticated/credit'
     | '/_authenticated/dashboard'
     | '/_authenticated/getaway'
     | '/_authenticated/invoices'
@@ -381,6 +416,7 @@ export interface FileRouteTypes {
     | '/_authenticated/plan'
     | '/_authenticated/preferences'
     | '/_authenticated/trips'
+    | '/r/$code'
     | '/$lang/'
     | '/_authenticated/admin/analytics'
     | '/_authenticated/admin/getaway'
@@ -394,6 +430,7 @@ export interface FileRouteTypes {
     | '/api/trip/price-context'
     | '/api/trip/search'
     | '/_authenticated/admin/'
+    | '/api/public/supplier/order-updated'
     | '/api/public/calendar/callback/$provider'
     | '/api/public/calendar/feed/$token'
   fileRoutesById: FileRoutesById
@@ -405,12 +442,14 @@ export interface RootRouteChildren {
   AssistantRoute: typeof AssistantRoute
   AuthRoute: typeof AuthRoute
   BusinessRoute: typeof BusinessRoute
+  RCodeRoute: typeof RCodeRoute
   ApiPublicGetawayPricesRoute: typeof ApiPublicGetawayPricesRoute
   ApiPublicGetawayWeeklyRoute: typeof ApiPublicGetawayWeeklyRoute
   ApiPublicTripRemindersRoute: typeof ApiPublicTripRemindersRoute
   ApiTripParseRoute: typeof ApiTripParseRoute
   ApiTripPriceContextRoute: typeof ApiTripPriceContextRoute
   ApiTripSearchRoute: typeof ApiTripSearchRoute
+  ApiPublicSupplierOrderUpdatedRoute: typeof ApiPublicSupplierOrderUpdatedRoute
   ApiPublicCalendarCallbackProviderRoute: typeof ApiPublicCalendarCallbackProviderRoute
   ApiPublicCalendarFeedTokenRoute: typeof ApiPublicCalendarFeedTokenRoute
 }
@@ -487,6 +526,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LangBusinessRouteImport
       parentRoute: typeof LangRoute
     }
+    '/_authenticated/credit': {
+      id: '/_authenticated/credit'
+      path: '/credit'
+      fullPath: '/credit'
+      preLoaderRoute: typeof AuthenticatedCreditRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -535,6 +581,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/trips'
       preLoaderRoute: typeof AuthenticatedTripsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/r/$code': {
+      id: '/r/$code'
+      path: '/r/$code'
+      fullPath: '/r/$code'
+      preLoaderRoute: typeof RCodeRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin/': {
       id: '/_authenticated/admin/'
@@ -620,6 +673,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiTripSearchRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/supplier/order-updated': {
+      id: '/api/public/supplier/order-updated'
+      path: '/api/public/supplier/order-updated'
+      fullPath: '/api/public/supplier/order-updated'
+      preLoaderRoute: typeof ApiPublicSupplierOrderUpdatedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/calendar/callback/$provider': {
       id: '/api/public/calendar/callback/$provider'
       path: '/api/public/calendar/callback/$provider'
@@ -638,6 +698,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedCreditRoute: typeof AuthenticatedCreditRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedGetawayRoute: typeof AuthenticatedGetawayRoute
   AuthenticatedInvoicesRoute: typeof AuthenticatedInvoicesRoute
@@ -654,6 +715,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedCreditRoute: AuthenticatedCreditRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedGetawayRoute: AuthenticatedGetawayRoute,
   AuthenticatedInvoicesRoute: AuthenticatedInvoicesRoute,
@@ -695,12 +757,14 @@ const rootRouteChildren: RootRouteChildren = {
   AssistantRoute: AssistantRoute,
   AuthRoute: AuthRoute,
   BusinessRoute: BusinessRoute,
+  RCodeRoute: RCodeRoute,
   ApiPublicGetawayPricesRoute: ApiPublicGetawayPricesRoute,
   ApiPublicGetawayWeeklyRoute: ApiPublicGetawayWeeklyRoute,
   ApiPublicTripRemindersRoute: ApiPublicTripRemindersRoute,
   ApiTripParseRoute: ApiTripParseRoute,
   ApiTripPriceContextRoute: ApiTripPriceContextRoute,
   ApiTripSearchRoute: ApiTripSearchRoute,
+  ApiPublicSupplierOrderUpdatedRoute: ApiPublicSupplierOrderUpdatedRoute,
   ApiPublicCalendarCallbackProviderRoute:
     ApiPublicCalendarCallbackProviderRoute,
   ApiPublicCalendarFeedTokenRoute: ApiPublicCalendarFeedTokenRoute,

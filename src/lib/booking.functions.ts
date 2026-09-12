@@ -7,6 +7,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { TripSearchResponse, TripStop } from "@/lib/trip/types";
 import { CITIES } from "@/lib/trip/cities";
+import { paymentKey, shouldStopBeforeSupplier } from "@/lib/trip/idempotency";
 import {
   tripCalendarEvents,
   type CalendarEvent,
@@ -134,19 +135,21 @@ export const bookTripCard = createServerFn({ method: "POST" })
       status: string;
       expires_at: string | null;
     };
-    if (card.status === "booked") throw new Error("already-booked");
-
     // A settled payment already exists for this card: a retry must never charge
     // twice, so stop before touching the supplier.
-    const idempotencyKey = `${card.id}-payment`;
+    const idempotencyKey = paymentKey(card.id);
     const earlier = await supabase
       .from("payments")
       .select("status")
       .eq("user_id", userId)
       .eq("idempotency_key", idempotencyKey)
       .maybeSingle();
-    const settled = (earlier.data as { status?: string } | null)?.status;
-    if (settled === "test_settled" || settled === "settled") {
+    if (
+      shouldStopBeforeSupplier({
+        cardStatus: card.status,
+        earlierPaymentStatus: (earlier.data as { status?: string } | null)?.status ?? null,
+      })
+    ) {
       throw new Error("already-booked");
     }
 
@@ -486,12 +489,28 @@ export const bookTripCard = createServerFn({ method: "POST" })
       .eq("id", card.id)
       .eq("user_id", userId);
 
+    // Travel credit comes off this trip, and a referral pays out on the
+    // invited traveller's first confirmed booking. Never block the booking.
+    let creditAppliedMinor = 0;
+    try {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { availableCreditMinor, creditToApply, spendCredit, grantReferralRewards } =
+        await import("@/lib/referrals.server");
+      const balance = await availableCreditMinor(supabase as never, userId);
+      creditAppliedMinor = creditToApply(balance, Math.round(confirmedTotal * 100));
+      await spendCredit(supabaseAdmin as never, userId, tripId, creditAppliedMinor);
+      await grantReferralRewards(supabaseAdmin as never, userId, tripId);
+    } catch (error) {
+      console.error("credit/referral step failed", error);
+      creditAppliedMinor = 0;
+    }
+
     await supabase.from("payments").upsert(
       {
         user_id: userId,
         trip_id: tripId,
         provider_ref: flightOrderId,
-        amount_minor: Math.round(confirmedTotal * 100),
+        amount_minor: Math.max(0, Math.round(confirmedTotal * 100) - creditAppliedMinor),
         status: settledStatus,
         idempotency_key: idempotencyKey,
         failure_note: status === "partial" ? reason : null,
