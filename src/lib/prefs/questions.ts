@@ -730,6 +730,10 @@ export const DEFAULT_PREFS: TravelPrefs = {
   interests: [],
   music: [],
   budgetBand: null,
+  dealbreakers: [],
+  extraAnswers: {},
+  accessibilityNote: null,
+  avoidNote: null,
 };
 
 const RATING_TO_NUMBER: Record<string, number> = {
@@ -776,12 +780,23 @@ export function answersToPrefs(answers: Answers, toggles: Toggles): TravelPrefs 
     interests: answers["interests"] ?? [],
     music: answers["music"] ?? [],
     budgetBand: first(answers["budgetBand"]),
+    dealbreakers: DEALBREAKER_FIELDS.filter((field) => Boolean(toggles[field])),
+    extraAnswers: Object.fromEntries(
+      EXTRA_ANSWER_FIELDS.map((field) => [field, clean(field)]).filter(
+        ([, values]) => (values as string[]).length > 0,
+      ),
+    ) as Record<string, string[]>,
+    accessibilityNote: first(answers["accessibilityNote"]),
+    avoidNote: first(answers["avoidNote"]),
   };
 }
 
 export function prefsToAnswers(prefs: TravelPrefs): { answers: Answers; toggles: Toggles } {
   return {
     answers: {
+      ...prefs.extraAnswers,
+      accessibilityNote: prefs.accessibilityNote ? [prefs.accessibilityNote] : [],
+      avoidNote: prefs.avoidNote ? [prefs.avoidNote] : [],
       seat: [prefs.seat],
       cabinChoice: [prefs.cabinRule === "business_over_2h" ? "business_over_2h" : prefs.cabinClass],
       carTransmission: [prefs.carTransmission],
