@@ -19,9 +19,31 @@ function itineraryLines(items: ItemRow[]): string {
     .map((item) => {
       const p = item.payload ?? {};
       const when =
-        p['departAt'] ?? p['checkin'] ?? p['pickup'] ?? null;
-      const label = item.kind === "flight" ? "Flight" : item.kind === "car" ? "Car" : "Hotel";
-      return `<li>${label}: ${item.title}${when ? ` — ${String(when).replace("T", " ").slice(0, 16)}` : ""}</li>`;
+        p['departAt'] ??
+        p['pickupAt'] ??
+        p['reservationAt'] ??
+        p['checkin'] ??
+        p['pickup'] ??
+        null;
+      const label =
+        item.kind === "flight"
+          ? "Flight"
+          : item.kind === "car"
+            ? "Car"
+            : item.kind === "ride"
+              ? "Transfer"
+              : item.kind === "restaurant"
+                ? "Dinner"
+                : item.kind === "insurance"
+                  ? "Insurance"
+                  : "Hotel";
+      const where =
+        item.kind === "ride"
+          ? [p['pickupAddress'], p['dropoffAddress']].filter(Boolean).join(" → ")
+          : item.kind === "restaurant" && p['partySize']
+            ? `table for ${String(p['partySize'])}`
+            : "";
+      return `<li>${label}: ${item.title}${when ? ` — ${String(when).replace("T", " ").slice(0, 16)}` : ""}${where ? ` (${where})` : ""}</li>`;
     })
     .join("");
 }

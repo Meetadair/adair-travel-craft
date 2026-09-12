@@ -453,6 +453,39 @@ export type Database = {
         }
         Relationships: []
       }
+      providers: {
+        Row: {
+          category: string
+          created_at: string
+          enabled: boolean
+          id: string
+          label: string
+          priority: number
+          provider: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          label: string
+          priority?: number
+          provider: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          label?: string
+          priority?: number
+          provider?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       subscriptions: {
         Row: {
           created_at: string

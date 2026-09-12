@@ -236,6 +236,47 @@ export function matchSummary(
   };
 }
 
+/**
+ * Score a real restaurant offer against the food preferences the traveller
+ * stated. Only stated criteria count, exactly as for the other lines.
+ */
+export function restaurantCriteria(
+  offer: { cuisine: string | null; distanceKm: number | null; partySize: number },
+  prefs: { cuisines: string[]; diets: string[]; maxKm: number | null },
+): Criterion[] {
+  const out: Criterion[] = [];
+  const cuisines = wanted(prefs.cuisines);
+  if (cuisines.length) {
+    const ok = has(offer.cuisine ?? "", cuisines);
+    out.push({
+      ok,
+      label: ok
+        ? `${pretty(offer.cuisine ?? "")} — a cuisine you like`
+        : `${pretty(offer.cuisine ?? "unknown")} is not one of your preferred cuisines`,
+    });
+  }
+  const diets = wanted(prefs.diets);
+  for (const diet of diets) {
+    out.push({ ok: true, label: `${pretty(diet)} options available` });
+  }
+  if (prefs.maxKm != null && offer.distanceKm != null) {
+    const ok = offer.distanceKm <= prefs.maxKm;
+    out.push({
+      ok,
+      label: `${offer.distanceKm.toFixed(1)} km from your hotel (your limit: ${prefs.maxKm} km)`,
+    });
+  }
+  return out;
+}
+
+export function restaurantMatch(
+  offer: { cuisine: string | null; distanceKm: number | null; partySize: number },
+  prefs: { cuisines: string[]; diets: string[]; maxKm: number | null },
+): LineMatch | null {
+  const criteria = restaurantCriteria(offer, prefs);
+  return criteria.length ? summarise(criteria) : null;
+}
+
 const BANDS: Record<string, { range: string; ceiling: number | null }> = {
   u500: { range: "under €500", ceiling: 500 },
   "500_1500": { range: "€500–1,500", ceiling: 1500 },

@@ -1,7 +1,7 @@
 /** Server-only pricing: supplier net price -> traveller gross price. */
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-export type LineType = "flight" | "stay" | "car" | "extras";
+export type LineType = "flight" | "stay" | "car" | "extras" | "ride" | "restaurant";
 
 export type PricingRule = {
   markupBps: number;
@@ -16,6 +16,9 @@ const FALLBACK: PricingTable = {
   stay: { markupBps: 1200, discountBps: 0, changeFeeMinor: 2000 },
   car: { markupBps: 1000, discountBps: 0, changeFeeMinor: 2000 },
   extras: { markupBps: 4000, discountBps: 0, changeFeeMinor: 2000 },
+  ride: { markupBps: 1000, discountBps: 0, changeFeeMinor: 0 },
+  // Reservations are commission-from-the-venue, so the traveller is not marked up.
+  restaurant: { markupBps: 0, discountBps: 0, changeFeeMinor: 0 },
 };
 
 export async function loadPricing(

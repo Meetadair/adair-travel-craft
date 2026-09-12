@@ -35,6 +35,8 @@ const bookSchema = z.object({
     stay: z.boolean(),
     car: z.boolean(),
     insurance: z.boolean().optional(),
+    /** Optional airport transfers, by leg. */
+    rides: z.array(z.enum(["arrival", "departure"])).max(2).optional(),
   }),
   companyId: z.string().uuid().nullable(),
   traveller: travellerSchema,
@@ -224,6 +226,62 @@ export const bookTripCard = createServerFn({ method: "POST" })
 
 
 
+    // Airport transfers. Booked through the enabled ride provider when one is
+    // connected; otherwise stored as a requested line with no price, so the
+    // itinerary carries the pickup details without inventing a fare.
+    const wantedRides = data.include.rides ?? [];
+    if (wantedRides.length && search.flight) {
+      const [{ ridePlansFor }, registry] = await Promise.all([
+        import("@/lib/suppliers/rides/plan"),
+        import("@/lib/suppliers/registry.server"),
+      ]);
+      const provider = await registry.rideProvider(supabase);
+      for (const plan of ridePlansFor(search).filter((p) => wantedRides.includes(p.leg))) {
+        const payload: ItemCalendarPayload = {
+          pickupAt: plan.pickupAt,
+          pickupAddress: plan.pickupAddress,
+          dropoffAddress: plan.dropoffAddress,
+        };
+        if (provider.status !== "ok") {
+          lines.push({
+            kind: "ride",
+            title: plan.label,
+            status: "requested",
+            amountEur: 0,
+            reference: null,
+            note: "transfer-provider-not-connected",
+            payload,
+          });
+          continue;
+        }
+        const found = await provider.data.search(plan);
+        const quote = found.status === "ok" ? found.data[0] : null;
+        if (!quote) {
+          lines.push({
+            kind: "ride",
+            title: plan.label,
+            status: "requested",
+            amountEur: 0,
+            reference: null,
+            note: "transfer-provider-not-connected",
+            payload,
+          });
+          continue;
+        }
+        const order = await provider.data.book(plan, quote.quoteRef);
+        const gross = pricing.fromMinor(pricing.grossMinor(quote.netEur, table.ride));
+        lines.push({
+          kind: "ride",
+          title: `${plan.label} · ${quote.providerLabel}`,
+          status: order.status === "ok" ? "confirmed" : "requested",
+          amountEur: order.status === "ok" ? gross : 0,
+          reference: order.status === "ok" ? order.data.reference : null,
+          note: order.status === "ok" ? null : "transfer-provider-not-connected",
+          payload,
+        });
+      }
+    }
+
     if (!lines.length) throw new Error("nothing-selected");
 
     const confirmedTotal =
@@ -302,7 +360,12 @@ export const bookTripCard = createServerFn({ method: "POST" })
       title: line.title,
       detail: line.note,
       status: line.status,
-      supplier: line.kind === "insurance" ? "adair" : "duffel",
+      supplier:
+        line.kind === "insurance"
+          ? "adair"
+          : line.kind === "ride" || line.kind === "restaurant"
+            ? "partner"
+            : "duffel",
       supplier_order_id: line.kind === "flight" ? flightOrderId : null,
       offer_reference: line.reference,
       amount: line.amountEur,

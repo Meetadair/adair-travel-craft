@@ -6,6 +6,8 @@ import { Plane, BedDouble, CarFront, Check, AlertTriangle, ShieldCheck } from "l
 import { INSURANCE_DETAIL, INSURANCE_TITLE } from "@/lib/trip/insurance";
 import { SiteNav } from "@/components/site-nav";
 import { AddToCalendar } from "@/components/add-to-calendar";
+import { TripExtras } from "@/components/trip-extras";
+import type { RideLeg } from "@/lib/suppliers/types";
 
 import { getTripCard } from "@/lib/trip-live.functions";
 import { bookTripCard, type BookingResult } from "@/lib/booking.functions";
@@ -46,6 +48,12 @@ export function BookPage({ cardId }: { cardId: string }) {
     car: true,
     insurance: false,
   });
+  // Airport transfers the traveller opted into, by leg.
+  const [rides, setRides] = useState<RideLeg[]>([]);
+  const toggleRide = (leg: RideLeg) =>
+    setRides((current) =>
+      current.includes(leg) ? current.filter((l) => l !== leg) : [...current, leg],
+    );
   const [companyId, setCompanyId] = useState<string>("");
   const [traveller, setTraveller] = useState({
     givenName: "",
@@ -63,7 +71,7 @@ export function BookPage({ cardId }: { cardId: string }) {
       book({
         data: {
           cardId,
-          include,
+          include: { ...include, rides },
           companyId: companyId || null,
           traveller: {
             ...traveller,
@@ -184,6 +192,7 @@ export function BookPage({ cardId }: { cardId: string }) {
                   </p>
                 </div>
               )}
+              <TripExtras cardId={cardId} rides={rides} onToggleRide={toggleRide} />
               <div className="flex items-center justify-between px-5 py-4">
                 <span className="text-sm font-semibold">Total</span>
                 <span className="font-display text-xl font-semibold text-primary">

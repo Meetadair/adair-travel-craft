@@ -2,7 +2,16 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { Plane, BedDouble, CarFront, ShieldCheck, X } from "lucide-react";
+import {
+  Plane,
+  BedDouble,
+  CarFront,
+  CarTaxiFront,
+  ShieldCheck,
+  UtensilsCrossed,
+  X,
+} from "lucide-react";
+import { AddReservation } from "@/components/add-reservation";
 import { SiteNav } from "@/components/site-nav";
 import { AddToCalendar } from "@/components/add-to-calendar";
 import { TripRoute } from "@/components/trip-route";
@@ -18,6 +27,8 @@ const ICONS: Record<string, React.ReactNode> = {
   hotel: <BedDouble className="size-4" />,
   car: <CarFront className="size-4" />,
   insurance: <ShieldCheck className="size-4" />,
+  ride: <CarTaxiFront className="size-4" />,
+  restaurant: <UtensilsCrossed className="size-4" />,
 };
 
 function eventsFor(trip: MyTrip) {
@@ -161,6 +172,14 @@ export function TripsPage() {
                   </li>
                 ))}
               </ul>
+
+              {trip.status === "booked" && (
+                <AddReservation
+                  tripId={trip.id}
+                  startDate={trip.startDate}
+                  endDate={trip.endDate}
+                />
+              )}
 
               {trip.stops.length > 1 && (
                 <div className="border-t border-border px-5 py-4">

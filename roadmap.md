@@ -45,3 +45,12 @@
 - [x] Task 3: swap a line from stored alternatives, choice_feedback table, per-line match score, trip budget status, amend-by-sentence
 - [ ] Task 4: split questionnaire into Part 1 essentials + dealbreakers (hard filters) and Part 2 optional refinement with completion %
 - [ ] Task 5: smaller logo in the top bar (~70-75%)
+
+## Round: restaurants + rides (provider-adapter layer)
+- [x] `src/lib/suppliers/` adapter layer: one shared contract per category, one file per provider (uber, bolt, thefork, opentable), each reading its own secret and reporting `unavailable` when absent
+- [x] `providers` table records which provider is enabled per category, so one can be switched on without a deploy
+- [x] `pricing_rules` extended: `ride` 1000 bps, `restaurant` 0 bps (all plans)
+- [x] Optional airport transfers on the signed-in card and at booking (opt-in, pickup/drop-off derived from the flight and hotel, no invented fare), stored as `trip_items` of kind `ride`
+- [x] Dinner reservations section per evening of the trip, filtered by the profile's cuisines/diets/distance/budget, with a per-offer match score; "Add a reservation" on confirmed trips in My trips
+- [x] Rides and reservations included in the .ics export and reminder emails
+- [ ] Connect the live supplier APIs: add the provider key and fill in that adapter's search/quote/book/cancel
