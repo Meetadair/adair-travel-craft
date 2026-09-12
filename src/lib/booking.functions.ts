@@ -659,6 +659,33 @@ export const bookTripCard = createServerFn({ method: "POST" })
       console.error("calendar sync failed", error);
     }
 
+    // Confirmation on the traveller's chosen channel. Never blocks the booking.
+    try {
+      const { loadChannel, notifyTraveller } = await import("@/lib/notifications/send.server");
+      const channel = await loadChannel(supabase, userId);
+      const email = context.claims?.['email'];
+      await notifyTraveller(supabase, {
+        userId,
+        kind: "booking_confirmation",
+        params: [
+          request.destinationCity,
+          `${request.departDate} – ${request.returnDate}`,
+          flightReference ?? tripId,
+        ],
+        email:
+          typeof email === "string" && email
+            ? {
+                to: email,
+                subject: `Your trip to ${request.destinationCity} is confirmed`,
+                html: `<p>Your trip to ${request.destinationCity}, ${request.departDate} – ${request.returnDate}, is confirmed.</p><p>Reference ${flightReference ?? tripId}.</p><p>Adair</p>`,
+              }
+            : null,
+        ...channel,
+      });
+    } catch (error) {
+      console.error("booking notification failed", error);
+    }
+
     const calendar = tripCalendarEvents({
       id: tripId,
       title: `${request.destinationCity} · ${request.departDate} – ${request.returnDate}`,
