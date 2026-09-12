@@ -12,6 +12,7 @@ import type { RideLeg } from "@/lib/suppliers/types";
 import { getTripCard } from "@/lib/trip-live.functions";
 import { bookTripCard, type BookingResult } from "@/lib/booking.functions";
 import { getAccount } from "@/lib/account.functions";
+import { listCompanions } from "@/lib/companions.functions";
 import { getPaymentSession } from "@/lib/payment.functions";
 import { PaymentStep, type AuthorisedPayment } from "@/components/payment-step";
 import { eur } from "@/lib/trip/client";
@@ -87,6 +88,18 @@ export function BookPage({ cardId }: { cardId: string }) {
     gender: "m",
     title: "mr",
   });
+  /** One entry per extra seat; passenger 1 is the lead traveller above. */
+  const [companions, setCompanions] = useState<
+    Array<{
+      givenName: string;
+      familyName: string;
+      bornOn: string;
+      gender: string;
+      title: string;
+      passportNumber: string;
+      remember: boolean;
+    }>
+  >([]);
   const [result, setResult] = useState<BookingResult | null>(null);
   /** "review" = traveller + invoice details, "pay" = card entry. */
   const [step, setStep] = useState<"review" | "pay">("review");
@@ -111,6 +124,15 @@ export function BookPage({ cardId }: { cardId: string }) {
             gender: traveller.gender as "m" | "f",
             title: traveller.title as "mr" | "ms" | "mrs",
           },
+          companions: companions.map((c) => ({
+            givenName: c.givenName,
+            familyName: c.familyName,
+            bornOn: c.bornOn,
+            gender: c.gender as "m" | "f",
+            title: c.title as "mr" | "ms" | "mrs",
+            passportNumber: c.passportNumber.trim() || null,
+            remember: c.remember,
+          })),
           payment: authorised,
         },
       }),
@@ -122,7 +144,13 @@ export function BookPage({ cardId }: { cardId: string }) {
     traveller.familyName.trim().length > 0 &&
     /.+@.+\..+/.test(traveller.email) &&
     traveller.phone.trim().length >= 6 &&
-    /^\d{4}-\d{2}-\d{2}$/.test(traveller.bornOn);
+    /^\d{4}-\d{2}-\d{2}$/.test(traveller.bornOn) &&
+    companions.every(
+      (c) =>
+        c.givenName.trim().length > 0 &&
+        c.familyName.trim().length > 0 &&
+        /^\d{4}-\d{2}-\d{2}$/.test(c.bornOn),
+    );
 
   // Booked (fully or partly): show the confirmation, then move on to My trips.
   useEffect(() => {
