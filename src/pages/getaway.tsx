@@ -8,6 +8,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { BedDouble, Compass, MapPin, UtensilsCrossed, Landmark } from "lucide-react";
 import { SiteNav } from "@/components/site-nav";
+import { GetawayDayImage, GetawayHero } from "@/components/getaway-image";
 import { getWeeklyGetaway, muteGetawayTheme } from "@/lib/getaway.functions";
 
 const KIND_ICON = {
@@ -41,13 +42,21 @@ export function GetawayPage() {
   return (
     <div className="min-h-screen bg-background">
       <SiteNav />
-      <main className="mx-auto max-w-3xl px-6 py-12 sm:py-16">
+      {result?.status === "ok" ? (
+        <GetawayHero
+          image={result.proposal.destination.image}
+          title={result.proposal.destination.name}
+          subtitle={`${result.proposal.destination.country} · ${result.proposal.destination.airport}${
+            result.proposal.theme ? ` · ${result.proposal.theme.name}` : ""
+          }`}
+        />
+      ) : (
+        <GetawayHero image={null} title="One trip, chosen for you" subtitle="Getaway · this week" />
+      )}
+      <main className="mx-auto max-w-3xl px-6 py-10 sm:py-14">
         <p className="inline-flex items-center gap-2 rounded-full border border-border px-3 py-1 text-xs text-muted-foreground">
           <Compass className="size-3.5" /> Getaway · this week
         </p>
-        <h1 className="mt-4 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
-          One trip, chosen for you
-        </h1>
 
         {query.isLoading && <p className="mt-8 text-sm text-muted-foreground">Looking…</p>}
 
@@ -71,14 +80,10 @@ export function GetawayPage() {
             const p = result.proposal;
             return (
               <>
-                <section className="hairline-card mt-8 p-6">
+                <section className="hairline-card mt-6 p-6">
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <h2 className="font-display text-2xl font-semibold">{p.destination.name}</h2>
-                      <p className="mt-1 text-sm text-muted-foreground">
-                        {p.destination.country} · {p.destination.airport}
-                        {p.theme ? ` · ${p.theme.name}` : ""}
-                      </p>
+                      <h2 className="font-display text-2xl font-semibold">Why this one</h2>
                     </div>
                     {p.reach && (
                       <span className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground">
@@ -205,7 +210,14 @@ export function GetawayPage() {
                     )}
                     <ol className="mt-4 space-y-3">
                       {p.itinerary.days.map((day) => (
-                        <li key={day.dayNumber} className="hairline-card p-5">
+                        <li key={day.dayNumber} className="hairline-card flex gap-4 p-5">
+                          {day.image && (
+                            <GetawayDayImage
+                              image={day.image}
+                              alt={`Day ${day.dayNumber} in ${p.destination.name}`}
+                            />
+                          )}
+                          <div className="min-w-0 flex-1">
                           <p className="text-sm font-medium">Day {day.dayNumber}</p>
                           {day.morning && (
                             <p className="mt-2 text-sm text-muted-foreground">
@@ -232,6 +244,7 @@ export function GetawayPage() {
                               Table · {day.mealPlaces.join(", ")}
                             </p>
                           )}
+                          </div>
                         </li>
                       ))}
                     </ol>
