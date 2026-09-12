@@ -417,6 +417,32 @@ export function BookPage({ cardId }: { cardId: string }) {
                 </li>
               ))}
             </ul>
+
+            {result.status !== "failed" && (
+              <div className="mt-5 space-y-1 border-t border-border pt-4 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Charged</span>
+                  <span className="font-semibold">{eur(result.payment?.amountEur ?? result.totalEur)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Paid with</span>
+                  <span className="capitalize">{methodLabel(result.payment)}</span>
+                </div>
+                {result.status === "partial" && (
+                  <p className="pt-2 text-xs text-muted-foreground">
+                    One part of this trip could not be confirmed, so you were only charged for what
+                    was booked.
+                  </p>
+                )}
+                <button
+                  onClick={() => navigate({ to: "/invoices" })}
+                  className="pt-2 text-xs text-primary underline"
+                >
+                  View the invoice
+                </button>
+              </div>
+            )}
+
             {result.calendar.length > 0 && (
               <AddToCalendar
                 events={result.calendar}
