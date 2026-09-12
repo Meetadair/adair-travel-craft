@@ -92,11 +92,16 @@
 - [x] Step 4 — questionnaire split: every question carries `part: 1 | 2` in `src/lib/prefs/questions.ts`; onboarding asks the eight essentials (home airport, purpose, cabin, seat, hotel stars, hotel rating, car setup, budget), then a bridge screen offering "Finish now" or "Keep going" for the taste questions; Preferences groups the same set under "Essentials" and "Taste" Part 1 now also asks the dealbreakers as toggles (never below 4 stars, no lift, shared bathroom, automatic only, non-smoking, no hostel, step-free, pets) and those act as HARD filters applied before ranking — stays and cars failing one are dropped, and the rules a supplier does not publish are shown honestly instead of guessed. Part 2 adds travel style, typical trip length, booking lead time, who they travel with, loyalty programmes, three trade-off questions and free-text accessibility / always-avoid notes, stored in `preferences.dealbreakers`, `extra_answers`, `accessibility_note`, `avoid_note`. Preferences shows a completion meter for Part 2, and the dashboard carries a dismissible "finish your profile" prompt.
 - [x] Step 5 — small fixes verified: top-bar logo at `h-7` (~75% of before), voice input live behind feature detection, calendar connect + ICS + reminders in place, payment provider adapter active with Duffel selected and Stripe built but off
 
-## Adair Getaway (next)
-- [ ] Data model: `getaway_themes`, `getaway_destinations`, `getaway_destination_themes` (season lives on the join row), `getaway_places`, `getaway_itineraries` + `getaway_itinerary_days`, `getaway_prices`
-- [ ] Matching engine in order: reach (3 h flight / 3 h drive from home airport) → season → interest match + dealbreakers → price last
-- [ ] Nightly price check per active home airport for coming weekends, 90 days of history as our own price baseline
-- [ ] Customer-facing Getaway section: this week's proposal, editorial note, curated places, real prices, "Plan this trip" into the normal flow, why-chosen line, "not interested in this theme"
-- [ ] Weekly email when RESEND_API_KEY exists (in-app always)
-- [ ] `/admin/getaway` editorial tools: themes, destinations, theme+season assignments, curated places, day-by-day itineraries, active toggles, gap list
-- [ ] Seed destinations/themes skeleton only — editorial notes and curated places left empty for Andrzej's team
+## Adair Getaway (built, content pending)
+- [x] Data model: `getaway_themes`, `getaway_destinations`, `getaway_destination_themes` (season lives on the join row), `getaway_places`, `getaway_itineraries` + `getaway_itinerary_days`, `getaway_prices`, plus `getaway_proposals` (one per traveller per week) and `getaway_theme_optouts`
+- [x] Matching engine (`src/lib/getaway/match.ts` + `src/lib/getaway.functions.ts`) in the fixed order: REACH from the stored home airport (3 h flight, or 3 h drive only where the destination is marked drivable from that airport; anything longer is only shown framed as "needs more than a weekend") → SEASON enforced in the query against the theme join row → INTEREST against interests/cuisines/travel style/companions/budget → PRICE last, as a tie-break against our own baseline
+- [x] Nightly price check at `/api/public/getaway-prices` (cron-secret protected): every home airport in use × active destinations × the next two weekends, capped at 120 lookups, paced ~0.9 s apart so live searches always win, skips anything priced in the last 20 h, prunes past 90 days
+- [x] `/getaway`: this week's proposal with the editorial note, curated places, day-by-day itinerary, real checked price with an honest "below/about/above the usual price" verdict, "Plan this trip" handing the sentence to the normal search flow, and "Not interested in <theme>" feeding straight back into matching
+- [x] Weekly email at `/api/public/getaway-weekly`; skips silently without RESEND_API_KEY (in-app always works)
+- [x] `/admin/getaway`: themes, destinations, per-theme season windows, curated places and day-by-day itineraries, active toggles everywhere, plus a list of destinations with no curated places yet
+- [x] Seeded 8 themes and 24 destinations with airports, coordinates and season windows — every editorial note and every curated hotel/restaurant deliberately left empty for the team
+- [ ] Schedule the two endpoints (daily price check, weekly email) — needs the cron secret pasted into the schedule, same as the trip reminders
+- [ ] Editorial content: notes, best-for/avoid-when, curated hotels/restaurants/sights, itineraries
+
+## Known warning
+- The database security linter flags `admin_analytics()` and `is_admin()` as SECURITY DEFINER functions callable by signed-in users. Both are intentional: `admin_analytics()` refuses non-admins itself, and `is_admin()` is what the policies rely on.
