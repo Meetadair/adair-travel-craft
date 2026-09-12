@@ -503,7 +503,9 @@ export type Database = {
       }
       preferences: {
         Row: {
+          accessibility_note: string | null
           airlines: Json
+          avoid_note: string | null
           budget_band: string | null
           cabin_class: string
           cabin_rule: string | null
@@ -515,7 +517,9 @@ export type Database = {
           car_transmission: string
           created_at: string
           cuisines: Json
+          dealbreakers: Json
           diets: Json
+          extra_answers: Json
           hotel_amenities: Json
           hotel_chains: Json
           hotel_max_km: number | null
@@ -535,7 +539,9 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          accessibility_note?: string | null
           airlines?: Json
+          avoid_note?: string | null
           budget_band?: string | null
           cabin_class?: string
           cabin_rule?: string | null
@@ -547,7 +553,9 @@ export type Database = {
           car_transmission?: string
           created_at?: string
           cuisines?: Json
+          dealbreakers?: Json
           diets?: Json
+          extra_answers?: Json
           hotel_amenities?: Json
           hotel_chains?: Json
           hotel_max_km?: number | null
@@ -567,7 +575,9 @@ export type Database = {
           user_id: string
         }
         Update: {
+          accessibility_note?: string | null
           airlines?: Json
+          avoid_note?: string | null
           budget_band?: string | null
           cabin_class?: string
           cabin_rule?: string | null
@@ -579,7 +589,9 @@ export type Database = {
           car_transmission?: string
           created_at?: string
           cuisines?: Json
+          dealbreakers?: Json
           diets?: Json
+          extra_answers?: Json
           hotel_amenities?: Json
           hotel_chains?: Json
           hotel_max_km?: number | null
