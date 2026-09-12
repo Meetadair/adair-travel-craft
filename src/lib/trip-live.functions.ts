@@ -27,6 +27,8 @@ export type LiveTripResult = {
   match?: MatchSummary | null;
   /** Where the total sits against their usual budget. */
   budget?: BudgetStatus | null;
+  /** Set when booking far ahead lowered our own fee. */
+  earlyBooking?: { daysAhead: number; discountBps: number; savedEur: number } | null;
   expiresAt: string | null;
 };
 
@@ -285,7 +287,14 @@ export const searchLiveTrip = createServerFn({ method: "POST" })
         saved_minor: pricing.toMinor(search.savedEur),
         saved_minutes: search.savedMinutes,
         expires_at: expiresAt,
-        items: { search, priced: { flight, stay, car, total }, insurance, match, budget },
+        items: {
+          search,
+          priced: { flight, stay, car, total },
+          insurance,
+          match,
+          budget,
+          earlyBooking,
+        },
       })
       .select("id")
       .single();
@@ -297,6 +306,14 @@ export const searchLiveTrip = createServerFn({ method: "POST" })
       total_eur: total,
       peak: Boolean((search as { peak?: unknown }).peak),
     });
+    if (earlyBooking) {
+      void record(userId, "early_booking_discount", {
+        days_ahead: earlyBooking.daysAhead,
+        discount_bps: earlyBooking.discountBps,
+        saved_eur: earlyBooking.savedEur,
+        total_eur: total,
+      });
+    }
     void record(userId, "card_created", { total_eur: total, has_stay: Boolean(search.stay) });
     for (const kind of ["flight", "stay", "car"] as const) {
       const line = match[kind];
@@ -316,6 +333,7 @@ export const searchLiveTrip = createServerFn({ method: "POST" })
       insurance,
       match,
       budget,
+      earlyBooking,
       expiresAt,
     };
   });
