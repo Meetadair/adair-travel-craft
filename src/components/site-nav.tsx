@@ -132,13 +132,8 @@ export function SiteNav() {
               >
                 Credit
               </Link>
-              <Link
-                to="/support"
-                className={linkClass}
-                activeProps={{ className: "text-foreground" }}
-              >
-                Help
-              </Link>
+              {/* Help lives in the signed-in footer beside Privacy and Terms. */}
+
               <Link
                 to="/preferences"
                 className={linkClass}
