@@ -52,6 +52,14 @@ function shiftIsoDate(iso: string, days: number): string {
     .slice(0, 10);
 }
 
+/** Short, human-readable pointer to the offer we swapped away from or to. */
+function reference(line: Record<string, unknown> | null): string | null {
+  if (!line) return null;
+  const id = line["offerId"] ?? line["rateId"] ?? line["quoteId"] ?? null;
+  const name = line["name"] ?? line["carrier"] ?? line["vehicle"] ?? null;
+  return (typeof id === "string" ? id : typeof name === "string" ? name : null) ?? null;
+}
+
 export const searchLiveTrip = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => sentenceSchema.parse(input))
@@ -72,7 +80,7 @@ export const searchLiveTrip = createServerFn({ method: "POST" })
       supabase
         .from("preferences")
         .select(
-          "cabin_class, max_connections, seat, airlines, cabin_rule, hotel_chains, hotel_stars, hotel_min_rating, hotel_amenities, hotel_types, car_brands, car_companies, car_class, car_transmission, budget_band",
+          "cabin_class, max_connections, hotel_max_km, seat, airlines, cabin_rule, hotel_chains, hotel_stars, hotel_min_rating, hotel_amenities, hotel_types, car_brands, car_companies, car_class, car_transmission, budget_band",
         )
         .eq("user_id", userId)
         .maybeSingle(),
@@ -96,6 +104,9 @@ export const searchLiveTrip = createServerFn({ method: "POST" })
       carCompanies: list(row?.["car_companies"]),
       carClass: (row?.["car_class"] as string | null) ?? null,
       carTransmission: (row?.["car_transmission"] as string) ?? "automatic",
+      cabinClass: (row?.["cabin_class"] as string) ?? "economy",
+      maxConnections: Number(row?.["max_connections"] ?? 1),
+      hotelMaxKm: (row?.["hotel_max_km"] as number | null) ?? null,
     };
 
     const parsed = parseTripSentence(data.sentence, new Date(), profile?.home_airport);
@@ -171,7 +182,24 @@ export const searchLiveTrip = createServerFn({ method: "POST" })
 
     const { matchSummary, budgetStatus } = await import("@/lib/trip/match");
     const match = matchSummary(search, searchPrefs);
-    const budget = budgetStatus(total, (row?.["budget_band"] as string | null) ?? null);
+    const cheapestAlt = (
+      list: { amountEur: number }[] | undefined,
+      kind: "flight" | "stay" | "car",
+    ) => {
+      const nets = (list ?? []).map((a) => a.amountEur).filter((n) => Number.isFinite(n));
+      if (!nets.length) return null;
+      return priceLine(Math.min(...nets), kind);
+    };
+    const budget = budgetStatus(
+      total,
+      (row?.["budget_band"] as string | null) ?? null,
+      { flight, stay, car },
+      {
+        flight: cheapestAlt(search.flightAlternatives, "flight"),
+        stay: cheapestAlt(search.hotelAlternatives, "stay"),
+        car: cheapestAlt(search.carAlternatives, "car"),
+      },
+    );
 
     const expiresAt =
       search.flight?.expiresAt ?? new Date(Date.now() + 20 * 60_000).toISOString();
@@ -256,7 +284,7 @@ export const swapCardAlternative = createServerFn({ method: "POST" })
     z
       .object({
         cardId: z.string().uuid(),
-        kind: z.enum(["stay", "car"]),
+        kind: z.enum(["flight", "stay", "car"]),
         index: z.number().int().min(0).max(2),
         reason: z.string().trim().max(200).optional(),
       })
@@ -294,7 +322,19 @@ export const swapCardAlternative = createServerFn({ method: "POST" })
     let recommended: Record<string, unknown> | null = null;
     let chosen: Record<string, unknown> | null = null;
 
-    if (data.kind === "stay") {
+    if (data.kind === "flight") {
+      const pick = search.flightAlternatives?.[data.index];
+      if (!pick) throw new Error("alternative-not-found");
+      const previous = search.flight;
+      recommended = previous ? { ...previous } : null;
+      chosen = { ...pick };
+      search.flight = pick;
+      search.flightAlternatives = [
+        ...(previous ? [previous] : []),
+        ...(search.flightAlternatives ?? []).filter((_, i) => i !== data.index),
+      ].slice(0, 3);
+      delete search.errors.flights;
+    } else if (data.kind === "stay") {
       const pick = search.hotelAlternatives?.[data.index];
       if (!pick) throw new Error("alternative-not-found");
       const previous = search.stay;
@@ -326,10 +366,12 @@ export const swapCardAlternative = createServerFn({ method: "POST" })
     // Remember that our suggestion was not the one they wanted.
     const { error: feedbackError } = await supabase.from("choice_feedback").insert({
       user_id: userId,
-      card_id: data.cardId,
-      line_type: data.kind,
+      trip_card_id: data.cardId,
+      item_kind: data.kind,
       recommended: (recommended ?? {}) as never,
       chosen: (chosen ?? {}) as never,
+      rejected_reference: reference(recommended),
+      chosen_reference: reference(chosen),
       ...(data.reason ? { reason: data.reason } : {}),
     });
     if (feedbackError) console.error("Could not log choice feedback", feedbackError);
@@ -354,8 +396,54 @@ export const swapCardAlternative = createServerFn({ method: "POST" })
 
     const priced = { flight, stay, car, total };
     const insurance = row.items.insurance ?? null;
-    const match = row.items.match ?? null;
-    const budget = row.items.budget ?? null;
+
+    const prefsRes = await supabase
+      .from("preferences")
+      .select(
+        "cabin_class, max_connections, hotel_max_km, seat, airlines, cabin_rule, hotel_chains, hotel_stars, hotel_min_rating, hotel_amenities, hotel_types, car_brands, car_companies, car_class, car_transmission, budget_band",
+      )
+      .eq("user_id", userId)
+      .maybeSingle();
+    const prefRow = (prefsRes.data ?? null) as Record<string, unknown> | null;
+    const list = (value: unknown): string[] =>
+      Array.isArray(value) ? value.filter((v): v is string => typeof v === "string") : [];
+    const searchPrefs: SearchPrefs = {
+      airlines: list(prefRow?.["airlines"]),
+      seat: (prefRow?.["seat"] as string) ?? "any",
+      cabinRule: (prefRow?.["cabin_rule"] as string | null) ?? null,
+      hotelChains: list(prefRow?.["hotel_chains"]),
+      hotelStars: list(prefRow?.["hotel_stars"]),
+      hotelMinRating: Number(prefRow?.["hotel_min_rating"] ?? 4),
+      hotelAmenities: list(prefRow?.["hotel_amenities"]),
+      hotelTypes: list(prefRow?.["hotel_types"]),
+      carBrands: list(prefRow?.["car_brands"]),
+      carCompanies: list(prefRow?.["car_companies"]),
+      carClass: (prefRow?.["car_class"] as string | null) ?? null,
+      carTransmission: (prefRow?.["car_transmission"] as string) ?? "automatic",
+      cabinClass: (prefRow?.["cabin_class"] as string) ?? "economy",
+      maxConnections: Number(prefRow?.["max_connections"] ?? 1),
+      hotelMaxKm: (prefRow?.["hotel_max_km"] as number | null) ?? null,
+    };
+    const { matchSummary, budgetStatus } = await import("@/lib/trip/match");
+    const match = matchSummary(search, searchPrefs);
+    const cheapestAlt = (
+      alts: { amountEur: number }[] | undefined,
+      kind: "flight" | "stay" | "car",
+    ) => {
+      const nets = (alts ?? []).map((a) => a.amountEur).filter((n) => Number.isFinite(n));
+      if (!nets.length) return null;
+      return priceLine(Math.min(...nets), kind);
+    };
+    const budget = budgetStatus(
+      total,
+      (prefRow?.["budget_band"] as string | null) ?? null,
+      { flight, stay, car },
+      {
+        flight: cheapestAlt(search.flightAlternatives, "flight"),
+        stay: cheapestAlt(search.hotelAlternatives, "stay"),
+        car: cheapestAlt(search.carAlternatives, "car"),
+      },
+    );
     const update = await supabase
       .from("trip_cards")
       .update({
