@@ -150,7 +150,8 @@ export async function createFlightOrder(input: {
                 })),
               }
             : {}),
-        })),
+          };
+        }),
       },
     }),
   });
