@@ -19,6 +19,9 @@ export type SearchPrefs = Pick<
   | "carCompanies"
   | "carClass"
   | "carTransmission"
+  | "cabinClass"
+  | "maxConnections"
+  | "hotelMaxKm"
 >;
 
 const fold = (value: string) =>

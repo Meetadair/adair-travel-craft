@@ -27,6 +27,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
+import { LineOptions, MatchNote } from "@/components/trip-line-options";
 import { searchLiveTrip, swapCardAlternative } from "@/lib/trip-live.functions";
 import type { BudgetStatus, MatchSummary } from "@/lib/trip/match";
 import {
@@ -435,11 +436,15 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
     return next;
   };
 
-  const swapAlternative = async (kind: "stay" | "car", index: number) => {
+  const swapAlternative = async (
+    kind: "flight" | "stay" | "car",
+    index: number,
+    reason?: string,
+  ) => {
     if (!cardId || swapping) return;
     setSwapping(true);
     try {
-      const result = await runSwap({ data: { cardId, kind, index } });
+      const result = await runSwap({ data: { cardId, kind, index, ...(reason ? { reason } : {}) } });
       setMatch(result.match ?? null);
       setBudget(result.budget ?? null);
       setLive(applyPriced(result));
@@ -527,14 +532,17 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
     }
   };
 
+  const [amendBase, setAmendBase] = useState("");
+
   /** "Make it business class" — same trip, changed by one extra sentence. */
   const amendTrip = async () => {
     const change = amendText.trim();
     if (!change || amending) return;
     setAmending(true);
     try {
-      const base = submission?.sentence.trim() || d.userMessage;
-      const sentence = `${base}. ${change}`;
+      // Everything they said before, plus the change — later wording wins.
+      const base = amendBase || submission?.sentence.trim() || d.userMessage;
+      const sentence = `${base}. Change: ${change}`;
       if (signedIn) {
         const result = await runLiveSearch({ data: { sentence } });
         setCardId(result.cardId);
@@ -545,6 +553,7 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
       } else {
         setLive(await searchTrip(await parseTrip(sentence)));
       }
+      setAmendBase(sentence);
       setAmendText("");
     } catch {
       /* keep the current card on screen */
@@ -872,12 +881,17 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                     )}
 
 
-                    {match?.flight && match.flight.score != null && (
-                      <p className="px-5 pb-3 text-xs text-muted-foreground">
-                        {match.flight.score}% match to your preferences
-                        {match.flight.reasons.length > 0 ? ` · ${match.flight.reasons.join(" · ")}` : ""}
-                        {match.flight.misses.length > 0 ? ` · ${match.flight.misses.join(" · ")}` : ""}
-                      </p>
+                    <MatchNote match={match?.flight} label="flight" />
+
+                    {live?.flight && !dropped.flight && (
+                      <LineOptions
+                        busy={swapping}
+                        options={(live.flightAlternatives ?? []).map((alt) => ({
+                          title: `${alt.carrier} ${alt.flightNumbers.join(" / ")}`,
+                          priceLabel: eur(alt.amountEur),
+                        }))}
+                        onPick={(index, reason) => void swapAlternative("flight", index, reason)}
+                      />
                     )}
 
                     {requestedNames.hotel && !dropped.hotel && (
@@ -977,33 +991,17 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
 
 
 
-                    {match?.stay && match.stay.score != null && (
-                      <p className="px-5 pb-3 text-xs text-muted-foreground">
-                        {match.stay.score}% match to your preferences
-                        {match.stay.reasons.length > 0 ? ` · ${match.stay.reasons.join(" · ")}` : ""}
-                        {match.stay.misses.length > 0 ? ` · ${match.stay.misses.join(" · ")}` : ""}
-                      </p>
-                    )}
+                    <MatchNote match={match?.stay} label="hotel" />
 
-                    {live?.stay && live.hotelAlternatives.length > 0 && (
-                      <div className="px-5 pb-4">
-                        <p className="text-xs text-muted-foreground">Other hotels for the same dates:</p>
-                        <ul className="mt-2 space-y-2">
-                          {live.hotelAlternatives.map((alt, index) => (
-                            <li key={`alt-stay-${index}`}>
-                              <button
-                                type="button"
-                                disabled={swapping}
-                                onClick={() => void swapAlternative("stay", index)}
-                                className="flex w-full items-center justify-between gap-3 rounded-xl border border-border px-4 py-2.5 text-left text-sm hover:border-primary disabled:opacity-60"
-                              >
-                                <span className="min-w-0 truncate">{alt.name}</span>
-                                <span className="shrink-0">{eur(alt.amountEur)}</span>
-                              </button>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
+                    {live?.stay && !dropped.hotel && (
+                      <LineOptions
+                        busy={swapping}
+                        options={live.hotelAlternatives.map((alt) => ({
+                          title: alt.name,
+                          priceLabel: eur(alt.amountEur),
+                        }))}
+                        onPick={(index, reason) => void swapAlternative("stay", index, reason)}
+                      />
                     )}
 
                     {requestedNames.car && !dropped.car && (
@@ -1092,33 +1090,17 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                     )}
 
 
-                    {match?.car && match.car.score != null && (
-                      <p className="px-5 pb-3 text-xs text-muted-foreground">
-                        {match.car.score}% match to your preferences
-                        {match.car.reasons.length > 0 ? ` · ${match.car.reasons.join(" · ")}` : ""}
-                        {match.car.misses.length > 0 ? ` · ${match.car.misses.join(" · ")}` : ""}
-                      </p>
-                    )}
+                    <MatchNote match={match?.car} label="car" />
 
-                    {live?.car && live.carAlternatives.length > 0 && (
-                      <div className="px-5 pb-4">
-                        <p className="text-xs text-muted-foreground">Other cars for the same dates:</p>
-                        <ul className="mt-2 space-y-2">
-                          {live.carAlternatives.map((alt, index) => (
-                            <li key={`alt-car-${index}`}>
-                              <button
-                                type="button"
-                                disabled={swapping}
-                                onClick={() => void swapAlternative("car", index)}
-                                className="flex w-full items-center justify-between gap-3 rounded-xl border border-border px-4 py-2.5 text-left text-sm hover:border-primary disabled:opacity-60"
-                              >
-                                <span className="min-w-0 truncate">{alt.vehicle + " · " + alt.supplier}</span>
-                                <span className="shrink-0">{eur(alt.amountEur)}</span>
-                              </button>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
+                    {live?.car && !dropped.car && (
+                      <LineOptions
+                        busy={swapping}
+                        options={live.carAlternatives.map((alt) => ({
+                          title: `${alt.vehicle} · ${alt.supplier}`,
+                          priceLabel: eur(alt.amountEur),
+                        }))}
+                        onPick={(index, reason) => void swapAlternative("car", index, reason)}
+                      />
                     )}
 
                     {insurance && (
@@ -1166,10 +1148,14 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                     {budget && budget.state !== "unknown" && showTotal && (
                       <p className="px-5 py-3 text-xs text-muted-foreground">
                         {budget.state === "within"
-                          ? `Within your usual budget (${budget.label}).`
-                          : budget.state === "near"
-                            ? `Close to the top of your usual budget (${budget.label}).`
-                            : `Above your usual budget (${budget.label}).`}
+                          ? `✓ Within your budget (your range: ${budget.range}).`
+                          : `⚠ ${eur(budget.overEur)} over your budget (${budget.range})${
+                              budget.culpritLabel ? `, mostly ${budget.culpritLabel}` : ""
+                            }.${
+                              budget.fixTotalEur != null
+                                ? ` Another option on that line brings the trip to ${eur(budget.fixTotalEur)} — see "Show other options" above.`
+                                : ""
+                            }`}
                       </p>
                     )}
 

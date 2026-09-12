@@ -40,6 +40,8 @@ export type FlightResult = {
   arriveAt: string;
   returnDepartAt: string | null;
   cabin: string;
+  /** Connections on the outbound leg; 0 means direct. */
+  stops?: number;
   amount: number;
   currency: string;
   amountEur: number;
@@ -78,6 +80,8 @@ export type CarResult = {
 export type TripSearchResponse = {
   request: TripRequest;
   flight: FlightResult | null;
+  /** Next best flights from the same search, ready to swap in. */
+  flightAlternatives?: FlightResult[];
   stay: StayResult | null;
   car: CarResult | null;
   totalEur: number;
