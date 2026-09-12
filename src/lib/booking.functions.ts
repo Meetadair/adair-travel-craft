@@ -622,6 +622,30 @@ export const bookTripCard = createServerFn({ method: "POST" })
       .eq("id", card.id)
       .eq("user_id", userId);
 
+    // Remember the people travelling along, encrypted, for the next booking.
+    try {
+      const remembered = (data.companions ?? []).filter((c) => c.remember);
+      if (remembered.length > 0) {
+        const { encryptSecret } = await import("@/lib/loyalty/crypto.server");
+        const rows = [];
+        for (const c of remembered) {
+          const passport = c.passportNumber?.trim() || null;
+          rows.push({
+            user_id: userId,
+            label: `${c.givenName} ${c.familyName}`.trim(),
+            given_name_encrypted: await encryptSecret(c.givenName),
+            family_name_encrypted: await encryptSecret(c.familyName),
+            born_on_encrypted: await encryptSecret(c.bornOn),
+            passport_number_encrypted: passport ? await encryptSecret(passport) : null,
+            passport_last4: passport ? passport.slice(-4) : null,
+          });
+        }
+        await supabase.from("travel_companions").insert(rows as never);
+      }
+    } catch (error) {
+      console.error("saving companions failed", error);
+    }
+
     // Travel credit comes off this trip, and a referral pays out on the
     // invited traveller's first confirmed booking. Never block the booking.
     let creditAppliedMinor = 0;
