@@ -23,12 +23,33 @@ const inputClass =
 function failureMessage(reason: string | null): string {
   switch (reason) {
     case "offer-expired":
-      return "The airline released this fare while you were confirming. Nothing was charged — search again to get a fresh price.";
+      return "The airline released this fare while you were confirming. Your card was not charged — search again to get a fresh price.";
     case "supplier-not-configured":
       return "Live booking is not switched on yet. Nothing was charged.";
+    case "card-declined":
+      return "Your card was declined, so nothing was charged. Try another card or ask your bank.";
+    case "already-booked":
+      return "This trip is already paid for — we did not charge you again. You will find it in My trips.";
     default:
-      return "The airline could not complete this booking. Nothing was charged — please search again.";
+      return "The airline could not complete this booking. Your card was not charged — please search again.";
   }
+}
+
+/** Turns a thrown booking error into one of the reasons above. */
+function reasonFromError(error: unknown): string | null {
+  const message = error instanceof Error ? error.message : "";
+  if (message.includes("already-booked")) return "already-booked";
+  if (message.includes("offer")) return "offer-expired";
+  if (message.includes("card")) return "card-declined";
+  return null;
+}
+
+/** How the traveller paid, for the receipt. */
+function methodLabel(payment: BookingResult["payment"]): string {
+  if (!payment) return "Duffel balance";
+  if (payment.method === "balance") return "Duffel balance";
+  const brand = payment.brand ? payment.brand.replace(/_/g, " ") : "Card";
+  return payment.last4 ? `${brand} ···· ${payment.last4}` : brand;
 }
 
 
