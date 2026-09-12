@@ -55,6 +55,8 @@ async function run(): Promise<Response> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
   const day = 86_400_000;
+  const escapeHtml = (value: string) =>
+    value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   const iso = (d: Date) => d.toISOString().slice(0, 10);
   const today = iso(new Date());
   const tomorrow = iso(new Date(Date.now() + day));
@@ -90,6 +92,24 @@ async function run(): Promise<Response> {
     ),
   );
 
+  // "Getting from the airport" note for the day-before email, when the team
+  // has written one for that destination.
+  const cities = Array.from(
+    new Set(trips.map((t) => (t.city ?? "").trim()).filter((c) => c.length > 0)),
+  );
+  const airportTips = new Map<string, string>();
+  if (cities.length) {
+    const { parseTravelTips } = await import("@/lib/trip/tips");
+    const destRes = await supabaseAdmin
+      .from("getaway_destinations")
+      .select("name, travel_tips")
+      .in("name", cities);
+    for (const row of (destRes.data ?? []) as Array<{ name: string; travel_tips: unknown }>) {
+      const tip = parseTravelTips(row.travel_tips).airport;
+      if (tip) airportTips.set(row.name.toLowerCase(), tip);
+    }
+  }
+
   let sent = 0;
   for (const trip of trips) {
     const kind = trip.start_date === today ? "day_of" : "day_before";
@@ -103,7 +123,11 @@ async function run(): Promise<Response> {
       kind === "day_of"
         ? `Today: your trip to ${trip.city ?? "your destination"}`
         : `Tomorrow: your trip to ${trip.city ?? "your destination"}`;
-    const html = `<p>${subject}</p><ul>${itineraryLines(items.filter((i) => i.trip_id === trip.id))}</ul><p>Adair</p>`;
+    const airportTip = trip.city ? airportTips.get(trip.city.trim().toLowerCase()) : undefined;
+    const tipBlock = airportTip
+      ? `<p><strong>Getting from the airport:</strong> ${escapeHtml(airportTip)}</p>`
+      : "";
+    const html = `<p>${subject}</p><ul>${itineraryLines(items.filter((i) => i.trip_id === trip.id))}</ul>${tipBlock}<p>Adair</p>`;
 
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
