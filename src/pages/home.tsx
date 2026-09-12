@@ -28,6 +28,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { searchLiveTrip, swapCardAlternative } from "@/lib/trip-live.functions";
+import type { BudgetStatus, MatchSummary } from "@/lib/trip/match";
 import {
   INSURANCE_DETAIL,
   INSURANCE_TITLE,
@@ -415,6 +416,12 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
     car: string | null;
   }>({ hotel: null, car: null });
   const [swapping, setSwapping] = useState(false);
+  // How well each line fits saved preferences, and where the total sits
+  // against the traveller's usual budget (signed-in cards only).
+  const [match, setMatch] = useState<MatchSummary | null>(null);
+  const [budget, setBudget] = useState<BudgetStatus | null>(null);
+  const [amendText, setAmendText] = useState("");
+  const [amending, setAmending] = useState(false);
 
   const applyPriced = (result: {
     search: TripSearchResponse;
@@ -433,6 +440,8 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
     setSwapping(true);
     try {
       const result = await runSwap({ data: { cardId, kind, index } });
+      setMatch(result.match ?? null);
+      setBudget(result.budget ?? null);
       setLive(applyPriced(result));
     } catch {
       /* leave the current card in place; the traveller can search again */
@@ -496,6 +505,8 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
         });
         setCardId(result.cardId);
         setInsurance(result.insurance);
+        setMatch(result.match ?? null);
+        setBudget(result.budget ?? null);
         setLive(applyPriced(result));
       } else {
         const request = await parseTrip(sentence);
@@ -516,6 +527,32 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
     }
   };
 
+  /** "Make it business class" — same trip, changed by one extra sentence. */
+  const amendTrip = async () => {
+    const change = amendText.trim();
+    if (!change || amending) return;
+    setAmending(true);
+    try {
+      const base = submission?.sentence.trim() || d.userMessage;
+      const sentence = `${base}. ${change}`;
+      if (signedIn) {
+        const result = await runLiveSearch({ data: { sentence } });
+        setCardId(result.cardId);
+        setInsurance(result.insurance);
+        setMatch(result.match ?? null);
+        setBudget(result.budget ?? null);
+        setLive(applyPriced(result));
+      } else {
+        setLive(await searchTrip(await parseTrip(sentence)));
+      }
+      setAmendText("");
+    } catch {
+      /* keep the current card on screen */
+    } finally {
+      setAmending(false);
+    }
+  };
+
   /** Same sentence, new stop order: re-search and re-price the first leg. */
   const reorderStops = async (next: TripStop[]) => {
     setRouteStops(next);
@@ -531,6 +568,8 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
       priced.totalEur = result.priced.total;
       setCardId(result.cardId);
       setInsurance(result.insurance);
+      setMatch(result.match ?? null);
+      setBudget(result.budget ?? null);
       setLive(priced);
       setRouteStops(priced.request.stops ?? next);
     } catch {
@@ -557,6 +596,9 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
     setLiveFailed(false);
     setCardId(null);
     setInsurance(null);
+    setMatch(null);
+    setBudget(null);
+    setAmendText("");
     setAddInsurance(false);
     setDropped({ flight: false, hotel: false, car: false });
     setPriceContext(null);
@@ -590,6 +632,8 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
         if (!cancelled) {
           setCardId(result.cardId);
           setInsurance(result.insurance);
+          setMatch(result.match ?? null);
+          setBudget(result.budget ?? null);
         }
         return priced;
       }
