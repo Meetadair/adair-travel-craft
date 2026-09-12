@@ -300,7 +300,18 @@ export async function searchStay(
         stayScore(a.rawName, a.result.rating, a.result.amount, prefs),
     )[0]!;
 
-  return { stay: best.result, alternatives: [], requested: null, notFound: false };
+  // Keep the next best few so the traveller can swap without a new search.
+  const stayOthers = (pool.length ? pool : mapped)
+    .filter((m) => m !== best)
+    .slice()
+    .sort(
+      (a, b) =>
+        stayScore(b.rawName, b.result.rating, b.result.amount, prefs) -
+        stayScore(a.rawName, a.result.rating, a.result.amount, prefs),
+    )
+    .slice(0, 3)
+    .map((m) => m.result);
+  return { stay: best.result, alternatives: stayOthers, requested: null, notFound: false };
 }
 
 
@@ -397,7 +408,17 @@ export async function searchCar(
         carScore(b.result.supplier, b.rawName, b.result.transmission, b.result.amount, prefs) -
         carScore(a.result.supplier, a.rawName, a.result.transmission, a.result.amount, prefs),
     )[0]!;
-  return { car: best.result, alternatives: [], requested: null, notFound: false };
+  const carOthers = mapped
+    .filter((m) => m !== best)
+    .slice()
+    .sort(
+      (a, b) =>
+        carScore(b.result.supplier, b.rawName, b.result.transmission, b.result.amount, prefs) -
+        carScore(a.result.supplier, a.rawName, a.result.transmission, a.result.amount, prefs),
+    )
+    .slice(0, 3)
+    .map((m) => m.result);
+  return { car: best.result, alternatives: carOthers, requested: null, notFound: false };
 }
 
 
