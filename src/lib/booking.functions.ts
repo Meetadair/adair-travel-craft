@@ -102,6 +102,8 @@ export type BookingResult = {
     applied: Array<{ programme: string; masked: string; tier: string | null; where: string }>;
     notApplied: Array<{ programme: string; masked: string; note: string }>;
   };
+  /** Travel credit taken off this trip, and what is left afterwards. */
+  credit?: { appliedEur: number; remainingEur: number };
   /** What was charged and how, for the receipt. */
   payment: {
     method: "card" | "saved-card" | "balance";
