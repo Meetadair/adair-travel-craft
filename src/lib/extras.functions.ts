@@ -7,6 +7,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import type { RideClass, RideLeg, UnavailableReason } from "@/lib/suppliers/types";
 import type { LineMatch } from "@/lib/trip/match";
 import type { TripSearchResponse } from "@/lib/trip/types";
@@ -278,7 +279,7 @@ export const addTripReservation = createServerFn({ method: "POST" })
   );
 
 async function insertReservation(
-  supabase: { from: (table: string) => any },
+  supabase: SupabaseClient,
   userId: string,
   tripId: string,
   offer: {
