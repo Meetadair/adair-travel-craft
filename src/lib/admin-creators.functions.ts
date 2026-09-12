@@ -300,7 +300,10 @@ export const reviewCreatorPlace = createServerFn({ method: "POST" })
       active: data.decision === "approved",
     };
     if (data.editorialNote !== null) update["editorial_note"] = data.editorialNote;
-    const { error } = await db.from("getaway_places").update(update).eq("id", data.id);
+    const { error } = await db
+      .from("getaway_places")
+      .update(update as never)
+      .eq("id", data.id);
     if (error) throw new Error(error.message);
     await db.from("audit_log").insert({
       actor: context.userId,

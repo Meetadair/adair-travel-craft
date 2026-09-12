@@ -157,7 +157,10 @@ export const applyAsCreator = createServerFn({ method: "POST" })
         delete update["payout_iban_encrypted"];
         delete update["payout_iban_last4"];
       }
-      const { error } = await supabaseAdmin.from("creators").update(update).eq("id", found.id);
+      const { error } = await supabaseAdmin
+        .from("creators")
+        .update(update as never)
+        .eq("id", found.id);
       if (error) throw new Error(error.message);
       return { handle: found.handle, status: found.status as CreatorStatus };
     }
