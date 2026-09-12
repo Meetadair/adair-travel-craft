@@ -133,15 +133,6 @@ export function PreferencesPage() {
                 <p className="mb-2 text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
                   Home airport
                 </p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                <Link
-                  to="/credit"
-                  className="underline decoration-border underline-offset-4 hover:text-foreground"
-                >
-                  Credit &amp; referrals
-                </Link>{" "}
-                — {referral.data ? `${eur(referral.data.balanceMinor / 100)} available` : "invite friends and earn travel credit"}.
-              </p>
                 <AirportPicker value={homeAirport} onChange={setHomeAirport} />
               </div>
             </section>
@@ -229,6 +220,15 @@ export function PreferencesPage() {
                   Invoices
                 </Link>{" "}
                 — every booked trip and its PDF documents.
+              </p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                <Link
+                  to="/credit"
+                  className="underline decoration-border underline-offset-4 hover:text-foreground"
+                >
+                  Credit &amp; referrals
+                </Link>{" "}
+                — {referral.data ? `${eur(referral.data.balanceMinor / 100)} available` : "invite friends and earn travel credit"}.
               </p>
               <CompanyEditor companies={companies} onChange={setCompanies} />
             </section>
