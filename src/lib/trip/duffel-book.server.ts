@@ -82,6 +82,19 @@ export async function createFlightOrder(input: {
     gender: "m" | "f";
     title: "mr" | "ms" | "mrs";
   };
+  /**
+   * Everyone else on the booking, in seat order. Each gets their own name and
+   * date of birth; the lead traveller's contact details are used throughout,
+   * because that is who we can actually reach.
+   */
+  companions?: Array<{
+    givenName: string;
+    familyName: string;
+    bornOn: string;
+    gender: "m" | "f";
+    title: "mr" | "ms" | "mrs";
+    passportNumber?: string | null;
+  }>;
   idempotencyKey: string;
   /**
    * Customer card payment. When present the airline is paid with the card the
@@ -117,16 +130,19 @@ export async function createFlightOrder(input: {
               }
             : { type: "balance", amount: input.amount.toFixed(2), currency: input.currency },
         ],
-        passengers: input.passengerIds.map((id) => ({
+        passengers: input.passengerIds.map((id, index) => {
+          const person =
+            index === 0 ? input.traveller : (input.companions ?? [])[index - 1] ?? input.traveller;
+          return {
           id,
-          given_name: input.traveller.givenName,
-          family_name: input.traveller.familyName,
-          born_on: input.traveller.bornOn,
-          gender: input.traveller.gender,
-          title: input.traveller.title,
+          given_name: person.givenName,
+          family_name: person.familyName,
+          born_on: person.bornOn,
+          gender: person.gender,
+          title: person.title,
           email: input.traveller.email,
           phone_number: input.traveller.phone,
-          ...(input.loyaltyAccounts?.length
+          ...(index === 0 && input.loyaltyAccounts?.length
             ? {
                 loyalty_programme_accounts: input.loyaltyAccounts.map((a) => ({
                   airline_iata_code: a.airlineIataCode,
