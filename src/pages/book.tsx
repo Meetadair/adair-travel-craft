@@ -602,6 +602,17 @@ export function BookPage({ cardId }: { cardId: string }) {
                   <span className="text-muted-foreground">Charged</span>
                   <span className="font-semibold">{eur(result.payment?.amountEur ?? result.totalEur)}</span>
                 </div>
+                {(result.credit?.appliedEur ?? 0) > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Credit applied</span>
+                    <span>
+                      −{eur(result.credit!.appliedEur)}
+                      {result.credit!.remainingEur > 0
+                        ? ` · ${eur(result.credit!.remainingEur)} left`
+                        : ""}
+                    </span>
+                  </div>
+                )}
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Paid with</span>
                   <span className="capitalize">{methodLabel(result.payment)}</span>

@@ -102,6 +102,8 @@ export type BookingResult = {
     applied: Array<{ programme: string; masked: string; tier: string | null; where: string }>;
     notApplied: Array<{ programme: string; masked: string; note: string }>;
   };
+  /** Travel credit taken off this trip, and what is left afterwards. */
+  credit?: { appliedEur: number; remainingEur: number };
   /** What was charged and how, for the receipt. */
   payment: {
     method: "card" | "saved-card" | "balance";
@@ -684,17 +686,20 @@ export const bookTripCard = createServerFn({ method: "POST" })
     // Travel credit comes off this trip, and a referral pays out on the
     // invited traveller's first confirmed booking. Never block the booking.
     let creditAppliedMinor = 0;
+    let creditRemainingMinor = 0;
     try {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       const { availableCreditMinor, creditToApply, spendCredit, grantReferralRewards } =
         await import("@/lib/referrals.server");
       const balance = await availableCreditMinor(supabase as never, userId);
       creditAppliedMinor = creditToApply(balance, Math.round(confirmedTotal * 100));
+      creditRemainingMinor = Math.max(0, balance - creditAppliedMinor);
       await spendCredit(supabaseAdmin as never, userId, tripId, creditAppliedMinor);
       await grantReferralRewards(supabaseAdmin as never, userId, tripId);
     } catch (error) {
       console.error("credit/referral step failed", error);
       creditAppliedMinor = 0;
+      creditRemainingMinor = 0;
     }
 
     // Creator commission: a share of our margin, pending until the
@@ -884,11 +889,15 @@ export const bookTripCard = createServerFn({ method: "POST" })
       testMode: isTestKey(),
       calendar,
       loyalty: { applied: loyaltyApplied, notApplied: loyaltyNotApplied },
+      credit: {
+        appliedEur: creditAppliedMinor / 100,
+        remainingEur: creditRemainingMinor / 100,
+      },
       payment: {
         method: paymentMethod,
         brand: data.payment?.brand ?? null,
         last4: data.payment?.last4 ?? null,
-        amountEur: confirmedTotal,
+        amountEur: Math.max(0, confirmedTotal - creditAppliedMinor / 100),
         status: "test_settled",
       },
     };

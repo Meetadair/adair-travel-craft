@@ -5,6 +5,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { Check } from "lucide-react";
 import { SiteNav } from "@/components/site-nav";
+import { getMyReferral } from "@/lib/referrals.functions";
+import { eur } from "@/lib/trip/client";
 import {
   addCompany,
   deleteCompany,
@@ -54,6 +56,8 @@ export function PreferencesPage() {
   const queryClient = useQueryClient();
 
   const account = useQuery({ queryKey: ["account"], queryFn: () => fetchAccount() });
+  const fetchReferral = useServerFn(getMyReferral);
+  const referral = useQuery({ queryKey: ["my-referral"], queryFn: () => fetchReferral({}) });
 
   const [fullName, setFullName] = useState("");
   const [homeAirport, setHomeAirport] = useState("WAW");
@@ -216,6 +220,15 @@ export function PreferencesPage() {
                   Invoices
                 </Link>{" "}
                 — every booked trip and its PDF documents.
+              </p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                <Link
+                  to="/credit"
+                  className="underline decoration-border underline-offset-4 hover:text-foreground"
+                >
+                  Credit &amp; referrals
+                </Link>{" "}
+                — {referral.data ? `${eur(referral.data.balanceMinor / 100)} available` : "invite friends and earn travel credit"}.
               </p>
               <CompanyEditor companies={companies} onChange={setCompanies} />
             </section>
