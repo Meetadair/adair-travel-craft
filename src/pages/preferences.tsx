@@ -125,8 +125,17 @@ export function PreferencesPage() {
               </div>
             </section>
 
-            {QUESTIONS.filter((q) => q.kind === "fields").map((q) => (
-              <section key={q.id} className="hairline-card space-y-4 p-5 sm:p-6">
+            {QUESTIONS.filter((q) => q.kind === "fields")
+              .slice()
+              .sort((a, b) => a.part - b.part)
+              .map((q, index, list) => (
+                <div key={q.id}>
+                  {(index === 0 || list[index - 1]!.part !== q.part) && (
+                    <p className="mb-2 mt-2 text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                      {q.part === 1 ? "Essentials" : "Taste — makes every match better"}
+                    </p>
+                  )}
+              <section className="hairline-card space-y-4 p-5 sm:p-6">
                 <h2 className="font-display text-lg font-semibold">{q.title}</h2>
                 {q.singles?.map((def) => (
                   <SingleField
