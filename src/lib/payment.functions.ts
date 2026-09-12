@@ -1,12 +1,13 @@
 /**
  * Payment step server functions.
  *
- * The card is entered in Duffel's hosted component in the browser; we only
- * handle the client key, the resulting provider tokens and the saved-card list.
+ * These go through the payment adapter interface in `src/lib/payments`, never a
+ * provider SDK, so the active provider can be switched from the admin panel.
  */
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { PaymentMethodKind, SettlementModel } from "@/lib/payments/types";
 
 export type SavedCard = {
   id: string;
