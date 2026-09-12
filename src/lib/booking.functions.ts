@@ -392,6 +392,7 @@ export const bookTripCard = createServerFn({ method: "POST" })
         { onConflict: "user_id,idempotency_key" },
       );
       await audit("booking_failed", { cardId: card.id, reason });
+      void recordEvent(userId, "booking_failed", { cause: reason ?? "unknown", card_id: card.id });
       return {
         tripId: null,
         status,
@@ -466,6 +467,11 @@ export const bookTripCard = createServerFn({ method: "POST" })
     }));
     const itemsRes = await supabase.from("trip_items").insert(itemsInsert).select("id, position");
     if (itemsRes.error) throw new Error(itemsRes.error.message);
+    void recordEvent(userId, "booking_completed", {
+      card_id: card.id,
+      status,
+      total_eur: confirmedTotal,
+    });
     const insertedIds = new Map(
       ((itemsRes.data ?? []) as Array<{ id: string; position: number }>).map((r) => [
         r.position,
