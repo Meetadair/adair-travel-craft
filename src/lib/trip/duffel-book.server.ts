@@ -89,6 +89,8 @@ export async function createFlightOrder(input: {
    * otherwise the Duffel balance is used.
    */
   cardPayment?: { threeDSecureSessionId: string } | null;
+  /** Frequent-flyer accounts the supplier accepts on the order. */
+  loyaltyAccounts?: Array<{ airlineIataCode: string; accountNumber: string }>;
 }): Promise<OrderResult> {
   const json = await call<{
     data?: {
@@ -124,6 +126,14 @@ export async function createFlightOrder(input: {
           title: input.traveller.title,
           email: input.traveller.email,
           phone_number: input.traveller.phone,
+          ...(input.loyaltyAccounts?.length
+            ? {
+                loyalty_programme_accounts: input.loyaltyAccounts.map((a) => ({
+                  airline_iata_code: a.airlineIataCode,
+                  account_number: a.accountNumber,
+                })),
+              }
+            : {}),
         })),
       },
     }),
