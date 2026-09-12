@@ -7,6 +7,8 @@ import { SiteNav } from "@/components/site-nav";
 import { RefineProfilePrompt } from "@/components/prefs/refine-prompt";
 import { supabase } from "@/integrations/supabase/client";
 import { listTrips, deleteTrip, getProfile, saveProfile } from "@/lib/travel.functions";
+import { attributeReferral } from "@/lib/referrals.functions";
+import { REFERRAL_STORAGE_KEY } from "@/routes/r.$code";
 import { downloadTripInvoice } from "@/lib/trip-pdf";
 import { useLocale, useT } from "@/lib/i18n";
 
