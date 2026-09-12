@@ -454,6 +454,61 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
   const [routeStops, setRouteStops] = useState<TripStop[] | null>(null);
   const [rerouting, setRerouting] = useState(false);
 
+  // Why is this trip pricey? Real comparison searches on nearby dates.
+  const [priceContext, setPriceContext] = useState<PriceContext | null>(null);
+  const [datesKept, setDatesKept] = useState(false);
+  const [movingDates, setMovingDates] = useState(false);
+
+  const contextKey = live?.request
+    ? `${live.request.destinationIata}|${live.request.departDate}|${live.request.returnDate}`
+    : null;
+
+  useEffect(() => {
+    const request = live?.request;
+    if (!request) return;
+    let active = true;
+    void fetchPriceContext(request).then((ctx) => {
+      if (active && ctx?.peak) setPriceContext(ctx);
+    });
+    return () => {
+      active = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contextKey]);
+
+  /** Re-run the same trip on the genuinely cheapest date we found. */
+  const moveDates = async () => {
+    const ctx = priceContext;
+    if (!ctx?.offsetDays || !ctx.cheapestDepartDate || !ctx.cheapestReturnDate) return;
+    setMovingDates(true);
+    try {
+      const sentence = submission?.sentence.trim() || d.userMessage;
+      if (signedIn) {
+        const result = await runLiveSearch({
+          data: { sentence, dateShiftDays: ctx.offsetDays },
+        });
+        setCardId(result.cardId);
+        setInsurance(result.insurance);
+        setLive(applyPriced(result));
+      } else {
+        const request = await parseTrip(sentence);
+        setLive(
+          await searchTrip({
+            ...request,
+            departDate: ctx.cheapestDepartDate,
+            returnDate: ctx.cheapestReturnDate,
+          }),
+        );
+      }
+      setPriceContext(null);
+      setDatesKept(true);
+    } catch {
+      /* keep the current card on screen */
+    } finally {
+      setMovingDates(false);
+    }
+  };
+
   /** Same sentence, new stop order: re-search and re-price the first leg. */
   const reorderStops = async (next: TripStop[]) => {
     setRouteStops(next);
