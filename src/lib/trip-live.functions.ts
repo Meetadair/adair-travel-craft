@@ -60,6 +60,21 @@ function reference(line: Record<string, unknown> | null): string | null {
   return (typeof id === "string" ? id : typeof name === "string" ? name : null) ?? null;
 }
 
+
+/** Analytics sink. Never allowed to break the interaction it measures. */
+async function record(
+  userId: string,
+  name: string,
+  props: Record<string, unknown>,
+): Promise<void> {
+  try {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    await supabaseAdmin.from("events").insert({ name, user_id: userId, props: props as never });
+  } catch (error) {
+    console.error("event insert failed", error);
+  }
+}
+
 export const searchLiveTrip = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => sentenceSchema.parse(input))
@@ -247,6 +262,23 @@ export const searchLiveTrip = createServerFn({ method: "POST" })
       .select("id")
       .single();
     if (card.error) throw new Error(card.error.message);
+
+    void record(userId, "search_run", {
+      destination: request.destinationCity,
+      destination_iata: request.destinationIata,
+      total_eur: total,
+      peak: Boolean((search as { peak?: unknown }).peak),
+    });
+    void record(userId, "card_created", { total_eur: total, has_stay: Boolean(search.stay) });
+    for (const kind of ["flight", "stay", "car"] as const) {
+      const line = match[kind];
+      if (!line || line.total === 0) continue;
+      void record(userId, "match_score", {
+        kind,
+        score: Math.round((line.met / line.total) * 100),
+        unmet: line.criteria.filter((c) => !c.ok).map((c) => c.label),
+      });
+    }
 
     return {
       cardId: (card.data as { id: string }).id,
