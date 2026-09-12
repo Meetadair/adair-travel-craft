@@ -57,6 +57,11 @@ const bookSchema = z.object({
     )
     .max(8)
     .optional(),
+  /** Airline extras the customer chose: supplier service ids and quantities. */
+  ancillaries: z
+    .array(z.object({ id: z.string().trim().min(3).max(120), quantity: z.number().int().min(1).max(9) }))
+    .max(12)
+    .optional(),
   /**
    * Result of the hosted card step. Only provider tokens — never card data.
    */
@@ -268,6 +273,21 @@ export const bookTripCard = createServerFn({ method: "POST" })
     const plan = (planRes.data as { plan: string } | null)?.plan ?? "free";
     const table = await pricing.loadPricing(supabase, plan);
 
+    // The airline's own bags and seats, re-read so we price what it still sells.
+    let ancillaryOptions: import("@/lib/trip/ancillaries").AncillaryOption[] = [];
+    const ancillaryChoices = data.ancillaries ?? [];
+    if (data.include.flight && search.flight?.offerId && ancillaryChoices.length > 0) {
+      try {
+        const { getOfferAncillaries } = await import("@/lib/trip/duffel-book.server");
+        const result = await getOfferAncillaries(search.flight.offerId, table.extras);
+        ancillaryOptions = result.options;
+      } catch (error) {
+        console.error("ancillaries re-read failed", error);
+      }
+    }
+    const availableIds = new Set(ancillaryOptions.map((o) => o.id));
+    const services = ancillaryChoices.filter((c) => availableIds.has(c.id));
+
     if (data.include.flight && search.flight?.offerId) {
       try {
         const offer = await getOffer(search.flight.offerId);
@@ -281,6 +301,7 @@ export const bookTripCard = createServerFn({ method: "POST" })
           passengerIds: offer.passengerIds,
           traveller: data.traveller,
           companions: data.companions ?? [],
+          services,
           idempotencyKey: `${card.id}-flight`,
           cardPayment,
           loyaltyAccounts: flightAccounts,
@@ -314,6 +335,20 @@ export const bookTripCard = createServerFn({ method: "POST" })
             returnDepartAt: search.flight.returnDepartAt,
           },
         });
+
+        // One line per chosen bag or seat, priced with the extras markup.
+        const { ancillaryLines } = await import("@/lib/trip/ancillaries");
+        for (const extra of ancillaryLines(ancillaryOptions, services)) {
+          lines.push({
+            kind: "extra",
+            title: extra.quantity > 1 ? `${extra.title} × ${extra.quantity}` : extra.title,
+            status: "confirmed",
+            amountEur: extra.priceEur,
+            reference: order.bookingReference,
+            note: extra.detail || null,
+            payload: { serviceId: extra.id, quantity: extra.quantity },
+          });
+        }
 
       } catch (error) {
         failed = true;
