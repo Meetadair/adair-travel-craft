@@ -235,6 +235,19 @@ export function OnboardingPage() {
                   Skip
                 </button>
               )}
+              {isBridge && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    track("onboarding_step", { question: "bridge_finish_now", step });
+                    mutation.mutate();
+                  }}
+                  disabled={mutation.isPending}
+                  className="text-sm text-muted-foreground underline decoration-border underline-offset-4 disabled:opacity-40"
+                >
+                  {mutation.isPending ? "Saving…" : "Finish now"}
+                </button>
+              )}
               {isSummary ? (
                 <button
                   type="button"
@@ -255,7 +268,7 @@ export function OnboardingPage() {
                   disabled={!canContinue}
                   className={primaryBtn}
                 >
-                  Continue <ArrowRight className="size-4" />
+                  {isBridge ? "Keep going" : "Continue"} <ArrowRight className="size-4" />
                 </button>
               )}
             </div>
