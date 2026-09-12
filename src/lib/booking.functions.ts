@@ -40,6 +40,19 @@ const bookSchema = z.object({
   }),
   companyId: z.string().uuid().nullable(),
   traveller: travellerSchema,
+  /**
+   * Result of the hosted card step. Only provider tokens — never card data.
+   */
+  payment: z
+    .object({
+      providerCardId: z.string().trim().min(3).max(120),
+      threeDSecureSessionId: z.string().trim().max(120),
+      brand: z.string().trim().max(40).nullable(),
+      last4: z.string().trim().regex(/^\d{4}$/).nullable(),
+      method: z.enum(["card", "saved-card"]),
+    })
+    .nullable()
+    .optional(),
 });
 
 export type BookingResult = {
@@ -62,6 +75,14 @@ export type BookingResult = {
   testMode: boolean;
   /** Calendar events for the booked legs, ready for .ics / Google Calendar. */
   calendar: CalendarEvent[];
+  /** What was charged and how, for the receipt. */
+  payment: {
+    method: "card" | "saved-card" | "balance";
+    brand: string | null;
+    last4: string | null;
+    amountEur: number;
+    status: string;
+  } | null;
 };
 
 
