@@ -16,6 +16,9 @@ export function AppFooter() {
         <Link to="/terms" className={cls}>
           Terms
         </Link>
+        <Link to="/creator" className={cls}>
+          Creators
+        </Link>
         <span className="text-xs text-muted-foreground">© Adair</span>
       </div>
     </footer>

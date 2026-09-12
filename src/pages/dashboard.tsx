@@ -8,6 +8,8 @@ import { RefineProfilePrompt } from "@/components/prefs/refine-prompt";
 import { supabase } from "@/integrations/supabase/client";
 import { listTrips, deleteTrip, getProfile, saveProfile } from "@/lib/travel.functions";
 import { attributeReferral } from "@/lib/referrals.functions";
+import { attributeCreator } from "@/lib/creators.functions";
+import { CREATOR_STORAGE_KEY } from "@/pages/creator-profile";
 import { REFERRAL_STORAGE_KEY } from "@/routes/r.$code";
 import { downloadTripInvoice } from "@/lib/trip-pdf";
 import { useLocale, useT } from "@/lib/i18n";
@@ -33,10 +35,29 @@ export function DashboardPage() {
     `${Number(amount).toLocaleString(locale, { maximumFractionDigits: 2 })} ${currency}`;
 
   const claimReferral = useServerFn(attributeReferral);
+  const claimCreator = useServerFn(attributeCreator);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setEmail(data.user?.email ?? ""));
   }, []);
+
+  // A creator link the visitor arrived with, attributed once they are signed in.
+  useEffect(() => {
+    let token = "";
+    try {
+      token = window.localStorage.getItem(CREATOR_STORAGE_KEY) ?? "";
+    } catch {
+      token = "";
+    }
+    if (!token) return;
+    void claimCreator({ data: { token } }).finally(() => {
+      try {
+        window.localStorage.removeItem(CREATOR_STORAGE_KEY);
+      } catch {
+        // Nothing to clean up when storage is unavailable.
+      }
+    });
+  }, [claimCreator]);
 
   // An invitation the visitor arrived with, claimed once they are signed in.
   useEffect(() => {

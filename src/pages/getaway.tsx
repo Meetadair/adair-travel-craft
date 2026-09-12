@@ -3,7 +3,7 @@
  * is either editorial content written by the team or a real checked price —
  * nothing is invented, and gaps are stated plainly.
  */
-import { useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { BedDouble, Compass, MapPin, UtensilsCrossed, Landmark } from "lucide-react";
@@ -195,6 +195,19 @@ export function GetawayPage() {
                           )}
                           {place.whyThisOne && (
                             <p className="mt-2 text-sm text-muted-foreground">{place.whyThisOne}</p>
+                          )}
+                          {place.recommendedBy && (
+                            <p className="mt-2 text-xs text-muted-foreground">
+                              Recommended by{" "}
+                              <Link
+                                to="/c/$handle"
+                                params={{ handle: place.recommendedBy.handle }}
+                                className="text-primary underline-offset-4 hover:underline"
+                              >
+                                {place.recommendedBy.name}
+                              </Link>{" "}
+                              · Creator partner
+                            </p>
                           )}
                         </li>
                       ))}

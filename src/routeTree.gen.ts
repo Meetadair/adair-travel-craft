@@ -21,6 +21,7 @@ import { Route as LangIndexRouteImport } from './routes/$lang.index'
 import { Route as LangAssistantRouteImport } from './routes/$lang.assistant'
 import { Route as LangAuthRouteImport } from './routes/$lang.auth'
 import { Route as LangBusinessRouteImport } from './routes/$lang.business'
+import { Route as AuthenticatedCreatorRouteImport } from './routes/_authenticated/creator'
 import { Route as AuthenticatedCreditRouteImport } from './routes/_authenticated/credit'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedGetawayRouteImport } from './routes/_authenticated/getaway'
@@ -30,12 +31,15 @@ import { Route as AuthenticatedPlanRouteImport } from './routes/_authenticated/p
 import { Route as AuthenticatedPreferencesRouteImport } from './routes/_authenticated/preferences'
 import { Route as AuthenticatedSupportRouteImport } from './routes/_authenticated/support'
 import { Route as AuthenticatedTripsRouteImport } from './routes/_authenticated/trips'
+import { Route as CHandleRouteImport } from './routes/c.$handle'
 import { Route as RCodeRouteImport } from './routes/r.$code'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authenticated/admin.analytics'
+import { Route as AuthenticatedAdminCreatorsRouteImport } from './routes/_authenticated/admin.creators'
 import { Route as AuthenticatedAdminGetawayRouteImport } from './routes/_authenticated/admin.getaway'
 import { Route as AuthenticatedAdminPaymentsRouteImport } from './routes/_authenticated/admin.payments'
 import { Route as AuthenticatedBookCardIdRouteImport } from './routes/_authenticated/book.$cardId'
+import { Route as AuthenticatedCreatorsApplyRouteImport } from './routes/_authenticated/creators.apply'
 import { Route as AuthenticatedDevStatusRouteImport } from './routes/_authenticated/dev.status'
 import { Route as ApiPublicGetawayPricesRouteImport } from './routes/api/public/getaway-prices'
 import { Route as ApiPublicGetawayWeeklyRouteImport } from './routes/api/public/getaway-weekly'
@@ -107,6 +111,11 @@ const LangBusinessRoute = LangBusinessRouteImport.update({
   path: '/business',
   getParentRoute: () => LangRoute,
 } as any)
+const AuthenticatedCreatorRoute = AuthenticatedCreatorRouteImport.update({
+  id: '/creator',
+  path: '/creator',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedCreditRoute = AuthenticatedCreditRouteImport.update({
   id: '/credit',
   path: '/credit',
@@ -153,6 +162,11 @@ const AuthenticatedTripsRoute = AuthenticatedTripsRouteImport.update({
   path: '/trips',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const CHandleRoute = CHandleRouteImport.update({
+  id: '/c/$handle',
+  path: '/c/$handle',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RCodeRoute = RCodeRouteImport.update({
   id: '/r/$code',
   path: '/r/$code',
@@ -167,6 +181,12 @@ const AuthenticatedAdminAnalyticsRoute =
   AuthenticatedAdminAnalyticsRouteImport.update({
     id: '/admin/analytics',
     path: '/admin/analytics',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminCreatorsRoute =
+  AuthenticatedAdminCreatorsRouteImport.update({
+    id: '/admin/creators',
+    path: '/admin/creators',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedAdminGetawayRoute =
@@ -186,6 +206,12 @@ const AuthenticatedBookCardIdRoute = AuthenticatedBookCardIdRouteImport.update({
   path: '/book/$cardId',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCreatorsApplyRoute =
+  AuthenticatedCreatorsApplyRouteImport.update({
+    id: '/creators/apply',
+    path: '/creators/apply',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDevStatusRoute = AuthenticatedDevStatusRouteImport.update({
   id: '/dev/status',
   path: '/dev/status',
@@ -257,6 +283,7 @@ export interface FileRoutesByFullPath {
   '/$lang/assistant': typeof LangAssistantRoute
   '/$lang/auth': typeof LangAuthRoute
   '/$lang/business': typeof LangBusinessRoute
+  '/creator': typeof AuthenticatedCreatorRoute
   '/credit': typeof AuthenticatedCreditRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/getaway': typeof AuthenticatedGetawayRoute
@@ -266,12 +293,15 @@ export interface FileRoutesByFullPath {
   '/preferences': typeof AuthenticatedPreferencesRoute
   '/support': typeof AuthenticatedSupportRoute
   '/trips': typeof AuthenticatedTripsRoute
+  '/c/$handle': typeof CHandleRoute
   '/r/$code': typeof RCodeRoute
   '/$lang/': typeof LangIndexRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
+  '/admin/creators': typeof AuthenticatedAdminCreatorsRoute
   '/admin/getaway': typeof AuthenticatedAdminGetawayRoute
   '/admin/payments': typeof AuthenticatedAdminPaymentsRoute
   '/book/$cardId': typeof AuthenticatedBookCardIdRoute
+  '/creators/apply': typeof AuthenticatedCreatorsApplyRoute
   '/dev/status': typeof AuthenticatedDevStatusRoute
   '/api/public/getaway-prices': typeof ApiPublicGetawayPricesRoute
   '/api/public/getaway-weekly': typeof ApiPublicGetawayWeeklyRoute
@@ -295,6 +325,7 @@ export interface FileRoutesByTo {
   '/$lang/assistant': typeof LangAssistantRoute
   '/$lang/auth': typeof LangAuthRoute
   '/$lang/business': typeof LangBusinessRoute
+  '/creator': typeof AuthenticatedCreatorRoute
   '/credit': typeof AuthenticatedCreditRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/getaway': typeof AuthenticatedGetawayRoute
@@ -304,12 +335,15 @@ export interface FileRoutesByTo {
   '/preferences': typeof AuthenticatedPreferencesRoute
   '/support': typeof AuthenticatedSupportRoute
   '/trips': typeof AuthenticatedTripsRoute
+  '/c/$handle': typeof CHandleRoute
   '/r/$code': typeof RCodeRoute
   '/$lang': typeof LangIndexRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
+  '/admin/creators': typeof AuthenticatedAdminCreatorsRoute
   '/admin/getaway': typeof AuthenticatedAdminGetawayRoute
   '/admin/payments': typeof AuthenticatedAdminPaymentsRoute
   '/book/$cardId': typeof AuthenticatedBookCardIdRoute
+  '/creators/apply': typeof AuthenticatedCreatorsApplyRoute
   '/dev/status': typeof AuthenticatedDevStatusRoute
   '/api/public/getaway-prices': typeof ApiPublicGetawayPricesRoute
   '/api/public/getaway-weekly': typeof ApiPublicGetawayWeeklyRoute
@@ -336,6 +370,7 @@ export interface FileRoutesById {
   '/$lang/assistant': typeof LangAssistantRoute
   '/$lang/auth': typeof LangAuthRoute
   '/$lang/business': typeof LangBusinessRoute
+  '/_authenticated/creator': typeof AuthenticatedCreatorRoute
   '/_authenticated/credit': typeof AuthenticatedCreditRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/getaway': typeof AuthenticatedGetawayRoute
@@ -345,12 +380,15 @@ export interface FileRoutesById {
   '/_authenticated/preferences': typeof AuthenticatedPreferencesRoute
   '/_authenticated/support': typeof AuthenticatedSupportRoute
   '/_authenticated/trips': typeof AuthenticatedTripsRoute
+  '/c/$handle': typeof CHandleRoute
   '/r/$code': typeof RCodeRoute
   '/$lang/': typeof LangIndexRoute
   '/_authenticated/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
+  '/_authenticated/admin/creators': typeof AuthenticatedAdminCreatorsRoute
   '/_authenticated/admin/getaway': typeof AuthenticatedAdminGetawayRoute
   '/_authenticated/admin/payments': typeof AuthenticatedAdminPaymentsRoute
   '/_authenticated/book/$cardId': typeof AuthenticatedBookCardIdRoute
+  '/_authenticated/creators/apply': typeof AuthenticatedCreatorsApplyRoute
   '/_authenticated/dev/status': typeof AuthenticatedDevStatusRoute
   '/api/public/getaway-prices': typeof ApiPublicGetawayPricesRoute
   '/api/public/getaway-weekly': typeof ApiPublicGetawayWeeklyRoute
@@ -377,6 +415,7 @@ export interface FileRouteTypes {
     | '/$lang/assistant'
     | '/$lang/auth'
     | '/$lang/business'
+    | '/creator'
     | '/credit'
     | '/dashboard'
     | '/getaway'
@@ -386,12 +425,15 @@ export interface FileRouteTypes {
     | '/preferences'
     | '/support'
     | '/trips'
+    | '/c/$handle'
     | '/r/$code'
     | '/$lang/'
     | '/admin/analytics'
+    | '/admin/creators'
     | '/admin/getaway'
     | '/admin/payments'
     | '/book/$cardId'
+    | '/creators/apply'
     | '/dev/status'
     | '/api/public/getaway-prices'
     | '/api/public/getaway-weekly'
@@ -415,6 +457,7 @@ export interface FileRouteTypes {
     | '/$lang/assistant'
     | '/$lang/auth'
     | '/$lang/business'
+    | '/creator'
     | '/credit'
     | '/dashboard'
     | '/getaway'
@@ -424,12 +467,15 @@ export interface FileRouteTypes {
     | '/preferences'
     | '/support'
     | '/trips'
+    | '/c/$handle'
     | '/r/$code'
     | '/$lang'
     | '/admin/analytics'
+    | '/admin/creators'
     | '/admin/getaway'
     | '/admin/payments'
     | '/book/$cardId'
+    | '/creators/apply'
     | '/dev/status'
     | '/api/public/getaway-prices'
     | '/api/public/getaway-weekly'
@@ -455,6 +501,7 @@ export interface FileRouteTypes {
     | '/$lang/assistant'
     | '/$lang/auth'
     | '/$lang/business'
+    | '/_authenticated/creator'
     | '/_authenticated/credit'
     | '/_authenticated/dashboard'
     | '/_authenticated/getaway'
@@ -464,12 +511,15 @@ export interface FileRouteTypes {
     | '/_authenticated/preferences'
     | '/_authenticated/support'
     | '/_authenticated/trips'
+    | '/c/$handle'
     | '/r/$code'
     | '/$lang/'
     | '/_authenticated/admin/analytics'
+    | '/_authenticated/admin/creators'
     | '/_authenticated/admin/getaway'
     | '/_authenticated/admin/payments'
     | '/_authenticated/book/$cardId'
+    | '/_authenticated/creators/apply'
     | '/_authenticated/dev/status'
     | '/api/public/getaway-prices'
     | '/api/public/getaway-weekly'
@@ -493,6 +543,7 @@ export interface RootRouteChildren {
   BusinessRoute: typeof BusinessRoute
   PrivacyRoute: typeof PrivacyRoute
   TermsRoute: typeof TermsRoute
+  CHandleRoute: typeof CHandleRoute
   RCodeRoute: typeof RCodeRoute
   ApiPublicGetawayPricesRoute: typeof ApiPublicGetawayPricesRoute
   ApiPublicGetawayWeeklyRoute: typeof ApiPublicGetawayWeeklyRoute
@@ -592,6 +643,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LangBusinessRouteImport
       parentRoute: typeof LangRoute
     }
+    '/_authenticated/creator': {
+      id: '/_authenticated/creator'
+      path: '/creator'
+      fullPath: '/creator'
+      preLoaderRoute: typeof AuthenticatedCreatorRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/credit': {
       id: '/_authenticated/credit'
       path: '/credit'
@@ -655,6 +713,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTripsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/c/$handle': {
+      id: '/c/$handle'
+      path: '/c/$handle'
+      fullPath: '/c/$handle'
+      preLoaderRoute: typeof CHandleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/r/$code': {
       id: '/r/$code'
       path: '/r/$code'
@@ -676,6 +741,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminAnalyticsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/creators': {
+      id: '/_authenticated/admin/creators'
+      path: '/admin/creators'
+      fullPath: '/admin/creators'
+      preLoaderRoute: typeof AuthenticatedAdminCreatorsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/getaway': {
       id: '/_authenticated/admin/getaway'
       path: '/admin/getaway'
@@ -695,6 +767,13 @@ declare module '@tanstack/react-router' {
       path: '/book/$cardId'
       fullPath: '/book/$cardId'
       preLoaderRoute: typeof AuthenticatedBookCardIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/creators/apply': {
+      id: '/_authenticated/creators/apply'
+      path: '/creators/apply'
+      fullPath: '/creators/apply'
+      preLoaderRoute: typeof AuthenticatedCreatorsApplyRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dev/status': {
@@ -778,6 +857,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedCreatorRoute: typeof AuthenticatedCreatorRoute
   AuthenticatedCreditRoute: typeof AuthenticatedCreditRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedGetawayRoute: typeof AuthenticatedGetawayRoute
@@ -788,14 +868,17 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSupportRoute: typeof AuthenticatedSupportRoute
   AuthenticatedTripsRoute: typeof AuthenticatedTripsRoute
   AuthenticatedAdminAnalyticsRoute: typeof AuthenticatedAdminAnalyticsRoute
+  AuthenticatedAdminCreatorsRoute: typeof AuthenticatedAdminCreatorsRoute
   AuthenticatedAdminGetawayRoute: typeof AuthenticatedAdminGetawayRoute
   AuthenticatedAdminPaymentsRoute: typeof AuthenticatedAdminPaymentsRoute
   AuthenticatedBookCardIdRoute: typeof AuthenticatedBookCardIdRoute
+  AuthenticatedCreatorsApplyRoute: typeof AuthenticatedCreatorsApplyRoute
   AuthenticatedDevStatusRoute: typeof AuthenticatedDevStatusRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedCreatorRoute: AuthenticatedCreatorRoute,
   AuthenticatedCreditRoute: AuthenticatedCreditRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedGetawayRoute: AuthenticatedGetawayRoute,
@@ -806,9 +889,11 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSupportRoute: AuthenticatedSupportRoute,
   AuthenticatedTripsRoute: AuthenticatedTripsRoute,
   AuthenticatedAdminAnalyticsRoute: AuthenticatedAdminAnalyticsRoute,
+  AuthenticatedAdminCreatorsRoute: AuthenticatedAdminCreatorsRoute,
   AuthenticatedAdminGetawayRoute: AuthenticatedAdminGetawayRoute,
   AuthenticatedAdminPaymentsRoute: AuthenticatedAdminPaymentsRoute,
   AuthenticatedBookCardIdRoute: AuthenticatedBookCardIdRoute,
+  AuthenticatedCreatorsApplyRoute: AuthenticatedCreatorsApplyRoute,
   AuthenticatedDevStatusRoute: AuthenticatedDevStatusRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }
@@ -841,6 +926,7 @@ const rootRouteChildren: RootRouteChildren = {
   BusinessRoute: BusinessRoute,
   PrivacyRoute: PrivacyRoute,
   TermsRoute: TermsRoute,
+  CHandleRoute: CHandleRoute,
   RCodeRoute: RCodeRoute,
   ApiPublicGetawayPricesRoute: ApiPublicGetawayPricesRoute,
   ApiPublicGetawayWeeklyRoute: ApiPublicGetawayWeeklyRoute,

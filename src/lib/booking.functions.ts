@@ -621,6 +621,39 @@ export const bookTripCard = createServerFn({ method: "POST" })
       creditAppliedMinor = 0;
     }
 
+    // Creator commission: a share of our margin, pending until the
+    // free-cancellation window passes. Never blocks the booking.
+    try {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { accrueCreatorEarnings } = await import("@/lib/creators.server");
+      await accrueCreatorEarnings(
+        supabaseAdmin as never,
+        userId,
+        tripId,
+        lines.map((line, index) => {
+          const payload = (line.payload ?? {}) as Record<string, unknown>;
+          return {
+            tripItemId: insertedIds.get(index) ?? null,
+            kind: line.kind,
+            grossMinor: Math.round(line.amountEur * 100),
+            netMinor:
+              line.kind === "flight"
+                ? Math.round(flightNet * 100)
+                : line.kind === "insurance"
+                  ? Math.round((insurance?.netEur ?? 0) * 100)
+                  : null,
+            status: line.status,
+            getawayPlaceId:
+              typeof payload["getawayPlaceId"] === "string"
+                ? (payload["getawayPlaceId"] as string)
+                : null,
+          };
+        }),
+      );
+    } catch (error) {
+      console.error("creator commission step failed", error);
+    }
+
     await supabase.from("payments").upsert(
       {
         user_id: userId,
@@ -995,6 +1028,17 @@ export const cancelTripItem = createServerFn({ method: "POST" })
       })
       .eq("id", item.trip_id)
       .eq("user_id", userId);
+
+    // A cancelled trip takes any creator commission with it.
+    if (!active.length) {
+      try {
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const { reverseCreatorEarnings } = await import("@/lib/creators.server");
+        await reverseCreatorEarnings(supabaseAdmin as never, item.trip_id);
+      } catch (error) {
+        console.error("creator reversal failed", error);
+      }
+    }
 
     return { status };
   });
