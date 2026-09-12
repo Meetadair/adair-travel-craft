@@ -20,6 +20,12 @@ export type FieldDef = {
 
 export type QuestionDef = {
   id: string;
+  /**
+   * 1 = essentials and dealbreakers: enough to plan a trip, asked up front.
+   * 2 = taste: makes matches better, offered after the first part and always
+   * available later in Preferences.
+   */
+  part: 1 | 2;
   title: string;
   hint?: string;
   kind: "airport" | "fields" | "companies";
@@ -37,6 +43,7 @@ const NONE: [string, string] = ["none", "No preference"];
 export const QUESTIONS: QuestionDef[] = [
   {
     id: "airport",
+    part: 1,
     kind: "airport",
     skippable: false,
     title: "Which airport do you fly from?",
@@ -44,6 +51,7 @@ export const QUESTIONS: QuestionDef[] = [
   },
   {
     id: "purpose",
+    part: 1,
     kind: "fields",
     skippable: true,
     title: "What do you travel for?",
@@ -51,6 +59,7 @@ export const QUESTIONS: QuestionDef[] = [
   },
   {
     id: "airlines",
+    part: 2,
     kind: "fields",
     skippable: true,
     title: "Any airlines you prefer?",
@@ -88,6 +97,7 @@ export const QUESTIONS: QuestionDef[] = [
   },
   {
     id: "cabin",
+    part: 1,
     kind: "fields",
     skippable: true,
     title: "Which cabin should we book?",
@@ -106,6 +116,7 @@ export const QUESTIONS: QuestionDef[] = [
   },
   {
     id: "seat",
+    part: 1,
     kind: "fields",
     skippable: true,
     title: "Where do you like to sit?",
@@ -119,6 +130,7 @@ export const QUESTIONS: QuestionDef[] = [
   },
   {
     id: "hotelType",
+    part: 2,
     kind: "fields",
     skippable: true,
     title: "What kind of place do you stay in?",
@@ -138,6 +150,7 @@ export const QUESTIONS: QuestionDef[] = [
   },
   {
     id: "hotelChains",
+    part: 2,
     kind: "fields",
     skippable: true,
     title: "Any hotel groups you like?",
@@ -168,6 +181,7 @@ export const QUESTIONS: QuestionDef[] = [
   },
   {
     id: "hotelStars",
+    part: 1,
     kind: "fields",
     skippable: true,
     title: "How many stars?",
@@ -177,6 +191,7 @@ export const QUESTIONS: QuestionDef[] = [
   },
   {
     id: "hotelRating",
+    part: 1,
     kind: "fields",
     skippable: true,
     title: "Lowest guest score you accept?",
@@ -194,6 +209,7 @@ export const QUESTIONS: QuestionDef[] = [
   },
   {
     id: "hotelAmenities",
+    part: 2,
     kind: "fields",
     skippable: true,
     title: "What matters inside the hotel?",
@@ -223,6 +239,7 @@ export const QUESTIONS: QuestionDef[] = [
   },
   {
     id: "hotelDistance",
+    part: 2,
     kind: "fields",
     skippable: true,
     title: "How close to the centre or meeting point?",
@@ -235,6 +252,7 @@ export const QUESTIONS: QuestionDef[] = [
   },
   {
     id: "carBrands",
+    part: 2,
     kind: "fields",
     skippable: true,
     title: "Which car makes do you like?",
@@ -260,6 +278,7 @@ export const QUESTIONS: QuestionDef[] = [
   },
   {
     id: "carSetup",
+    part: 1,
     kind: "fields",
     skippable: true,
     title: "What sort of car, and how set up?",
@@ -289,6 +308,7 @@ export const QUESTIONS: QuestionDef[] = [
   },
   {
     id: "carCompanies",
+    part: 2,
     kind: "fields",
     skippable: true,
     title: "Preferred rental companies?",
@@ -311,6 +331,7 @@ export const QUESTIONS: QuestionDef[] = [
   },
   {
     id: "food",
+    part: 2,
     kind: "fields",
     skippable: true,
     title: "How do you like to eat?",
@@ -351,6 +372,7 @@ export const QUESTIONS: QuestionDef[] = [
   },
   {
     id: "interests",
+    part: 2,
     kind: "fields",
     skippable: true,
     title: "What do you enjoy on a trip?",
@@ -377,6 +399,7 @@ export const QUESTIONS: QuestionDef[] = [
   },
   {
     id: "music",
+    part: 2,
     kind: "fields",
     skippable: true,
     title: "Which music would you go out for?",
@@ -399,6 +422,7 @@ export const QUESTIONS: QuestionDef[] = [
   },
   {
     id: "budget",
+    part: 1,
     kind: "fields",
     skippable: true,
     title: "Typical budget per trip?",
@@ -417,6 +441,7 @@ export const QUESTIONS: QuestionDef[] = [
   },
   {
     id: "companies",
+    part: 2,
     kind: "companies",
     skippable: true,
     title: "Who should invoices be made out to?",

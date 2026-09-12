@@ -25,6 +25,8 @@ import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authentic
 import { Route as AuthenticatedPlanRouteImport } from './routes/_authenticated/plan'
 import { Route as AuthenticatedPreferencesRouteImport } from './routes/_authenticated/preferences'
 import { Route as AuthenticatedTripsRouteImport } from './routes/_authenticated/trips'
+import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authenticated/admin.analytics'
 import { Route as AuthenticatedAdminPaymentsRouteImport } from './routes/_authenticated/admin.payments'
 import { Route as AuthenticatedBookCardIdRouteImport } from './routes/_authenticated/book.$cardId'
 import { Route as AuthenticatedDevStatusRouteImport } from './routes/_authenticated/dev.status'
@@ -115,6 +117,17 @@ const AuthenticatedTripsRoute = AuthenticatedTripsRouteImport.update({
   path: '/trips',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
+  id: '/admin/',
+  path: '/admin/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAdminAnalyticsRoute =
+  AuthenticatedAdminAnalyticsRouteImport.update({
+    id: '/admin/analytics',
+    path: '/admin/analytics',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminPaymentsRoute =
   AuthenticatedAdminPaymentsRouteImport.update({
     id: '/admin/payments',
@@ -180,6 +193,7 @@ export interface FileRoutesByFullPath {
   '/preferences': typeof AuthenticatedPreferencesRoute
   '/trips': typeof AuthenticatedTripsRoute
   '/$lang/': typeof LangIndexRoute
+  '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/payments': typeof AuthenticatedAdminPaymentsRoute
   '/book/$cardId': typeof AuthenticatedBookCardIdRoute
   '/dev/status': typeof AuthenticatedDevStatusRoute
@@ -187,6 +201,7 @@ export interface FileRoutesByFullPath {
   '/api/trip/parse': typeof ApiTripParseRoute
   '/api/trip/price-context': typeof ApiTripPriceContextRoute
   '/api/trip/search': typeof ApiTripSearchRoute
+  '/admin/': typeof AuthenticatedAdminIndexRoute
   '/api/public/calendar/callback/$provider': typeof ApiPublicCalendarCallbackProviderRoute
   '/api/public/calendar/feed/$token': typeof ApiPublicCalendarFeedTokenRoute
 }
@@ -205,6 +220,7 @@ export interface FileRoutesByTo {
   '/preferences': typeof AuthenticatedPreferencesRoute
   '/trips': typeof AuthenticatedTripsRoute
   '/$lang': typeof LangIndexRoute
+  '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/payments': typeof AuthenticatedAdminPaymentsRoute
   '/book/$cardId': typeof AuthenticatedBookCardIdRoute
   '/dev/status': typeof AuthenticatedDevStatusRoute
@@ -212,6 +228,7 @@ export interface FileRoutesByTo {
   '/api/trip/parse': typeof ApiTripParseRoute
   '/api/trip/price-context': typeof ApiTripPriceContextRoute
   '/api/trip/search': typeof ApiTripSearchRoute
+  '/admin': typeof AuthenticatedAdminIndexRoute
   '/api/public/calendar/callback/$provider': typeof ApiPublicCalendarCallbackProviderRoute
   '/api/public/calendar/feed/$token': typeof ApiPublicCalendarFeedTokenRoute
 }
@@ -233,6 +250,7 @@ export interface FileRoutesById {
   '/_authenticated/preferences': typeof AuthenticatedPreferencesRoute
   '/_authenticated/trips': typeof AuthenticatedTripsRoute
   '/$lang/': typeof LangIndexRoute
+  '/_authenticated/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/_authenticated/admin/payments': typeof AuthenticatedAdminPaymentsRoute
   '/_authenticated/book/$cardId': typeof AuthenticatedBookCardIdRoute
   '/_authenticated/dev/status': typeof AuthenticatedDevStatusRoute
@@ -240,6 +258,7 @@ export interface FileRoutesById {
   '/api/trip/parse': typeof ApiTripParseRoute
   '/api/trip/price-context': typeof ApiTripPriceContextRoute
   '/api/trip/search': typeof ApiTripSearchRoute
+  '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/api/public/calendar/callback/$provider': typeof ApiPublicCalendarCallbackProviderRoute
   '/api/public/calendar/feed/$token': typeof ApiPublicCalendarFeedTokenRoute
 }
@@ -261,6 +280,7 @@ export interface FileRouteTypes {
     | '/preferences'
     | '/trips'
     | '/$lang/'
+    | '/admin/analytics'
     | '/admin/payments'
     | '/book/$cardId'
     | '/dev/status'
@@ -268,6 +288,7 @@ export interface FileRouteTypes {
     | '/api/trip/parse'
     | '/api/trip/price-context'
     | '/api/trip/search'
+    | '/admin/'
     | '/api/public/calendar/callback/$provider'
     | '/api/public/calendar/feed/$token'
   fileRoutesByTo: FileRoutesByTo
@@ -286,6 +307,7 @@ export interface FileRouteTypes {
     | '/preferences'
     | '/trips'
     | '/$lang'
+    | '/admin/analytics'
     | '/admin/payments'
     | '/book/$cardId'
     | '/dev/status'
@@ -293,6 +315,7 @@ export interface FileRouteTypes {
     | '/api/trip/parse'
     | '/api/trip/price-context'
     | '/api/trip/search'
+    | '/admin'
     | '/api/public/calendar/callback/$provider'
     | '/api/public/calendar/feed/$token'
   id:
@@ -313,6 +336,7 @@ export interface FileRouteTypes {
     | '/_authenticated/preferences'
     | '/_authenticated/trips'
     | '/$lang/'
+    | '/_authenticated/admin/analytics'
     | '/_authenticated/admin/payments'
     | '/_authenticated/book/$cardId'
     | '/_authenticated/dev/status'
@@ -320,6 +344,7 @@ export interface FileRouteTypes {
     | '/api/trip/parse'
     | '/api/trip/price-context'
     | '/api/trip/search'
+    | '/_authenticated/admin/'
     | '/api/public/calendar/callback/$provider'
     | '/api/public/calendar/feed/$token'
   fileRoutesById: FileRoutesById
@@ -453,6 +478,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTripsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/': {
+      id: '/_authenticated/admin/'
+      path: '/admin'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/analytics': {
+      id: '/_authenticated/admin/analytics'
+      path: '/admin/analytics'
+      fullPath: '/admin/analytics'
+      preLoaderRoute: typeof AuthenticatedAdminAnalyticsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/payments': {
       id: '/_authenticated/admin/payments'
       path: '/admin/payments'
@@ -526,9 +565,11 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedPlanRoute: typeof AuthenticatedPlanRoute
   AuthenticatedPreferencesRoute: typeof AuthenticatedPreferencesRoute
   AuthenticatedTripsRoute: typeof AuthenticatedTripsRoute
+  AuthenticatedAdminAnalyticsRoute: typeof AuthenticatedAdminAnalyticsRoute
   AuthenticatedAdminPaymentsRoute: typeof AuthenticatedAdminPaymentsRoute
   AuthenticatedBookCardIdRoute: typeof AuthenticatedBookCardIdRoute
   AuthenticatedDevStatusRoute: typeof AuthenticatedDevStatusRoute
+  AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -538,9 +579,11 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPlanRoute: AuthenticatedPlanRoute,
   AuthenticatedPreferencesRoute: AuthenticatedPreferencesRoute,
   AuthenticatedTripsRoute: AuthenticatedTripsRoute,
+  AuthenticatedAdminAnalyticsRoute: AuthenticatedAdminAnalyticsRoute,
   AuthenticatedAdminPaymentsRoute: AuthenticatedAdminPaymentsRoute,
   AuthenticatedBookCardIdRoute: AuthenticatedBookCardIdRoute,
   AuthenticatedDevStatusRoute: AuthenticatedDevStatusRoute,
+  AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

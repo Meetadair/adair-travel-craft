@@ -22,6 +22,7 @@ import { cleanCompany, type CompanyDraft } from "@/lib/prefs/company-draft";
 import { AirportPicker } from "@/components/prefs/airport-picker";
 import { CompanyEditor } from "@/components/prefs/company-editor";
 import { MultiField, SingleField, ToggleRow } from "@/components/prefs/option-chips";
+import { track } from "@/lib/track";
 
 const primaryBtn =
   "inline-flex min-h-12 items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-60";
@@ -38,7 +39,12 @@ export function OnboardingPage() {
   const [toggles, setToggles] = useState<Toggles>({});
   const [companies, setCompanies] = useState<CompanyDraft[]>([]);
 
-  const total = QUESTIONS.length + 2;
+  // Part 1 is essentials and dealbreakers; part 2 is taste. Between them sits a
+  // bridge screen so nobody feels trapped in a long form.
+  const part1 = useMemo(() => QUESTIONS.filter((q) => q.part === 1), []);
+  const part2 = useMemo(() => QUESTIONS.filter((q) => q.part === 2), []);
+  const bridgeStep = part1.length + 1;
+  const total = QUESTIONS.length + 3;
   const prefs = useMemo(() => answersToPrefs(answers, toggles), [answers, toggles]);
   const known = countKnownPreferences(prefs) + companies.length;
 
@@ -56,7 +62,13 @@ export function OnboardingPage() {
     onSuccess: () => navigate({ to: "/dashboard" }),
   });
 
-  const question = step >= 1 && step <= QUESTIONS.length ? QUESTIONS[step - 1] : null;
+  const question =
+    step >= 1 && step <= part1.length
+      ? part1[step - 1]
+      : step > bridgeStep && step <= bridgeStep + part2.length
+        ? part2[step - bridgeStep - 1]
+        : null;
+  const isBridge = step === bridgeStep;
   const isSummary = step === total - 1;
   const canContinue = !question ? true : question.kind === "airport" ? Boolean(homeAirport) : true;
 
@@ -86,10 +98,18 @@ export function OnboardingPage() {
 
         <h1 className="mt-6 font-display text-3xl font-semibold tracking-tight">
           {step === 0 && "What should we call you?"}
+          {isBridge && "That's the essentials"}
           {question && question.title}
           {isSummary && `Adair now knows ${known} preference${known === 1 ? "" : "s"}`}
         </h1>
         {question?.hint && <p className="mt-2 text-sm text-muted-foreground">{question.hint}</p>}
+        {isBridge && (
+          <p className="mt-2 text-sm text-muted-foreground">
+            We can plan a trip from here. The rest is taste — favourite airlines, hotel style,
+            food, music — and it makes every suggestion fit you better. About two more minutes,
+            and you can always add it later under Preferences.
+          </p>
+        )}
         {isSummary && (
           <p className="mt-2 text-sm text-muted-foreground">
             Every answer stays editable later under Preferences.
@@ -206,10 +226,26 @@ export function OnboardingPage() {
               {question?.skippable && (
                 <button
                   type="button"
-                  onClick={() => setStep((s) => s + 1)}
+                  onClick={() => {
+                    track("onboarding_skip", { question: question?.id ?? String(step), step });
+                    setStep((s) => s + 1);
+                  }}
                   className="text-sm text-muted-foreground underline decoration-border underline-offset-4"
                 >
                   Skip
+                </button>
+              )}
+              {isBridge && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    track("onboarding_step", { question: "bridge_finish_now", step });
+                    mutation.mutate();
+                  }}
+                  disabled={mutation.isPending}
+                  className="text-sm text-muted-foreground underline decoration-border underline-offset-4 disabled:opacity-40"
+                >
+                  {mutation.isPending ? "Saving…" : "Finish now"}
                 </button>
               )}
               {isSummary ? (
@@ -225,11 +261,14 @@ export function OnboardingPage() {
               ) : (
                 <button
                   type="button"
-                  onClick={() => setStep((s) => s + 1)}
+                  onClick={() => {
+                    track("onboarding_step", { question: question?.id ?? String(step), step });
+                    setStep((s) => s + 1);
+                  }}
                   disabled={!canContinue}
                   className={primaryBtn}
                 >
-                  Continue <ArrowRight className="size-4" />
+                  {isBridge ? "Keep going" : "Continue"} <ArrowRight className="size-4" />
                 </button>
               )}
             </div>

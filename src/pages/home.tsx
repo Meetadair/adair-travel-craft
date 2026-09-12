@@ -28,6 +28,8 @@ import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { LineOptions, MatchNote } from "@/components/trip-line-options";
+import { ArrivalPlanNote, TransferNote } from "@/components/arrival-plan-note";
+import { track } from "@/lib/track";
 import { TripExtras } from "@/components/trip-extras";
 import { searchLiveTrip, swapCardAlternative } from "@/lib/trip-live.functions";
 import type { BudgetStatus, MatchSummary } from "@/lib/trip/match";
@@ -443,6 +445,7 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
     reason?: string,
   ) => {
     if (!cardId || swapping) return;
+    track("line_swapped", { kind, ...(reason ? { reason } : {}) });
     setSwapping(true);
     try {
       const result = await runSwap({ data: { cardId, kind, index, ...(reason ? { reason } : {}) } });
@@ -502,6 +505,7 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
   const moveDates = async () => {
     const ctx = priceContext;
     if (!ctx?.offsetDays || !ctx.cheapestDepartDate || !ctx.cheapestReturnDate) return;
+    track("cheaper_dates_accepted", { city: ctx.city, saving_eur: ctx.savingEur });
     setMovingDates(true);
     try {
       const sentence = submission?.sentence.trim() || d.userMessage;
@@ -844,6 +848,15 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                     <p className="mt-0.5 text-xs text-muted-foreground">{d.cardSubtitle}</p>
                   </div>
 
+                  {live?.arrivalPlan && (
+                    <ArrivalPlanNote
+                      plan={live.arrivalPlan}
+                      locale={locale}
+                      busy={swapping}
+                      onPickSafer={(index) => void swapAlternative("flight", index)}
+                    />
+                  )}
+
                   <div className="divide-y divide-border">
                     {dropped.flight ? null : live?.flight && req ? (
                       <div className={reveal(1)}>
@@ -892,7 +905,18 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                           priceLabel: eur(alt.amountEur),
                         }))}
                         onPick={(index, reason) => void swapAlternative("flight", index, reason)}
+                        emptyNote="No other flight came back for these dates — try shifting the dates by a day."
                       />
+                    )}
+
+                    {live?.departureNote && (
+                      <p className="px-5 py-3 text-xs leading-relaxed text-muted-foreground">
+                        {live.departureNote}
+                      </p>
+                    )}
+
+                    {live?.transfer && !dropped.flight && (
+                      <TransferNote transfer={live.transfer} locale={locale} />
                     )}
 
                     {requestedNames.hotel && !dropped.hotel && (
@@ -1276,7 +1300,10 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                         </button>
                         <button
                           type="button"
-                          onClick={() => setDatesKept(true)}
+                          onClick={() => {
+                            track("cheaper_dates_dismissed", { city: priceContext.city });
+                            setDatesKept(true);
+                          }}
                           className="inline-flex min-h-11 items-center rounded-xl border border-border px-4 py-2 text-sm font-medium"
                         >
                           Keep my dates
@@ -1604,6 +1631,7 @@ export function HomePage() {
   );
 
   function runDemo(sentence: string) {
+    track("sentence_typed", { length: sentence.trim().length });
     setSubmission({ sentence, key: Date.now() });
     document
       .getElementById("demo")

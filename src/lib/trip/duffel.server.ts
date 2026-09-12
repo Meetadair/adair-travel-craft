@@ -5,6 +5,12 @@
  */
 import { findByName } from "./match";
 import { carScore, flightScore, stayScore, type SearchPrefs } from "@/lib/trip/rank";
+import {
+  DEFAULT_PLANNING_RULES,
+  planBackwards,
+  type ArrivalPlan,
+  type PlanningRules,
+} from "./backwards";
 import type {
   CarResult,
   FlightResult,
@@ -183,8 +189,29 @@ export async function searchFlight(
     };
   };
 
-  // Keep the next best few so the traveller can swap without a new search.
-  const alternatives = ranked.slice(1, 4).map(toResult);
+  // Keep the next best genuinely different itineraries so the traveller can
+  // swap without a new search. Duffel returns many near-identical offers, so
+  // dedupe on the itinerary itself rather than showing the same flight thrice.
+  const seen = new Set<string>();
+  const key = (offer: DuffelOffer): string => {
+    const legs = offer.slices?.[0]?.segments ?? [];
+    const numbers = legs
+      .map(
+        (s) =>
+          `${s.marketing_carrier?.iata_code ?? ""}${s.marketing_carrier_flight_number ?? ""}`,
+      )
+      .join("-");
+    return `${numbers}|${legs[0]?.departing_at ?? ""}|${offer.total_amount}`;
+  };
+  seen.add(key(best));
+  const alternatives: FlightResult[] = [];
+  for (const offer of ranked.slice(1)) {
+    const id = key(offer);
+    if (seen.has(id)) continue;
+    seen.add(id);
+    alternatives.push(toResult(offer));
+    if (alternatives.length === 3) break;
+  }
 
   const outbound = best.slices?.[0]?.segments ?? [];
   const first = outbound[0];
@@ -469,6 +496,7 @@ function noteFor(error: unknown): string {
 export async function searchTripWithDuffel(
   req: TripRequest,
   prefs?: SearchPrefs,
+  planning?: { rules: PlanningRules; business: boolean },
 ): Promise<TripSearchResponse> {
   const errors: TripSearchResponse["errors"] = {};
 
@@ -524,6 +552,65 @@ export async function searchTripWithDuffel(
     errors.cars = noteFor(carRes.reason);
   }
 
+  // Fixed arrival time: re-pick the flight backwards from the deadline.
+  let arrivalPlan: ArrivalPlan | null = null;
+  let transfer: TripSearchResponse["transfer"] = null;
+  if (req.mustArriveBy && flight) {
+    const rules = planning?.rules ?? DEFAULT_PLANNING_RULES;
+    const candidates = [flight, ...flightAlternatives];
+    const result = planBackwards({
+      candidates,
+      mustArriveBy: req.mustArriveBy,
+      meetingLocation: req.meetingLocation ?? null,
+      destinationIata: req.destinationIata,
+      // Airport-to-centre run; the meeting is assumed to be in the city.
+      transferDistanceKm: 25,
+      rules,
+      business: planning?.business ?? false,
+    });
+    if (result.chosen) {
+      flight = result.chosen;
+      flightAlternatives = candidates.filter((_, i) => i !== result.chosenIndex);
+    }
+    arrivalPlan = result.plan;
+    transfer = {
+      pickupAt: result.plan.transferPickupAt,
+      fromLabel: `${req.destinationIata} airport`,
+      toLabel: req.meetingLocation ?? `${req.destinationCity} centre`,
+      minutes: result.plan.transferMin,
+      supplierConnected: false,
+    };
+  }
+
+  // Reverse constraint: "I have to leave Milan by Thursday evening".
+  let departureNote: string | null = null;
+  if (req.mustDepartBy && flight) {
+    const deadline = Date.parse(req.mustDepartBy);
+    const fits = (candidate: FlightResult) => {
+      const back = candidate.returnDepartAt ? Date.parse(candidate.returnDepartAt) : NaN;
+      return Number.isFinite(back) && back <= deadline;
+    };
+    const local = (iso: string) =>
+      new Date(iso).toLocaleTimeString("en-GB", {
+        hour: "2-digit",
+        minute: "2-digit",
+        timeZone: "UTC",
+      });
+    if (!fits(flight)) {
+      const swap = flightAlternatives.find(fits);
+      if (swap) {
+        const previous = flight;
+        flightAlternatives = [previous, ...flightAlternatives.filter((f) => f !== swap)].slice(0, 3);
+        flight = swap;
+        departureNote = `Return moved to ${local(swap.returnDepartAt!)} so you leave before your deadline.`;
+      } else if (flight.returnDepartAt) {
+        departureNote = `The earliest return we can source leaves ${local(
+          flight.returnDepartAt,
+        )}, after the time you wanted to be away. Shifting the return date by a day fixes it.`;
+      }
+    }
+  }
+
   const parts = [flight, stay, car].filter(Boolean) as Array<{
     amountEur: number;
     approx: boolean;
@@ -547,6 +634,9 @@ export async function searchTripWithDuffel(
     carRequested,
     carNotFound,
     carAlternatives,
+    arrivalPlan,
+    transfer,
+    departureNote,
     errors,
   };
 }

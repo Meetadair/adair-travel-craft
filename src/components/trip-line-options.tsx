@@ -56,14 +56,20 @@ export function LineOptions({
   options,
   busy,
   onPick,
+  emptyNote,
 }: {
   options: AltOption[];
   busy?: boolean;
   onPick: (index: number, reason?: string) => void;
+  /** Calm note shown when the supplier returned nothing else for this line. */
+  emptyNote?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [picked, setPicked] = useState<number | null>(null);
-  if (!options.length) return null;
+  if (!options.length) {
+    if (!emptyNote) return null;
+    return <p className="px-5 pb-4 text-xs text-muted-foreground">{emptyNote}</p>;
+  }
 
   if (picked !== null) {
     return (
@@ -106,9 +112,12 @@ export function LineOptions({
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        className="text-xs font-medium text-primary underline underline-offset-4"
+        className="flex w-full items-center justify-between gap-3 rounded-xl border border-border px-4 py-2.5 text-sm font-medium text-primary hover:border-primary sm:w-auto sm:justify-start"
       >
-        {open ? "Hide other options" : "Show other options"}
+        <span>{open ? "Hide other options" : "Show other options"}</span>
+        <span className="text-xs font-normal text-muted-foreground">
+          {options.length} {options.length === 1 ? "option" : "options"}
+        </span>
       </button>
       {open && (
         <ul className="mt-2 space-y-2">
