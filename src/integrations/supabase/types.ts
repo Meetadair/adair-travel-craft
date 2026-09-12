@@ -151,6 +151,60 @@ export type Database = {
         }
         Relationships: []
       }
+      error_log: {
+        Row: {
+          created_at: string
+          id: string
+          message: string
+          route: string | null
+          stack: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message: string
+          route?: string | null
+          stack?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string
+          route?: string | null
+          stack?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      events: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          props: Json
+          session_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          props?: Json
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          props?: Json
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       hotel_requests_missed: {
         Row: {
           checkin_date: string | null
@@ -423,6 +477,7 @@ export type Database = {
           home_airport: string
           hotel_chains: string | null
           id: string
+          is_admin: boolean
           onboarded: boolean
           plan: string
           preferred_airlines: string | null
@@ -441,6 +496,7 @@ export type Database = {
           home_airport?: string
           hotel_chains?: string | null
           id: string
+          is_admin?: boolean
           onboarded?: boolean
           plan?: string
           preferred_airlines?: string | null
@@ -459,6 +515,7 @@ export type Database = {
           home_airport?: string
           hotel_chains?: string | null
           id?: string
+          is_admin?: boolean
           onboarded?: boolean
           plan?: string
           preferred_airlines?: string | null
@@ -875,7 +932,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
