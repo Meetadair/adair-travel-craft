@@ -20,6 +20,7 @@ import { Route as LangAssistantRouteImport } from './routes/$lang.assistant'
 import { Route as LangAuthRouteImport } from './routes/$lang.auth'
 import { Route as LangBusinessRouteImport } from './routes/$lang.business'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedGetawayRouteImport } from './routes/_authenticated/getaway'
 import { Route as AuthenticatedInvoicesRouteImport } from './routes/_authenticated/invoices'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedPlanRouteImport } from './routes/_authenticated/plan'
@@ -90,6 +91,11 @@ const LangBusinessRoute = LangBusinessRouteImport.update({
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedGetawayRoute = AuthenticatedGetawayRouteImport.update({
+  id: '/getaway',
+  path: '/getaway',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedInvoicesRoute = AuthenticatedInvoicesRouteImport.update({
@@ -193,6 +199,7 @@ export interface FileRoutesByFullPath {
   '/$lang/auth': typeof LangAuthRoute
   '/$lang/business': typeof LangBusinessRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/getaway': typeof AuthenticatedGetawayRoute
   '/invoices': typeof AuthenticatedInvoicesRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/plan': typeof AuthenticatedPlanRoute
@@ -221,6 +228,7 @@ export interface FileRoutesByTo {
   '/$lang/auth': typeof LangAuthRoute
   '/$lang/business': typeof LangBusinessRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/getaway': typeof AuthenticatedGetawayRoute
   '/invoices': typeof AuthenticatedInvoicesRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/plan': typeof AuthenticatedPlanRoute
@@ -252,6 +260,7 @@ export interface FileRoutesById {
   '/$lang/auth': typeof LangAuthRoute
   '/$lang/business': typeof LangBusinessRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/getaway': typeof AuthenticatedGetawayRoute
   '/_authenticated/invoices': typeof AuthenticatedInvoicesRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/plan': typeof AuthenticatedPlanRoute
@@ -283,6 +292,7 @@ export interface FileRouteTypes {
     | '/$lang/auth'
     | '/$lang/business'
     | '/dashboard'
+    | '/getaway'
     | '/invoices'
     | '/onboarding'
     | '/plan'
@@ -311,6 +321,7 @@ export interface FileRouteTypes {
     | '/$lang/auth'
     | '/$lang/business'
     | '/dashboard'
+    | '/getaway'
     | '/invoices'
     | '/onboarding'
     | '/plan'
@@ -341,6 +352,7 @@ export interface FileRouteTypes {
     | '/$lang/auth'
     | '/$lang/business'
     | '/_authenticated/dashboard'
+    | '/_authenticated/getaway'
     | '/_authenticated/invoices'
     | '/_authenticated/onboarding'
     | '/_authenticated/plan'
@@ -454,6 +466,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/getaway': {
+      id: '/_authenticated/getaway'
+      path: '/getaway'
+      fullPath: '/getaway'
+      preLoaderRoute: typeof AuthenticatedGetawayRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/invoices': {
@@ -580,6 +599,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedGetawayRoute: typeof AuthenticatedGetawayRoute
   AuthenticatedInvoicesRoute: typeof AuthenticatedInvoicesRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedPlanRoute: typeof AuthenticatedPlanRoute
@@ -594,6 +614,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedGetawayRoute: AuthenticatedGetawayRoute,
   AuthenticatedInvoicesRoute: AuthenticatedInvoicesRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedPlanRoute: AuthenticatedPlanRoute,
