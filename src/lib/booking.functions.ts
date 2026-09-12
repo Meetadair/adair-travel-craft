@@ -686,6 +686,7 @@ export const bookTripCard = createServerFn({ method: "POST" })
       reason,
       testMode: isTestKey(),
       calendar,
+      loyalty: { applied: loyaltyApplied, notApplied: loyaltyNotApplied },
       payment: {
         method: paymentMethod,
         brand: data.payment?.brand ?? null,
