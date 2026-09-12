@@ -443,6 +443,30 @@ export function BookPage({ cardId }: { cardId: string }) {
               </div>
             )}
 
+            {(result.loyalty?.applied.length || result.loyalty?.notApplied.length) && (
+              <div className="mt-5 border-t border-border pt-4 text-sm">
+                <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                  Loyalty numbers
+                </p>
+                <ul className="mt-2 space-y-1">
+                  {result.loyalty.applied.map((m) => (
+                    <li key={`${m.programme}-${m.masked}`} className="text-muted-foreground">
+                      <span className="text-foreground">{m.programme}</span> {m.masked}
+                      {m.tier ? ` · ${m.tier}` : ""} — {m.where}
+                    </li>
+                  ))}
+                  {result.loyalty.notApplied.map((m) => (
+                    <li key={`${m.programme}-${m.masked}-x`} className="text-muted-foreground">
+                      <span className="text-foreground">{m.programme}</span> {m.masked} — not
+                      applied: {m.note}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+
+
             {result.calendar.length > 0 && (
               <AddToCalendar
                 events={result.calendar}
