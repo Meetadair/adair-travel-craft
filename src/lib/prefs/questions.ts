@@ -18,6 +18,12 @@ export type FieldDef = {
   noneValue?: string;
 };
 
+export type TextDef = {
+  field: string;
+  label: string;
+  placeholder?: string;
+};
+
 export type QuestionDef = {
   id: string;
   /**
@@ -33,6 +39,7 @@ export type QuestionDef = {
   singles?: FieldDef[];
   multis?: FieldDef[];
   toggles?: { field: string; label: string }[];
+  texts?: TextDef[];
 };
 
 const opts = (...pairs: Array<[string, string]>): Option[] =>
