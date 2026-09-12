@@ -3,7 +3,7 @@
  * is either editorial content written by the team or a real checked price —
  * nothing is invented, and gaps are stated plainly.
  */
-import { useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { BedDouble, Compass, MapPin, UtensilsCrossed, Landmark } from "lucide-react";
