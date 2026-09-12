@@ -30,10 +30,17 @@ const TABLES: Array<{ table: string; column: string }> = [
   { table: "support_requests", column: "user_id" },
   { table: "events", column: "user_id" },
   { table: "saved_cards", column: "user_id" },
+  { table: "loyalty_memberships", column: "user_id" },
 ];
 
 /** Columns we must never hand back, even though we store a reference. */
-const REDACT = new Set(["access_token", "refresh_token", "token", "provider_card_id"]);
+const REDACT = new Set([
+  "access_token",
+  "refresh_token",
+  "token",
+  "provider_card_id",
+  "member_number_encrypted",
+]);
 
 function scrub(rows: unknown): unknown {
   if (!Array.isArray(rows)) return rows;
@@ -109,6 +116,7 @@ export const deleteMyAccount = createServerFn({ method: "POST" })
       "calendar_oauth_states",
       "choice_feedback",
       "saved_cards",
+      "loyalty_memberships",
       "preferences",
       "getaway_proposals",
       "getaway_theme_optouts",
