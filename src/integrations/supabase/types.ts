@@ -1627,25 +1627,34 @@ export type Database = {
           created_at: string
           email: string
           id: string
+          invite_error: string | null
+          invited_at: string | null
           referral_code: string
           sentence: string | null
           type: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string
           email: string
           id?: string
+          invite_error?: string | null
+          invited_at?: string | null
           referral_code: string
           sentence?: string | null
           type?: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string
           email?: string
           id?: string
+          invite_error?: string | null
+          invited_at?: string | null
           referral_code?: string
           sentence?: string | null
           type?: string
+          user_id?: string | null
         }
         Relationships: []
       }
