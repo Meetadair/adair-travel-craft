@@ -205,9 +205,7 @@ export const bookTripCard = createServerFn({ method: "POST" })
     // Programmes earn across partners, not only on the airline that owns them:
     // a LOT ticket credits Miles & More. The mapping lives in the database.
     const flightCarrierCode =
-      search.flight?.flightNumbers[0]?.match(/^[A-Z0-9]{2}/)?.[0] ??
-      search.flight?.carrierIata ??
-      null;
+      search.flight?.flightNumbers[0]?.match(/^[A-Z0-9]{2}/)?.[0] ?? null;
     const flightMemberships = usable.filter(
       (m) =>
         m.category === "airline" &&
