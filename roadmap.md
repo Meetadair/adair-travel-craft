@@ -54,3 +54,8 @@
 - [x] Dinner reservations section per evening of the trip, filtered by the profile's cuisines/diets/distance/budget, with a per-offer match score; "Add a reservation" on confirmed trips in My trips
 - [x] Rides and reservations included in the .ics export and reminder emails
 - [ ] Connect the live supplier APIs: add the provider key and fill in that adapter's search/quote/book/cancel
+
+## Payments (done)
+- Duffel hosted card form + 3-D Secure on the booking screen (test mode), card data never touches our backend
+- Saved cards (provider token only), payment outcomes + idempotency key recorded in payments
+- No Apple Pay / Google Pay: Duffel Cards does not support digital wallets. Add Stripe alongside if wallets are wanted.
