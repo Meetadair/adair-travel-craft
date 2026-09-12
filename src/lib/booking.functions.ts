@@ -377,6 +377,13 @@ export const bookTripCard = createServerFn({ method: "POST" })
         reason,
         testMode: isTestKey(),
         calendar: [],
+        payment: {
+          method: paymentMethod,
+          brand: data.payment?.brand ?? null,
+          last4: data.payment?.last4 ?? null,
+          amountEur: 0,
+          status: "failed",
+        },
       };
 
     }
@@ -448,15 +455,20 @@ export const bookTripCard = createServerFn({ method: "POST" })
       .eq("id", card.id)
       .eq("user_id", userId);
 
-    await supabase.from("payments").insert({
-      user_id: userId,
-      trip_id: tripId,
-      provider: "duffel-test",
-      provider_ref: flightOrderId,
-      amount_minor: Math.round(confirmedTotal * 100),
-      status: "test_settled",
-      idempotency_key: `${card.id}-payment`,
-    });
+    await supabase.from("payments").upsert(
+      {
+        user_id: userId,
+        trip_id: tripId,
+        provider: "duffel-test",
+        provider_ref: flightOrderId,
+        amount_minor: Math.round(confirmedTotal * 100),
+        status: "test_settled",
+        idempotency_key: idempotencyKey,
+        failure_note: status === "partial" ? reason : null,
+        ...paymentDetails,
+      },
+      { onConflict: "user_id,idempotency_key" },
+    );
 
     await audit("booking_created", {
       cardId: card.id,
@@ -546,6 +558,13 @@ export const bookTripCard = createServerFn({ method: "POST" })
       reason,
       testMode: isTestKey(),
       calendar,
+      payment: {
+        method: paymentMethod,
+        brand: data.payment?.brand ?? null,
+        last4: data.payment?.last4 ?? null,
+        amountEur: confirmedTotal,
+        status: "test_settled",
+      },
     };
 
 
