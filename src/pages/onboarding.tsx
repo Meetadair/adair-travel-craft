@@ -39,7 +39,12 @@ export function OnboardingPage() {
   const [toggles, setToggles] = useState<Toggles>({});
   const [companies, setCompanies] = useState<CompanyDraft[]>([]);
 
-  const total = QUESTIONS.length + 2;
+  // Part 1 is essentials and dealbreakers; part 2 is taste. Between them sits a
+  // bridge screen so nobody feels trapped in a long form.
+  const part1 = useMemo(() => QUESTIONS.filter((q) => q.part === 1), []);
+  const part2 = useMemo(() => QUESTIONS.filter((q) => q.part === 2), []);
+  const bridgeStep = part1.length + 1;
+  const total = QUESTIONS.length + 3;
   const prefs = useMemo(() => answersToPrefs(answers, toggles), [answers, toggles]);
   const known = countKnownPreferences(prefs) + companies.length;
 
@@ -57,7 +62,13 @@ export function OnboardingPage() {
     onSuccess: () => navigate({ to: "/dashboard" }),
   });
 
-  const question = step >= 1 && step <= QUESTIONS.length ? QUESTIONS[step - 1] : null;
+  const question =
+    step >= 1 && step <= part1.length
+      ? part1[step - 1]
+      : step > bridgeStep && step <= bridgeStep + part2.length
+        ? part2[step - bridgeStep - 1]
+        : null;
+  const isBridge = step === bridgeStep;
   const isSummary = step === total - 1;
   const canContinue = !question ? true : question.kind === "airport" ? Boolean(homeAirport) : true;
 
@@ -87,10 +98,18 @@ export function OnboardingPage() {
 
         <h1 className="mt-6 font-display text-3xl font-semibold tracking-tight">
           {step === 0 && "What should we call you?"}
+          {isBridge && "That's the essentials"}
           {question && question.title}
           {isSummary && `Adair now knows ${known} preference${known === 1 ? "" : "s"}`}
         </h1>
         {question?.hint && <p className="mt-2 text-sm text-muted-foreground">{question.hint}</p>}
+        {isBridge && (
+          <p className="mt-2 text-sm text-muted-foreground">
+            We can plan a trip from here. The rest is taste — favourite airlines, hotel style,
+            food, music — and it makes every suggestion fit you better. About two more minutes,
+            and you can always add it later under Preferences.
+          </p>
+        )}
         {isSummary && (
           <p className="mt-2 text-sm text-muted-foreground">
             Every answer stays editable later under Preferences.
