@@ -29,6 +29,7 @@ import { Route as AuthenticatedBookCardIdRouteImport } from './routes/_authentic
 import { Route as AuthenticatedDevStatusRouteImport } from './routes/_authenticated/dev.status'
 import { Route as ApiPublicTripRemindersRouteImport } from './routes/api/public/trip-reminders'
 import { Route as ApiTripParseRouteImport } from './routes/api/trip/parse'
+import { Route as ApiTripPriceContextRouteImport } from './routes/api/trip/price-context'
 import { Route as ApiTripSearchRouteImport } from './routes/api/trip/search'
 
 const IndexRoute = IndexRouteImport.update({
@@ -131,6 +132,11 @@ const ApiTripParseRoute = ApiTripParseRouteImport.update({
   path: '/api/trip/parse',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiTripPriceContextRoute = ApiTripPriceContextRouteImport.update({
+  id: '/api/trip/price-context',
+  path: '/api/trip/price-context',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiTripSearchRoute = ApiTripSearchRouteImport.update({
   id: '/api/trip/search',
   path: '/api/trip/search',
@@ -157,6 +163,7 @@ export interface FileRoutesByFullPath {
   '/dev/status': typeof AuthenticatedDevStatusRoute
   '/api/public/trip-reminders': typeof ApiPublicTripRemindersRoute
   '/api/trip/parse': typeof ApiTripParseRoute
+  '/api/trip/price-context': typeof ApiTripPriceContextRoute
   '/api/trip/search': typeof ApiTripSearchRoute
 }
 export interface FileRoutesByTo {
@@ -178,6 +185,7 @@ export interface FileRoutesByTo {
   '/dev/status': typeof AuthenticatedDevStatusRoute
   '/api/public/trip-reminders': typeof ApiPublicTripRemindersRoute
   '/api/trip/parse': typeof ApiTripParseRoute
+  '/api/trip/price-context': typeof ApiTripPriceContextRoute
   '/api/trip/search': typeof ApiTripSearchRoute
 }
 export interface FileRoutesById {
@@ -202,6 +210,7 @@ export interface FileRoutesById {
   '/_authenticated/dev/status': typeof AuthenticatedDevStatusRoute
   '/api/public/trip-reminders': typeof ApiPublicTripRemindersRoute
   '/api/trip/parse': typeof ApiTripParseRoute
+  '/api/trip/price-context': typeof ApiTripPriceContextRoute
   '/api/trip/search': typeof ApiTripSearchRoute
 }
 export interface FileRouteTypes {
@@ -226,6 +235,7 @@ export interface FileRouteTypes {
     | '/dev/status'
     | '/api/public/trip-reminders'
     | '/api/trip/parse'
+    | '/api/trip/price-context'
     | '/api/trip/search'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -247,6 +257,7 @@ export interface FileRouteTypes {
     | '/dev/status'
     | '/api/public/trip-reminders'
     | '/api/trip/parse'
+    | '/api/trip/price-context'
     | '/api/trip/search'
   id:
     | '__root__'
@@ -270,6 +281,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dev/status'
     | '/api/public/trip-reminders'
     | '/api/trip/parse'
+    | '/api/trip/price-context'
     | '/api/trip/search'
   fileRoutesById: FileRoutesById
 }
@@ -282,6 +294,7 @@ export interface RootRouteChildren {
   BusinessRoute: typeof BusinessRoute
   ApiPublicTripRemindersRoute: typeof ApiPublicTripRemindersRoute
   ApiTripParseRoute: typeof ApiTripParseRoute
+  ApiTripPriceContextRoute: typeof ApiTripPriceContextRoute
   ApiTripSearchRoute: typeof ApiTripSearchRoute
 }
 
@@ -427,6 +440,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiTripParseRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/trip/price-context': {
+      id: '/api/trip/price-context'
+      path: '/api/trip/price-context'
+      fullPath: '/api/trip/price-context'
+      preLoaderRoute: typeof ApiTripPriceContextRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/trip/search': {
       id: '/api/trip/search'
       path: '/api/trip/search'
@@ -487,6 +507,7 @@ const rootRouteChildren: RootRouteChildren = {
   BusinessRoute: BusinessRoute,
   ApiPublicTripRemindersRoute: ApiPublicTripRemindersRoute,
   ApiTripParseRoute: ApiTripParseRoute,
+  ApiTripPriceContextRoute: ApiTripPriceContextRoute,
   ApiTripSearchRoute: ApiTripSearchRoute,
 }
 export const routeTree = rootRouteImport

@@ -21,6 +21,23 @@ export async function searchTrip(request: TripRequest): Promise<TripSearchRespon
   return (await res.json()) as TripSearchResponse;
 }
 
+/** Nearby-date comparison for the same trip; safe to call after the card renders. */
+export async function fetchPriceContext(
+  request: TripRequest,
+): Promise<import("./price-context.server").PriceContext | null> {
+  try {
+    const res = await fetch("/api/trip/price-context", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(request),
+    });
+    if (!res.ok) return null;
+    return (await res.json()) as import("./price-context.server").PriceContext;
+  } catch {
+    return null;
+  }
+}
+
 const EUR = new Intl.NumberFormat("en-US", {
   style: "currency",
   currency: "EUR",
