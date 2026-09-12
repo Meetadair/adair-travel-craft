@@ -1,6 +1,6 @@
 /** Large tappable option buttons used by the onboarding wizard and Preferences. */
 import { Check } from "lucide-react";
-import type { FieldDef, Option } from "@/lib/prefs/questions";
+import type { FieldDef, Option, TextDef } from "@/lib/prefs/questions";
 
 const base =
   "flex min-h-12 items-center justify-between gap-2 rounded-xl border px-4 py-3 text-left text-sm transition-colors motion-reduce:transition-none";
@@ -90,6 +90,33 @@ export function MultiField({
         ))}
       </div>
     </div>
+  );
+}
+
+/** Free-text answer, e.g. accessibility needs or things to always avoid. */
+export function TextField({
+  def,
+  value,
+  onChange,
+}: {
+  def: TextDef;
+  value: string;
+  onChange: (next: string) => void;
+}) {
+  return (
+    <label className="block">
+      <span className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+        {def.label}
+      </span>
+      <textarea
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={def.placeholder}
+        rows={3}
+        maxLength={500}
+        className="mt-2 w-full rounded-xl border border-border bg-background px-4 py-3 text-sm outline-none focus:border-primary"
+      />
+    </label>
   );
 }
 
