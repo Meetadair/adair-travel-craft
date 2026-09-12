@@ -153,3 +153,9 @@
 - [x] Applied in `trip-live.functions.ts` only when the trip is leisure (purpose not business); survives a line swap, savings recalculated. Stored on the card as `items.earlyBooking`.
 - [x] Card line worded honestly ("you're booking N days ahead, so our fee is lower"), never as a supplier discount. Analytics event `early_booking_discount`.
 - Build clean: tsgo clean, 112 tests pass, `/`, `/trips`, `/preferences` 200.
+
+### 2. Travel tips per destination — done
+- [x] `getaway_destinations.travel_tips` (jsonb, empty by default) with five editorial categories: getting from the airport, local payment and tipping, transport, one thing worth knowing, when to avoid.
+- [x] Editable at /admin/getaway alongside the other editorial content; `src/lib/trip/tips.ts` is the single parser/renderer. 3 unit tests.
+- [x] Shown in My trips as "Good to know in <city>" for booked trips only; the day-before reminder email carries the "getting from the airport" note.
+- [x] Nothing written yet means nothing shown — no generated filler. Content stays for the team to write.
