@@ -22,8 +22,12 @@ const toBase64 = (bytes: Uint8Array): string => {
   return btoa(out);
 };
 
-const fromBase64 = (value: string): Uint8Array =>
-  Uint8Array.from(atob(value), (c) => c.charCodeAt(0));
+const fromBase64 = (value: string): Uint8Array<ArrayBuffer> => {
+  const raw = atob(value);
+  const bytes = new Uint8Array(new ArrayBuffer(raw.length));
+  for (let i = 0; i < raw.length; i += 1) bytes[i] = raw.charCodeAt(i);
+  return bytes;
+};
 
 export async function encryptToken(plain: string): Promise<string> {
   const iv = crypto.getRandomValues(new Uint8Array(12));
