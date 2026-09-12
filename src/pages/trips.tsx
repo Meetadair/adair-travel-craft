@@ -173,6 +173,14 @@ export function TripsPage() {
                 ))}
               </ul>
 
+              {trip.status === "booked" && (
+                <AddReservation
+                  tripId={trip.id}
+                  startDate={trip.startDate}
+                  endDate={trip.endDate}
+                />
+              )}
+
               {trip.stops.length > 1 && (
                 <div className="border-t border-border px-5 py-4">
                   <button
