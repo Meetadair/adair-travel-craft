@@ -864,6 +864,48 @@ export type Database = {
         }
         Relationships: []
       }
+      loyalty_memberships: {
+        Row: {
+          airline_iata: string | null
+          category: string
+          created_at: string
+          id: string
+          member_number_encrypted: string
+          member_number_last4: string
+          programme_code: string
+          programme_label: string
+          tier: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          airline_iata?: string | null
+          category: string
+          created_at?: string
+          id?: string
+          member_number_encrypted: string
+          member_number_last4: string
+          programme_code: string
+          programme_label: string
+          tier?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          airline_iata?: string | null
+          category?: string
+          created_at?: string
+          id?: string
+          member_number_encrypted?: string
+          member_number_last4?: string
+          programme_code?: string
+          programme_label?: string
+          tier?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       payment_providers: {
         Row: {
           created_at: string
