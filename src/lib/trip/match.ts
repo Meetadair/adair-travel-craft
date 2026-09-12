@@ -1,8 +1,54 @@
 /**
- * How well each line matches the traveller's saved preferences, in plain words.
- * Only preferences they actually filled in count, so an empty profile never
- * produces a low score — it produces no score at all.
+ * Name matching for "book this exact hotel / this exact car" requests.
+ * Accent- and punctuation-insensitive, allows partial and substring hits.
  */
+
+export function normalizeName(value: string): string {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+/** Words that carry no identity of their own. */
+const STOP = new Set(["hotel", "hotels", "the", "a", "an", "de", "la", "le", "du", "del", "of", "and"]);
+
+function tokens(value: string): string[] {
+  return normalizeName(value)
+    .split(" ")
+    .filter((t) => t.length > 1 && !STOP.has(t));
+}
+
+/** True when `candidate` plausibly is the requested venue. */
+export function nameMatches(candidate: string, requested: string): boolean {
+  const a = normalizeName(candidate);
+  const b = normalizeName(requested);
+  if (!a || !b) return false;
+  if (a === b) return true;
+  if (a.includes(b) || b.includes(a)) return true;
+
+  const wanted = tokens(requested);
+  if (!wanted.length) return false;
+  const have = new Set(tokens(candidate));
+  const hits = wanted.filter((t) => have.has(t) || a.includes(t)).length;
+  return hits / wanted.length >= 0.6;
+}
+
+/** Best match out of a list, or null when nothing is close enough. */
+export function findByName<T>(
+  items: T[],
+  requested: string,
+  nameOf: (item: T) => string,
+): T | null {
+  const exact = items.find((i) => normalizeName(nameOf(i)) === normalizeName(requested));
+  if (exact) return exact;
+  return items.find((i) => nameMatches(nameOf(i), requested)) ?? null;
+}
+
+/* ------------------- preference match scores ------------------- */
+
 import type { SearchPrefs } from "./rank";
 import type { TripSearchResponse } from "./types";
 
@@ -54,19 +100,12 @@ export function matchSummary(search: TripSearchResponse, prefs?: SearchPrefs | n
   const flightChecks: Array<{ ok: boolean; hit: string; miss: string }> = [];
   const flight = search.flight;
   if (flight) {
-    const carrier = `${flight.carrier ?? ""} ${flight.summary ?? ""}`;
+    const carrier = `${flight.carrier} ${flight.flightNumbers.join(" ")}`;
     if (prefs.airlines.length && !prefs.airlines.includes("any")) {
       flightChecks.push({
         ok: contains(carrier, prefs.airlines),
         hit: "Airline you prefer",
         miss: "Not one of your preferred airlines",
-      });
-    }
-    if (typeof flight.stops === "number") {
-      flightChecks.push({
-        ok: flight.stops === 0,
-        hit: "Direct flight",
-        miss: "Has a connection",
       });
     }
   }
