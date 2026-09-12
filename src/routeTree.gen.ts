@@ -38,6 +38,7 @@ import { Route as ApiPublicTripRemindersRouteImport } from './routes/api/public/
 import { Route as ApiTripParseRouteImport } from './routes/api/trip/parse'
 import { Route as ApiTripPriceContextRouteImport } from './routes/api/trip/price-context'
 import { Route as ApiTripSearchRouteImport } from './routes/api/trip/search'
+import { Route as ApiPublicSupplierOrderUpdatedRouteImport } from './routes/api/public/supplier/order-updated'
 import { Route as ApiPublicCalendarCallbackProviderRouteImport } from './routes/api/public/calendar/callback.$provider'
 import { Route as ApiPublicCalendarFeedTokenRouteImport } from './routes/api/public/calendar/feed.$token'
 
@@ -189,6 +190,12 @@ const ApiTripSearchRoute = ApiTripSearchRouteImport.update({
   path: '/api/trip/search',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicSupplierOrderUpdatedRoute =
+  ApiPublicSupplierOrderUpdatedRouteImport.update({
+    id: '/api/public/supplier/order-updated',
+    path: '/api/public/supplier/order-updated',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicCalendarCallbackProviderRoute =
   ApiPublicCalendarCallbackProviderRouteImport.update({
     id: '/api/public/calendar/callback/$provider',
@@ -231,6 +238,7 @@ export interface FileRoutesByFullPath {
   '/api/trip/price-context': typeof ApiTripPriceContextRoute
   '/api/trip/search': typeof ApiTripSearchRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/api/public/supplier/order-updated': typeof ApiPublicSupplierOrderUpdatedRoute
   '/api/public/calendar/callback/$provider': typeof ApiPublicCalendarCallbackProviderRoute
   '/api/public/calendar/feed/$token': typeof ApiPublicCalendarFeedTokenRoute
 }
@@ -262,6 +270,7 @@ export interface FileRoutesByTo {
   '/api/trip/price-context': typeof ApiTripPriceContextRoute
   '/api/trip/search': typeof ApiTripSearchRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/api/public/supplier/order-updated': typeof ApiPublicSupplierOrderUpdatedRoute
   '/api/public/calendar/callback/$provider': typeof ApiPublicCalendarCallbackProviderRoute
   '/api/public/calendar/feed/$token': typeof ApiPublicCalendarFeedTokenRoute
 }
@@ -296,6 +305,7 @@ export interface FileRoutesById {
   '/api/trip/price-context': typeof ApiTripPriceContextRoute
   '/api/trip/search': typeof ApiTripSearchRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/api/public/supplier/order-updated': typeof ApiPublicSupplierOrderUpdatedRoute
   '/api/public/calendar/callback/$provider': typeof ApiPublicCalendarCallbackProviderRoute
   '/api/public/calendar/feed/$token': typeof ApiPublicCalendarFeedTokenRoute
 }
@@ -330,6 +340,7 @@ export interface FileRouteTypes {
     | '/api/trip/price-context'
     | '/api/trip/search'
     | '/admin/'
+    | '/api/public/supplier/order-updated'
     | '/api/public/calendar/callback/$provider'
     | '/api/public/calendar/feed/$token'
   fileRoutesByTo: FileRoutesByTo
@@ -361,6 +372,7 @@ export interface FileRouteTypes {
     | '/api/trip/price-context'
     | '/api/trip/search'
     | '/admin'
+    | '/api/public/supplier/order-updated'
     | '/api/public/calendar/callback/$provider'
     | '/api/public/calendar/feed/$token'
   id:
@@ -394,6 +406,7 @@ export interface FileRouteTypes {
     | '/api/trip/price-context'
     | '/api/trip/search'
     | '/_authenticated/admin/'
+    | '/api/public/supplier/order-updated'
     | '/api/public/calendar/callback/$provider'
     | '/api/public/calendar/feed/$token'
   fileRoutesById: FileRoutesById
@@ -411,6 +424,7 @@ export interface RootRouteChildren {
   ApiTripParseRoute: typeof ApiTripParseRoute
   ApiTripPriceContextRoute: typeof ApiTripPriceContextRoute
   ApiTripSearchRoute: typeof ApiTripSearchRoute
+  ApiPublicSupplierOrderUpdatedRoute: typeof ApiPublicSupplierOrderUpdatedRoute
   ApiPublicCalendarCallbackProviderRoute: typeof ApiPublicCalendarCallbackProviderRoute
   ApiPublicCalendarFeedTokenRoute: typeof ApiPublicCalendarFeedTokenRoute
 }
@@ -620,6 +634,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiTripSearchRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/supplier/order-updated': {
+      id: '/api/public/supplier/order-updated'
+      path: '/api/public/supplier/order-updated'
+      fullPath: '/api/public/supplier/order-updated'
+      preLoaderRoute: typeof ApiPublicSupplierOrderUpdatedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/calendar/callback/$provider': {
       id: '/api/public/calendar/callback/$provider'
       path: '/api/public/calendar/callback/$provider'
@@ -701,6 +722,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiTripParseRoute: ApiTripParseRoute,
   ApiTripPriceContextRoute: ApiTripPriceContextRoute,
   ApiTripSearchRoute: ApiTripSearchRoute,
+  ApiPublicSupplierOrderUpdatedRoute: ApiPublicSupplierOrderUpdatedRoute,
   ApiPublicCalendarCallbackProviderRoute:
     ApiPublicCalendarCallbackProviderRoute,
   ApiPublicCalendarFeedTokenRoute: ApiPublicCalendarFeedTokenRoute,

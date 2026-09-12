@@ -132,7 +132,7 @@ async function handle(request: Request): Promise<Response> {
 
     const updated = await supabaseAdmin
       .from("trip_items")
-      .update({ status, payload, detail })
+      .update({ status, payload: payload as never, detail })
       .eq("id", item.id)
       .select("id")
       .maybeSingle();
