@@ -24,7 +24,7 @@ export const en = {
         "Flight, hotel, and car in a single booking card. Instead of five apps — one conversation.",
     },
     hero: {
-      badge: "AI travel assistant — concept",
+      badge: "Your personal travel planner — concept",
       titleLine1: "One sentence.",
       titleLine2: "The whole trip.",
       lead: "Adair bundles your flight, hotel, and car into a single booking card — all in one chat window. Instead of five apps, one conversation.",
