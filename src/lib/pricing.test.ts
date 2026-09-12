@@ -1,6 +1,16 @@
 import { describe, expect, it } from "vitest";
 
-import { fromMinor, grossMinor, loadPricing, toMinor } from "@/lib/pricing.server";
+import {
+  FALLBACK_LEAD_TIME_TIERS,
+  daysUntilDeparture,
+  fromMinor,
+  grossMinor,
+  leadTimeDiscountBps,
+  loadLeadTimeTiers,
+  loadPricing,
+  toMinor,
+  withLeadTimeDiscount,
+} from "@/lib/pricing.server";
 
 type Row = {
   line_type: string;
@@ -15,9 +25,10 @@ function stubSupabase(rows: Row[] | null) {
     from() {
       return {
         select() {
-          return {
-            eq: async () => ({ data: rows, error: null }),
-          };
+          const result = { data: rows, error: null };
+          const eq = () =>
+            Object.assign(Promise.resolve(result), { like: async () => result });
+          return { eq };
         },
       };
     },
@@ -89,5 +100,53 @@ describe("loadPricing", () => {
     );
     expect(table.flight).toEqual({ markupBps: 900, discountBps: 0, changeFeeMinor: 500 });
     expect(table.ride.markupBps).toBe(1000);
+  });
+});
+
+describe("early-booking lead time", () => {
+  it("counts whole days to departure", () => {
+    const now = new Date("2026-09-12T15:00:00Z");
+    expect(daysUntilDeparture("2026-12-15", now)).toBe(94);
+    expect(daysUntilDeparture("2026-11-11", now)).toBe(60);
+    expect(daysUntilDeparture("2026-09-12", now)).toBe(0);
+    expect(daysUntilDeparture("2026-09-01", now)).toBe(0);
+  });
+
+  it("takes the best qualifying tier only", () => {
+    const tiers = FALLBACK_LEAD_TIME_TIERS;
+    expect(leadTimeDiscountBps(tiers, 94)).toBe(200);
+    expect(leadTimeDiscountBps(tiers, 90)).toBe(200);
+    expect(leadTimeDiscountBps(tiers, 89)).toBe(100);
+    expect(leadTimeDiscountBps(tiers, 60)).toBe(100);
+    expect(leadTimeDiscountBps(tiers, 59)).toBe(0);
+  });
+
+  it("reads the tiers from the rules table, best first", async () => {
+    const tiers = await loadLeadTimeTiers(
+      stubSupabase([
+        { line_type: "lead_time_60", markup_bps: 0, discount_bps: 100, change_fee_minor: 0 },
+        { line_type: "lead_time_90", markup_bps: 0, discount_bps: 200, change_fee_minor: 0 },
+      ]),
+      "free",
+    );
+    expect(tiers).toEqual([
+      { minDays: 90, discountBps: 200 },
+      { minDays: 60, discountBps: 100 },
+    ]);
+  });
+
+  it("lowers our markup by the tier, and never below zero", async () => {
+    const table = await loadPricing(stubSupabase(rules), "free");
+    const discounted = withLeadTimeDiscount(table, 200);
+    // 6% flight markup becomes 4%.
+    expect(grossMinor(100, discounted.flight)).toBe(10400);
+    expect(grossMinor(100, discounted.stay)).toBe(11200);
+    // A commission-only line has no markup to give away.
+    expect(grossMinor(100, discounted.restaurant)).toBe(10000);
+  });
+
+  it("changes nothing when the trip is booked late", async () => {
+    const table = await loadPricing(stubSupabase(rules), "free");
+    expect(withLeadTimeDiscount(table, 0)).toEqual(table);
   });
 });
