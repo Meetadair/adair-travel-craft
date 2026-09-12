@@ -42,7 +42,14 @@ import { SiteNav } from "@/components/site-nav";
 import { LocaleLink, useLocale, useT, type Dict } from "@/lib/i18n";
 import { parseDemoSentence, fill, referralCode } from "@/lib/demo-sentence";
 import { joinWaitlist } from "@/lib/waitlist.functions";
-import { parseTrip, searchTrip, eur, timeLabel, dayLabel } from "@/lib/trip/client";
+import {
+  parseTrip,
+  searchTrip,
+  fetchPriceContext,
+  eur,
+  timeLabel,
+  dayLabel,
+} from "@/lib/trip/client";
 import type { TripSearchResponse } from "@/lib/trip/types";
 
 type Submission = { sentence: string; key: number };
