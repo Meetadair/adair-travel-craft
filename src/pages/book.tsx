@@ -12,9 +12,14 @@ import type { RideLeg } from "@/lib/suppliers/types";
 import { getTripCard } from "@/lib/trip-live.functions";
 import { bookTripCard, type BookingResult } from "@/lib/booking.functions";
 import { getAccount } from "@/lib/account.functions";
+import { listCompanions } from "@/lib/companions.functions";
+import { getFlightAncillaries } from "@/lib/ancillaries.functions";
+import { FlightExtras } from "@/components/flight-extras";
+import { ancillariesTotalEur, type AncillarySelection } from "@/lib/trip/ancillaries";
 import { getPaymentSession } from "@/lib/payment.functions";
 import { PaymentStep, type AuthorisedPayment } from "@/components/payment-step";
 import { eur } from "@/lib/trip/client";
+import { isSchengen } from "@/lib/trip/backwards";
 
 const inputClass =
   "mt-1 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary";
@@ -87,6 +92,20 @@ export function BookPage({ cardId }: { cardId: string }) {
     gender: "m",
     title: "mr",
   });
+  /** One entry per extra seat; passenger 1 is the lead traveller above. */
+  const [companions, setCompanions] = useState<
+    Array<{
+      givenName: string;
+      familyName: string;
+      bornOn: string;
+      gender: string;
+      title: string;
+      passportNumber: string;
+      remember: boolean;
+    }>
+  >([]);
+  const [extras, setExtras] = useState<AncillarySelection[]>([]);
+  const [extrasTouched, setExtrasTouched] = useState(false);
   const [result, setResult] = useState<BookingResult | null>(null);
   /** "review" = traveller + invoice details, "pay" = card entry. */
   const [step, setStep] = useState<"review" | "pay">("review");
@@ -111,18 +130,44 @@ export function BookPage({ cardId }: { cardId: string }) {
             gender: traveller.gender as "m" | "f",
             title: traveller.title as "mr" | "ms" | "mrs",
           },
+          companions: companions.map((c) => ({
+            givenName: c.givenName,
+            familyName: c.familyName,
+            bornOn: c.bornOn,
+            gender: c.gender as "m" | "f",
+            title: c.title as "mr" | "ms" | "mrs",
+            passportNumber: c.passportNumber.trim() || null,
+            remember: c.remember,
+          })),
+          ancillaries: include.flight ? extras : [],
           payment: authorised,
         },
       }),
     onSuccess: (data) => setResult(data),
   });
 
+  const updateCompanion = (
+    index: number,
+    patch: Partial<(typeof companions)[number]>,
+  ) =>
+    setCompanions((current) => current.map((c, i) => (i === index ? { ...c, ...patch } : c)));
+
+  /** Passports are only asked for on routes that leave the Schengen area. */
+  const destinationIata = card.data?.search?.request.destinationIata;
+  const passportNeeded = !!destinationIata && !isSchengen(destinationIata);
+
   const travellerReady =
     traveller.givenName.trim().length > 0 &&
     traveller.familyName.trim().length > 0 &&
     /.+@.+\..+/.test(traveller.email) &&
     traveller.phone.trim().length >= 6 &&
-    /^\d{4}-\d{2}-\d{2}$/.test(traveller.bornOn);
+    /^\d{4}-\d{2}-\d{2}$/.test(traveller.bornOn) &&
+    companions.every(
+      (c) =>
+        c.givenName.trim().length > 0 &&
+        c.familyName.trim().length > 0 &&
+        /^\d{4}-\d{2}-\d{2}$/.test(c.bornOn),
+    );
 
   // Booked (fully or partly): show the confirmation, then move on to My trips.
   useEffect(() => {
@@ -134,6 +179,48 @@ export function BookPage({ cardId }: { cardId: string }) {
 
 
   const search = card.data?.search;
+  const paxCount = Math.max(1, search?.request.passengers ?? 1);
+  const fetchCompanions = useServerFn(listCompanions);
+  const fetchExtras = useServerFn(getFlightAncillaries);
+  const flightExtras = useQuery({
+    queryKey: ["flight-extras", cardId],
+    queryFn: () => fetchExtras({ data: { cardId } }),
+    enabled: include.flight,
+    staleTime: 10 * 60 * 1000,
+  });
+
+  // Pre-tick the airline's extras from the stored preferences, once.
+  useEffect(() => {
+    if (extrasTouched || !flightExtras.data) return;
+    setExtras(flightExtras.data.preselected);
+  }, [flightExtras.data, extrasTouched]);
+
+  const extrasTotal = flightExtras.data
+    ? ancillariesTotalEur(flightExtras.data.options, extras)
+    : 0;
+  const saved = useQuery({ queryKey: ["companions"], queryFn: () => fetchCompanions({}) });
+
+  // Match the number of forms to the seats booked, pre-filling saved people.
+  useEffect(() => {
+    setCompanions((current) => {
+      const wanted = paxCount - 1;
+      if (current.length === wanted) return current;
+      const next = current.slice(0, wanted);
+      while (next.length < wanted) {
+        const suggestion = saved.data?.[next.length];
+        next.push({
+          givenName: suggestion?.givenName ?? "",
+          familyName: suggestion?.familyName ?? "",
+          bornOn: suggestion?.bornOn ?? "",
+          gender: "f",
+          title: "ms",
+          passportNumber: "",
+          remember: !suggestion,
+        });
+      }
+      return next;
+    });
+  }, [paxCount, saved.data]);
   const priced = card.data?.priced;
   const insurance = card.data?.insurance ?? null;
   const selectedTotal =
@@ -141,7 +228,8 @@ export function BookPage({ cardId }: { cardId: string }) {
       ((include.flight ? (priced?.flight ?? 0) : 0) +
         (include.stay ? (priced?.stay ?? 0) : 0) +
         (include.car ? (priced?.car ?? 0) : 0) +
-        (include.insurance && insurance ? insurance.grossEur : 0)) *
+        (include.insurance && insurance ? insurance.grossEur : 0) +
+        (include.flight ? extrasTotal : 0)) *
         100,
     ) / 100;
 
@@ -243,7 +331,9 @@ export function BookPage({ cardId }: { cardId: string }) {
             </div>
 
             <div className="hairline-card mt-6 space-y-4 p-6">
-              <h2 className="font-display text-lg font-semibold">Traveller</h2>
+              <h2 className="font-display text-lg font-semibold">
+                {paxCount === 1 ? "Traveller" : `Travellers · ${paxCount}`}
+              </h2>
               <div className="grid gap-4 sm:grid-cols-2">
                 <label className="block">
                   <span className="text-xs font-medium text-muted-foreground">First name</span>
@@ -308,6 +398,83 @@ export function BookPage({ cardId }: { cardId: string }) {
                 </label>
               </div>
 
+
+              {companions.map((person, index) => (
+                <div key={index} className="space-y-3 border-t border-border pt-4">
+                  <p className="text-xs font-medium text-muted-foreground">
+                    {`Traveller ${index + 2} of ${paxCount}`}
+                  </p>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <label className="block">
+                      <span className="text-xs font-medium text-muted-foreground">First name</span>
+                      <input
+                        className={inputClass}
+                        value={person.givenName}
+                        onChange={(e) => updateCompanion(index, { givenName: e.target.value })}
+                      />
+                    </label>
+                    <label className="block">
+                      <span className="text-xs font-medium text-muted-foreground">Last name</span>
+                      <input
+                        className={inputClass}
+                        value={person.familyName}
+                        onChange={(e) => updateCompanion(index, { familyName: e.target.value })}
+                      />
+                    </label>
+                    <label className="block">
+                      <span className="text-xs font-medium text-muted-foreground">
+                        Date of birth
+                      </span>
+                      <input
+                        type="date"
+                        className={inputClass}
+                        value={person.bornOn}
+                        onChange={(e) => updateCompanion(index, { bornOn: e.target.value })}
+                      />
+                    </label>
+                    <label className="block">
+                      <span className="text-xs font-medium text-muted-foreground">Title</span>
+                      <select
+                        className={inputClass}
+                        value={person.title}
+                        onChange={(e) =>
+                          updateCompanion(index, {
+                            title: e.target.value,
+                            gender: e.target.value === "mr" ? "m" : "f",
+                          })
+                        }
+                      >
+                        <option value="mr">Mr</option>
+                        <option value="ms">Ms</option>
+                        <option value="mrs">Mrs</option>
+                      </select>
+                    </label>
+                    {passportNeeded && (
+                      <label className="block sm:col-span-2">
+                        <span className="text-xs font-medium text-muted-foreground">
+                          Passport number
+                        </span>
+                        <input
+                          className={inputClass}
+                          value={person.passportNumber}
+                          onChange={(e) =>
+                            updateCompanion(index, { passportNumber: e.target.value })
+                          }
+                        />
+                      </label>
+                    )}
+                  </div>
+                  <label className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <input
+                      type="checkbox"
+                      checked={person.remember}
+                      onChange={(e) => updateCompanion(index, { remember: e.target.checked })}
+                    />
+                    Save to the people I travel with
+                  </label>
+                </div>
+              ))}
+
               {account.data?.companies.length ? (
                 <label className="block">
                   <span className="text-xs font-medium text-muted-foreground">Invoice to</span>
@@ -347,6 +514,17 @@ export function BookPage({ cardId }: { cardId: string }) {
                 </p>
               )}
             </div>
+
+            {include.flight && flightExtras.data && (
+              <FlightExtras
+                data={flightExtras.data}
+                selection={extras}
+                onChange={(next) => {
+                  setExtrasTouched(true);
+                  setExtras(next);
+                }}
+              />
+            )}
 
             {step === "pay" && (
               <div className="hairline-card mt-6 space-y-4 p-6">

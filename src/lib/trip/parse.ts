@@ -5,6 +5,7 @@
  */
 import { CITIES, DEFAULT_DESTINATION, DEFAULT_ORIGIN, findCity, type CityEntry } from "./cities";
 import { airportByIata } from "@/lib/prefs/airports";
+import { passengersFromSentence } from "./passengers";
 import type { TripRequest, TripStop } from "./types";
 
 /** Weekday match terms, index 0 = Monday. */
@@ -43,12 +44,8 @@ function cabinOf(text: string): TripRequest["cabinClass"] {
   return "economy";
 }
 
-function passengersOf(text: string): number {
-  const match = /(\d+)\s*(passengers?|people|persons?|adults?|osob|osoby|pasa[zż]er)/.exec(text);
-  const n = match ? Number(match[1]) : 1;
-  if (!Number.isFinite(n) || n < 1) return 1;
-  return Math.min(n, 9);
-}
+/** Head count, including phrases like "for two", "with my wife", "we trójkę". */
+const passengersOf = passengersFromSentence;
 
 /** "near the Duomo", "close to the convention center", "koło Duomo". */
 function hotelWishOf(sentence: string): string | null {

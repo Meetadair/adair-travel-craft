@@ -41,6 +41,27 @@ const bookSchema = z.object({
   }),
   companyId: z.string().uuid().nullable(),
   traveller: travellerSchema,
+  /** Everyone else on the booking, in seat order after the lead traveller. */
+  companions: z
+    .array(
+      z.object({
+        givenName: z.string().trim().min(1).max(60),
+        familyName: z.string().trim().min(1).max(60),
+        bornOn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+        gender: z.enum(["m", "f"]),
+        title: z.enum(["mr", "ms", "mrs"]),
+        passportNumber: z.string().trim().max(40).nullable().optional(),
+        /** Save this person to "people I travel with" for next time. */
+        remember: z.boolean().optional(),
+      }),
+    )
+    .max(8)
+    .optional(),
+  /** Airline extras the customer chose: supplier service ids and quantities. */
+  ancillaries: z
+    .array(z.object({ id: z.string().trim().min(3).max(120), quantity: z.number().int().min(1).max(9) }))
+    .max(12)
+    .optional(),
   /**
    * Result of the hosted card step. Only provider tokens — never card data.
    */
@@ -252,6 +273,21 @@ export const bookTripCard = createServerFn({ method: "POST" })
     const plan = (planRes.data as { plan: string } | null)?.plan ?? "free";
     const table = await pricing.loadPricing(supabase, plan);
 
+    // The airline's own bags and seats, re-read so we price what it still sells.
+    let ancillaryOptions: import("@/lib/trip/ancillaries").AncillaryOption[] = [];
+    const ancillaryChoices = data.ancillaries ?? [];
+    if (data.include.flight && search.flight?.offerId && ancillaryChoices.length > 0) {
+      try {
+        const { getOfferAncillaries } = await import("@/lib/trip/duffel-book.server");
+        const result = await getOfferAncillaries(search.flight.offerId, table.extras);
+        ancillaryOptions = result.options;
+      } catch (error) {
+        console.error("ancillaries re-read failed", error);
+      }
+    }
+    const availableIds = new Set(ancillaryOptions.map((o) => o.id));
+    const services = ancillaryChoices.filter((c) => availableIds.has(c.id));
+
     if (data.include.flight && search.flight?.offerId) {
       try {
         const offer = await getOffer(search.flight.offerId);
@@ -264,6 +300,8 @@ export const bookTripCard = createServerFn({ method: "POST" })
           currency: offer.currency,
           passengerIds: offer.passengerIds,
           traveller: data.traveller,
+          companions: data.companions ?? [],
+          services,
           idempotencyKey: `${card.id}-flight`,
           cardPayment,
           loyaltyAccounts: flightAccounts,
@@ -297,6 +335,20 @@ export const bookTripCard = createServerFn({ method: "POST" })
             returnDepartAt: search.flight.returnDepartAt,
           },
         });
+
+        // One line per chosen bag or seat, priced with the extras markup.
+        const { ancillaryLines } = await import("@/lib/trip/ancillaries");
+        for (const extra of ancillaryLines(ancillaryOptions, services)) {
+          lines.push({
+            kind: "extra",
+            title: extra.quantity > 1 ? `${extra.title} × ${extra.quantity}` : extra.title,
+            status: "confirmed",
+            amountEur: extra.priceEur,
+            reference: order.bookingReference,
+            note: extra.detail || null,
+            payload: { serviceId: extra.id, quantity: extra.quantity },
+          });
+        }
 
       } catch (error) {
         failed = true;
@@ -604,6 +656,30 @@ export const bookTripCard = createServerFn({ method: "POST" })
       .update({ status: "booked" })
       .eq("id", card.id)
       .eq("user_id", userId);
+
+    // Remember the people travelling along, encrypted, for the next booking.
+    try {
+      const remembered = (data.companions ?? []).filter((c) => c.remember);
+      if (remembered.length > 0) {
+        const { encryptSecret } = await import("@/lib/loyalty/crypto.server");
+        const rows = [];
+        for (const c of remembered) {
+          const passport = c.passportNumber?.trim() || null;
+          rows.push({
+            user_id: userId,
+            label: `${c.givenName} ${c.familyName}`.trim(),
+            given_name_encrypted: await encryptSecret(c.givenName),
+            family_name_encrypted: await encryptSecret(c.familyName),
+            born_on_encrypted: await encryptSecret(c.bornOn),
+            passport_number_encrypted: passport ? await encryptSecret(passport) : null,
+            passport_last4: passport ? passport.slice(-4) : null,
+          });
+        }
+        await supabase.from("travel_companions").insert(rows as never);
+      }
+    } catch (error) {
+      console.error("saving companions failed", error);
+    }
 
     // Travel credit comes off this trip, and a referral pays out on the
     // invited traveller's first confirmed booking. Never block the booking.
