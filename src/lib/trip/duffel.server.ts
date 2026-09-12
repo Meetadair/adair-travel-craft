@@ -116,7 +116,7 @@ type DuffelOffer = {
 export async function searchFlight(
   req: TripRequest,
   prefs?: SearchPrefs,
-): Promise<FlightResult | null> {
+): Promise<{ flight: FlightResult; alternatives: FlightResult[] } | null> {
   const json = await duffel<{ data?: { offers?: DuffelOffer[] } }>(
     "/air/offer_requests?return_offers=true",
     {
@@ -147,14 +147,44 @@ export async function searchFlight(
   const pool = simple.length ? simple : offers;
   const carrierText = (o: DuffelOffer) =>
     `${o.owner?.name ?? ""} ${o.slices?.[0]?.segments?.[0]?.marketing_carrier?.name ?? ""}`;
-  const best = pool
+  const ranked = pool
     .slice()
     .sort(
       (a, b) =>
         flightScore(carrierText(a), Number(a.total_amount), prefs) -
         flightScore(carrierText(b), Number(b.total_amount), prefs),
-    )[0];
+    );
+  const best = ranked[0];
   if (!best) return null;
+
+  const toResult = (offer: DuffelOffer): FlightResult => {
+    const legs = offer.slices?.[0]?.segments ?? [];
+    const head = legs[0];
+    const tail = legs[legs.length - 1];
+    const value = Number(offer.total_amount);
+    const cur = offer.total_currency;
+    return {
+      carrier: head?.marketing_carrier?.name ?? offer.owner?.name ?? "Airline",
+      flightNumbers: legs
+        .map((s) =>
+          `${s.marketing_carrier?.iata_code ?? ""}${s.marketing_carrier_flight_number ?? ""}`.trim(),
+        )
+        .filter(Boolean),
+      departAt: head?.departing_at ?? `${req.departDate}T00:00:00`,
+      arriveAt: tail?.arriving_at ?? `${req.departDate}T00:00:00`,
+      returnDepartAt: offer.slices?.[1]?.segments?.[0]?.departing_at ?? null,
+      cabin: head?.passengers?.[0]?.cabin_class ?? req.cabinClass,
+      stops: Math.max(0, legs.length - 1),
+      amount: round(value),
+      currency: cur,
+      ...toEur(value, cur),
+      offerId: offer.id,
+      expiresAt: offer.expires_at ?? null,
+    };
+  };
+
+  // Keep the next best few so the traveller can swap without a new search.
+  const alternatives = ranked.slice(1, 4).map(toResult);
 
   const outbound = best.slices?.[0]?.segments ?? [];
   const first = outbound[0];
@@ -162,7 +192,7 @@ export async function searchFlight(
   const amount = Number(best.total_amount);
   const currency = best.total_currency;
 
-  return {
+  const flight: FlightResult = {
     carrier: first?.marketing_carrier?.name ?? best.owner?.name ?? "Airline",
     flightNumbers: outbound
       .map((s) =>
@@ -176,9 +206,11 @@ export async function searchFlight(
     amount: round(amount),
     currency,
     ...toEur(amount, currency),
+    stops: Math.max(0, outbound.length - 1),
     offerId: best.id,
     expiresAt: best.expires_at ?? null,
   };
+  return { flight, alternatives };
 }
 
 /* -------------------------------- stays -------------------------------- */
