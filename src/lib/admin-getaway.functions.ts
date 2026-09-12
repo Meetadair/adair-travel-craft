@@ -6,6 +6,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { TIP_CATEGORIES, parseTravelTips, type TravelTips } from "@/lib/trip/tips";
 
 async function assertAdmin(supabase: SupabaseClient, userId: string): Promise<void> {
   const { data, error } = await supabase
@@ -39,6 +40,8 @@ export type AdminDestination = {
   editorial_note: string | null;
   best_for: string | null;
   avoid_when: string | null;
+  /** Short destination notes shown on a booked trip; empty until written. */
+  travel_tips: TravelTips;
   typical_nights: number;
   active: boolean;
   /** Theme assignments, each with its own season window. */
@@ -72,6 +75,7 @@ export const getGetawayContent = createServerFn({ method: "GET" })
         editorial_note: (d['editorial_note'] as string | null) ?? null,
         best_for: (d['best_for'] as string | null) ?? null,
         avoid_when: (d['avoid_when'] as string | null) ?? null,
+        travel_tips: parseTravelTips(d['travel_tips']),
         typical_nights: Number(d['typical_nights']),
         active: Boolean(d['active']),
         themes: ((joins.data ?? []) as Array<Record<string, unknown>>)
@@ -156,6 +160,14 @@ export const saveGetawayDestination = createServerFn({ method: "POST" })
         editorial_note: z.string().trim().max(4000).nullable(),
         best_for: z.string().trim().max(600).nullable(),
         avoid_when: z.string().trim().max(600).nullable(),
+        travel_tips: z
+          .object(
+            Object.fromEntries(
+              TIP_CATEGORIES.map((c) => [c.key, z.string().trim().max(1200).optional()]),
+            ) as Record<string, z.ZodOptional<z.ZodString>>,
+          )
+          .partial()
+          .default({}),
         typical_nights: z.number().int().min(1).max(21),
         active: z.boolean(),
       })
