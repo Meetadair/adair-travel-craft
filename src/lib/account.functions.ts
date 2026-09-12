@@ -36,6 +36,13 @@ export type Account = {
 const asList = (value: unknown): string[] =>
   Array.isArray(value) ? value.filter((v): v is string => typeof v === "string") : [];
 
+const asAnswerMap = (value: unknown): Record<string, string[]> => {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  return Object.fromEntries(
+    Object.entries(value as Record<string, unknown>).map(([key, val]) => [key, asList(val)]),
+  );
+};
+
 type PrefRow = Record<string, unknown>;
 
 function rowToPrefs(row: PrefRow | null): TravelPrefs {
@@ -68,6 +75,10 @@ function rowToPrefs(row: PrefRow | null): TravelPrefs {
     interests: asList(row["interests"]),
     music: asList(row["music"]),
     budgetBand: (row["budget_band"] as string | null) ?? null,
+    dealbreakers: asList(row["dealbreakers"]),
+    extraAnswers: asAnswerMap(row["extra_answers"]),
+    accessibilityNote: (row["accessibility_note"] as string | null) ?? null,
+    avoidNote: (row["avoid_note"] as string | null) ?? null,
   };
 }
 
