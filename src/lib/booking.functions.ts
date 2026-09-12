@@ -120,6 +120,31 @@ export const bookTripCard = createServerFn({ method: "POST" })
     };
     if (card.status === "booked") throw new Error("already-booked");
 
+    // A settled payment already exists for this card: a retry must never charge
+    // twice, so stop before touching the supplier.
+    const idempotencyKey = `${card.id}-payment`;
+    const earlier = await supabase
+      .from("payments")
+      .select("status")
+      .eq("user_id", userId)
+      .eq("idempotency_key", idempotencyKey)
+      .maybeSingle();
+    if ((earlier.data as { status?: string } | null)?.status === "test_settled") {
+      throw new Error("already-booked");
+    }
+
+    const paymentMethod: "card" | "saved-card" | "balance" = data.payment?.method ?? "balance";
+    const cardPayment =
+      data.payment && data.payment.threeDSecureSessionId
+        ? { threeDSecureSessionId: data.payment.threeDSecureSessionId }
+        : null;
+    const paymentDetails = {
+      method: paymentMethod,
+      card_brand: data.payment?.brand ?? null,
+      card_last4: data.payment?.last4 ?? null,
+      three_ds_status: cardPayment ? "authenticated" : null,
+    };
+
     const search = card.items.search;
     const priced = card.items.priced;
     const request = search.request;
@@ -150,6 +175,7 @@ export const bookTripCard = createServerFn({ method: "POST" })
           passengerIds: offer.passengerIds,
           traveller: data.traveller,
           idempotencyKey: `${card.id}-flight`,
+          cardPayment,
         });
         flightOrderId = order.id;
         flightReference = order.bookingReference;
@@ -328,13 +354,18 @@ export const bookTripCard = createServerFn({ method: "POST" })
     // Nothing at all could be booked: keep the card open so the traveller can
     // simply search again instead of ending up with an empty trip.
     if (status === "failed") {
-      await supabase.from("payments").insert({
-        user_id: userId,
-        provider: "duffel-test",
-        amount_minor: Math.round(priced.total * 100),
-        status: "failed",
-        idempotency_key: `${card.id}-payment`,
-      });
+      await supabase.from("payments").upsert(
+        {
+          user_id: userId,
+          provider: "duffel-test",
+          amount_minor: Math.round(priced.total * 100),
+          status: "failed",
+          idempotency_key: idempotencyKey,
+          failure_note: reason,
+          ...paymentDetails,
+        },
+        { onConflict: "user_id,idempotency_key" },
+      );
       await audit("booking_failed", { cardId: card.id, reason });
       return {
         tripId: null,
