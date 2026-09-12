@@ -53,6 +53,7 @@ export type Database = {
           expires_at: string | null
           id: string
           provider: string
+          read_enabled: boolean
           refresh_token: string | null
           time_zone: string | null
           updated_at: string
@@ -66,6 +67,7 @@ export type Database = {
           expires_at?: string | null
           id?: string
           provider: string
+          read_enabled?: boolean
           refresh_token?: string | null
           time_zone?: string | null
           updated_at?: string
@@ -79,6 +81,7 @@ export type Database = {
           expires_at?: string | null
           id?: string
           provider?: string
+          read_enabled?: boolean
           refresh_token?: string | null
           time_zone?: string | null
           updated_at?: string
@@ -133,6 +136,54 @@ export type Database = {
           redirect_uri?: string
           state?: string
           time_zone?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      calendar_trip_hints: {
+        Row: {
+          city: string
+          created_at: string
+          dismissed_at: string | null
+          ends_at: string
+          event_id: string
+          iata: string | null
+          id: string
+          location: string
+          provider: string
+          starts_at: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          city: string
+          created_at?: string
+          dismissed_at?: string | null
+          ends_at: string
+          event_id: string
+          iata?: string | null
+          id?: string
+          location: string
+          provider: string
+          starts_at: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          city?: string
+          created_at?: string
+          dismissed_at?: string | null
+          ends_at?: string
+          event_id?: string
+          iata?: string | null
+          id?: string
+          location?: string
+          provider?: string
+          starts_at?: string
+          title?: string
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
