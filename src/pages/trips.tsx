@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { AddReservation } from "@/components/add-reservation";
 import { SiteNav } from "@/components/site-nav";
+import { AppFooter } from "@/components/app-footer";
 import { AddToCalendar } from "@/components/add-to-calendar";
 import { TripRoute } from "@/components/trip-route";
 import { MapPin } from "lucide-react";
@@ -209,6 +210,16 @@ export function TripsPage() {
                 </div>
               )}
 
+              <div className="border-t border-border px-5 py-4">
+                <Link
+                  to="/support"
+                  search={{ trip: trip.id, category: "other" }}
+                  className="text-sm text-muted-foreground underline decoration-border underline-offset-4 hover:text-foreground"
+                >
+                  Something wrong with this trip?
+                </Link>
+              </div>
+
               {eventsFor(trip).length > 0 && (
                 <div className="border-t border-border px-5 py-4">
                   <AddToCalendar events={eventsFor(trip)} title={trip.city ?? trip.title} />
@@ -219,6 +230,7 @@ export function TripsPage() {
           ))}
         </div>
       </main>
+      <AppFooter />
     </div>
   );
 }

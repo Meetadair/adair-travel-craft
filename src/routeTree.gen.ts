@@ -15,6 +15,8 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AssistantRouteImport } from './routes/assistant'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as BusinessRouteImport } from './routes/business'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as LangIndexRouteImport } from './routes/$lang.index'
 import { Route as LangAssistantRouteImport } from './routes/$lang.assistant'
 import { Route as LangAuthRouteImport } from './routes/$lang.auth'
@@ -26,6 +28,7 @@ import { Route as AuthenticatedInvoicesRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedPlanRouteImport } from './routes/_authenticated/plan'
 import { Route as AuthenticatedPreferencesRouteImport } from './routes/_authenticated/preferences'
+import { Route as AuthenticatedSupportRouteImport } from './routes/_authenticated/support'
 import { Route as AuthenticatedTripsRouteImport } from './routes/_authenticated/trips'
 import { Route as RCodeRouteImport } from './routes/r.$code'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
@@ -71,6 +74,16 @@ const AuthRoute = AuthRouteImport.update({
 const BusinessRoute = BusinessRouteImport.update({
   id: '/business',
   path: '/business',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LangIndexRoute = LangIndexRouteImport.update({
@@ -129,6 +142,11 @@ const AuthenticatedPreferencesRoute =
     path: '/preferences',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedSupportRoute = AuthenticatedSupportRouteImport.update({
+  id: '/support',
+  path: '/support',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedTripsRoute = AuthenticatedTripsRouteImport.update({
   id: '/trips',
   path: '/trips',
@@ -227,6 +245,8 @@ export interface FileRoutesByFullPath {
   '/assistant': typeof AssistantRoute
   '/auth': typeof AuthRoute
   '/business': typeof BusinessRoute
+  '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
   '/$lang/assistant': typeof LangAssistantRoute
   '/$lang/auth': typeof LangAuthRoute
   '/$lang/business': typeof LangBusinessRoute
@@ -237,6 +257,7 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/plan': typeof AuthenticatedPlanRoute
   '/preferences': typeof AuthenticatedPreferencesRoute
+  '/support': typeof AuthenticatedSupportRoute
   '/trips': typeof AuthenticatedTripsRoute
   '/r/$code': typeof RCodeRoute
   '/$lang/': typeof LangIndexRoute
@@ -261,6 +282,8 @@ export interface FileRoutesByTo {
   '/assistant': typeof AssistantRoute
   '/auth': typeof AuthRoute
   '/business': typeof BusinessRoute
+  '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
   '/$lang/assistant': typeof LangAssistantRoute
   '/$lang/auth': typeof LangAuthRoute
   '/$lang/business': typeof LangBusinessRoute
@@ -271,6 +294,7 @@ export interface FileRoutesByTo {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/plan': typeof AuthenticatedPlanRoute
   '/preferences': typeof AuthenticatedPreferencesRoute
+  '/support': typeof AuthenticatedSupportRoute
   '/trips': typeof AuthenticatedTripsRoute
   '/r/$code': typeof RCodeRoute
   '/$lang': typeof LangIndexRoute
@@ -298,6 +322,8 @@ export interface FileRoutesById {
   '/assistant': typeof AssistantRoute
   '/auth': typeof AuthRoute
   '/business': typeof BusinessRoute
+  '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
   '/$lang/assistant': typeof LangAssistantRoute
   '/$lang/auth': typeof LangAuthRoute
   '/$lang/business': typeof LangBusinessRoute
@@ -308,6 +334,7 @@ export interface FileRoutesById {
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/plan': typeof AuthenticatedPlanRoute
   '/_authenticated/preferences': typeof AuthenticatedPreferencesRoute
+  '/_authenticated/support': typeof AuthenticatedSupportRoute
   '/_authenticated/trips': typeof AuthenticatedTripsRoute
   '/r/$code': typeof RCodeRoute
   '/$lang/': typeof LangIndexRoute
@@ -335,6 +362,8 @@ export interface FileRouteTypes {
     | '/assistant'
     | '/auth'
     | '/business'
+    | '/privacy'
+    | '/terms'
     | '/$lang/assistant'
     | '/$lang/auth'
     | '/$lang/business'
@@ -345,6 +374,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/plan'
     | '/preferences'
+    | '/support'
     | '/trips'
     | '/r/$code'
     | '/$lang/'
@@ -369,6 +399,8 @@ export interface FileRouteTypes {
     | '/assistant'
     | '/auth'
     | '/business'
+    | '/privacy'
+    | '/terms'
     | '/$lang/assistant'
     | '/$lang/auth'
     | '/$lang/business'
@@ -379,6 +411,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/plan'
     | '/preferences'
+    | '/support'
     | '/trips'
     | '/r/$code'
     | '/$lang'
@@ -405,6 +438,8 @@ export interface FileRouteTypes {
     | '/assistant'
     | '/auth'
     | '/business'
+    | '/privacy'
+    | '/terms'
     | '/$lang/assistant'
     | '/$lang/auth'
     | '/$lang/business'
@@ -415,6 +450,7 @@ export interface FileRouteTypes {
     | '/_authenticated/onboarding'
     | '/_authenticated/plan'
     | '/_authenticated/preferences'
+    | '/_authenticated/support'
     | '/_authenticated/trips'
     | '/r/$code'
     | '/$lang/'
@@ -442,6 +478,8 @@ export interface RootRouteChildren {
   AssistantRoute: typeof AssistantRoute
   AuthRoute: typeof AuthRoute
   BusinessRoute: typeof BusinessRoute
+  PrivacyRoute: typeof PrivacyRoute
+  TermsRoute: typeof TermsRoute
   RCodeRoute: typeof RCodeRoute
   ApiPublicGetawayPricesRoute: typeof ApiPublicGetawayPricesRoute
   ApiPublicGetawayWeeklyRoute: typeof ApiPublicGetawayWeeklyRoute
@@ -496,6 +534,20 @@ declare module '@tanstack/react-router' {
       path: '/business'
       fullPath: '/business'
       preLoaderRoute: typeof BusinessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/$lang/': {
@@ -573,6 +625,13 @@ declare module '@tanstack/react-router' {
       path: '/preferences'
       fullPath: '/preferences'
       preLoaderRoute: typeof AuthenticatedPreferencesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/support': {
+      id: '/_authenticated/support'
+      path: '/support'
+      fullPath: '/support'
+      preLoaderRoute: typeof AuthenticatedSupportRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/trips': {
@@ -705,6 +764,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedPlanRoute: typeof AuthenticatedPlanRoute
   AuthenticatedPreferencesRoute: typeof AuthenticatedPreferencesRoute
+  AuthenticatedSupportRoute: typeof AuthenticatedSupportRoute
   AuthenticatedTripsRoute: typeof AuthenticatedTripsRoute
   AuthenticatedAdminAnalyticsRoute: typeof AuthenticatedAdminAnalyticsRoute
   AuthenticatedAdminGetawayRoute: typeof AuthenticatedAdminGetawayRoute
@@ -722,6 +782,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedPlanRoute: AuthenticatedPlanRoute,
   AuthenticatedPreferencesRoute: AuthenticatedPreferencesRoute,
+  AuthenticatedSupportRoute: AuthenticatedSupportRoute,
   AuthenticatedTripsRoute: AuthenticatedTripsRoute,
   AuthenticatedAdminAnalyticsRoute: AuthenticatedAdminAnalyticsRoute,
   AuthenticatedAdminGetawayRoute: AuthenticatedAdminGetawayRoute,
@@ -757,6 +818,8 @@ const rootRouteChildren: RootRouteChildren = {
   AssistantRoute: AssistantRoute,
   AuthRoute: AuthRoute,
   BusinessRoute: BusinessRoute,
+  PrivacyRoute: PrivacyRoute,
+  TermsRoute: TermsRoute,
   RCodeRoute: RCodeRoute,
   ApiPublicGetawayPricesRoute: ApiPublicGetawayPricesRoute,
   ApiPublicGetawayWeeklyRoute: ApiPublicGetawayWeeklyRoute,

@@ -127,3 +127,14 @@
 - [x] `src/components/calendar-trip-hints.tsx` — suggestion cards above the input ("Shall I plan the trip?"), prefilling a must-arrive-by sentence into the existing backwards planning. Never books automatically.
 - [x] No mailbox/email reading anywhere — deliberately out of scope.
 - Build clean: tsgo clean, 104 tests pass, `/`, `/assistant`, `/preferences`, `/trips` all 200.
+
+## Gap-filling pass
+
+- [x] GDPR: "Download my data" (JSON + summary, audit-logged) and account deletion in Settings — personal data removed, calendar tokens revoked, tax/payment rows anonymised not deleted, existing supplier bookings must be cancelled first.
+- [x] /privacy and /terms placeholder pages (to be completed by counsel) linked from the signed-in footer.
+- [x] Support: `support_requests` table, Help in the signed-in nav, "Something wrong with this trip?" on every trip, /support form (trip auto-attached, category, urgency, description), admin "Help requests" card with trip context and status changes, optional Resend notification to SUPPORT_EMAIL (skipped silently when unset).
+- [ ] Multi-passenger booking (parser count, per-passenger details, per-count pricing).
+- [ ] Loyalty numbers passed to the supplier / stored on the booking.
+- [ ] Change a booked trip (dates, hotel) with price difference and change conditions.
+- [ ] One clarifying question at search time when the sentence is genuinely ambiguous.
+- [ ] Ranking that learns from `choice_feedback`, surfaced and resettable on Preferences.
