@@ -357,7 +357,7 @@ export function BookPage({ cardId }: { cardId: string }) {
                   <PaymentStep
                     session={payment.data}
                     amountEur={selectedTotal}
-                    disabled={mutation.isPending || card.data?.expired}
+                    disabled={mutation.isPending || card.data?.expired === true}
                     payingLabel={mutation.isPending ? "Payment approved — booking your trip…" : null}
                     onAuthorised={(authorised) => mutation.mutate(authorised)}
                   />
