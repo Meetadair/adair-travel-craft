@@ -49,8 +49,10 @@ function itineraryLines(items: ItemRow[]): string {
 }
 
 async function run(): Promise<Response> {
-  const apiKey = process.env['RESEND_API_KEY'];
-  if (!apiKey) return Response.json({ ok: true, skipped: "no-email-key", sent: 0 });
+  const { hasWhatsAppKeys } = await import("@/lib/notifications/whatsapp");
+  if (!process.env['RESEND_API_KEY'] && !hasWhatsAppKeys()) {
+    return Response.json({ ok: true, skipped: "no-message-channel", sent: 0 });
+  }
 
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
