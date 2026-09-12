@@ -112,6 +112,13 @@ export function SiteNav() {
           {signedIn && (
             <>
               <Link
+                to="/getaway"
+                className={linkClass}
+                activeProps={{ className: "text-foreground" }}
+              >
+                Getaway
+              </Link>
+              <Link
                 to="/invoices"
                 className={`hidden sm:inline-block ${linkClass}`}
                 activeProps={{ className: "text-foreground" }}
