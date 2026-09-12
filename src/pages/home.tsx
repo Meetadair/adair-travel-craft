@@ -28,6 +28,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { searchLiveTrip, swapCardAlternative } from "@/lib/trip-live.functions";
+import type { BudgetStatus, MatchSummary } from "@/lib/trip/match";
 import {
   INSURANCE_DETAIL,
   INSURANCE_TITLE,
@@ -415,6 +416,12 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
     car: string | null;
   }>({ hotel: null, car: null });
   const [swapping, setSwapping] = useState(false);
+  // How well each line fits saved preferences, and where the total sits
+  // against the traveller's usual budget (signed-in cards only).
+  const [match, setMatch] = useState<MatchSummary | null>(null);
+  const [budget, setBudget] = useState<BudgetStatus | null>(null);
+  const [amendText, setAmendText] = useState("");
+  const [amending, setAmending] = useState(false);
 
   const applyPriced = (result: {
     search: TripSearchResponse;
@@ -433,6 +440,8 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
     setSwapping(true);
     try {
       const result = await runSwap({ data: { cardId, kind, index } });
+      setMatch(result.match ?? null);
+      setBudget(result.budget ?? null);
       setLive(applyPriced(result));
     } catch {
       /* leave the current card in place; the traveller can search again */
@@ -496,6 +505,8 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
         });
         setCardId(result.cardId);
         setInsurance(result.insurance);
+        setMatch(result.match ?? null);
+        setBudget(result.budget ?? null);
         setLive(applyPriced(result));
       } else {
         const request = await parseTrip(sentence);
@@ -516,6 +527,32 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
     }
   };
 
+  /** "Make it business class" — same trip, changed by one extra sentence. */
+  const amendTrip = async () => {
+    const change = amendText.trim();
+    if (!change || amending) return;
+    setAmending(true);
+    try {
+      const base = submission?.sentence.trim() || d.userMessage;
+      const sentence = `${base}. ${change}`;
+      if (signedIn) {
+        const result = await runLiveSearch({ data: { sentence } });
+        setCardId(result.cardId);
+        setInsurance(result.insurance);
+        setMatch(result.match ?? null);
+        setBudget(result.budget ?? null);
+        setLive(applyPriced(result));
+      } else {
+        setLive(await searchTrip(await parseTrip(sentence)));
+      }
+      setAmendText("");
+    } catch {
+      /* keep the current card on screen */
+    } finally {
+      setAmending(false);
+    }
+  };
+
   /** Same sentence, new stop order: re-search and re-price the first leg. */
   const reorderStops = async (next: TripStop[]) => {
     setRouteStops(next);
@@ -531,6 +568,8 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
       priced.totalEur = result.priced.total;
       setCardId(result.cardId);
       setInsurance(result.insurance);
+      setMatch(result.match ?? null);
+      setBudget(result.budget ?? null);
       setLive(priced);
       setRouteStops(priced.request.stops ?? next);
     } catch {
@@ -557,6 +596,9 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
     setLiveFailed(false);
     setCardId(null);
     setInsurance(null);
+    setMatch(null);
+    setBudget(null);
+    setAmendText("");
     setAddInsurance(false);
     setDropped({ flight: false, hotel: false, car: false });
     setPriceContext(null);
@@ -590,6 +632,8 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
         if (!cancelled) {
           setCardId(result.cardId);
           setInsurance(result.insurance);
+          setMatch(result.match ?? null);
+          setBudget(result.budget ?? null);
         }
         return priced;
       }
@@ -827,6 +871,15 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                       </div>
                     )}
 
+
+                    {match?.flight && match.flight.score != null && (
+                      <p className="px-5 pb-3 text-xs text-muted-foreground">
+                        {match.flight.score}% match to your preferences
+                        {match.flight.reasons.length > 0 ? ` · ${match.flight.reasons.join(" · ")}` : ""}
+                        {match.flight.misses.length > 0 ? ` · ${match.flight.misses.join(" · ")}` : ""}
+                      </p>
+                    )}
+
                     {requestedNames.hotel && !dropped.hotel && (
                       <p className="px-5 pt-3 text-xs text-muted-foreground">
                         Requested: <span className="font-medium text-foreground">{requestedNames.hotel}</span>
@@ -923,6 +976,36 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                     )}
 
 
+
+                    {match?.stay && match.stay.score != null && (
+                      <p className="px-5 pb-3 text-xs text-muted-foreground">
+                        {match.stay.score}% match to your preferences
+                        {match.stay.reasons.length > 0 ? ` · ${match.stay.reasons.join(" · ")}` : ""}
+                        {match.stay.misses.length > 0 ? ` · ${match.stay.misses.join(" · ")}` : ""}
+                      </p>
+                    )}
+
+                    {live?.stay && live.hotelAlternatives.length > 0 && (
+                      <div className="px-5 pb-4">
+                        <p className="text-xs text-muted-foreground">Other hotels for the same dates:</p>
+                        <ul className="mt-2 space-y-2">
+                          {live.hotelAlternatives.map((alt, index) => (
+                            <li key={`alt-stay-${index}`}>
+                              <button
+                                type="button"
+                                disabled={swapping}
+                                onClick={() => void swapAlternative("stay", index)}
+                                className="flex w-full items-center justify-between gap-3 rounded-xl border border-border px-4 py-2.5 text-left text-sm hover:border-primary disabled:opacity-60"
+                              >
+                                <span className="min-w-0 truncate">{alt.name}</span>
+                                <span className="shrink-0">{eur(alt.amountEur)}</span>
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
                     {requestedNames.car && !dropped.car && (
                       <p className="px-5 pt-3 text-xs text-muted-foreground">
                         Requested: <span className="font-medium text-foreground">{requestedNames.car}</span>
@@ -1008,6 +1091,36 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                       </div>
                     )}
 
+
+                    {match?.car && match.car.score != null && (
+                      <p className="px-5 pb-3 text-xs text-muted-foreground">
+                        {match.car.score}% match to your preferences
+                        {match.car.reasons.length > 0 ? ` · ${match.car.reasons.join(" · ")}` : ""}
+                        {match.car.misses.length > 0 ? ` · ${match.car.misses.join(" · ")}` : ""}
+                      </p>
+                    )}
+
+                    {live?.car && live.carAlternatives.length > 0 && (
+                      <div className="px-5 pb-4">
+                        <p className="text-xs text-muted-foreground">Other cars for the same dates:</p>
+                        <ul className="mt-2 space-y-2">
+                          {live.carAlternatives.map((alt, index) => (
+                            <li key={`alt-car-${index}`}>
+                              <button
+                                type="button"
+                                disabled={swapping}
+                                onClick={() => void swapAlternative("car", index)}
+                                className="flex w-full items-center justify-between gap-3 rounded-xl border border-border px-4 py-2.5 text-left text-sm hover:border-primary disabled:opacity-60"
+                              >
+                                <span className="min-w-0 truncate">{alt.vehicle + " · " + alt.supplier}</span>
+                                <span className="shrink-0">{eur(alt.amountEur)}</span>
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
                     {insurance && (
                       <div className={`${reveal(3)} px-5 py-4`}>
                         <div className="flex flex-wrap items-center gap-3">
@@ -1048,6 +1161,42 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                       </div>
                     )}
 
+
+
+                    {budget && budget.state !== "unknown" && showTotal && (
+                      <p className="px-5 py-3 text-xs text-muted-foreground">
+                        {budget.state === "within"
+                          ? `Within your usual budget (${budget.label}).`
+                          : budget.state === "near"
+                            ? `Close to the top of your usual budget (${budget.label}).`
+                            : `Above your usual budget (${budget.label}).`}
+                      </p>
+                    )}
+
+                    {live && showActions && (
+                      <div className="px-5 py-3">
+                        <label htmlFor="amend" className="text-xs text-muted-foreground">
+                          Change something? Just say it.
+                        </label>
+                        <div className="mt-2 flex gap-2">
+                          <input
+                            id="amend"
+                            value={amendText}
+                            onChange={(event) => setAmendText(event.target.value)}
+                            placeholder="business class, one night later"
+                            className="min-w-0 flex-1 rounded-xl border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => void amendTrip()}
+                            disabled={amending || !amendText.trim()}
+                            className="shrink-0 rounded-xl border border-border px-3 py-2 text-sm font-medium hover:border-primary disabled:opacity-60"
+                          >
+                            {amending ? "Updating…" : "Update"}
+                          </button>
+                        </div>
+                      </div>
+                    )}
 
                     {invoiceVisible && showTotal && (
                       <div className="animate-rise flex items-center gap-2 px-5 py-3 text-xs text-muted-foreground">

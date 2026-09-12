@@ -6,6 +6,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { TripRequest, TripSearchResponse } from "@/lib/trip/types";
+import type { BudgetStatus, MatchSummary } from "@/lib/trip/match";
 import type { InsuranceQuote } from "@/lib/trip/insurance";
 import type { SearchPrefs } from "@/lib/trip/rank";
 
@@ -22,6 +23,10 @@ export type LiveTripResult = {
   };
   /** Optional travel-insurance offer; only counted when the traveller opts in. */
   insurance: InsuranceQuote | null;
+  /** How well each line fits the traveller's saved preferences. */
+  match?: MatchSummary | null;
+  /** Where the total sits against their usual budget. */
+  budget?: BudgetStatus | null;
   expiresAt: string | null;
 };
 
@@ -67,7 +72,7 @@ export const searchLiveTrip = createServerFn({ method: "POST" })
       supabase
         .from("preferences")
         .select(
-          "cabin_class, max_connections, seat, airlines, cabin_rule, hotel_chains, hotel_stars, hotel_min_rating, hotel_amenities, hotel_types, car_brands, car_companies, car_class, car_transmission",
+          "cabin_class, max_connections, seat, airlines, cabin_rule, hotel_chains, hotel_stars, hotel_min_rating, hotel_amenities, hotel_types, car_brands, car_companies, car_class, car_transmission, budget_band",
         )
         .eq("user_id", userId)
         .maybeSingle(),
@@ -164,6 +169,10 @@ export const searchLiveTrip = createServerFn({ method: "POST" })
       request.passengers,
     );
 
+    const { matchSummary, budgetStatus } = await import("@/lib/trip/match");
+    const match = matchSummary(search, searchPrefs);
+    const budget = budgetStatus(total, (row?.["budget_band"] as string | null) ?? null);
+
     const expiresAt =
       search.flight?.expiresAt ?? new Date(Date.now() + 20 * 60_000).toISOString();
 
@@ -177,7 +186,7 @@ export const searchLiveTrip = createServerFn({ method: "POST" })
         saved_minor: pricing.toMinor(search.savedEur),
         saved_minutes: search.savedMinutes,
         expires_at: expiresAt,
-        items: { search, priced: { flight, stay, car, total }, insurance },
+        items: { search, priced: { flight, stay, car, total }, insurance, match, budget },
       })
       .select("id")
       .single();
@@ -189,6 +198,8 @@ export const searchLiveTrip = createServerFn({ method: "POST" })
       search,
       priced: { flight, stay, car, total },
       insurance,
+      match,
+      budget,
       expiresAt,
     };
   });
@@ -212,6 +223,8 @@ export const getTripCard = createServerFn({ method: "POST" })
         search: TripSearchResponse;
         priced: LiveTripResult["priced"];
         insurance?: InsuranceQuote | null;
+        match?: MatchSummary | null;
+        budget?: BudgetStatus | null;
       };
       total_minor: number;
       saved_minor: number;
@@ -223,6 +236,8 @@ export const getTripCard = createServerFn({ method: "POST" })
       search: row.items.search,
       priced: row.items.priced,
       insurance: row.items.insurance ?? null,
+      match: row.items.match ?? null,
+      budget: row.items.budget ?? null,
       totalEur: row.total_minor / 100,
       savedEur: row.saved_minor / 100,
       expiresAt: row.expires_at,
@@ -243,6 +258,7 @@ export const swapCardAlternative = createServerFn({ method: "POST" })
         cardId: z.string().uuid(),
         kind: z.enum(["stay", "car"]),
         index: z.number().int().min(0).max(2),
+        reason: z.string().trim().max(200).optional(),
       })
       .parse(input),
   )
@@ -267,27 +283,56 @@ export const swapCardAlternative = createServerFn({ method: "POST" })
         search: TripSearchResponse;
         priced: LiveTripResult["priced"];
         insurance?: InsuranceQuote | null;
+        match?: MatchSummary | null;
+        budget?: BudgetStatus | null;
       };
       saved_minor: number;
       expires_at: string | null;
     };
     const search = row.items.search;
 
+    let recommended: Record<string, unknown> | null = null;
+    let chosen: Record<string, unknown> | null = null;
+
     if (data.kind === "stay") {
       const pick = search.hotelAlternatives?.[data.index];
       if (!pick) throw new Error("alternative-not-found");
+      const previous = search.stay;
+      recommended = previous ? { ...previous } : null;
+      chosen = { ...pick };
       search.stay = pick;
-      search.hotelAlternatives = [];
+      // Keep the rest swappable, with the earlier pick back on the list.
+      search.hotelAlternatives = [
+        ...(previous ? [previous] : []),
+        ...(search.hotelAlternatives ?? []).filter((_, i) => i !== data.index),
+      ].slice(0, 3);
       search.hotelNotFound = false;
       delete search.errors.stays;
     } else {
       const pick = search.carAlternatives?.[data.index];
       if (!pick) throw new Error("alternative-not-found");
+      const previous = search.car;
+      recommended = previous ? { ...previous } : null;
+      chosen = { ...pick };
       search.car = pick;
-      search.carAlternatives = [];
+      search.carAlternatives = [
+        ...(previous ? [previous] : []),
+        ...(search.carAlternatives ?? []).filter((_, i) => i !== data.index),
+      ].slice(0, 3);
       search.carNotFound = false;
       delete search.errors.cars;
     }
+
+    // Remember that our suggestion was not the one they wanted.
+    const { error: feedbackError } = await supabase.from("choice_feedback").insert({
+      user_id: userId,
+      card_id: data.cardId,
+      line_type: data.kind,
+      recommended: (recommended ?? {}) as never,
+      chosen: (chosen ?? {}) as never,
+      ...(data.reason ? { reason: data.reason } : {}),
+    });
+    if (feedbackError) console.error("Could not log choice feedback", feedbackError);
 
     const plan = (profileRes.data as { plan: string } | null)?.plan ?? "free";
     const table = await pricing.loadPricing(supabase, plan);
@@ -309,12 +354,14 @@ export const swapCardAlternative = createServerFn({ method: "POST" })
 
     const priced = { flight, stay, car, total };
     const insurance = row.items.insurance ?? null;
+    const match = row.items.match ?? null;
+    const budget = row.items.budget ?? null;
     const update = await supabase
       .from("trip_cards")
       .update({
         total_minor: pricing.toMinor(total),
         markup_minor: pricing.toMinor(Math.max(0, total - netTotal)),
-        items: { search, priced, insurance },
+        items: { search, priced, insurance, match, budget },
       })
       .eq("user_id", userId)
       .eq("id", data.cardId);
@@ -326,6 +373,8 @@ export const swapCardAlternative = createServerFn({ method: "POST" })
       search,
       priced,
       insurance,
+      match,
+      budget,
       expiresAt: row.expires_at,
     } satisfies LiveTripResult;
   });
