@@ -159,6 +159,79 @@ function findCitiesInOrder(text: string): CityEntry[] {
     });
 }
 
+
+/** 24-hour clock time in a sentence: "3pm", "15:00", "o 15.00". */
+function clockOf(text: string): { hour: number; minute: number } | null {
+  const match =
+    /\b(?:by|before|at|until|o|na|przed|do)\s*(\d{1,2})(?:[:.](\d{2}))?\s*(am|pm|rano|wieczor|wieczór)?/i.exec(
+      text,
+    );
+  if (!match?.[1]) return null;
+  let hour = Number(match[1]);
+  const minute = match[2] ? Number(match[2]) : 0;
+  const suffix = (match[3] ?? "").toLowerCase();
+  if (/pm|wieczor|wieczór/.test(suffix) && hour < 12) hour += 12;
+  if (/am|rano/.test(suffix) && hour === 12) hour = 0;
+  if (hour > 23 || minute > 59) return null;
+  return { hour, minute };
+}
+
+/** The date a deadline refers to: today, tomorrow, or a named weekday. */
+function deadlineDate(text: string, today: Date, fallbackIso: string): Date {
+  if (/\btomorrow\b|jutro/.test(text)) return addDays(today, 1);
+  if (/\btoday\b|dzis|dziś|dzisiaj/.test(text)) return new Date(today.getTime());
+  for (let index = 0; index < WEEKDAYS.length; index += 1) {
+    if (WEEKDAYS[index]!.some((term) => text.includes(term))) return nextWeekday(today, index);
+  }
+  return new Date(Date.parse(`${fallbackIso}T12:00:00Z`));
+}
+
+function atUtc(date: Date, hour: number, minute: number): string {
+  const d = new Date(
+    Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), hour, minute),
+  );
+  return d.toISOString();
+}
+
+/**
+ * "I need to be in Milan tomorrow at 3pm", "muszę być w Mediolanie jutro o 15:00".
+ * A required arrival, kept separate from the ordinary date range.
+ */
+function mustArriveOf(sentence: string, today: Date, fallbackIso: string): string | null {
+  const text = sentence.toLowerCase();
+  const wantsArrival =
+    /\b(?:need to be|have to be|must be|be in|be there|arrive|arriving|land|meeting|conference)\b/.test(
+      text,
+    ) || /musz[eę] by[cć]|mam by[cć]|spotkanie|konferencj|trzeba by[cć]/.test(text);
+  if (!wantsArrival) return null;
+  const clock = clockOf(text);
+  if (!clock) return null;
+  return atUtc(deadlineDate(text, today, fallbackIso), clock.hour, clock.minute);
+}
+
+/** "I have to leave Milan by Thursday evening" — the reverse constraint. */
+function mustDepartOf(sentence: string, today: Date, fallbackIso: string): string | null {
+  const text = sentence.toLowerCase();
+  const wantsDeparture =
+    /\b(?:leave|depart|fly back|be back|head back|return)\b/.test(text) ||
+    /wyje[zż]d|wracam|wr[oó]ci[cć]|odlot/.test(text);
+  if (!wantsDeparture) return null;
+  const evening = /\bevening\b|wieczor|wieczór/.test(text);
+  const clock = clockOf(text);
+  if (!clock && !evening) return null;
+  const date = deadlineDate(text, today, fallbackIso);
+  return clock ? atUtc(date, clock.hour, clock.minute) : atUtc(date, 20, 0);
+}
+
+/** Where they have to be: "meeting at the Duomo", "spotkanie w biurze BNP". */
+function meetingLocationOf(sentence: string): string | null {
+  const match =
+    /(?:meeting|conference|appointment|spotkanie|konferencj\w*)\s+(?:at|in|near|w|we|przy|na)\s+([^,.;]{2,60})/i.exec(
+      sentence,
+    );
+  return match?.[1]?.trim() ?? null;
+}
+
 export function parseTripSentence(
   sentence: string,
   today = new Date(),
@@ -212,6 +285,15 @@ export function parseTripSentence(
       (c) => c.toLowerCase() === value.toLowerCase(),
     );
 
+  const mustArriveBy = mustArriveOf(sentence, today, iso(depart));
+  if (mustArriveBy) {
+    // The deadline is the day they travel; keep at least one night if the
+    // sentence implied a stay.
+    depart = new Date(Date.parse(`${mustArriveBy.slice(0, 10)}T12:00:00Z`));
+    if (back.getTime() <= depart.getTime()) back = addDays(depart, 1);
+  }
+  const mustDepartBy = mustDepartOf(sentence, today, iso(back));
+
   const stopEntries = destinations.length ? destinations : [destination];
   const stops: TripStop[] = [
     { city: origin.city, iata: origin.iata, lat: origin.lat, lon: origin.lon },
@@ -233,6 +315,9 @@ export function parseTripSentence(
     hotelNameExact: namedHotel && !isCityName(namedHotel) ? namedHotel : null,
     carNameExact: carNameExactOf(sentence),
     needsCar: /\bcar\b|auto|samoch|rental|mietwagen|voiture/.test(text) && !/no car|without a car|bez auta|bez samoch/.test(text),
+    mustArriveBy,
+    mustDepartBy,
+    meetingLocation: meetingLocationOf(sentence) ?? hotelWishOf(sentence),
     invoiceToCompany: /invoice|company|vat|faktur|firm|rechnung|societ|empresa/.test(text),
     stops,
   };

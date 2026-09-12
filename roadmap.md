@@ -84,3 +84,10 @@
 - [x] `payments` records provider, provider reference, method, settlement model, idempotency key and outcome; a retry stops before the supplier
 - [x] Admin screen at `/admin/payments`: switch provider without a deploy (written to `audit_log`), see credentials/test mode/methods per provider and the last 50 payments with their money model
 - [ ] To go live on Stripe: add STRIPE_SECRET_KEY + STRIPE_PUBLISHABLE_KEY and make its row active
+
+## Work order (Sep 2026)
+- [x] Step 1 — "Show other options": alternatives are stored on the card server-side; flight alternatives now deduped on the real itinerary (so three distinct flights, not the same one thrice); the control is a full-width bordered button with an option count, directly under the flight line, plus a calm note when the supplier returned nothing else.
+- [x] Step 2 — plan backwards from a fixed arrival time: parser reads "be in Milan tomorrow at 3pm" / "muszę być w Mediolanie jutro o 15:00" into `must_arrive_by` + `meeting_location`; `planning_rules` table holds the buffers (45/75 min airport, 30 min margin, +20 min for business, transfer = 12 min + 1.6 min/km) and is admin-tunable; the search picks the latest flight that still lands in time, shows the arithmetic on the card, offers the calmer flight when tight, states the shortfall plainly when nothing arrives in time, adds the airport→meeting transfer (no price — no ride supplier connected), and handles the reverse "leave by" constraint
+- [ ] Step 3 — finish analytics + admin panel + event logging + error boundary
+- [ ] Step 4 — questionnaire split (Part 1 essentials/dealbreakers, Part 2 optional)
+- [ ] Step 5 — small fixes (logo size, voice, calendar, payment adapter verification)

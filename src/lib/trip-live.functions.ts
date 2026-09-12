@@ -80,7 +80,7 @@ export const searchLiveTrip = createServerFn({ method: "POST" })
       supabase
         .from("preferences")
         .select(
-          "cabin_class, max_connections, hotel_max_km, seat, airlines, cabin_rule, hotel_chains, hotel_stars, hotel_min_rating, hotel_amenities, hotel_types, car_brands, car_companies, car_class, car_transmission, budget_band",
+          "cabin_class, max_connections, hotel_max_km, seat, airlines, cabin_rule, hotel_chains, hotel_stars, hotel_min_rating, hotel_amenities, hotel_types, car_brands, car_companies, car_class, car_transmission, budget_band, trip_purpose",
         )
         .eq("user_id", userId)
         .maybeSingle(),
@@ -143,7 +143,35 @@ export const searchLiveTrip = createServerFn({ method: "POST" })
     if (requestRow.error) throw new Error(requestRow.error.message);
     const tripRequestId = (requestRow.data as { id: string }).id;
 
-    const search = await searchTripWithDuffel(request, searchPrefs);
+    // Buffers used when planning backwards from a fixed arrival time; tunable
+    // by an admin without a deploy.
+    const { DEFAULT_PLANNING_RULES } = await import("@/lib/trip/backwards");
+    const rulesRes = await supabase
+      .from("planning_rules")
+      .select(
+        "schengen_clear_min, non_schengen_clear_min, safety_margin_min, business_extra_margin_min, transfer_base_min, transfer_min_per_km",
+      )
+      .eq("active", true)
+      .limit(1)
+      .maybeSingle();
+    const ruleRow = (rulesRes.data ?? null) as Record<string, unknown> | null;
+    const planningRules = ruleRow
+      ? {
+          schengenClearMin: Number(ruleRow["schengen_clear_min"]),
+          nonSchengenClearMin: Number(ruleRow["non_schengen_clear_min"]),
+          safetyMarginMin: Number(ruleRow["safety_margin_min"]),
+          businessExtraMarginMin: Number(ruleRow["business_extra_margin_min"]),
+          transferBaseMin: Number(ruleRow["transfer_base_min"]),
+          transferMinPerKm: Number(ruleRow["transfer_min_per_km"]),
+        }
+      : DEFAULT_PLANNING_RULES;
+    const purposes = list(row?.["trip_purpose"]).map((p) => p.toLowerCase());
+    const business = purposes.some((p) => p.includes("business") || p.includes("work"));
+
+    const search = await searchTripWithDuffel(request, searchPrefs, {
+      rules: planningRules,
+      business,
+    });
 
     // Internal demand reporting: which named hotels we cannot source yet.
     if (search.hotelNotFound && search.hotelRequested) {

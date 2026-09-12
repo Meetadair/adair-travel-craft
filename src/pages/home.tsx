@@ -28,6 +28,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { LineOptions, MatchNote } from "@/components/trip-line-options";
+import { ArrivalPlanNote, TransferNote } from "@/components/arrival-plan-note";
 import { TripExtras } from "@/components/trip-extras";
 import { searchLiveTrip, swapCardAlternative } from "@/lib/trip-live.functions";
 import type { BudgetStatus, MatchSummary } from "@/lib/trip/match";
@@ -844,6 +845,15 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                     <p className="mt-0.5 text-xs text-muted-foreground">{d.cardSubtitle}</p>
                   </div>
 
+                  {live?.arrivalPlan && (
+                    <ArrivalPlanNote
+                      plan={live.arrivalPlan}
+                      locale={locale}
+                      busy={swapping}
+                      onPickSafer={(index) => void swapAlternative("flight", index)}
+                    />
+                  )}
+
                   <div className="divide-y divide-border">
                     {dropped.flight ? null : live?.flight && req ? (
                       <div className={reveal(1)}>
@@ -892,7 +902,18 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                           priceLabel: eur(alt.amountEur),
                         }))}
                         onPick={(index, reason) => void swapAlternative("flight", index, reason)}
+                        emptyNote="No other flight came back for these dates — try shifting the dates by a day."
                       />
+                    )}
+
+                    {live?.departureNote && (
+                      <p className="px-5 py-3 text-xs leading-relaxed text-muted-foreground">
+                        {live.departureNote}
+                      </p>
+                    )}
+
+                    {live?.transfer && !dropped.flight && (
+                      <TransferNote transfer={live.transfer} locale={locale} />
                     )}
 
                     {requestedNames.hotel && !dropped.hotel && (

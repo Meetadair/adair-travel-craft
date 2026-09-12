@@ -459,6 +459,48 @@ export type Database = {
           },
         ]
       }
+      planning_rules: {
+        Row: {
+          active: boolean
+          business_extra_margin_min: number
+          created_at: string
+          id: string
+          name: string
+          non_schengen_clear_min: number
+          safety_margin_min: number
+          schengen_clear_min: number
+          transfer_base_min: number
+          transfer_min_per_km: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          business_extra_margin_min?: number
+          created_at?: string
+          id?: string
+          name: string
+          non_schengen_clear_min?: number
+          safety_margin_min?: number
+          schengen_clear_min?: number
+          transfer_base_min?: number
+          transfer_min_per_km?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          business_extra_margin_min?: number
+          created_at?: string
+          id?: string
+          name?: string
+          non_schengen_clear_min?: number
+          safety_margin_min?: number
+          schengen_clear_min?: number
+          transfer_base_min?: number
+          transfer_min_per_km?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       preferences: {
         Row: {
           airlines: Json

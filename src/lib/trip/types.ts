@@ -27,6 +27,12 @@ export type TripRequest = {
   /** A specific car supplier or model, e.g. "Sixt" or "Tesla". */
   carNameExact: string | null;
   needsCar: boolean;
+  /** A time they must already be at the meeting (ISO), when the sentence set one. */
+  mustArriveBy?: string | null;
+  /** A time they must leave the destination by (ISO). */
+  mustDepartBy?: string | null;
+  /** Where the meeting is, when named. */
+  meetingLocation?: string | null;
   invoiceToCompany: boolean;
   /** Ordered stops: origin first, then every destination named in the sentence. */
   stops: TripStop[];
@@ -97,6 +103,19 @@ export type TripSearchResponse = {
   carRequested: string | null;
   carNotFound: boolean;
   carAlternatives: CarResult[];
+  /** Backwards plan from a fixed arrival time, when the sentence set one. */
+  arrivalPlan?: import("./backwards").ArrivalPlan | null;
+  /** Airport transfer we added so they reach the meeting on time. */
+  transfer?: {
+    pickupAt: string;
+    fromLabel: string;
+    toLabel: string;
+    minutes: number;
+    /** No ride supplier is connected yet, so we never show a price. */
+    supplierConnected: boolean;
+  } | null;
+  /** Note about a "must leave by" constraint we could or could not meet. */
+  departureNote?: string | null;
   /** Short note per failed part, e.g. { stays: "no availability" }. */
   errors: Partial<Record<"flights" | "stays" | "cars", string>>;
 };
