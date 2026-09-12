@@ -134,19 +134,21 @@ export const bookTripCard = createServerFn({ method: "POST" })
       status: string;
       expires_at: string | null;
     };
-    if (card.status === "booked") throw new Error("already-booked");
-
     // A settled payment already exists for this card: a retry must never charge
     // twice, so stop before touching the supplier.
-    const idempotencyKey = `${card.id}-payment`;
+    const idempotencyKey = paymentKey(card.id);
     const earlier = await supabase
       .from("payments")
       .select("status")
       .eq("user_id", userId)
       .eq("idempotency_key", idempotencyKey)
       .maybeSingle();
-    const settled = (earlier.data as { status?: string } | null)?.status;
-    if (settled === "test_settled" || settled === "settled") {
+    if (
+      shouldStopBeforeSupplier({
+        cardStatus: card.status,
+        earlierPaymentStatus: (earlier.data as { status?: string } | null)?.status ?? null,
+      })
+    ) {
       throw new Error("already-booked");
     }
 
