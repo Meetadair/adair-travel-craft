@@ -112,6 +112,10 @@ function prefsToRow(userId: string, p: TravelPrefs) {
     interests: p.interests,
     music: p.music,
     budget_band: p.budgetBand,
+    dealbreakers: p.dealbreakers,
+    extra_answers: p.extraAnswers,
+    accessibility_note: p.accessibilityNote,
+    avoid_note: p.avoidNote,
   };
 }
 
@@ -211,6 +215,10 @@ const prefsSchema = z.object({
   interests: strList,
   music: strList,
   budgetBand: z.string().trim().max(40).nullable().default(null),
+  dealbreakers: strList,
+  extraAnswers: z.record(z.string().max(40), strList).default({}),
+  accessibilityNote: z.string().trim().max(500).nullable().default(null),
+  avoidNote: z.string().trim().max(500).nullable().default(null),
 });
 
 const companySchema = z.object({
