@@ -1638,6 +1638,15 @@ export function HomePage() {
       ?.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" });
   }
 
+  /** Handed over from Getaway's "Plan this trip": run it straight away. */
+  useEffect(() => {
+    const handoff = window.sessionStorage.getItem("adair.getaway.sentence");
+    if (!handoff) return;
+    window.sessionStorage.removeItem("adair.getaway.sentence");
+    runDemo(handoff);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <div className="min-h-screen bg-background">
       <SiteNav />
