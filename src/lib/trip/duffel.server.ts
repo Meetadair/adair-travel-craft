@@ -4,7 +4,14 @@
  * failing part returns a short note instead of breaking the response.
  */
 import { findByName } from "./match";
-import { carScore, flightScore, stayScore, type SearchPrefs } from "@/lib/trip/rank";
+import {
+  carScore,
+  carsPassingDealbreakers,
+  flightScore,
+  stayScore,
+  staysPassingDealbreakers,
+  type SearchPrefs,
+} from "@/lib/trip/rank";
 import {
   DEFAULT_PLANNING_RULES,
   planBackwards,
@@ -329,7 +336,15 @@ export async function searchStay(
     };
   };
 
-  const mapped = results.map(map);
+  // Dealbreakers are hard rules: drop anything that fails one before ranking.
+  const mapped = staysPassingDealbreakers(
+    results.map(map),
+    (m) => ({ name: m.rawName, rating: m.result.rating }),
+    prefs,
+  );
+  if (!mapped.length) {
+    return { stay: null, alternatives: [], requested, notFound: Boolean(requested) };
+  }
 
   // A named hotel overrides every preference-based pick.
   if (requested) {
@@ -348,7 +363,7 @@ export async function searchStay(
 
   // Above the 25th price percentile, then ranked by the traveller's hotel
   // preferences (chain, stars, rating, amenities) rather than price alone.
-  const prices = results.map((r) => Number(r.cheapest_rate_total_amount)).sort((a, b) => a - b);
+  const prices = mapped.map((m) => m.result.amount).sort((a, b) => a - b);
   const floor = prices[Math.floor(prices.length * 0.25)] ?? prices[0]!;
   const pool = mapped.filter((m) => m.result.amount >= floor);
   const best = (pool.length ? pool : mapped)
@@ -443,7 +458,14 @@ export async function searchCar(
     };
   };
 
-  const mapped = results.map(map);
+  const mapped = carsPassingDealbreakers(
+    results.map(map),
+    (m) => ({ transmission: m.result.transmission }),
+    prefs,
+  );
+  if (!mapped.length) {
+    return { car: null, alternatives: [], requested, notFound: Boolean(requested) };
+  }
 
   // A named supplier or model overrides the cheapest-automatic pick.
   if (requested) {

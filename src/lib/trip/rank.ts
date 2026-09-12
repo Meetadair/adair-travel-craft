@@ -22,6 +22,7 @@ export type SearchPrefs = Pick<
   | "cabinClass"
   | "maxConnections"
   | "hotelMaxKm"
+  | "dealbreakers"
 >;
 
 const fold = (value: string) =>
@@ -112,6 +113,50 @@ function matchesAny(text: string, words: string[]): boolean {
 
 function anySelected(text: string, selected: string[], table: Record<string, string[]>): boolean {
   return selected.some((key) => matchesAny(text, table[key] ?? [key]));
+}
+
+/* ------------------------------ hard filters ------------------------------ */
+
+/**
+ * Dealbreakers are rules, not scores: anything failing one is dropped before
+ * ranking. We only apply the rules the supplier data can actually answer —
+ * the rest stay recorded on the profile and are shown to the traveller.
+ */
+export function staysPassingDealbreakers<T>(
+  items: T[],
+  read: (item: T) => { name: string; rating: number | null },
+  prefs?: SearchPrefs,
+): T[] {
+  const rules = prefs?.dealbreakers ?? [];
+  if (!rules.length) return items;
+  return items.filter((item) => {
+    const { name, rating } = read(item);
+    if (rules.includes("dbStars4") && (rating == null || rating < 4)) return false;
+    if (rules.includes("dbNoHostel") && matchesAny(name, ["hostel"])) return false;
+    return true;
+  });
+}
+
+export function carsPassingDealbreakers<T>(
+  items: T[],
+  read: (item: T) => { transmission: string },
+  prefs?: SearchPrefs,
+): T[] {
+  const rules = prefs?.dealbreakers ?? [];
+  if (!rules.includes("dbAutomatic")) return items;
+  return items.filter((item) => matchesAny(read(item).transmission, ["automatic", "auto"]));
+}
+
+/** The rules we cannot verify from supplier data yet — shown, never faked. */
+export function unverifiableDealbreakers(prefs?: SearchPrefs): string[] {
+  const shown: Record<string, string> = {
+    dbLift: "a lift",
+    dbSharedBath: "a private bathroom",
+    dbNonSmoking: "non-smoking",
+    dbStepFree: "step-free access",
+    dbPets: "pets allowed",
+  };
+  return (prefs?.dealbreakers ?? []).flatMap((rule) => (shown[rule] ? [shown[rule]] : []));
 }
 
 /** Preferred carriers rank as if they were 12% cheaper. */

@@ -36,6 +36,13 @@ export type Account = {
 const asList = (value: unknown): string[] =>
   Array.isArray(value) ? value.filter((v): v is string => typeof v === "string") : [];
 
+const asAnswerMap = (value: unknown): Record<string, string[]> => {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  return Object.fromEntries(
+    Object.entries(value as Record<string, unknown>).map(([key, val]) => [key, asList(val)]),
+  );
+};
+
 type PrefRow = Record<string, unknown>;
 
 function rowToPrefs(row: PrefRow | null): TravelPrefs {
@@ -68,6 +75,10 @@ function rowToPrefs(row: PrefRow | null): TravelPrefs {
     interests: asList(row["interests"]),
     music: asList(row["music"]),
     budgetBand: (row["budget_band"] as string | null) ?? null,
+    dealbreakers: asList(row["dealbreakers"]),
+    extraAnswers: asAnswerMap(row["extra_answers"]),
+    accessibilityNote: (row["accessibility_note"] as string | null) ?? null,
+    avoidNote: (row["avoid_note"] as string | null) ?? null,
   };
 }
 
@@ -101,6 +112,10 @@ function prefsToRow(userId: string, p: TravelPrefs) {
     interests: p.interests,
     music: p.music,
     budget_band: p.budgetBand,
+    dealbreakers: p.dealbreakers,
+    extra_answers: p.extraAnswers,
+    accessibility_note: p.accessibilityNote,
+    avoid_note: p.avoidNote,
   };
 }
 
@@ -132,7 +147,7 @@ const COMPANY_COLUMNS =
   "id, name, legal_form, country, city, postcode, street, building, address_extra, vat_id, address, invoice_email, invoice_emails, is_default";
 
 const PREF_COLUMNS =
-  "seat, cabin_class, max_connections, hotel_min_rating, hotel_rules, car_transmission, trip_purpose, airlines, cabin_rule, seat_front, seat_legroom, hotel_types, hotel_chains, hotel_stars, hotel_rating_level, hotel_amenities, hotel_max_km, car_brands, car_class, car_navigation, car_child_seat, car_companies, cuisines, diets, interests, music, budget_band";
+  "seat, cabin_class, max_connections, hotel_min_rating, hotel_rules, car_transmission, trip_purpose, airlines, cabin_rule, seat_front, seat_legroom, hotel_types, hotel_chains, hotel_stars, hotel_rating_level, hotel_amenities, hotel_max_km, car_brands, car_class, car_navigation, car_child_seat, car_companies, cuisines, diets, interests, music, budget_band, dealbreakers, extra_answers, accessibility_note, avoid_note";
 
 export const getAccount = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -200,6 +215,10 @@ const prefsSchema = z.object({
   interests: strList,
   music: strList,
   budgetBand: z.string().trim().max(40).nullable().default(null),
+  dealbreakers: strList,
+  extraAnswers: z.record(z.string().max(40), strList).default({}),
+  accessibilityNote: z.string().trim().max(500).nullable().default(null),
+  avoidNote: z.string().trim().max(500).nullable().default(null),
 });
 
 const companySchema = z.object({

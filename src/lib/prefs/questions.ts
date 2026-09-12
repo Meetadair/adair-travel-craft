@@ -18,6 +18,12 @@ export type FieldDef = {
   noneValue?: string;
 };
 
+export type TextDef = {
+  field: string;
+  label: string;
+  placeholder?: string;
+};
+
 export type QuestionDef = {
   id: string;
   /**
@@ -33,6 +39,7 @@ export type QuestionDef = {
   singles?: FieldDef[];
   multis?: FieldDef[];
   toggles?: { field: string; label: string }[];
+  texts?: TextDef[];
 };
 
 const opts = (...pairs: Array<[string, string]>): Option[] =>
@@ -440,6 +447,155 @@ export const QUESTIONS: QuestionDef[] = [
     ],
   },
   {
+    id: "dealbreakers",
+    part: 1,
+    kind: "fields",
+    skippable: true,
+    title: "Anything we should never book?",
+    hint: "Hard rules, not preferences. We filter these out before comparing options — and where a supplier does not publish the detail, we tell you rather than guess.",
+    toggles: [
+      { field: "dbStars4", label: "Never below 4 stars" },
+      { field: "dbLift", label: "Never without a lift" },
+      { field: "dbSharedBath", label: "Never a shared bathroom" },
+      { field: "dbAutomatic", label: "Automatic transmission only" },
+      { field: "dbNonSmoking", label: "Non-smoking only" },
+      { field: "dbNoHostel", label: "Never a hostel" },
+      { field: "dbStepFree", label: "Step-free access required" },
+      { field: "dbPets", label: "Must allow pets" },
+    ],
+  },
+  {
+    id: "style",
+    part: 2,
+    kind: "fields",
+    skippable: true,
+    title: "How do you like to travel?",
+    singles: [
+      {
+        field: "travelStyle",
+        options: opts(
+          ["efficiency", "Efficiency — shortest door to door"],
+          ["comfort", "Comfort — space and calm"],
+          ["value", "Value — best price that still works"],
+          ["experience", "Experience first — the place matters most"],
+        ),
+      },
+    ],
+  },
+  {
+    id: "rhythm",
+    part: 2,
+    kind: "fields",
+    skippable: true,
+    title: "Your usual rhythm",
+    singles: [
+      {
+        field: "tripLength",
+        label: "Typical trip length",
+        options: opts(
+          ["1", "A day"],
+          ["2_3", "2 – 3 nights"],
+          ["4_7", "4 – 7 nights"],
+          ["8plus", "Longer than a week"],
+        ),
+      },
+      {
+        field: "leadTime",
+        label: "How far ahead you usually book",
+        options: opts(
+          ["last_minute", "Last minute"],
+          ["1_2w", "1 – 2 weeks"],
+          ["1m", "About a month"],
+          ["3m_plus", "Three months or more"],
+        ),
+      },
+    ],
+    multis: [
+      {
+        field: "companions",
+        label: "Who you usually travel with",
+        options: opts(
+          ["alone", "Alone"],
+          ["partner", "Partner"],
+          ["family", "Family with children"],
+          ["colleagues", "Colleagues"],
+          ["friends", "Friends"],
+        ),
+      },
+    ],
+  },
+  {
+    id: "loyalty",
+    part: 2,
+    kind: "fields",
+    skippable: true,
+    title: "Loyalty programmes you hold",
+    hint: "We favour these when the price is close.",
+    multis: [
+      {
+        field: "loyalty",
+        options: opts(
+          ["miles_more", "Miles & More"],
+          ["flying_blue", "Flying Blue"],
+          ["executive_club", "British Airways Executive Club"],
+          ["star_alliance_other", "Other Star Alliance"],
+          ["marriott_bonvoy", "Marriott Bonvoy"],
+          ["hilton_honors", "Hilton Honors"],
+          ["world_of_hyatt", "World of Hyatt"],
+          ["ihg_one", "IHG One Rewards"],
+          ["accor_all", "Accor ALL"],
+          ["none", "None"],
+        ),
+        noneValue: "none",
+      },
+    ],
+  },
+  {
+    id: "tradeoffs",
+    part: 2,
+    kind: "fields",
+    skippable: true,
+    title: "Three quick trade-offs",
+    hint: "These predict your real choices better than anything else we ask.",
+    singles: [
+      {
+        field: "tradeConnection",
+        label: "Pay about €50 more to avoid a connection?",
+        options: opts(["yes", "Yes"], ["no", "No"], ["depends", "Depends on the trip"]),
+      },
+      {
+        field: "tradeCloser",
+        label: "Pay about €50 more for a hotel 10 minutes closer?",
+        options: opts(["yes", "Yes"], ["no", "No"], ["depends", "Depends on the trip"]),
+      },
+      {
+        field: "tradeMorning",
+        label: "Pay about €50 more for a direct morning departure?",
+        options: opts(["yes", "Yes"], ["no", "No"], ["depends", "Depends on the trip"]),
+      },
+    ],
+  },
+  {
+    id: "notes",
+    part: 2,
+    kind: "fields",
+    skippable: true,
+    title: "Anything else we should know?",
+    hint: "Written in your words. We read these before every booking.",
+    texts: [
+      {
+        field: "accessibilityNote",
+        label: "Accessibility needs",
+        placeholder: "e.g. step-free route, assistance at the gate",
+      },
+      {
+        field: "avoidNote",
+        label: "Always avoid",
+        placeholder: "e.g. no red-eye flights, no rooms above the 10th floor",
+      },
+    ],
+  },
+  {
     id: "companies",
     part: 2,
     kind: "companies",
@@ -514,7 +670,37 @@ export type TravelPrefs = {
   interests: string[];
   music: string[];
   budgetBand: string | null;
+  /** Hard rules, e.g. "dbNoHostel" — filtered out before ranking. */
+  dealbreakers: string[];
+  /** Part 2 profile answers keyed by field, kept open so new questions need no migration. */
+  extraAnswers: Record<string, string[]>;
+  accessibilityNote: string | null;
+  avoidNote: string | null;
 };
+
+/** Toggle fields that act as hard filters rather than scores. */
+export const DEALBREAKER_FIELDS = [
+  "dbStars4",
+  "dbLift",
+  "dbSharedBath",
+  "dbAutomatic",
+  "dbNonSmoking",
+  "dbNoHostel",
+  "dbStepFree",
+  "dbPets",
+] as const;
+
+/** Part 2 answer fields stored in the open `extraAnswers` map. */
+export const EXTRA_ANSWER_FIELDS = [
+  "travelStyle",
+  "tripLength",
+  "leadTime",
+  "companions",
+  "loyalty",
+  "tradeConnection",
+  "tradeCloser",
+  "tradeMorning",
+] as const;
 
 export const DEFAULT_PREFS: TravelPrefs = {
   seat: "any",
@@ -544,6 +730,10 @@ export const DEFAULT_PREFS: TravelPrefs = {
   interests: [],
   music: [],
   budgetBand: null,
+  dealbreakers: [],
+  extraAnswers: {},
+  accessibilityNote: null,
+  avoidNote: null,
 };
 
 const RATING_TO_NUMBER: Record<string, number> = {
@@ -590,12 +780,23 @@ export function answersToPrefs(answers: Answers, toggles: Toggles): TravelPrefs 
     interests: answers["interests"] ?? [],
     music: answers["music"] ?? [],
     budgetBand: first(answers["budgetBand"]),
+    dealbreakers: DEALBREAKER_FIELDS.filter((field) => Boolean(toggles[field])),
+    extraAnswers: Object.fromEntries(
+      EXTRA_ANSWER_FIELDS.map((field) => [field, clean(field)]).filter(
+        ([, values]) => (values as string[]).length > 0,
+      ),
+    ) as Record<string, string[]>,
+    accessibilityNote: first(answers["accessibilityNote"]),
+    avoidNote: first(answers["avoidNote"]),
   };
 }
 
 export function prefsToAnswers(prefs: TravelPrefs): { answers: Answers; toggles: Toggles } {
   return {
     answers: {
+      ...prefs.extraAnswers,
+      accessibilityNote: prefs.accessibilityNote ? [prefs.accessibilityNote] : [],
+      avoidNote: prefs.avoidNote ? [prefs.avoidNote] : [],
       seat: [prefs.seat],
       cabinChoice: [prefs.cabinRule === "business_over_2h" ? "business_over_2h" : prefs.cabinClass],
       carTransmission: [prefs.carTransmission],
@@ -655,6 +856,32 @@ export function countKnownPreferences(prefs: TravelPrefs): number {
     prefs.carChildSeat ? 1 : 0,
   ];
   return lists.reduce((sum, l) => sum + l.length, 0) + singles.reduce((a, b) => a + b, 0);
+}
+
+/**
+ * How much of the optional "Refine your profile" part is filled in, 0–100.
+ * Shown on Preferences and in the prompt after the essentials.
+ */
+export function part2Completion(prefs: TravelPrefs, companyCount = 0): number {
+  const filled = [
+    prefs.airlines.length,
+    prefs.hotelTypes.length,
+    prefs.hotelChains.length,
+    prefs.hotelAmenities.length,
+    prefs.hotelMaxKm ? 1 : 0,
+    prefs.carBrands.length,
+    prefs.carCompanies.length,
+    prefs.cuisines.length,
+    prefs.diets.length,
+    prefs.interests.length,
+    prefs.music.length,
+    ...EXTRA_ANSWER_FIELDS.map((field) => (prefs.extraAnswers[field]?.length ? 1 : 0)),
+    prefs.accessibilityNote ? 1 : 0,
+    prefs.avoidNote ? 1 : 0,
+    companyCount,
+  ].filter((count) => count > 0).length;
+  const total = 11 + EXTRA_ANSWER_FIELDS.length + 3;
+  return Math.min(100, Math.round((filled / total) * 100));
 }
 
 /** Label lookup for the summary and Preferences page. */

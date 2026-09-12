@@ -15,13 +15,14 @@ import {
 import {
   QUESTIONS,
   answersToPrefs,
+  part2Completion,
   prefsToAnswers,
   type Answers,
   type Toggles,
 } from "@/lib/prefs/questions";
 import { AirportPicker } from "@/components/prefs/airport-picker";
 import { CompanyEditor } from "@/components/prefs/company-editor";
-import { MultiField, SingleField, ToggleRow } from "@/components/prefs/option-chips";
+import { MultiField, SingleField, TextField, ToggleRow } from "@/components/prefs/option-chips";
 import { cleanCompany, type CompanyDraft } from "@/lib/prefs/company-draft";
 import { ConnectedCalendars } from "@/components/prefs/connected-calendars";
 
@@ -95,6 +96,8 @@ export function PreferencesPage() {
     },
   });
 
+  const completion = part2Completion(answersToPrefs(answers, toggles), companies.length);
+
   return (
     <div className="min-h-screen bg-background">
       <SiteNav />
@@ -131,9 +134,26 @@ export function PreferencesPage() {
               .map((q, index, list) => (
                 <div key={q.id}>
                   {(index === 0 || list[index - 1]!.part !== q.part) && (
-                    <p className="mb-2 mt-2 text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
-                      {q.part === 1 ? "Essentials" : "Taste — makes every match better"}
-                    </p>
+                    <div className="mb-2 mt-2" id={q.part === 2 ? "refine" : undefined}>
+                      <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                        {q.part === 1
+                          ? "Essentials & dealbreakers"
+                          : "Refine your profile — makes every match better"}
+                      </p>
+                      {q.part === 2 && (
+                        <div className="mt-2 flex items-center gap-3">
+                          <div className="h-1 w-40 overflow-hidden rounded-full bg-border">
+                            <span
+                              className="block h-full rounded-full bg-primary"
+                              style={{ width: `${completion}%` }}
+                            />
+                          </div>
+                          <span className="text-xs text-muted-foreground">
+                            {completion}% complete — optional
+                          </span>
+                        </div>
+                      )}
+                    </div>
                   )}
               <section className="hairline-card space-y-4 p-5 sm:p-6">
                 <h2 className="font-display text-lg font-semibold">{q.title}</h2>
@@ -151,6 +171,16 @@ export function PreferencesPage() {
                     def={def}
                     value={answers[def.field] ?? []}
                     onChange={(next) => setAnswers((p) => ({ ...p, [def.field]: next }))}
+                  />
+                ))}
+                {q.texts?.map((def) => (
+                  <TextField
+                    key={def.field}
+                    def={def}
+                    value={answers[def.field]?.[0] ?? ""}
+                    onChange={(next) =>
+                      setAnswers((p) => ({ ...p, [def.field]: next.trim() ? [next] : [] }))
+                    }
                   />
                 ))}
                 {q.toggles?.length ? (
