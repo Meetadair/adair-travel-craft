@@ -44,6 +44,47 @@ export type Database = {
         }
         Relationships: []
       }
+      choice_feedback: {
+        Row: {
+          card_id: string | null
+          chosen: Json
+          created_at: string
+          id: string
+          line_type: string
+          reason: string | null
+          recommended: Json
+          user_id: string
+        }
+        Insert: {
+          card_id?: string | null
+          chosen?: Json
+          created_at?: string
+          id?: string
+          line_type: string
+          reason?: string | null
+          recommended?: Json
+          user_id: string
+        }
+        Update: {
+          card_id?: string | null
+          chosen?: Json
+          created_at?: string
+          id?: string
+          line_type?: string
+          reason?: string | null
+          recommended?: Json
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "choice_feedback_card_id_fkey"
+            columns: ["card_id"]
+            isOneToOne: false
+            referencedRelation: "trip_cards"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       companies: {
         Row: {
           address: string | null
