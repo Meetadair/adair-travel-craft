@@ -128,16 +128,19 @@ export function AssistantPage() {
         </form>
 
         <div className="mt-4 flex flex-wrap gap-2">
-          {t.assistant.examples.map((ex) => (
+          {examples.map((ex) => (
             <button
               key={ex}
+              type="button"
               onClick={() => setInput(ex)}
               className="tag-pill text-left hover:bg-secondary"
             >
-              {ex.slice(0, 46)}…
+              {ex.length > 46 ? `${ex.slice(0, 46)}…` : ex}
             </button>
           ))}
         </div>
+
+        <CalendarTripHints onPlan={(sentence) => setInput(sentence)} />
 
         {asked && (
           <div className="mt-12 flex justify-end">
