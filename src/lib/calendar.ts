@@ -37,6 +37,9 @@ export type ItemCalendarPayload = {
   partySize?: number | null;
   venueName?: string | null;
   cuisine?: string | null;
+  /** Loyalty membership carried on the line, masked for display. */
+  loyaltyProgramme?: string | null;
+  loyaltyMemberMasked?: string | null;
   /** Free-text note stored with the line (e.g. the insurance offer wording). */
   note?: string | null;
 };
