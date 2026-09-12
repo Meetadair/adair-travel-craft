@@ -50,7 +50,7 @@ import {
   timeLabel,
   dayLabel,
 } from "@/lib/trip/client";
-import type { TripSearchResponse } from "@/lib/trip/types";
+import type { PriceContext, TripSearchResponse } from "@/lib/trip/types";
 
 type Submission = { sentence: string; key: number };
 
