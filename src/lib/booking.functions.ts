@@ -184,23 +184,62 @@ export const bookTripCard = createServerFn({ method: "POST" })
     const request = search.request;
 
     // Loyalty numbers from the traveller's wallet, decrypted server-side only.
-    const { loadMemberships } = await import("@/lib/loyalty/booking.server");
+    const { loadEarningRules, loadMemberships } = await import("@/lib/loyalty/booking.server");
+    const { earnsOn } = await import("@/lib/loyalty/earning");
     const memberships = await loadMemberships(userId);
-    const mask = (last4: string) => `•••• ${last4}`;
+    const earningRules = await loadEarningRules();
+    const mask = (last4: string) => (last4 ? `•••• ${last4}` : "no number");
     const loyaltyApplied: BookingResult["loyalty"]["applied"] = [];
     const loyaltyNotApplied: BookingResult["loyalty"]["notApplied"] = [];
-    const flightAccounts = memberships
-      .filter((m) => m.category === "airline" && m.airlineIata)
-      .map((m) => ({ airlineIataCode: m.airlineIata as string, accountNumber: m.memberNumber }));
-    for (const m of memberships.filter((m) => m.category === "airline" && !m.airlineIata)) {
+
+    // A programme with no member number cannot credit anything — say so plainly.
+    for (const m of memberships.filter((m) => !m.hasNumber)) {
+      loyaltyNotApplied.push({
+        programme: m.programmeLabel,
+        masked: "no number",
+        note: "no number, not applied",
+      });
+    }
+    const usable = memberships.filter((m) => m.hasNumber);
+
+    // Programmes earn across partners, not only on the airline that owns them:
+    // a LOT ticket credits Miles & More. The mapping lives in the database.
+    const flightCarrierCode =
+      search.flight?.flightNumbers[0]?.match(/^[A-Z0-9]{2}/)?.[0] ??
+      search.flight?.carrierIata ??
+      null;
+    const flightMemberships = usable.filter(
+      (m) =>
+        m.category === "airline" &&
+        (earnsOn(earningRules, "airline", m.programmeCode, flightCarrierCode) ||
+          (m.airlineIata !== null && m.airlineIata === flightCarrierCode)),
+    );
+    const flightAccounts = flightMemberships
+      .filter((m) => m.airlineIata ?? flightCarrierCode)
+      .map((m) => ({
+        airlineIataCode: (flightCarrierCode ?? m.airlineIata) as string,
+        accountNumber: m.memberNumber,
+      }));
+    for (const m of usable.filter(
+      (m) => m.category === "airline" && !flightMemberships.includes(m),
+    )) {
       loyaltyNotApplied.push({
         programme: m.programmeLabel,
         masked: mask(m.last4),
-        note: "the airline needs this programme's carrier code — quote it at check-in",
+        note: "this flight's airline doesn't earn in this programme",
       });
     }
-    const hotelMembership = memberships.find((m) => m.category === "hotel") ?? null;
-    const carMembership = memberships.find((m) => m.category === "car") ?? null;
+
+    const hotelName = search.stay?.name ?? null;
+    const carSupplier = search.car ? `${search.car.supplier} ${search.car.vehicle}` : null;
+    const hotelMembership =
+      usable.find(
+        (m) => m.category === "hotel" && earnsOn(earningRules, "hotel", m.programmeCode, hotelName),
+      ) ?? null;
+    const carMembership =
+      usable.find(
+        (m) => m.category === "car" && earnsOn(earningRules, "car", m.programmeCode, carSupplier),
+      ) ?? null;
 
     const lines: BookingResult["lines"] = [];
     let repriced: BookingResult["repriced"] = null;
@@ -231,7 +270,7 @@ export const bookTripCard = createServerFn({ method: "POST" })
           cardPayment,
           loyaltyAccounts: flightAccounts,
         });
-        for (const m of memberships.filter((m) => m.category === "airline" && m.airlineIata)) {
+        for (const m of flightMemberships) {
           loyaltyApplied.push({
             programme: m.programmeLabel,
             masked: mask(m.last4),
@@ -318,6 +357,30 @@ export const bookTripCard = createServerFn({ method: "POST" })
           loyaltyProgramme: carMembership?.programmeLabel ?? null,
           loyaltyMemberMasked: carMembership ? mask(carMembership.last4) : null,
         },
+      });
+    }
+
+    if (!flightMemberships.length && lines.some((l) => l.kind === "flight")) {
+      loyaltyNotApplied.push({
+        programme: "No loyalty programme applies to this flight",
+        masked: "",
+        note: usable.some((m) => m.category === "airline")
+          ? "none of your airline programmes earn on this carrier"
+          : "no airline programme with a number in your wallet",
+      });
+    }
+    for (const m of usable.filter((m) => m.category === "hotel" && m !== hotelMembership)) {
+      loyaltyNotApplied.push({
+        programme: m.programmeLabel,
+        masked: mask(m.last4),
+        note: "this hotel doesn't earn in this programme",
+      });
+    }
+    for (const m of usable.filter((m) => m.category === "car" && m !== carMembership)) {
+      loyaltyNotApplied.push({
+        programme: m.programmeLabel,
+        masked: mask(m.last4),
+        note: "this rental company doesn't earn in this programme",
       });
     }
 
