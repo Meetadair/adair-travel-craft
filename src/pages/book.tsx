@@ -139,6 +139,18 @@ export function BookPage({ cardId }: { cardId: string }) {
     onSuccess: (data) => setResult(data),
   });
 
+  const updateCompanion = (
+    index: number,
+    patch: Partial<(typeof companions)[number]>,
+  ) =>
+    setCompanions((current) => current.map((c, i) => (i === index ? { ...c, ...patch } : c)));
+
+  /** Passports are collected when the two cities sit in different countries. */
+  const passportNeeded =
+    !!search &&
+    search.request.originCountry !== undefined &&
+    search.request.originCountry !== search.request.destinationCountry;
+
   const travellerReady =
     traveller.givenName.trim().length > 0 &&
     traveller.familyName.trim().length > 0 &&
@@ -162,6 +174,31 @@ export function BookPage({ cardId }: { cardId: string }) {
 
 
   const search = card.data?.search;
+  const paxCount = Math.max(1, search?.request.passengers ?? 1);
+  const fetchCompanions = useServerFn(listCompanions);
+  const saved = useQuery({ queryKey: ["companions"], queryFn: () => fetchCompanions({}) });
+
+  // Match the number of forms to the seats booked, pre-filling saved people.
+  useEffect(() => {
+    setCompanions((current) => {
+      const wanted = paxCount - 1;
+      if (current.length === wanted) return current;
+      const next = current.slice(0, wanted);
+      while (next.length < wanted) {
+        const suggestion = saved.data?.[next.length];
+        next.push({
+          givenName: suggestion?.givenName ?? "",
+          familyName: suggestion?.familyName ?? "",
+          bornOn: suggestion?.bornOn ?? "",
+          gender: "f",
+          title: "ms",
+          passportNumber: "",
+          remember: !suggestion,
+        });
+      }
+      return next;
+    });
+  }, [paxCount, saved.data]);
   const priced = card.data?.priced;
   const insurance = card.data?.insurance ?? null;
   const selectedTotal =
@@ -271,7 +308,9 @@ export function BookPage({ cardId }: { cardId: string }) {
             </div>
 
             <div className="hairline-card mt-6 space-y-4 p-6">
-              <h2 className="font-display text-lg font-semibold">Traveller</h2>
+              <h2 className="font-display text-lg font-semibold">
+                {paxCount === 1 ? "Traveller" : `Travellers · ${paxCount}`}
+              </h2>
               <div className="grid gap-4 sm:grid-cols-2">
                 <label className="block">
                   <span className="text-xs font-medium text-muted-foreground">First name</span>
@@ -335,6 +374,83 @@ export function BookPage({ cardId }: { cardId: string }) {
                   </select>
                 </label>
               </div>
+
+
+              {companions.map((person, index) => (
+                <div key={index} className="space-y-3 border-t border-border pt-4">
+                  <p className="text-xs font-medium text-muted-foreground">
+                    {`Traveller ${index + 2} of ${paxCount}`}
+                  </p>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <label className="block">
+                      <span className="text-xs font-medium text-muted-foreground">First name</span>
+                      <input
+                        className={inputClass}
+                        value={person.givenName}
+                        onChange={(e) => updateCompanion(index, { givenName: e.target.value })}
+                      />
+                    </label>
+                    <label className="block">
+                      <span className="text-xs font-medium text-muted-foreground">Last name</span>
+                      <input
+                        className={inputClass}
+                        value={person.familyName}
+                        onChange={(e) => updateCompanion(index, { familyName: e.target.value })}
+                      />
+                    </label>
+                    <label className="block">
+                      <span className="text-xs font-medium text-muted-foreground">
+                        Date of birth
+                      </span>
+                      <input
+                        type="date"
+                        className={inputClass}
+                        value={person.bornOn}
+                        onChange={(e) => updateCompanion(index, { bornOn: e.target.value })}
+                      />
+                    </label>
+                    <label className="block">
+                      <span className="text-xs font-medium text-muted-foreground">Title</span>
+                      <select
+                        className={inputClass}
+                        value={person.title}
+                        onChange={(e) =>
+                          updateCompanion(index, {
+                            title: e.target.value,
+                            gender: e.target.value === "mr" ? "m" : "f",
+                          })
+                        }
+                      >
+                        <option value="mr">Mr</option>
+                        <option value="ms">Ms</option>
+                        <option value="mrs">Mrs</option>
+                      </select>
+                    </label>
+                    {passportNeeded && (
+                      <label className="block sm:col-span-2">
+                        <span className="text-xs font-medium text-muted-foreground">
+                          Passport number
+                        </span>
+                        <input
+                          className={inputClass}
+                          value={person.passportNumber}
+                          onChange={(e) =>
+                            updateCompanion(index, { passportNumber: e.target.value })
+                          }
+                        />
+                      </label>
+                    )}
+                  </div>
+                  <label className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <input
+                      type="checkbox"
+                      checked={person.remember}
+                      onChange={(e) => updateCompanion(index, { remember: e.target.checked })}
+                    />
+                    Save to the people I travel with
+                  </label>
+                </div>
+              ))}
 
               {account.data?.companies.length ? (
                 <label className="block">
