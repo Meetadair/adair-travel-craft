@@ -41,6 +41,19 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   const router = useRouter();
   useEffect(() => {
     reportLovableError(error, { boundary: "tanstack_root_error_component" });
+    // Also record it in our own error log, so /admin shows recent failures.
+    void import("@/lib/events.functions")
+      .then(({ logAppError }) =>
+        logAppError({
+          data: {
+            message: String(error?.message ?? error).slice(0, 500),
+            ...(error?.stack ? { stack: error.stack.slice(0, 4000) } : {}),
+            route:
+              typeof window === "undefined" ? "server" : window.location.pathname.slice(0, 300),
+          },
+        }),
+      )
+      .catch(() => {});
   }, [error]);
 
   return (
