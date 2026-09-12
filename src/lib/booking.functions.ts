@@ -367,7 +367,6 @@ export const bookTripCard = createServerFn({ method: "POST" })
       await supabase.from("payments").upsert(
         {
           user_id: userId,
-          provider: "duffel-test",
           amount_minor: Math.round(priced.total * 100),
           status: "failed",
           idempotency_key: idempotencyKey,
@@ -469,10 +468,9 @@ export const bookTripCard = createServerFn({ method: "POST" })
       {
         user_id: userId,
         trip_id: tripId,
-        provider: "duffel-test",
         provider_ref: flightOrderId,
         amount_minor: Math.round(confirmedTotal * 100),
-        status: "test_settled",
+        status: settledStatus,
         idempotency_key: idempotencyKey,
         failure_note: status === "partial" ? reason : null,
         ...paymentDetails,
