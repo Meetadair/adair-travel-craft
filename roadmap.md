@@ -184,3 +184,17 @@
       BA / Iberia / Aer Lingus, Bonvoy across its brands, Hertz Gold across
       Hertz-Dollar-Thrifty, and so on). Booking sends the matching number.
 - [x] Where nothing matches: "No loyalty programme applies to this flight."
+
+## Getaway — visual
+- [x] Pictures per destination (own upload wins, Unsplash fallback by name, credit stored)
+      and one optional picture per itinerary day. Uploads are resized in the browser to
+      1600px WebP + JPEG fallback + a 560px email copy under 150 KB, kept in a private
+      Cloud storage bucket and served through /api/public/getaway-image.
+- [x] /getaway leads with a full-width hero, name and theme overlaid on a gradient scrim.
+      One image, never a carousel. No Ken Burns or parallax, so reduced motion is honoured.
+      Everything below the hero lazy-loads with explicit dimensions.
+- [x] Weekly email: picture, then note, then price. Max 600px wide, small JPEG.
+- [x] No picture and no UNSPLASH_ACCESS_KEY → calm typographic header, never a grey box.
+- [x] Hotels deliberately have no pictures until the hotel supplier is enabled and its
+      own property photos are available.
+- [x] UNSPLASH_ACCESS_KEY shown on /dev/status.
