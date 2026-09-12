@@ -112,6 +112,24 @@ export function SiteNav() {
           >
             {t.nav.trips}
           </Link>
+          {signedIn && (
+            <>
+              <Link
+                to="/invoices"
+                className={`hidden sm:inline-block ${linkClass}`}
+                activeProps={{ className: "text-foreground" }}
+              >
+                Invoices
+              </Link>
+              <Link
+                to="/preferences"
+                className={linkClass}
+                activeProps={{ className: "text-foreground" }}
+              >
+                Settings
+              </Link>
+            </>
+          )}
           <LanguageMenu />
           {signedIn ? (
             <Link
