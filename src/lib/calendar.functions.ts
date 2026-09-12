@@ -17,6 +17,8 @@ export type CalendarSettings = {
     provider: CalendarProviderName;
     accountEmail: string | null;
     connectedAt: string;
+    /** Optional read access: lets Adair spot trips from their calendar. */
+    readEnabled: boolean;
   }>;
   /** Unguessable path for the .ics subscription feed, without the host. */
   feedPath: string;
@@ -35,7 +37,7 @@ export const getCalendarSettings = createServerFn({ method: "GET" })
 
     const connectionsRes = await supabase
       .from("calendar_connections")
-      .select("provider, account_email, created_at")
+      .select("provider, account_email, created_at, read_enabled")
       .eq("user_id", userId);
 
     let feedRes = await supabase
@@ -55,6 +57,7 @@ export const getCalendarSettings = createServerFn({ method: "GET" })
         provider: row.provider as CalendarProviderName,
         accountEmail: row.account_email,
         connectedAt: row.created_at,
+        readEnabled: Boolean(row.read_enabled),
       })),
       feedPath: `/api/public/calendar/feed/${feedRes.data?.token ?? ""}.ics`,
     };
@@ -68,6 +71,8 @@ export const startCalendarConnect = createServerFn({ method: "POST" })
         provider: providerSchema,
         origin: z.string().url(),
         timeZone: z.string().max(64).optional(),
+        /** Ask for read access too (spotting trips) — separate opt-in. */
+        read: z.boolean().optional(),
       })
       .parse(input),
   )
@@ -76,7 +81,8 @@ export const startCalendarConnect = createServerFn({ method: "POST" })
     const { authorizeUrl, providerAvailable } = await import("@/lib/calendar/providers.server");
     if (!providerAvailable(data.provider)) throw new Error("provider-not-configured");
 
-    const state = randomToken();
+    // The "read_" prefix tells the callback this consent included read access.
+    const state = `${data.read ? "read_" : ""}${randomToken()}`;
     const redirectUri = `${data.origin.replace(/\/$/, "")}/api/public/calendar/callback/${data.provider}`;
     const insert = await supabase.from("calendar_oauth_states").insert({
       state,
@@ -87,7 +93,7 @@ export const startCalendarConnect = createServerFn({ method: "POST" })
     });
     if (insert.error) throw new Error(insert.error.message);
 
-    return { url: authorizeUrl(data.provider, { redirectUri, state }) };
+    return { url: authorizeUrl(data.provider, { redirectUri, state, read: data.read === true }) };
   });
 
 export const disconnectCalendar = createServerFn({ method: "POST" })
@@ -152,4 +158,112 @@ export const syncMyTripsToCalendars = createServerFn({ method: "POST" })
       });
     }
     return { events };
+  });
+
+/**
+ * Reading the calendar to spot trips — a separate, optional opt-in on top of
+ * the existing write connection. Off by default.
+ */
+export const setCalendarRead = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ provider: providerSchema, enabled: z.boolean() }).parse(input),
+  )
+  .handler(async ({ data, context }): Promise<{ ok: true; needsConsent: boolean }> => {
+    const { supabase, userId } = context;
+    const res = await supabase
+      .from("calendar_connections")
+      .update({ read_enabled: data.enabled })
+      .eq("user_id", userId)
+      .eq("provider", data.provider);
+    if (res.error) throw new Error(res.error.message);
+
+    if (!data.enabled) {
+      // Turning it off deletes everything we stored from their calendar.
+      await supabase
+        .from("calendar_trip_hints")
+        .delete()
+        .eq("user_id", userId)
+        .eq("provider", data.provider);
+    }
+    return { ok: true, needsConsent: data.enabled };
+  });
+
+export const scanCalendarHints = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<{ found: number }> => {
+    const { supabase, userId } = context;
+    const profile = await supabase
+      .from("profiles")
+      .select("home_airport")
+      .eq("id", userId)
+      .maybeSingle();
+    const homeIata = (profile.data?.home_airport ?? "WAW").toUpperCase();
+    const { scanHints } = await import("@/lib/calendar/hints.server");
+    const result = await scanHints(supabase, userId, homeIata);
+    return { found: result.found };
+  });
+
+export type TripHintRow = {
+  id: string;
+  title: string;
+  city: string;
+  location: string;
+  startsAt: string;
+  endsAt: string;
+  sentence: string;
+};
+
+export const listTripHints = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<{ hints: TripHintRow[]; readEnabled: boolean }> => {
+    const { supabase, userId } = context;
+    const [profile, connections, hints] = await Promise.all([
+      supabase.from("profiles").select("home_airport").eq("id", userId).maybeSingle(),
+      supabase.from("calendar_connections").select("read_enabled").eq("user_id", userId),
+      supabase
+        .from("calendar_trip_hints")
+        .select("id, title, city, location, starts_at, ends_at")
+        .eq("user_id", userId)
+        .is("dismissed_at", null)
+        .gte("ends_at", new Date().toISOString())
+        .order("starts_at", { ascending: true })
+        .limit(5),
+    ]);
+
+    const { CITIES } = await import("@/lib/trip/cities");
+    const { hintSentence } = await import("@/lib/calendar/hints");
+    const homeIata = (profile.data?.home_airport ?? "WAW").toUpperCase();
+    const homeCity = CITIES.find((c) => c.iata === homeIata)?.city ?? "home";
+
+    return {
+      readEnabled: (connections.data ?? []).some((c) => c.read_enabled),
+      hints: (hints.data ?? []).map((row) => ({
+        id: row.id,
+        title: row.title,
+        city: row.city,
+        location: row.location,
+        startsAt: row.starts_at,
+        endsAt: row.ends_at,
+        sentence: hintSentence(
+          { city: row.city, startsAt: row.starts_at, endsAt: row.ends_at },
+          homeCity,
+        ),
+      })),
+    };
+  });
+
+/** Dismissing is final: the suggestion never comes back. */
+export const dismissTripHint = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const res = await supabase
+      .from("calendar_trip_hints")
+      .update({ dismissed_at: new Date().toISOString() })
+      .eq("user_id", userId)
+      .eq("id", data.id);
+    if (res.error) throw new Error(res.error.message);
+    return { ok: true };
   });

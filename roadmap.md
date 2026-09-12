@@ -118,3 +118,12 @@
 - [x] 3 — Referrals and credit: `referral_codes` (one code per traveller, created on first use), `referrals` (one attribution per invited traveller), `credits` ledger. `/r/:code` remembers the code and sends the visitor to sign in; the code is claimed once they are signed in. Both sides are paid only when the invited traveller's FIRST booking confirms — €40 referrer, €20 friend — and never on signup. Credit is applied automatically against the next booking total and shown with balance and history at `/credit`. Vouchers only, never stored money.
 - [x] 4 — Waitlist no longer diverges: `waitlist` carries `invited_at`, `invite_error`, `user_id`; `/admin` lists everyone waiting and turns sign-ups into real account invitations in batches, marking already-registered addresses as reconciled.
 - [x] 5 — PWA: `public/manifest.webmanifest`, icons generated from the Adair logo, `public/service-worker.js` caching only the offline shell and static assets (never `/api/*` or server-function calls), `public/offline.html` saying plainly that searching and booking need a connection. No offline booking.
+
+## Personal example prompts + calendar-read trip hints (this round)
+- [x] `src/lib/prompt-suggestions.ts` — pure builder: always departs the stored home airport, then repeat-a-past-trip, default-invoice-company, in-season/in-reach Getaway match, must-arrive-by example; rotates daily by user seed, tapping fills the input without submitting. 8 unit tests.
+- [x] `src/lib/suggestions.functions.ts` — authenticated server fn feeding the builder from profile / preferences / past trips / default company / active getaway destinations. Signed-out marketing page keeps the generic examples, unchanged.
+- [x] Calendar read is a SEPARATE optional opt-in (`calendar_connections.read_enabled`, read scopes requested only when asked via a `read_` state prefix); turning it off deletes the stored hints.
+- [x] `calendar_trip_hints` (owner-only): only future, non-all-day, non-recurring events whose location resolves to a city away from home, 90-day window, minimal fields only; past hints purged, dismissal final. 8 unit tests.
+- [x] `src/components/calendar-trip-hints.tsx` — suggestion cards above the input ("Shall I plan the trip?"), prefilling a must-arrive-by sentence into the existing backwards planning. Never books automatically.
+- [x] No mailbox/email reading anywhere — deliberately out of scope.
+- Build clean: tsgo clean, 104 tests pass, `/`, `/assistant`, `/preferences`, `/trips` all 200.

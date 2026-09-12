@@ -40,7 +40,7 @@ const MS_SCOPES = ["offline_access", "openid", "email", "Calendars.ReadWrite", "
 
 export function authorizeUrl(
   provider: CalendarProvider,
-  opts: { redirectUri: string; state: string },
+  opts: { redirectUri: string; state: string; read?: boolean },
 ): string {
   const creds = providerCreds(provider);
   if (!creds) throw new Error("provider-not-configured");
@@ -49,7 +49,7 @@ export function authorizeUrl(
       client_id: creds.clientId,
       redirect_uri: opts.redirectUri,
       response_type: "code",
-      scope: GOOGLE_SCOPES.join(" "),
+      scope: (opts.read ? readScopes("google") : GOOGLE_SCOPES).join(" "),
       access_type: "offline",
       include_granted_scopes: "true",
       prompt: "consent",
@@ -62,7 +62,7 @@ export function authorizeUrl(
     redirect_uri: opts.redirectUri,
     response_type: "code",
     response_mode: "query",
-    scope: MS_SCOPES.join(" "),
+    scope: (opts.read ? readScopes("microsoft") : MS_SCOPES).join(" "),
     state: opts.state,
   });
   return `https://login.microsoftonline.com/common/oauth2/v2.0/authorize?${params.toString()}`;
@@ -256,4 +256,97 @@ export async function removeEvent(
       ? `${googleEventsUrl(opts.calendarId)}/${encodeURIComponent(opts.eventId)}`
       : `https://graph.microsoft.com/v1.0/me/events/${encodeURIComponent(opts.eventId)}`;
   await callApi(url, opts.accessToken, "DELETE");
+}
+
+/**
+ * Reading is a separate, optional consent. These scopes are only requested
+ * when the customer opts in to letting Adair spot trips, and they are
+ * read-only: we can list events, never change or delete them.
+ */
+const GOOGLE_READ_SCOPE = "https://www.googleapis.com/auth/calendar.readonly";
+const MS_READ_SCOPE = "Calendars.Read";
+
+/** One upcoming event, reduced to the few fields a trip hint needs. */
+export type RawCalendarEvent = {
+  id: string;
+  title: string;
+  location: string | null;
+  start: string | null;
+  end: string | null;
+  allDay: boolean;
+  recurring: boolean;
+};
+
+/** Forward-looking events in a window. Read-only; no other calendar data. */
+export async function listUpcomingEvents(
+  provider: CalendarProvider,
+  opts: { accessToken: string; calendarId: string; from: Date; to: Date; limit?: number },
+): Promise<RawCalendarEvent[]> {
+  const limit = opts.limit ?? 100;
+  const timeMin = opts.from.toISOString();
+  const timeMax = opts.to.toISOString();
+
+  if (provider === "google") {
+    const params = new URLSearchParams({
+      timeMin,
+      timeMax,
+      singleEvents: "true",
+      orderBy: "startTime",
+      maxResults: String(limit),
+      fields: "items(id,summary,location,start,end,recurringEventId)",
+    });
+    const json = await callApi(
+      `${googleEventsUrl(opts.calendarId)}?${params.toString()}`,
+      opts.accessToken,
+      "GET",
+    );
+    const items = (json?.["items"] ?? []) as Array<Record<string, never>>;
+    return items.map((item) => {
+      const start = item["start"] as unknown as { date?: string; dateTime?: string } | undefined;
+      const end = item["end"] as unknown as { date?: string; dateTime?: string } | undefined;
+      return {
+        id: String(item["id"] ?? ""),
+        title: String(item["summary"] ?? ""),
+        location: (item["location"] as unknown as string) ?? null,
+        start: start?.dateTime ?? start?.date ?? null,
+        end: end?.dateTime ?? end?.date ?? null,
+        allDay: Boolean(start?.date && !start?.dateTime),
+        recurring: Boolean(item["recurringEventId"]),
+      };
+    });
+  }
+
+  const params = new URLSearchParams({
+    startDateTime: timeMin,
+    endDateTime: timeMax,
+    $top: String(limit),
+    $select: "id,subject,location,start,end,isAllDay,type,seriesMasterId",
+  });
+  const json = await callApi(
+    `https://graph.microsoft.com/v1.0/me/calendarView?${params.toString()}`,
+    opts.accessToken,
+    "GET",
+  );
+  const items = (json?.["value"] ?? []) as Array<Record<string, never>>;
+  return items.map((item) => {
+    const start = item["start"] as unknown as { dateTime?: string } | undefined;
+    const end = item["end"] as unknown as { dateTime?: string } | undefined;
+    const location = item["location"] as unknown as { displayName?: string } | undefined;
+    const type = String(item["type"] ?? "singleInstance");
+    return {
+      id: String(item["id"] ?? ""),
+      title: String(item["subject"] ?? ""),
+      location: location?.displayName ?? null,
+      start: start?.dateTime ? `${start.dateTime}Z`.replace(/Z+$/, "Z") : null,
+      end: end?.dateTime ? `${end.dateTime}Z`.replace(/Z+$/, "Z") : null,
+      allDay: Boolean(item["isAllDay"]),
+      recurring: type !== "singleInstance" || Boolean(item["seriesMasterId"]),
+    };
+  });
+}
+
+export function readScopes(provider: CalendarProvider): string[] {
+  return provider === "google"
+    ? [...GOOGLE_SCOPES, GOOGLE_READ_SCOPE]
+    : [...MS_SCOPES, MS_READ_SCOPE];
 }

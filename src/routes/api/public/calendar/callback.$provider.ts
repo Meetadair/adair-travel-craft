@@ -52,6 +52,8 @@ export const Route = createFileRoute("/api/public/calendar/callback/$provider")(
               expires_at: tokens.expiresAt,
               calendar_id: "primary",
               time_zone: row.time_zone,
+              // Read access only when the customer opted in for this consent.
+              read_enabled: state.startsWith("read_"),
             },
             { onConflict: "user_id,provider" },
           );
