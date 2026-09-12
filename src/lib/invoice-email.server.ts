@@ -23,6 +23,8 @@ export type InvoiceEmailInput = {
   endDate: string | null;
   totalEur: number;
   testMode: boolean;
+  /** Set when this invoice corrects an earlier one after a trip change. */
+  correctionOf?: string | null;
   lines: InvoiceEmailLine[];
 };
 
@@ -65,9 +67,11 @@ export async function sendInvoiceEmail(
 
   const html = `<div style="font-family:Helvetica,Arial,sans-serif;color:#2e2921;max-width:560px">
     <p style="font-size:20px;font-weight:600;margin:0 0 4px">Adair.</p>
-    <p style="margin:0 0 16px;color:#8f8b85">VAT invoice ${input.documentNumber}${
-      input.testMode ? " · Test mode — no real charge" : ""
-    }</p>
+    <p style="margin:0 0 16px;color:#8f8b85">${
+      input.correctionOf ? "Corrected VAT invoice" : "VAT invoice"
+    } ${input.documentNumber}${
+      input.correctionOf ? ` · replaces ${input.correctionOf}` : ""
+    }${input.testMode ? " · Test mode — no real charge" : ""}</p>
     <p style="margin:0 0 4px"><strong>${input.companyName ?? ""}</strong></p>
     <p style="margin:0 0 16px;color:#6b665e">${input.companyAddress.join(", ")}${
       input.companyVatId ? `<br>VAT ID ${input.companyVatId}` : ""
@@ -87,7 +91,7 @@ export async function sendInvoiceEmail(
     body: JSON.stringify({
       from: process.env["RESEND_FROM"] ?? "Adair <onboarding@resend.dev>",
       to: recipients,
-      subject: `Invoice ${input.documentNumber} · ${route || "Adair trip"}`,
+      subject: `${input.correctionOf ? "Corrected invoice" : "Invoice"} ${input.documentNumber} · ${route || "Adair trip"}`,
       html,
     }),
   });
