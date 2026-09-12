@@ -431,3 +431,81 @@ export const inviteWaitlist = createServerFn({ method: "POST" })
     });
     return { invited, skipped, failed };
   });
+
+/* ------------------------------ help requests ------------------------------ */
+
+export type AdminSupportRequest = {
+  id: string;
+  category: string;
+  urgency: string;
+  status: string;
+  description: string;
+  createdAt: string;
+  contactEmail: string | null;
+  tripId: string | null;
+  tripReference: string | null;
+  tripTitle: string | null;
+  tripStatus: string | null;
+  tripDates: string | null;
+  tripTotalEur: number | null;
+};
+
+export const listSupportRequests = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<AdminSupportRequest[]> => {
+    await assertAdmin(context.supabase, context.userId);
+    const db = await admin();
+    const { data, error } = await db
+      .from("support_requests")
+      .select(
+        "id, category, urgency, status, description, created_at, contact_email, trip_id, trip_reference, trips(title, status, start_date, end_date, total_amount)",
+      )
+      .order("created_at", { ascending: false })
+      .limit(100);
+    if (error) throw new Error(error.message);
+    return ((data ?? []) as Array<Record<string, unknown>>).map((row) => {
+      const trip = (row["trips"] ?? null) as Record<string, unknown> | null;
+      const start = (trip?.["start_date"] as string | null) ?? null;
+      const end = (trip?.["end_date"] as string | null) ?? null;
+      return {
+        id: row["id"] as string,
+        category: row["category"] as string,
+        urgency: row["urgency"] as string,
+        status: row["status"] as string,
+        description: (row["description"] as string) ?? "",
+        createdAt: row["created_at"] as string,
+        contactEmail: (row["contact_email"] as string | null) ?? null,
+        tripId: (row["trip_id"] as string | null) ?? null,
+        tripReference: (row["trip_reference"] as string | null) ?? null,
+        tripTitle: (trip?.["title"] as string | null) ?? null,
+        tripStatus: (trip?.["status"] as string | null) ?? null,
+        tripDates: start ? `${start}${end ? ` → ${end}` : ""}` : null,
+        tripTotalEur: trip?.["total_amount"] == null ? null : Number(trip["total_amount"]),
+      };
+    });
+  });
+
+export const setSupportStatus = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        id: z.string().uuid(),
+        status: z.enum(["open", "in progress", "resolved"]),
+        adminNote: z.string().trim().max(2000).nullable().default(null),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const db = await admin();
+    const { error } = await db
+      .from("support_requests")
+      .update({ status: data.status, admin_note: data.adminNote })
+      .eq("id", data.id);
+    if (error) throw new Error(error.message);
+    await writeAudit(context.userId, "support.status", `support_request:${data.id}`, null, {
+      status: data.status,
+    });
+    return { ok: true };
+  });
