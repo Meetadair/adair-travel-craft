@@ -122,6 +122,7 @@ export const searchLiveTrip = createServerFn({ method: "POST" })
       cabinClass: (row?.["cabin_class"] as string) ?? "economy",
       maxConnections: Number(row?.["max_connections"] ?? 1),
       hotelMaxKm: (row?.["hotel_max_km"] as number | null) ?? null,
+      dealbreakers: list(row?.["dealbreakers"]),
     };
 
     const parsed = parseTripSentence(data.sentence, new Date(), profile?.home_airport);
@@ -483,6 +484,7 @@ export const swapCardAlternative = createServerFn({ method: "POST" })
       cabinClass: (prefRow?.["cabin_class"] as string) ?? "economy",
       maxConnections: Number(prefRow?.["max_connections"] ?? 1),
       hotelMaxKm: (prefRow?.["hotel_max_km"] as number | null) ?? null,
+      dealbreakers: list(prefRow?.["dealbreakers"]),
     };
     const { matchSummary, budgetStatus } = await import("@/lib/trip/match");
     const match = matchSummary(search, searchPrefs);
