@@ -210,4 +210,6 @@
 - [x] Creator-submitted places stay hidden until editorial approval; approved ones show "Recommended by …" plus a plain "Creator partner" label and link to /c/:handle
 - [x] Bookings of a creator-recommended place earn that creator, even without their link
 - [x] Content licence acceptance stored with a timestamp; licence wording is a placeholder for counsel
+- [x] "Recommended by" shows the creator's avatar (or their initial) next to the name
+- [x] Tests cover accrual (attribution, curation, expired window, paused creator, markup-derived margin, extras mapping, skipped failed lines) and reversal
 - [ ] Flat subscription commission (€10/€25) pays out when paid plans go live

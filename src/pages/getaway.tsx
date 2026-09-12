@@ -197,16 +197,30 @@ export function GetawayPage() {
                             <p className="mt-2 text-sm text-muted-foreground">{place.whyThisOne}</p>
                           )}
                           {place.recommendedBy && (
-                            <p className="mt-2 text-xs text-muted-foreground">
-                              Recommended by{" "}
-                              <Link
-                                to="/c/$handle"
-                                params={{ handle: place.recommendedBy.handle }}
-                                className="text-primary underline-offset-4 hover:underline"
-                              >
-                                {place.recommendedBy.name}
-                              </Link>{" "}
-                              · Creator partner
+                            <p className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
+                              {place.recommendedBy.avatarUrl ? (
+                                <img
+                                  src={place.recommendedBy.avatarUrl}
+                                  alt={place.recommendedBy.name}
+                                  loading="lazy"
+                                  className="size-6 rounded-full border border-border object-cover"
+                                />
+                              ) : (
+                                <span className="flex size-6 items-center justify-center rounded-full border border-border text-[10px] font-semibold uppercase">
+                                  {place.recommendedBy.name.slice(0, 1)}
+                                </span>
+                              )}
+                              <span>
+                                Recommended by{" "}
+                                <Link
+                                  to="/c/$handle"
+                                  params={{ handle: place.recommendedBy.handle }}
+                                  className="text-primary underline-offset-4 hover:underline"
+                                >
+                                  {place.recommendedBy.name}
+                                </Link>{" "}
+                                · Creator partner
+                              </span>
                             </p>
                           )}
                         </li>
