@@ -32,6 +32,7 @@ import { Route as ApiTripParseRouteImport } from './routes/api/trip/parse'
 import { Route as ApiTripPriceContextRouteImport } from './routes/api/trip/price-context'
 import { Route as ApiTripSearchRouteImport } from './routes/api/trip/search'
 import { Route as ApiPublicCalendarCallbackProviderRouteImport } from './routes/api/public/calendar/callback.$provider'
+import { Route as ApiPublicCalendarFeedTokenRouteImport } from './routes/api/public/calendar/feed.$token'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -149,6 +150,12 @@ const ApiPublicCalendarCallbackProviderRoute =
     path: '/api/public/calendar/callback/$provider',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicCalendarFeedTokenRoute =
+  ApiPublicCalendarFeedTokenRouteImport.update({
+    id: '/api/public/calendar/feed/$token',
+    path: '/api/public/calendar/feed/$token',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -173,6 +180,7 @@ export interface FileRoutesByFullPath {
   '/api/trip/price-context': typeof ApiTripPriceContextRoute
   '/api/trip/search': typeof ApiTripSearchRoute
   '/api/public/calendar/callback/$provider': typeof ApiPublicCalendarCallbackProviderRoute
+  '/api/public/calendar/feed/$token': typeof ApiPublicCalendarFeedTokenRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -196,6 +204,7 @@ export interface FileRoutesByTo {
   '/api/trip/price-context': typeof ApiTripPriceContextRoute
   '/api/trip/search': typeof ApiTripSearchRoute
   '/api/public/calendar/callback/$provider': typeof ApiPublicCalendarCallbackProviderRoute
+  '/api/public/calendar/feed/$token': typeof ApiPublicCalendarFeedTokenRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -222,6 +231,7 @@ export interface FileRoutesById {
   '/api/trip/price-context': typeof ApiTripPriceContextRoute
   '/api/trip/search': typeof ApiTripSearchRoute
   '/api/public/calendar/callback/$provider': typeof ApiPublicCalendarCallbackProviderRoute
+  '/api/public/calendar/feed/$token': typeof ApiPublicCalendarFeedTokenRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -248,6 +258,7 @@ export interface FileRouteTypes {
     | '/api/trip/price-context'
     | '/api/trip/search'
     | '/api/public/calendar/callback/$provider'
+    | '/api/public/calendar/feed/$token'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -271,6 +282,7 @@ export interface FileRouteTypes {
     | '/api/trip/price-context'
     | '/api/trip/search'
     | '/api/public/calendar/callback/$provider'
+    | '/api/public/calendar/feed/$token'
   id:
     | '__root__'
     | '/'
@@ -296,6 +308,7 @@ export interface FileRouteTypes {
     | '/api/trip/price-context'
     | '/api/trip/search'
     | '/api/public/calendar/callback/$provider'
+    | '/api/public/calendar/feed/$token'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -310,6 +323,7 @@ export interface RootRouteChildren {
   ApiTripPriceContextRoute: typeof ApiTripPriceContextRoute
   ApiTripSearchRoute: typeof ApiTripSearchRoute
   ApiPublicCalendarCallbackProviderRoute: typeof ApiPublicCalendarCallbackProviderRoute
+  ApiPublicCalendarFeedTokenRoute: typeof ApiPublicCalendarFeedTokenRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -475,6 +489,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicCalendarCallbackProviderRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/calendar/feed/$token': {
+      id: '/api/public/calendar/feed/$token'
+      path: '/api/public/calendar/feed/$token'
+      fullPath: '/api/public/calendar/feed/$token'
+      preLoaderRoute: typeof ApiPublicCalendarFeedTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -532,6 +553,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiTripSearchRoute: ApiTripSearchRoute,
   ApiPublicCalendarCallbackProviderRoute:
     ApiPublicCalendarCallbackProviderRoute,
+  ApiPublicCalendarFeedTokenRoute: ApiPublicCalendarFeedTokenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
