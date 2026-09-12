@@ -30,16 +30,44 @@ export function TripRoute({
   reordering?: boolean;
 }) {
   const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const [overIndex, setOverIndex] = useState<number | null>(null);
   const distance = routeDistanceKm(stops);
   const shortest = bestOrderDistanceKm(stops);
   const detour = distance - shortest;
 
   const move = (from: number, to: number) => {
-    if (!onReorder || to < 0 || to >= stops.length) return;
+    if (!onReorder || to < 0 || to >= stops.length || from === to) return;
     const next = [...stops];
     const [item] = next.splice(from, 1);
     next.splice(to, 0, item!);
     onReorder(next);
+  };
+
+  /** Finger/pen dragging: find the stop under the pointer and drop there. */
+  const indexUnderPointer = (x: number, y: number) => {
+    const node = document.elementFromPoint(x, y)?.closest("[data-stop-index]");
+    const raw = node?.getAttribute("data-stop-index");
+    return raw === null || raw === undefined ? null : Number(raw);
+  };
+
+  const handlePointerDown = (index: number) => (event: React.PointerEvent) => {
+    if (!onReorder) return;
+    event.preventDefault();
+    (event.target as HTMLElement).setPointerCapture?.(event.pointerId);
+    setDragIndex(index);
+    setOverIndex(index);
+  };
+
+  const handlePointerMove = (event: React.PointerEvent) => {
+    if (dragIndex === null) return;
+    const target = indexUnderPointer(event.clientX, event.clientY);
+    if (target !== null) setOverIndex(target);
+  };
+
+  const handlePointerUp = () => {
+    if (dragIndex !== null && overIndex !== null) move(dragIndex, overIndex);
+    setDragIndex(null);
+    setOverIndex(null);
   };
 
   return (
