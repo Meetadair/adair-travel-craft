@@ -4,6 +4,7 @@
  * failing part returns a short note instead of breaking the response.
  */
 import { findByName } from "./match";
+import { guestsPerRoom, roomsFor } from "./passengers";
 import {
   carScore,
   carsPassingDealbreakers,
@@ -286,8 +287,9 @@ export async function searchStay(
     data: {
       check_in_date: req.departDate,
       check_out_date: req.returnDate,
-      rooms: 1,
-      guests: [{ type: "adult" }],
+      // Two share a room; three or more get doubles rather than one big room.
+      rooms: roomsFor(req.passengers),
+      guests: Array.from({ length: guestsPerRoom(req.passengers) }, () => ({ type: "adult" })),
       location: sample
         ? {
             radius: TEST_LOCATION.radius,
