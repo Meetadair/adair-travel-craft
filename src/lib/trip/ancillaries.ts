@@ -3,7 +3,8 @@
  * fare. Nothing here invents an option: everything comes from the supplier's
  * own list of available services. Pure functions only, safe on the client.
  */
-import { grossMinor, type MarkupRule } from "./pricing-shared";
+/** The markup applied to extras, in basis points, from `pricing_rules`. */
+export type MarkupRule = { markupBps: number; discountBps: number };
 
 export type AncillaryKind = "bag" | "seat";
 
@@ -39,7 +40,8 @@ export const ANCILLARY_NO_SEATS_NOTE =
 
 /** Applies the extras markup to a supplier price. */
 export function customerPriceEur(netEur: number, rule: MarkupRule): number {
-  return grossMinor(netEur, rule) / 100;
+  const bps = 10_000 + rule.markupBps - rule.discountBps;
+  return Math.round(Math.round(netEur * 100) * (bps / 10_000)) / 100;
 }
 
 export function bagLabel(weightKg: number | null): string {
