@@ -242,6 +242,9 @@ export function AdminPage() {
           <Link to="/admin/payments" className="text-primary underline-offset-4 hover:underline">
             Payments
           </Link>
+          <Link to="/admin/creators" className="text-primary underline-offset-4 hover:underline">
+            Creators
+          </Link>
         </p>
 
         {overview.isLoading && <p className="mt-8 text-sm text-muted-foreground">Loading…</p>}
