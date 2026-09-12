@@ -331,3 +331,103 @@ export const cancelTripAsAdmin = createServerFn({ method: "POST" })
     });
     return { ok: true };
   });
+
+export type WaitlistRow = {
+  id: string;
+  email: string;
+  type: string;
+  createdAt: string;
+  invitedAt: string | null;
+  inviteError: string | null;
+  hasAccount: boolean;
+};
+
+/** Everyone waiting, newest first, with whether they already have an account. */
+export const listWaitlist = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<WaitlistRow[]> => {
+    await assertAdmin(context.supabase, context.userId);
+    const sb = await admin();
+    const res = await sb
+      .from("waitlist")
+      .select("id, email, type, created_at, invited_at, invite_error, user_id")
+      .order("created_at", { ascending: false })
+      .limit(200);
+    if (res.error) throw new Error(res.error.message);
+    return ((res.data ?? []) as Array<Record<string, unknown>>).map((row) => ({
+      id: String(row['id']),
+      email: String(row['email']),
+      type: String(row['type']),
+      createdAt: String(row['created_at']),
+      invitedAt: (row['invited_at'] as string | null) ?? null,
+      inviteError: (row['invite_error'] as string | null) ?? null,
+      hasAccount: Boolean(row['user_id']),
+    }));
+  });
+
+/**
+ * Turns waiting sign-ups into real account invitations, so the waitlist and the
+ * accounts stop drifting apart. Already-invited rows are skipped.
+ */
+export const inviteWaitlist = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ ids: z.array(z.string().uuid()).min(1).max(50) }).parse(input),
+  )
+  .handler(async ({ context, data }): Promise<{ invited: number; skipped: number; failed: number }> => {
+    await assertAdmin(context.supabase, context.userId);
+    const sb = await admin();
+    const res = await sb
+      .from("waitlist")
+      .select("id, email, invited_at, user_id")
+      .in("id", data.ids);
+    if (res.error) throw new Error(res.error.message);
+
+    let invited = 0;
+    let skipped = 0;
+    let failed = 0;
+
+    for (const row of (res.data ?? []) as Array<{
+      id: string;
+      email: string;
+      invited_at: string | null;
+      user_id: string | null;
+    }>) {
+      if (row.invited_at || row.user_id) {
+        skipped += 1;
+        continue;
+      }
+      const result = await sb.auth.admin.inviteUserByEmail(row.email);
+      if (result.error) {
+        // Already registered counts as reconciled, not as a failure.
+        const message = result.error.message;
+        const known = /already/i.test(message);
+        await sb
+          .from("waitlist")
+          .update({
+            invited_at: known ? new Date().toISOString() : null,
+            invite_error: known ? null : message,
+          })
+          .eq("id", row.id);
+        if (known) invited += 1;
+        else failed += 1;
+      } else {
+        await sb
+          .from("waitlist")
+          .update({
+            invited_at: new Date().toISOString(),
+            invite_error: null,
+            user_id: result.data.user?.id ?? null,
+          })
+          .eq("id", row.id);
+        invited += 1;
+      }
+    }
+
+    await writeAudit(sb, context.userId, "waitlist.invite", "waitlist", null, {
+      invited,
+      skipped,
+      failed,
+    });
+    return { invited, skipped, failed };
+  });
