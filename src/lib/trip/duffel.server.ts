@@ -363,7 +363,7 @@ export async function searchStay(
 
   // Above the 25th price percentile, then ranked by the traveller's hotel
   // preferences (chain, stars, rating, amenities) rather than price alone.
-  const prices = results.map((r) => Number(r.cheapest_rate_total_amount)).sort((a, b) => a - b);
+  const prices = mapped.map((m) => m.result.amount).sort((a, b) => a - b);
   const floor = prices[Math.floor(prices.length * 0.25)] ?? prices[0]!;
   const pool = mapped.filter((m) => m.result.amount >= floor);
   const best = (pool.length ? pool : mapped)
