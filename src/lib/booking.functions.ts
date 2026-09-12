@@ -758,6 +758,10 @@ export const cancelTripItem = createServerFn({ method: "POST" })
       .eq("id", item.id)
       .eq("user_id", userId);
 
+    // Remove this line's events from any connected calendar.
+    const { removeItemFromCalendars } = await import("@/lib/calendar/sync.server");
+    await removeItemFromCalendars(supabase, userId, item.id);
+
     const remaining = await supabase
       .from("trip_items")
       .select("amount, status")
