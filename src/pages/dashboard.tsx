@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { FileDown, Plane, BedDouble, CarFront, Trash2, LogOut } from "lucide-react";
 import { SiteNav } from "@/components/site-nav";
+import { RefineProfilePrompt } from "@/components/prefs/refine-prompt";
 import { supabase } from "@/integrations/supabase/client";
 import { listTrips, deleteTrip, getProfile, saveProfile } from "@/lib/travel.functions";
 import { downloadTripInvoice } from "@/lib/trip-pdf";
@@ -127,6 +128,8 @@ export function DashboardPage() {
             <LogOut className="size-4" /> {t.dashboard.signOut}
           </button>
         </div>
+
+        <RefineProfilePrompt />
 
         {trips.isLoading && (
           <p className="mt-10 text-sm text-muted-foreground">{t.dashboard.loading}</p>
