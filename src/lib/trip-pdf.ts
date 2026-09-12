@@ -199,7 +199,9 @@ export async function downloadTripInvoice(data: InvoiceData) {
     });
     y -= 12;
     page.drawText(item.detail.slice(0, 70), { x: M, y, size: 8.5, font, color: INK_SOFT });
-    page.drawText(`${item.provider} · ${item.offerReference}`.slice(0, 34), {
+    // The traveller buys from Adair: show the booking reference only, never the
+    // supplier that fulfilled it.
+    page.drawText(`${item.offerReference ?? ""}`.slice(0, 34), {
       x: M + 250,
       y: y + 12,
       size: 8,
