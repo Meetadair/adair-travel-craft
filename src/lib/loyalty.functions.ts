@@ -16,6 +16,8 @@ export type Membership = {
   airlineIata: string | null;
   last4: string;
   tier: string | null;
+  /** False when the traveller kept the programme but hasn't given the number. */
+  hasNumber: boolean;
 };
 
 type Row = {
@@ -24,7 +26,7 @@ type Row = {
   programme_code: string;
   programme_label: string;
   airline_iata: string | null;
-  member_number_last4: string;
+  member_number_last4: string | null;
   tier: string | null;
 };
 
@@ -36,8 +38,9 @@ const toMembership = (row: Row): Membership => ({
   programmeCode: row.programme_code,
   programmeLabel: row.programme_label,
   airlineIata: row.airline_iata,
-  last4: row.member_number_last4,
+  last4: row.member_number_last4 ?? "",
   tier: row.tier,
+  hasNumber: Boolean(row.member_number_last4),
 });
 
 const upsertSchema = z.object({
@@ -51,7 +54,9 @@ const upsertSchema = z.object({
     .regex(/^[A-Z0-9]{2}$/)
     .nullable()
     .optional(),
-  memberNumber: z.string().trim().min(4).max(40),
+  // A programme with no number is kept, but marked incomplete: miles are only
+  // credited when the number reaches the supplier at booking.
+  memberNumber: z.string().trim().max(40),
   tier: z.string().trim().max(40).nullable().optional(),
 });
 
@@ -73,14 +78,15 @@ export const saveMembership = createServerFn({ method: "POST" })
   .handler(async ({ data, context }): Promise<Membership> => {
     const { encryptSecret } = await import("@/lib/loyalty/crypto.server");
     const number = data.memberNumber.replace(/\s+/g, "");
+    const hasNumber = number.length >= 4;
     const row = {
       user_id: context.userId,
       category: data.category,
       programme_code: data.programmeCode,
       programme_label: data.programmeLabel,
       airline_iata: data.airlineIata ?? null,
-      member_number_encrypted: await encryptSecret(number),
-      member_number_last4: number.slice(-4),
+      member_number_encrypted: hasNumber ? await encryptSecret(number) : null,
+      member_number_last4: hasNumber ? number.slice(-4) : null,
       tier: data.tier?.trim() ? data.tier.trim() : null,
     };
 
@@ -125,10 +131,11 @@ export const revealMembership = createServerFn({ method: "POST" })
       .maybeSingle();
     if (res.error) throw new Error(res.error.message);
     if (!res.data) throw new Error("not-found");
+    const stored = (res.data as { member_number_encrypted: string | null })
+      .member_number_encrypted;
+    if (!stored) return { memberNumber: "" };
     const { decryptSecret } = await import("@/lib/loyalty/crypto.server");
     return {
-      memberNumber: await decryptSecret(
-        (res.data as { member_number_encrypted: string }).member_number_encrypted,
-      ),
+      memberNumber: await decryptSecret(stored),
     };
   });
