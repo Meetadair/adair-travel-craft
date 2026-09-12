@@ -419,6 +419,7 @@ export const swapCardAlternative = createServerFn({ method: "POST" })
         insurance?: InsuranceQuote | null;
         match?: MatchSummary | null;
         budget?: BudgetStatus | null;
+        earlyBooking?: LiveTripResult["earlyBooking"];
       };
       saved_minor: number;
       expires_at: string | null;
@@ -483,9 +484,15 @@ export const swapCardAlternative = createServerFn({ method: "POST" })
     if (feedbackError) console.error("Could not log choice feedback", feedbackError);
 
     const plan = (profileRes.data as { plan: string } | null)?.plan ?? "free";
-    const table = await pricing.loadPricing(supabase, plan);
+    const baseTable = await pricing.loadPricing(supabase, plan);
+    // The early-booking reward was earned by the departure date, so it survives
+    // a swap; only the amount it saves is recalculated.
+    const earlyBps = row.items.earlyBooking?.discountBps ?? 0;
+    const table = pricing.withLeadTimeDiscount(baseTable, earlyBps);
     const priceLine = (net: number | null | undefined, kind: "flight" | "stay" | "car") =>
       net == null ? null : pricing.fromMinor(pricing.grossMinor(net, table[kind]));
+    const priceLineBase = (net: number | null | undefined, kind: "flight" | "stay" | "car") =>
+      net == null ? 0 : pricing.fromMinor(pricing.grossMinor(net, baseTable[kind]));
 
     const flight = priceLine(search.flight?.amountEur ?? null, "flight");
     const stay = priceLine(search.stay?.amountEur ?? null, "stay");
@@ -502,6 +509,18 @@ export const swapCardAlternative = createServerFn({ method: "POST" })
 
     const priced = { flight, stay, car, total };
     const insurance = row.items.insurance ?? null;
+
+    const baseTotal =
+      Math.round(
+        (priceLineBase(search.flight?.amountEur ?? null, "flight") +
+          priceLineBase(search.stay?.amountEur ?? null, "stay") +
+          priceLineBase(search.car?.amountEur ?? null, "car")) *
+          100,
+      ) / 100;
+    const earlyBooking =
+      row.items.earlyBooking && baseTotal > total
+        ? { ...row.items.earlyBooking, savedEur: Math.round((baseTotal - total) * 100) / 100 }
+        : null;
 
     const prefsRes = await supabase
       .from("preferences")
@@ -556,7 +575,7 @@ export const swapCardAlternative = createServerFn({ method: "POST" })
       .update({
         total_minor: pricing.toMinor(total),
         markup_minor: pricing.toMinor(Math.max(0, total - netTotal)),
-        items: { search, priced, insurance, match, budget },
+        items: { search, priced, insurance, match, budget, earlyBooking },
       })
       .eq("user_id", userId)
       .eq("id", data.cardId);
@@ -570,6 +589,7 @@ export const swapCardAlternative = createServerFn({ method: "POST" })
       insurance,
       match,
       budget,
+      earlyBooking,
       expiresAt: row.expires_at,
     } satisfies LiveTripResult;
   });
