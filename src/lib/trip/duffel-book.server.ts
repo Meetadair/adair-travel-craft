@@ -93,7 +93,7 @@ export async function createFlightOrder(input: {
     bornOn: string;
     gender: "m" | "f";
     title: "mr" | "ms" | "mrs";
-    passportNumber?: string | null;
+    passportNumber?: string | null | undefined;
   }>;
   idempotencyKey: string;
   /**
