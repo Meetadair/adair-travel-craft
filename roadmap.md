@@ -74,3 +74,13 @@
 - [x] Booking writes events to every connected calendar and stores provider event ids, so changes update and cancellations delete instead of duplicating; reminders 24 h + 2 h (Graph supports one reminder: 2 h)
 - [x] "Add to calendar" .ics download kept as the always-available fallback
 - [ ] Add GOOGLE_CALENDAR_CLIENT_ID/SECRET and MS_GRAPH_CLIENT_ID/SECRET to switch those two options on (hidden with a short note until then)
+
+## Payment provider adapter layer (this round)
+- [x] `src/lib/payments/types.ts`: one interface — createIntent / confirm / capture / cancel / refund / getStatus / supportedMethods, plus honest `unavailable` reasons and the settlement model (supplier-of-record vs merchant-of-record)
+- [x] `duffel-payments.ts` (card only, supplier of record) and `stripe.ts` (Payment Intents with Apple Pay + Google Pay via the Payment Element, merchant of record) — built but inactive
+- [x] `payment_providers` config row decides the active adapter; `registry.server.ts` picks the enabled row whose credentials exist; Duffel Payments stays the default
+- [x] Booking and the payment step call only the interface — no provider SDK import in the booking flow
+- [x] Checkout renders wallet buttons only when the adapter reports them and the device supports them; Duffel shows a plain note instead
+- [x] `payments` records provider, provider reference, method, settlement model, idempotency key and outcome; a retry stops before the supplier
+- [x] Admin screen at `/admin/payments`: switch provider without a deploy (written to `audit_log`), see credentials/test mode/methods per provider and the last 50 payments with their money model
+- [ ] To go live on Stripe: add STRIPE_SECRET_KEY + STRIPE_PUBLISHABLE_KEY and make its row active

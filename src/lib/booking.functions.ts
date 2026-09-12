@@ -129,9 +129,16 @@ export const bookTripCard = createServerFn({ method: "POST" })
       .eq("user_id", userId)
       .eq("idempotency_key", idempotencyKey)
       .maybeSingle();
-    if ((earlier.data as { status?: string } | null)?.status === "test_settled") {
+    const settled = (earlier.data as { status?: string } | null)?.status;
+    if (settled === "test_settled" || settled === "settled") {
       throw new Error("already-booked");
     }
+
+    // Which provider takes the money is a config row, read through the adapter
+    // interface — this flow never touches a provider SDK.
+    const { paymentProvider } = await import("@/lib/payments/registry.server");
+    const activeProvider = await paymentProvider(supabase);
+    const adapter = activeProvider.status === "ok" ? activeProvider.data : null;
 
     const paymentMethod: "card" | "saved-card" | "balance" = data.payment?.method ?? "balance";
     const cardPayment =
@@ -139,11 +146,14 @@ export const bookTripCard = createServerFn({ method: "POST" })
         ? { threeDSecureSessionId: data.payment.threeDSecureSessionId }
         : null;
     const paymentDetails = {
+      provider: adapter ? adapter.id : "none",
+      settlement_model: adapter ? adapter.settlementModel : null,
       method: paymentMethod,
       card_brand: data.payment?.brand ?? null,
       card_last4: data.payment?.last4 ?? null,
       three_ds_status: cardPayment ? "authenticated" : null,
     };
+    const settledStatus = adapter?.isTestMode() ? "test_settled" : "settled";
 
     const search = card.items.search;
     const priced = card.items.priced;
@@ -357,7 +367,6 @@ export const bookTripCard = createServerFn({ method: "POST" })
       await supabase.from("payments").upsert(
         {
           user_id: userId,
-          provider: "duffel-test",
           amount_minor: Math.round(priced.total * 100),
           status: "failed",
           idempotency_key: idempotencyKey,
@@ -459,10 +468,9 @@ export const bookTripCard = createServerFn({ method: "POST" })
       {
         user_id: userId,
         trip_id: tripId,
-        provider: "duffel-test",
         provider_ref: flightOrderId,
         amount_minor: Math.round(confirmedTotal * 100),
-        status: "test_settled",
+        status: settledStatus,
         idempotency_key: idempotencyKey,
         failure_note: status === "partial" ? reason : null,
         ...paymentDetails,

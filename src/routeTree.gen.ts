@@ -25,6 +25,7 @@ import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authentic
 import { Route as AuthenticatedPlanRouteImport } from './routes/_authenticated/plan'
 import { Route as AuthenticatedPreferencesRouteImport } from './routes/_authenticated/preferences'
 import { Route as AuthenticatedTripsRouteImport } from './routes/_authenticated/trips'
+import { Route as AuthenticatedAdminPaymentsRouteImport } from './routes/_authenticated/admin.payments'
 import { Route as AuthenticatedBookCardIdRouteImport } from './routes/_authenticated/book.$cardId'
 import { Route as AuthenticatedDevStatusRouteImport } from './routes/_authenticated/dev.status'
 import { Route as ApiPublicTripRemindersRouteImport } from './routes/api/public/trip-reminders'
@@ -114,6 +115,12 @@ const AuthenticatedTripsRoute = AuthenticatedTripsRouteImport.update({
   path: '/trips',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminPaymentsRoute =
+  AuthenticatedAdminPaymentsRouteImport.update({
+    id: '/admin/payments',
+    path: '/admin/payments',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedBookCardIdRoute = AuthenticatedBookCardIdRouteImport.update({
   id: '/book/$cardId',
   path: '/book/$cardId',
@@ -173,6 +180,7 @@ export interface FileRoutesByFullPath {
   '/preferences': typeof AuthenticatedPreferencesRoute
   '/trips': typeof AuthenticatedTripsRoute
   '/$lang/': typeof LangIndexRoute
+  '/admin/payments': typeof AuthenticatedAdminPaymentsRoute
   '/book/$cardId': typeof AuthenticatedBookCardIdRoute
   '/dev/status': typeof AuthenticatedDevStatusRoute
   '/api/public/trip-reminders': typeof ApiPublicTripRemindersRoute
@@ -197,6 +205,7 @@ export interface FileRoutesByTo {
   '/preferences': typeof AuthenticatedPreferencesRoute
   '/trips': typeof AuthenticatedTripsRoute
   '/$lang': typeof LangIndexRoute
+  '/admin/payments': typeof AuthenticatedAdminPaymentsRoute
   '/book/$cardId': typeof AuthenticatedBookCardIdRoute
   '/dev/status': typeof AuthenticatedDevStatusRoute
   '/api/public/trip-reminders': typeof ApiPublicTripRemindersRoute
@@ -224,6 +233,7 @@ export interface FileRoutesById {
   '/_authenticated/preferences': typeof AuthenticatedPreferencesRoute
   '/_authenticated/trips': typeof AuthenticatedTripsRoute
   '/$lang/': typeof LangIndexRoute
+  '/_authenticated/admin/payments': typeof AuthenticatedAdminPaymentsRoute
   '/_authenticated/book/$cardId': typeof AuthenticatedBookCardIdRoute
   '/_authenticated/dev/status': typeof AuthenticatedDevStatusRoute
   '/api/public/trip-reminders': typeof ApiPublicTripRemindersRoute
@@ -251,6 +261,7 @@ export interface FileRouteTypes {
     | '/preferences'
     | '/trips'
     | '/$lang/'
+    | '/admin/payments'
     | '/book/$cardId'
     | '/dev/status'
     | '/api/public/trip-reminders'
@@ -275,6 +286,7 @@ export interface FileRouteTypes {
     | '/preferences'
     | '/trips'
     | '/$lang'
+    | '/admin/payments'
     | '/book/$cardId'
     | '/dev/status'
     | '/api/public/trip-reminders'
@@ -301,6 +313,7 @@ export interface FileRouteTypes {
     | '/_authenticated/preferences'
     | '/_authenticated/trips'
     | '/$lang/'
+    | '/_authenticated/admin/payments'
     | '/_authenticated/book/$cardId'
     | '/_authenticated/dev/status'
     | '/api/public/trip-reminders'
@@ -440,6 +453,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTripsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/payments': {
+      id: '/_authenticated/admin/payments'
+      path: '/admin/payments'
+      fullPath: '/admin/payments'
+      preLoaderRoute: typeof AuthenticatedAdminPaymentsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/book/$cardId': {
       id: '/_authenticated/book/$cardId'
       path: '/book/$cardId'
@@ -506,6 +526,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedPlanRoute: typeof AuthenticatedPlanRoute
   AuthenticatedPreferencesRoute: typeof AuthenticatedPreferencesRoute
   AuthenticatedTripsRoute: typeof AuthenticatedTripsRoute
+  AuthenticatedAdminPaymentsRoute: typeof AuthenticatedAdminPaymentsRoute
   AuthenticatedBookCardIdRoute: typeof AuthenticatedBookCardIdRoute
   AuthenticatedDevStatusRoute: typeof AuthenticatedDevStatusRoute
 }
@@ -517,6 +538,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPlanRoute: AuthenticatedPlanRoute,
   AuthenticatedPreferencesRoute: AuthenticatedPreferencesRoute,
   AuthenticatedTripsRoute: AuthenticatedTripsRoute,
+  AuthenticatedAdminPaymentsRoute: AuthenticatedAdminPaymentsRoute,
   AuthenticatedBookCardIdRoute: AuthenticatedBookCardIdRoute,
   AuthenticatedDevStatusRoute: AuthenticatedDevStatusRoute,
 }
