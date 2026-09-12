@@ -173,3 +173,14 @@
 - [x] Wired into booking confirmation, day-before reminder, supplier schedule
       change and the weekly Getaway.
 - Remaining external setup: Meta business verification and template approval.
+
+## Loyalty clarifications
+- [x] A programme can be kept without a member number, but is marked incomplete
+      in Settings ("Without your member number, miles won't be credited.") and on
+      the confirmation ("Miles & More — no number, not applied").
+- [x] Editable `loyalty_earning_rules` table maps each programme to the airlines,
+      hotel brands and rental brands it actually earns on (Miles & More on LOT /
+      Austrian / Swiss / Star Alliance, Flying Blue on AF-KL-SkyTeam, Avios on
+      BA / Iberia / Aer Lingus, Bonvoy across its brands, Hertz Gold across
+      Hertz-Dollar-Thrifty, and so on). Booking sends the matching number.
+- [x] Where nothing matches: "No loyalty programme applies to this flight."
