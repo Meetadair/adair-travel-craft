@@ -55,8 +55,8 @@ export function TripChangePage({ tripId }: { tripId: string }) {
       });
       const result = await search({ data: { sentence: started.sentence } });
       return {
-        cardId: result.card.id,
-        newTotalEur: result.card.priced.total,
+        cardId: result.cardId,
+        newTotalEur: result.priced.total,
         oldTotalEur: started.oldTotalEur,
         feeEur: started.feeEur,
         kind,
