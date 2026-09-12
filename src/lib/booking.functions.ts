@@ -41,6 +41,22 @@ const bookSchema = z.object({
   }),
   companyId: z.string().uuid().nullable(),
   traveller: travellerSchema,
+  /** Everyone else on the booking, in seat order after the lead traveller. */
+  companions: z
+    .array(
+      z.object({
+        givenName: z.string().trim().min(1).max(60),
+        familyName: z.string().trim().min(1).max(60),
+        bornOn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+        gender: z.enum(["m", "f"]),
+        title: z.enum(["mr", "ms", "mrs"]),
+        passportNumber: z.string().trim().max(40).nullable().optional(),
+        /** Save this person to "people I travel with" for next time. */
+        remember: z.boolean().optional(),
+      }),
+    )
+    .max(8)
+    .optional(),
   /**
    * Result of the hosted card step. Only provider tokens — never card data.
    */
@@ -264,6 +280,7 @@ export const bookTripCard = createServerFn({ method: "POST" })
           currency: offer.currency,
           passengerIds: offer.passengerIds,
           traveller: data.traveller,
+          companions: data.companions ?? [],
           idempotencyKey: `${card.id}-flight`,
           cardPayment,
           loyaltyAccounts: flightAccounts,
