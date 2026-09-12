@@ -670,7 +670,37 @@ export type TravelPrefs = {
   interests: string[];
   music: string[];
   budgetBand: string | null;
+  /** Hard rules, e.g. "dbNoHostel" — filtered out before ranking. */
+  dealbreakers: string[];
+  /** Part 2 profile answers keyed by field, kept open so new questions need no migration. */
+  extraAnswers: Record<string, string[]>;
+  accessibilityNote: string | null;
+  avoidNote: string | null;
 };
+
+/** Toggle fields that act as hard filters rather than scores. */
+export const DEALBREAKER_FIELDS = [
+  "dbStars4",
+  "dbLift",
+  "dbSharedBath",
+  "dbAutomatic",
+  "dbNonSmoking",
+  "dbNoHostel",
+  "dbStepFree",
+  "dbPets",
+] as const;
+
+/** Part 2 answer fields stored in the open `extraAnswers` map. */
+export const EXTRA_ANSWER_FIELDS = [
+  "travelStyle",
+  "tripLength",
+  "leadTime",
+  "companions",
+  "loyalty",
+  "tradeConnection",
+  "tradeCloser",
+  "tradeMorning",
+] as const;
 
 export const DEFAULT_PREFS: TravelPrefs = {
   seat: "any",
