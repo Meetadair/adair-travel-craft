@@ -9,7 +9,8 @@ export type DataExport = {
   generatedAt: string;
   userId: string;
   summary: string[];
-  data: Record<string, unknown>;
+  /** The full export as pretty-printed JSON, ready to save as a file. */
+  json: string;
 };
 
 const TABLES: Array<{ table: string; column: string }> = [
@@ -77,7 +78,12 @@ export const exportMyData = createServerFn({ method: "POST" })
       after: { tables: TABLES.map((t) => t.table) },
     });
 
-    return { generatedAt: new Date().toISOString(), userId, summary, data };
+    return {
+      generatedAt: new Date().toISOString(),
+      userId,
+      summary,
+      json: JSON.stringify({ generatedAt: new Date().toISOString(), userId, data }, null, 2),
+    };
   });
 
 export type DeletionResult = {
