@@ -12,6 +12,8 @@ import type { RideLeg } from "@/lib/suppliers/types";
 import { getTripCard } from "@/lib/trip-live.functions";
 import { bookTripCard, type BookingResult } from "@/lib/booking.functions";
 import { getAccount } from "@/lib/account.functions";
+import { getPaymentSession } from "@/lib/payment.functions";
+import { PaymentStep, type AuthorisedPayment } from "@/components/payment-step";
 import { eur } from "@/lib/trip/client";
 
 const inputClass =
