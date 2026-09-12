@@ -45,12 +45,12 @@ export const getFlightAncillaries = createServerFn({ method: "POST" })
     const offerId = search.flight?.offerId;
     if (!offerId) return empty;
 
-    const [{ getOfferAncillaries }, { loadPricingTable }] = await Promise.all([
+    const [{ getOfferAncillaries }, { loadPricing }] = await Promise.all([
       import("@/lib/trip/duffel-book.server"),
       import("@/lib/pricing.server"),
     ]);
 
-    const table = await loadPricingTable(context.supabase as never, "free");
+    const table = await loadPricing(context.supabase as never, "free");
 
     let options: AncillaryOption[] = [];
     try {
