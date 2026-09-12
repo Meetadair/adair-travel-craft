@@ -795,6 +795,24 @@ export const listMyTrips = createServerFn({ method: "GET" })
     }>;
 
 
+    // Destination notes, shown once a trip is booked. Nothing is generated:
+    // a destination with no editorial tips simply has none.
+    const cities = Array.from(
+      new Set(trips.map((t) => (t.city ?? "").trim()).filter((c) => c.length > 0)),
+    );
+    const tipsByCity = new Map<string, Array<{ key: string; label: string; text: string }>>();
+    if (cities.length) {
+      const { listTravelTips } = await import("@/lib/trip/tips");
+      const destRes = await supabase
+        .from("getaway_destinations")
+        .select("name, travel_tips")
+        .in("name", cities);
+      for (const row of (destRes.data ?? []) as Array<{ name: string; travel_tips: unknown }>) {
+        const tips = listTravelTips(row.travel_tips);
+        if (tips.length) tipsByCity.set(row.name.toLowerCase(), tips);
+      }
+    }
+
     return trips.map((trip) => ({
       id: trip.id,
       title: trip.title,
@@ -820,6 +838,10 @@ export const listMyTrips = createServerFn({ method: "GET" })
           payload: (i.payload ?? null) as ItemCalendarPayload | null,
 
         })),
+      tips:
+        trip.status === "cancelled" || !trip.city
+          ? []
+          : (tipsByCity.get(trip.city.trim().toLowerCase()) ?? []),
     }));
   });
 
