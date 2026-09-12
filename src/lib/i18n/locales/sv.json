@@ -51,11 +51,11 @@
           "detail": "separat bilbokning"
         },
         {
-          "name": "Uber",
+          "name": "Taxiapp",
           "detail": "lokala resor"
         },
         {
-          "name": "OpenTable",
+          "name": "Restaurangapp",
           "detail": "restauranger, separat"
         }
       ]
@@ -85,9 +85,6 @@
       "invoiceLine": "Faktura → ditt företag",
       "share": "Dela detta resekort",
       "shareCopied": "Kopierat",
-      "sourceFlight": "Duffel · NDC/GDS",
-      "sourceStay": "Duffel Stays",
-      "sourceCar": "Duffel Cars",
       "testMode": "Testläge — exempeldata för flyg",
       "bookTooltip": "Bokning öppnar vid lansering",
       "remove": "Ta bort",

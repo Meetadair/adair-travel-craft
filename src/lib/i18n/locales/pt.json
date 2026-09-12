@@ -51,11 +51,11 @@
           "detail": "reserva de carro em separado"
         },
         {
-          "name": "Uber",
+          "name": "App de transporte",
           "detail": "deslocações locais"
         },
         {
-          "name": "OpenTable",
+          "name": "App de restaurantes",
           "detail": "restaurantes, em separado"
         }
       ]
@@ -85,9 +85,6 @@
       "invoiceLine": "Fatura → para a sua empresa",
       "share": "Partilhar este cartão de viagem",
       "shareCopied": "Copiado",
-      "sourceFlight": "Duffel · NDC/GDS",
-      "sourceStay": "Duffel Stays",
-      "sourceCar": "Duffel Cars",
       "testMode": "Modo de teste — dados de exemplo de companhias aéreas",
       "bookTooltip": "Reservas disponíveis no lançamento",
       "remove": "Remover este item",

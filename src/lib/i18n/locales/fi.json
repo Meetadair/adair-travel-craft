@@ -51,11 +51,11 @@
           "detail": "erillinen autovaraus"
         },
         {
-          "name": "Uber",
+          "name": "Kyytisovellus",
           "detail": "liikkuminen paikan päällä"
         },
         {
-          "name": "OpenTable",
+          "name": "Ravintolasovellus",
           "detail": "ravintolat erikseen"
         }
       ]
@@ -85,9 +85,6 @@
       "invoiceLine": "Lasku → yrityksellesi",
       "share": "Jaa tämä matkakortti",
       "shareCopied": "Kopioitu",
-      "sourceFlight": "Duffel · NDC/GDS",
-      "sourceStay": "Duffel Stays",
-      "sourceCar": "Duffel Cars",
       "testMode": "Testitila — esimerkkilentotiedot",
       "bookTooltip": "Varaaminen avautuu julkaisun yhteydessä",
       "remove": "Poista tämä kohde",

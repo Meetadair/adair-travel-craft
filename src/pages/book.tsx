@@ -46,8 +46,8 @@ function reasonFromError(error: unknown): string | null {
 
 /** How the traveller paid, for the receipt. */
 function methodLabel(payment: BookingResult["payment"]): string {
-  if (!payment) return "Duffel balance";
-  if (payment.method === "balance") return "Duffel balance";
+  if (!payment) return "Test-mode payment";
+  if (payment.method === "balance") return "Test-mode payment";
   const brand = payment.brand ? payment.brand.replace(/_/g, " ") : "Card";
   return payment.last4 ? `${brand} ···· ${payment.last4}` : brand;
 }

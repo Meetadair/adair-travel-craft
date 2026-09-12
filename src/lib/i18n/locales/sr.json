@@ -51,11 +51,11 @@
           "detail": "zasebna rezervacija automobila"
         },
         {
-          "name": "Uber",
+          "name": "Aplikacija za prevoz",
           "detail": "lokalni prevoz"
         },
         {
-          "name": "OpenTable",
+          "name": "Aplikacija za restorane",
           "detail": "restorani, odvojeno"
         }
       ]
@@ -85,9 +85,6 @@
       "invoiceLine": "Faktura → vaša kompanija",
       "share": "Podelite ovu karticu putovanja",
       "shareCopied": "Kopirano",
-      "sourceFlight": "Duffel · NDC/GDS",
-      "sourceStay": "Duffel Stays",
-      "sourceCar": "Duffel Cars",
       "testMode": "Testni režim — primeri podataka avio-kompanija",
       "bookTooltip": "Rezervacije počinju nakon lansiranja",
       "remove": "Uklonite ovu stavku",

@@ -51,11 +51,11 @@
           "detail": "réservation de voiture séparée"
         },
         {
-          "name": "Uber",
+          "name": "Appli de VTC",
           "detail": "déplacements sur place"
         },
         {
-          "name": "OpenTable",
+          "name": "Appli de restaurants",
           "detail": "restaurants, séparément"
         }
       ]
@@ -85,9 +85,6 @@
       "invoiceLine": "Facture → votre entreprise",
       "share": "Partager cette fiche",
       "shareCopied": "Copié",
-      "sourceFlight": "Duffel · NDC/GDS",
-      "sourceStay": "Duffel Stays",
-      "sourceCar": "Duffel Cars",
       "testMode": "Mode test — données de vol simulées",
       "bookTooltip": "Réservation disponible au lancement",
       "remove": "Retirer cet élément",

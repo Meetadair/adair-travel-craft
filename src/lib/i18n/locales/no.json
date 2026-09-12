@@ -51,11 +51,11 @@
           "detail": "separat leiebilbestilling"
         },
         {
-          "name": "Uber",
+          "name": "Taxiapp",
           "detail": "lokal transport"
         },
         {
-          "name": "OpenTable",
+          "name": "Restaurantapp",
           "detail": "restauranter, hver for seg"
         }
       ]
@@ -85,9 +85,6 @@
       "invoiceLine": "Faktura → din bedrift",
       "share": "Del dette reisekortet",
       "shareCopied": "Kopiert",
-      "sourceFlight": "Duffel · NDC/GDS",
-      "sourceStay": "Duffel Stays",
-      "sourceCar": "Duffel Cars",
       "testMode": "Testmodus — eksempeldata fra flyselskap",
       "bookTooltip": "Bestilling åpner ved lansering",
       "remove": "Fjern denne",

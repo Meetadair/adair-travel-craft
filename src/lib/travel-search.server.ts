@@ -388,13 +388,13 @@ export async function searchTrip(input: TripSearchInput): Promise<TripSearchResu
   try {
     flight = await duffelFlight(input);
   } catch {
-    warnings.push("Duffel did not return any flight offers — showing a sample value.");
+    warnings.push("No live flight offers came back — showing a sample value.");
   }
 
   const token = await amadeusToken();
   if (!token && !flight) {
     warnings.push(
-      "No provider API keys configured — the card contains sample data. Add Duffel and Amadeus keys to see real prices.",
+      "Live search is not switched on yet — the card contains sample data.",
     );
   }
 

@@ -105,3 +105,9 @@
 
 ## Known warning
 - The database security linter flags `admin_analytics()` and `is_admin()` as SECURITY DEFINER functions callable by signed-in users. Both are intentional: `admin_analytics()` refuses non-admins itself, and `is_admin()` is what the policies rely on.
+
+## Branding pass (done)
+- [x] Removed every supplier name the traveller can see: the "Duffel · NDC/GDS" / "Duffel Stays" / "Duffel Cars" tags are gone from the card in all 14 languages, the "five apps" comparison names a ride app and a restaurant app instead of Uber and OpenTable, the payment note and receipt no longer name the payment provider, transfers no longer show a ride-provider chip, and invoices print the booking reference alone
+- [x] Unavailable lines and failures now speak about Adair ("Transfers available at launch", "Live search is not switched on yet") and no error text names a provider
+- [x] Test-mode carrier and property names stay as they arrive from the supplier — that is data, and the row is labelled as test data
+- [x] Provider names remain accurate everywhere the traveller never looks: /admin, /dev/status, database columns, adapter labels, logs, code comments and this file

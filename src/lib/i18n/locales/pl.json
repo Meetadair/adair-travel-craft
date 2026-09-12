@@ -51,11 +51,11 @@
           "detail": "osobna rezerwacja auta"
         },
         {
-          "name": "Uber",
+          "name": "Aplikacja z przejazdami",
           "detail": "dojazdy na miejscu"
         },
         {
-          "name": "OpenTable",
+          "name": "Aplikacja z restauracjami",
           "detail": "restauracje, osobno"
         }
       ]
@@ -85,9 +85,6 @@
       "invoiceLine": "Faktura → Twoja firma",
       "share": "Udostępnij kartę podróży",
       "shareCopied": "Skopiowano",
-      "sourceFlight": "Duffel · NDC/GDS",
-      "sourceStay": "Duffel Stays",
-      "sourceCar": "Duffel Cars",
       "testMode": "Tryb testowy — przykładowe dane linii lotniczych",
       "bookTooltip": "Rezerwacja dostępna wkrótce",
       "remove": "Usuń ten element",

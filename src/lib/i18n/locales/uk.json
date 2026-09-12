@@ -51,11 +51,11 @@
           "detail": "окреме бронювання авто"
         },
         {
-          "name": "Uber",
+          "name": "Застосунок для поїздок",
           "detail": "міські поїздки"
         },
         {
-          "name": "OpenTable",
+          "name": "Застосунок для ресторанів",
           "detail": "ресторани, окремо"
         }
       ]
@@ -85,9 +85,6 @@
       "invoiceLine": "Рахунок → на вашу компанію",
       "share": "Поділитися карткою поїздки",
       "shareCopied": "Скопійовано",
-      "sourceFlight": "Duffel · NDC/GDS",
-      "sourceStay": "Duffel Stays",
-      "sourceCar": "Duffel Cars",
       "testMode": "Тестовий режим — зразки даних авіакомпаній",
       "bookTooltip": "Бронювання відкриється під час запуску",
       "remove": "Прибрати цей пункт",
