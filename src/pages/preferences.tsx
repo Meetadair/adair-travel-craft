@@ -23,6 +23,7 @@ import { AirportPicker } from "@/components/prefs/airport-picker";
 import { CompanyEditor } from "@/components/prefs/company-editor";
 import { MultiField, SingleField, ToggleRow } from "@/components/prefs/option-chips";
 import { cleanCompany, type CompanyDraft } from "@/lib/prefs/company-draft";
+import { ConnectedCalendars } from "@/components/prefs/connected-calendars";
 
 const toDraft = (company: Company): CompanyDraft => ({
   name: company.name,
@@ -157,6 +158,8 @@ export function PreferencesPage() {
                 ) : null}
               </section>
             ))}
+
+            <ConnectedCalendars />
 
             <section className="hairline-card space-y-4 p-5 sm:p-6">
               <h2 className="font-display text-lg font-semibold">Companies for invoicing</h2>

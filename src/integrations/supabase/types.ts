@@ -44,6 +44,99 @@ export type Database = {
         }
         Relationships: []
       }
+      calendar_connections: {
+        Row: {
+          access_token: string | null
+          account_email: string | null
+          calendar_id: string
+          created_at: string
+          expires_at: string | null
+          id: string
+          provider: string
+          refresh_token: string | null
+          time_zone: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          access_token?: string | null
+          account_email?: string | null
+          calendar_id?: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          provider: string
+          refresh_token?: string | null
+          time_zone?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          access_token?: string | null
+          account_email?: string | null
+          calendar_id?: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          provider?: string
+          refresh_token?: string | null
+          time_zone?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      calendar_feeds: {
+        Row: {
+          created_at: string
+          id: string
+          token: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          token: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          token?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      calendar_oauth_states: {
+        Row: {
+          created_at: string
+          provider: string
+          redirect_uri: string
+          state: string
+          time_zone: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          provider: string
+          redirect_uri: string
+          state: string
+          time_zone?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          provider?: string
+          redirect_uri?: string
+          state?: string
+          time_zone?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       choice_feedback: {
         Row: {
           chosen: Json | null
@@ -692,6 +785,7 @@ export type Database = {
       trip_items: {
         Row: {
           amount: number
+          calendar_event_ids: Json
           created_at: string
           currency: string
           detail: string | null
@@ -714,6 +808,7 @@ export type Database = {
         }
         Insert: {
           amount?: number
+          calendar_event_ids?: Json
           created_at?: string
           currency?: string
           detail?: string | null
@@ -736,6 +831,7 @@ export type Database = {
         }
         Update: {
           amount?: number
+          calendar_event_ids?: Json
           created_at?: string
           currency?: string
           detail?: string | null

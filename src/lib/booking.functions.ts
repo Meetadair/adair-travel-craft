@@ -531,6 +531,30 @@ export const bookTripCard = createServerFn({ method: "POST" })
       console.error("invoice email failed", error);
     }
 
+    // Push the trip into every connected calendar. Never blocks the booking.
+    try {
+      const { syncTripToCalendars } = await import("@/lib/calendar/sync.server");
+      await syncTripToCalendars(supabase, userId, {
+        id: tripId,
+        title: `${request.destinationCity} · ${request.departDate} – ${request.returnDate}`,
+        city: request.destinationCity,
+        startDate: request.departDate,
+        endDate: request.returnDate,
+        reference: flightReference,
+        items: lines.map((line, index) => ({
+          id: insertedIds.get(index) ?? `${tripId}-${index}`,
+          kind: line.kind,
+          title: line.title,
+          status: line.status,
+          reference: line.reference,
+          payload: line.payload ?? null,
+          eventIds: {},
+        })),
+      });
+    } catch (error) {
+      console.error("calendar sync failed", error);
+    }
+
     const calendar = tripCalendarEvents({
       id: tripId,
       title: `${request.destinationCity} · ${request.departDate} – ${request.returnDate}`,
@@ -733,6 +757,10 @@ export const cancelTripItem = createServerFn({ method: "POST" })
       .update({ status })
       .eq("id", item.id)
       .eq("user_id", userId);
+
+    // Remove this line's events from any connected calendar.
+    const { removeItemFromCalendars } = await import("@/lib/calendar/sync.server");
+    await removeItemFromCalendars(supabase, userId, item.id);
 
     const remaining = await supabase
       .from("trip_items")
