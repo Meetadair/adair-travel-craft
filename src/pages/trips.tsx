@@ -174,7 +174,17 @@ export function TripsPage() {
                   </button>
                   {mapFor === trip.id && (
                     <div className="mt-4">
-                      <TripRoute stops={trip.stops} />
+                      <TripRoute
+                        stops={order[trip.id] ?? trip.stops}
+                        onReorder={(next) =>
+                          setOrder((prev) => ({ ...prev, [trip.id]: next }))
+                        }
+                      />
+                      <p className="mt-2 text-xs text-muted-foreground">
+                        Przesuń przystanki uchwytem lub strzałkami, żeby ułożyć trasę
+                        logicznie. Zmiana kolejności tutaj nie zmienia już zrobionych
+                        rezerwacji.
+                      </p>
                     </div>
                   )}
                 </div>
