@@ -15,6 +15,8 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AssistantRouteImport } from './routes/assistant'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as BusinessRouteImport } from './routes/business'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as LangIndexRouteImport } from './routes/$lang.index'
 import { Route as LangAssistantRouteImport } from './routes/$lang.assistant'
 import { Route as LangAuthRouteImport } from './routes/$lang.auth'
@@ -71,6 +73,16 @@ const AuthRoute = AuthRouteImport.update({
 const BusinessRoute = BusinessRouteImport.update({
   id: '/business',
   path: '/business',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LangIndexRoute = LangIndexRouteImport.update({
@@ -227,6 +239,8 @@ export interface FileRoutesByFullPath {
   '/assistant': typeof AssistantRoute
   '/auth': typeof AuthRoute
   '/business': typeof BusinessRoute
+  '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
   '/$lang/assistant': typeof LangAssistantRoute
   '/$lang/auth': typeof LangAuthRoute
   '/$lang/business': typeof LangBusinessRoute
@@ -261,6 +275,8 @@ export interface FileRoutesByTo {
   '/assistant': typeof AssistantRoute
   '/auth': typeof AuthRoute
   '/business': typeof BusinessRoute
+  '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
   '/$lang/assistant': typeof LangAssistantRoute
   '/$lang/auth': typeof LangAuthRoute
   '/$lang/business': typeof LangBusinessRoute
@@ -298,6 +314,8 @@ export interface FileRoutesById {
   '/assistant': typeof AssistantRoute
   '/auth': typeof AuthRoute
   '/business': typeof BusinessRoute
+  '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
   '/$lang/assistant': typeof LangAssistantRoute
   '/$lang/auth': typeof LangAuthRoute
   '/$lang/business': typeof LangBusinessRoute
@@ -335,6 +353,8 @@ export interface FileRouteTypes {
     | '/assistant'
     | '/auth'
     | '/business'
+    | '/privacy'
+    | '/terms'
     | '/$lang/assistant'
     | '/$lang/auth'
     | '/$lang/business'
@@ -369,6 +389,8 @@ export interface FileRouteTypes {
     | '/assistant'
     | '/auth'
     | '/business'
+    | '/privacy'
+    | '/terms'
     | '/$lang/assistant'
     | '/$lang/auth'
     | '/$lang/business'
@@ -405,6 +427,8 @@ export interface FileRouteTypes {
     | '/assistant'
     | '/auth'
     | '/business'
+    | '/privacy'
+    | '/terms'
     | '/$lang/assistant'
     | '/$lang/auth'
     | '/$lang/business'
@@ -442,6 +466,8 @@ export interface RootRouteChildren {
   AssistantRoute: typeof AssistantRoute
   AuthRoute: typeof AuthRoute
   BusinessRoute: typeof BusinessRoute
+  PrivacyRoute: typeof PrivacyRoute
+  TermsRoute: typeof TermsRoute
   RCodeRoute: typeof RCodeRoute
   ApiPublicGetawayPricesRoute: typeof ApiPublicGetawayPricesRoute
   ApiPublicGetawayWeeklyRoute: typeof ApiPublicGetawayWeeklyRoute
@@ -496,6 +522,20 @@ declare module '@tanstack/react-router' {
       path: '/business'
       fullPath: '/business'
       preLoaderRoute: typeof BusinessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/$lang/': {
@@ -757,6 +797,8 @@ const rootRouteChildren: RootRouteChildren = {
   AssistantRoute: AssistantRoute,
   AuthRoute: AuthRoute,
   BusinessRoute: BusinessRoute,
+  PrivacyRoute: PrivacyRoute,
+  TermsRoute: TermsRoute,
   RCodeRoute: RCodeRoute,
   ApiPublicGetawayPricesRoute: ApiPublicGetawayPricesRoute,
   ApiPublicGetawayWeeklyRoute: ApiPublicGetawayWeeklyRoute,
