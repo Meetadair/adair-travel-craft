@@ -82,6 +82,7 @@ export function TripRoute({
         {stops.map((stop, index) => (
           <li
             key={`${stop.iata}-${index}`}
+            data-stop-index={index}
             draggable={Boolean(onReorder)}
             onDragStart={() => setDragIndex(index)}
             onDragOver={(e) => onReorder && e.preventDefault()}
@@ -89,10 +90,24 @@ export function TripRoute({
               if (dragIndex !== null) move(dragIndex, index);
               setDragIndex(null);
             }}
-            className="flex items-center gap-3 rounded-xl border border-border bg-background px-3 py-2.5"
+            className={`flex items-center gap-3 rounded-xl border bg-background px-3 py-2.5 transition-colors ${
+              overIndex === index && dragIndex !== null
+                ? "border-primary"
+                : "border-border"
+            } ${dragIndex === index ? "opacity-60" : ""}`}
           >
             {onReorder && (
-              <GripVertical className="hidden size-4 shrink-0 cursor-grab text-muted-foreground sm:block" />
+              <button
+                type="button"
+                aria-label={`Przesuń ${stop.city}`}
+                onPointerDown={handlePointerDown(index)}
+                onPointerMove={handlePointerMove}
+                onPointerUp={handlePointerUp}
+                onPointerCancel={handlePointerUp}
+                className="shrink-0 cursor-grab touch-none text-muted-foreground"
+              >
+                <GripVertical className="size-4" />
+              </button>
             )}
             <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-primary text-[11px] font-semibold text-primary-foreground">
               {index + 1}
