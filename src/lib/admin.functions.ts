@@ -504,7 +504,7 @@ export const setSupportStatus = createServerFn({ method: "POST" })
       .update({ status: data.status, admin_note: data.adminNote })
       .eq("id", data.id);
     if (error) throw new Error(error.message);
-    await writeAudit(context.userId, "support.status", `support_request:${data.id}`, null, {
+    await writeAudit(db, context.userId, "support.status", `support_request:${data.id}`, null, {
       status: data.status,
     });
     return { ok: true };
