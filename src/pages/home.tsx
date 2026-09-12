@@ -1353,6 +1353,7 @@ function Teams({ t }: { t: Dict }) {
 
 export function HomePage() {
   const t = useT();
+  const locale = useLocale();
   const [submission, setSubmission] = useState<Submission | null>(null);
   const reduced = usePrefersReducedMotion();
   const divider = (
