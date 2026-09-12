@@ -15,6 +15,8 @@ import {
   saveGetawayPlace,
   saveGetawayTheme,
   saveGetawayThemeAssignment,
+  getGetawayItineraryDays,
+  saveGetawayItineraryDay,
   type AdminDestination,
   type AdminTheme,
 } from "@/lib/admin-getaway.functions";
