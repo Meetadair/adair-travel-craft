@@ -30,6 +30,8 @@ export type GetawayPlace = {
   familyFriendly: boolean;
   lat: number | null;
   lon: number | null;
+  /** Present when a creator partner recommended this place. */
+  recommendedBy: { name: string; handle: string } | null;
 };
 
 export type GetawayDay = {
@@ -277,9 +279,12 @@ export const getWeeklyGetaway = createServerFn({ method: "GET" })
 
     const placesRes = await supabase
       .from("getaway_places")
-      .select("id, kind, name, address, latitude, longitude, editorial_note, why_this_one, price_band, family_friendly")
+      .select(
+        "id, kind, name, address, latitude, longitude, editorial_note, why_this_one, price_band, family_friendly, review_status, creators(display_name, handle, status)",
+      )
       .eq("destination_id", destRow.id)
       .eq("active", true)
+      .in("review_status", ["approved", "editorial"])
       .order("kind");
     const places: GetawayPlace[] = ((placesRes.data ?? []) as Array<Record<string, unknown>>).map((p) => ({
       id: String(p['id']),
@@ -292,6 +297,13 @@ export const getWeeklyGetaway = createServerFn({ method: "GET" })
       familyFriendly: Boolean(p['family_friendly']),
       lat: p['latitude'] === null ? null : Number(p['latitude']),
       lon: p['longitude'] === null ? null : Number(p['longitude']),
+      recommendedBy: (() => {
+        const creator = p['creators'] as
+          | { display_name?: string; handle?: string; status?: string }
+          | null;
+        if (!creator?.handle || creator.status !== "approved") return null;
+        return { name: String(creator.display_name ?? creator.handle), handle: creator.handle };
+      })(),
     }));
 
     const itinRes = await supabase
