@@ -93,11 +93,27 @@ type CardItems = {
 };
 
 
+
+/** Analytics sink; never allowed to break a booking. */
+async function recordEvent(
+  userId: string,
+  name: string,
+  props: Record<string, unknown>,
+): Promise<void> {
+  try {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    await supabaseAdmin.from("events").insert({ name, user_id: userId, props: props as never });
+  } catch (error) {
+    console.error("event insert failed", error);
+  }
+}
+
 export const bookTripCard = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => bookSchema.parse(input))
   .handler(async ({ data, context }): Promise<BookingResult> => {
     const { supabase, userId } = context;
+    void recordEvent(userId, "booking_started", { card_id: data.cardId });
     const [{ getOffer, createFlightOrder }, pricing, { isTestKey }] = await Promise.all([
       import("@/lib/trip/duffel-book.server"),
       import("@/lib/pricing.server"),
