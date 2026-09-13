@@ -33,11 +33,7 @@ import { track } from "@/lib/track";
 import { TripExtras } from "@/components/trip-extras";
 import { searchLiveTrip, swapCardAlternative } from "@/lib/trip-live.functions";
 import type { BudgetStatus, MatchSummary } from "@/lib/trip/match";
-import {
-  INSURANCE_DETAIL,
-  INSURANCE_TITLE,
-  type InsuranceQuote,
-} from "@/lib/trip/insurance";
+import { INSURANCE_DETAIL, INSURANCE_TITLE, type InsuranceQuote } from "@/lib/trip/insurance";
 import { parseTripSentence } from "@/lib/trip/parse";
 import { TripRoute } from "@/components/trip-route";
 import type { TripStop } from "@/lib/trip/types";
@@ -362,9 +358,11 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
   const [match, setMatch] = useState<MatchSummary | null>(null);
   const [budget, setBudget] = useState<BudgetStatus | null>(null);
   // Set when booking far ahead lowered our own fee (leisure trips only).
-  const [earlyBooking, setEarlyBooking] = useState<
-    { daysAhead: number; discountBps: number; savedEur: number } | null
-  >(null);
+  const [earlyBooking, setEarlyBooking] = useState<{
+    daysAhead: number;
+    discountBps: number;
+    savedEur: number;
+  } | null>(null);
   const [amendText, setAmendText] = useState("");
   const [amending, setAmending] = useState(false);
 
@@ -389,7 +387,9 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
     track("line_swapped", { kind, ...(reason ? { reason } : {}) });
     setSwapping(true);
     try {
-      const result = await runSwap({ data: { cardId, kind, index, ...(reason ? { reason } : {}) } });
+      const result = await runSwap({
+        data: { cardId, kind, index, ...(reason ? { reason } : {}) },
+      });
       setMatch(result.match ?? null);
       setBudget(result.budget ?? null);
       setEarlyBooking(result.earlyBooking ?? null);
@@ -400,7 +400,6 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
       setSwapping(false);
     }
   };
-
 
   useEffect(() => {
     let active = true;
@@ -459,7 +458,7 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
         setInsurance(result.insurance);
         setMatch(result.match ?? null);
         setBudget(result.budget ?? null);
-      setEarlyBooking(result.earlyBooking ?? null);
+        setEarlyBooking(result.earlyBooking ?? null);
         setLive(applyPriced(result));
       } else {
         const request = await parseTrip(sentence);
@@ -497,7 +496,7 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
         setInsurance(result.insurance);
         setMatch(result.match ?? null);
         setBudget(result.budget ?? null);
-      setEarlyBooking(result.earlyBooking ?? null);
+        setEarlyBooking(result.earlyBooking ?? null);
         setLive(applyPriced(result));
       } else {
         setLive(await searchTrip(await parseTrip(sentence)));
@@ -520,7 +519,8 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
     try {
       const result = await runLiveSearch({ data: { sentence, stops: next } });
       const priced = result.search;
-      if (priced.flight && result.priced.flight != null) priced.flight.amountEur = result.priced.flight;
+      if (priced.flight && result.priced.flight != null)
+        priced.flight.amountEur = result.priced.flight;
       if (priced.stay && result.priced.stay != null) priced.stay.amountEur = result.priced.stay;
       if (priced.car && result.priced.car != null) priced.car.amountEur = result.priced.car;
       priced.totalEur = result.priced.total;
@@ -569,7 +569,6 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
       setRequestedNames({ hotel: null, car: null });
     }
 
-
     // Kick the real search off immediately; the animation runs alongside it.
     const startedAt = Date.now();
     const search = (async () => {
@@ -593,7 +592,7 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
           setInsurance(result.insurance);
           setMatch(result.match ?? null);
           setBudget(result.budget ?? null);
-      setEarlyBooking(result.earlyBooking ?? null);
+          setEarlyBooking(result.earlyBooking ?? null);
         }
         return priced;
       }
@@ -701,8 +700,7 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
         ),
       )
     : 1;
-  const nightsLabel =
-    nights === 1 ? d.nightsOne : fill(d.nightsMany, { count: String(nights) });
+  const nightsLabel = nights === 1 ? d.nightsOne : fill(d.nightsMany, { count: String(nights) });
 
   const cardTitle = req
     ? `${req.destinationCity} · ${dayLabel(req.departDate, locale)} – ${dayLabel(req.returnDate, locale)}`
@@ -724,7 +722,11 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
   const totalLabel = eur(Math.round((travelTotal + insuranceAdd) * 100) / 100);
   // The saved estimate follows what is actually kept in the card.
   const savedShown = live
-    ? Math.round(live.savedEur * (travelTotal > 0 ? Math.min(1, travelTotal / Math.max(1, live.totalEur)) : 0) * 100) / 100
+    ? Math.round(
+        live.savedEur *
+          (travelTotal > 0 ? Math.min(1, travelTotal / Math.max(1, live.totalEur)) : 0) *
+          100,
+      ) / 100
     : 0;
   const invoiceVisible = req ? req.invoiceToCompany : Boolean(parsed?.invoice);
 
@@ -837,7 +839,6 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                       </div>
                     )}
 
-
                     <MatchNote match={match?.flight} label="flight" />
 
                     {live?.flight && !dropped.flight && (
@@ -864,7 +865,8 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
 
                     {requestedNames.hotel && !dropped.hotel && (
                       <p className="px-5 pt-3 text-xs text-muted-foreground">
-                        Requested: <span className="font-medium text-foreground">{requestedNames.hotel}</span>
+                        Requested:{" "}
+                        <span className="font-medium text-foreground">{requestedNames.hotel}</span>
                       </p>
                     )}
 
@@ -899,7 +901,8 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                     ) : live?.hotelNotFound ? (
                       <div className={`${reveal(2)} px-5 py-4`}>
                         <p className="text-sm font-medium">
-                          We don&apos;t have &lsquo;{live.hotelRequested}&rsquo; in our inventory yet
+                          We don&apos;t have &lsquo;{live.hotelRequested}&rsquo; in our inventory
+                          yet
                         </p>
                         {live.hotelAlternatives.length > 0 && (
                           <>
@@ -954,8 +957,6 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                       </div>
                     )}
 
-
-
                     <MatchNote match={match?.stay} label="hotel" />
 
                     {live?.stay && !dropped.hotel && (
@@ -971,7 +972,8 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
 
                     {requestedNames.car && !dropped.car && (
                       <p className="px-5 pt-3 text-xs text-muted-foreground">
-                        Requested: <span className="font-medium text-foreground">{requestedNames.car}</span>
+                        Requested:{" "}
+                        <span className="font-medium text-foreground">{requestedNames.car}</span>
                       </p>
                     )}
 
@@ -1037,7 +1039,6 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                         </p>
                       </div>
                     ) : live ? null : (
-
                       <div className={reveal(3)}>
                         <TripRow
                           icon={<CarFront className="size-4" />}
@@ -1050,7 +1051,6 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                         />
                       </div>
                     )}
-
 
                     <MatchNote match={match?.car} label="car" />
 
@@ -1090,8 +1090,6 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                       </div>
                     )}
 
-
-
                     {signedIn && cardId && <TripExtras cardId={cardId} />}
 
                     {anyDropped && (
@@ -1106,8 +1104,6 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                         </button>
                       </div>
                     )}
-
-
 
                     {earlyBooking && showTotal && (
                       <p className="px-5 py-3 text-xs text-muted-foreground">
@@ -1179,9 +1175,7 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                       {cardId ? (
                         <button
                           type="button"
-                          onClick={() =>
-                            navigate({ to: "/book/$cardId", params: { cardId } })
-                          }
+                          onClick={() => navigate({ to: "/book/$cardId", params: { cardId } })}
                           className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
                         >
                           {d.bookAll} <ChevronRight className="size-4" />
@@ -1205,8 +1199,7 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                           title={d.savedNote}
                           className="cursor-help underline decoration-primary/30 decoration-dotted underline-offset-4"
                         >
-                          {fill(d.savedLive, { amount: eur(savedShown) })} ·{" "}
-                          {d.savedEstimate}
+                          {fill(d.savedLive, { amount: eur(savedShown) })} · {d.savedEstimate}
                         </span>
                       </p>
                     ) : (
