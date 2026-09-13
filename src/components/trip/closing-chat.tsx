@@ -27,6 +27,7 @@ import { getPaymentSession } from "@/lib/payment.functions";
 import { PaymentStep, type AuthorisedPayment } from "@/components/payment-step";
 import { bookTripCard, type BookingResult } from "@/lib/booking.functions";
 import { track } from "@/lib/track";
+import { useT } from "@/lib/i18n";
 
 const fieldClass =
   "mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary";
@@ -59,6 +60,7 @@ export function ClosingChat({
   ancillaries?: Array<{ serviceId: string; quantity: number }>;
 }) {
   const navigate = useNavigate();
+  const c = useT().assistant.closing;
   const fetchAccount = useServerFn(getAccount);
   const fetchIdentity = useServerFn(getBookingIdentity);
   const fetchPayment = useServerFn(getPaymentSession);
@@ -134,14 +136,14 @@ export function ClosingChat({
     return (
       <div className="mt-4 space-y-2 text-sm">
         <p className="text-muted-foreground">
-          This route needs passport details, so we finish on the secure page.
+          {c.passport}
         </p>
         <button
           type="button"
           onClick={() => navigate({ to: "/book/$cardId", params: { cardId } })}
           className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground"
         >
-          Continue
+          {c.continueSecure}
         </button>
       </div>
     );
@@ -188,13 +190,11 @@ export function ClosingChat({
       }
     },
     onError: () =>
-      setProblem(
-        "That did not go through, and nothing was charged. We can finish it on the secure page.",
-      ),
+      setProblem(c.failed),
   });
 
   if (loading) {
-    return <p className="mt-4 text-sm text-muted-foreground">One moment…</p>;
+    return <p className="mt-4 text-sm text-muted-foreground">{c.moment}</p>;
   }
 
   if (result && result.status !== "failed") {
@@ -249,14 +249,14 @@ export function ClosingChat({
 
       {needsCompanyName && (
         <div className="space-y-2">
-          <p>Which company should the invoice go to?</p>
+          <p>{c.invoiceName}</p>
           <div className="flex gap-2">
             <input
               value={companyName}
               onChange={(event) => setCompanyName(event.target.value)}
-              placeholder="Company name"
+              placeholder={c.companyPlaceholder}
               className={`${fieldClass} mt-0`}
-              aria-label="Company name"
+              aria-label={c.companyPlaceholder}
             />
             <button
               type="button"
@@ -267,11 +267,11 @@ export function ClosingChat({
                     setCompanyChoice(saved.id);
                     void account.refetch();
                   })
-                  .catch(() => setProblem("We could not save that company. Try again."));
+                  .catch(() => setProblem(c.companyFailed));
               }}
               className="shrink-0 rounded-xl border border-border px-3 py-2 text-sm font-medium hover:border-primary disabled:opacity-60"
             >
-              Save
+              {c.save}
             </button>
           </div>
         </div>
@@ -280,41 +280,41 @@ export function ClosingChat({
       {/* ticket details: asked once, remembered afterwards */}
       {needsDetails && (
         <div className="space-y-2">
-          <p>I need your details for the ticket, once.</p>
+          <p>{c.detailsOnce}</p>
           <div className="grid gap-2 sm:grid-cols-2">
             <input
               value={details.givenName}
               onChange={(event) => setDetails((d) => ({ ...d, givenName: event.target.value }))}
-              placeholder="First name"
-              aria-label="First name"
+              placeholder={c.firstName}
+              aria-label={c.firstName}
               className={fieldClass}
             />
             <input
               value={details.familyName}
               onChange={(event) => setDetails((d) => ({ ...d, familyName: event.target.value }))}
-              placeholder="Last name"
-              aria-label="Last name"
+              placeholder={c.lastName}
+              aria-label={c.lastName}
               className={fieldClass}
             />
             <input
               value={details.email}
               onChange={(event) => setDetails((d) => ({ ...d, email: event.target.value }))}
-              placeholder="Email"
-              aria-label="Email"
+              placeholder={c.email}
+              aria-label={c.email}
               className={fieldClass}
             />
             <input
               value={details.phone}
               onChange={(event) => setDetails((d) => ({ ...d, phone: event.target.value }))}
-              placeholder="Phone"
-              aria-label="Phone"
+              placeholder={c.phone}
+              aria-label={c.phone}
               className={fieldClass}
             />
             <input
               type="date"
               value={details.bornOn}
               onChange={(event) => setDetails((d) => ({ ...d, bornOn: event.target.value }))}
-              aria-label="Date of birth"
+              aria-label={c.bornOn}
               className={fieldClass}
             />
           </div>
@@ -332,11 +332,11 @@ export function ClosingChat({
                   setDetailsSaved(true);
                   void identity.refetch();
                 })
-                .catch(() => setProblem("Those details were not accepted. Please check them."));
+                .catch(() => setProblem(c.detailsFailed));
             }}
             className="rounded-xl border border-border px-3 py-2 text-sm font-medium hover:border-primary"
           >
-            Save for next time
+            {c.saveForNextTime}
           </button>
         </div>
       )}
@@ -382,7 +382,7 @@ export function ClosingChat({
             onClick={() => navigate({ to: "/book/$cardId", params: { cardId } })}
             className="rounded-xl border border-border px-3 py-2 text-sm font-medium hover:border-primary"
           >
-            Finish on the secure page
+            {c.finishSecure}
           </button>
         </div>
       )}
@@ -398,14 +398,14 @@ export function ClosingChat({
             }}
             className="rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground disabled:opacity-60"
           >
-            Book it
+            {c.bookIt}
           </button>
           <button
             type="button"
             onClick={() => navigate({ to: "/book/$cardId", params: { cardId } })}
             className="rounded-xl border border-border px-4 py-2.5 text-sm font-medium hover:border-primary"
           >
-            Change something
+            {c.changeSomething}
           </button>
         </div>
       ) : payment.data ? (
@@ -420,12 +420,12 @@ export function ClosingChat({
           />
         </div>
       ) : (
-        <p className="text-muted-foreground">Opening the secure card form…</p>
+        <p className="text-muted-foreground">{c.opening}</p>
       )}
 
       {nothingToAsk(closing) && !payNow && (
         <p className="text-xs text-muted-foreground">
-          Test mode — no real charge is made and no ticket is issued.
+          {c.testMode}
         </p>
       )}
     </div>
