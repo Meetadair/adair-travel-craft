@@ -3,28 +3,18 @@ import {
   Plane,
   BedDouble,
   CarFront,
-  Check,
   X,
   ArrowRight,
-  UtensilsCrossed,
-  Wallet,
   Armchair,
-  Building2,
   Sparkles,
-  MapPin,
-  CalendarDays,
-  Clock,
   ChevronRight,
-  Coffee,
-  FileDown,
   Share2,
   Receipt,
-  Users,
   Copy,
   ShieldCheck,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { LineOptions, MatchNote } from "@/components/trip-line-options";
@@ -33,16 +23,11 @@ import { track } from "@/lib/track";
 import { TripExtras } from "@/components/trip-extras";
 import { searchLiveTrip, swapCardAlternative } from "@/lib/trip-live.functions";
 import type { BudgetStatus, MatchSummary } from "@/lib/trip/match";
-import {
-  INSURANCE_DETAIL,
-  INSURANCE_TITLE,
-  type InsuranceQuote,
-} from "@/lib/trip/insurance";
+import { INSURANCE_DETAIL, INSURANCE_TITLE, type InsuranceQuote } from "@/lib/trip/insurance";
 import { parseTripSentence } from "@/lib/trip/parse";
 import { TripRoute } from "@/components/trip-route";
 import type { TripStop } from "@/lib/trip/types";
 
-import { downloadTripInvoice } from "@/lib/trip-pdf";
 import { SiteNav } from "@/components/site-nav";
 import { LocaleLink, useLocale, useT, type Dict } from "@/lib/i18n";
 import { parseDemoSentence, fill, referralCode } from "@/lib/demo-sentence";
@@ -216,14 +201,9 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 function Hero({ t, onSubmit }: { t: Dict; onSubmit: (sentence: string) => void }) {
   const [value, setValue] = useState("");
   return (
-    <section className="mx-auto max-w-4xl px-6 pt-28 pb-20 text-center sm:pt-36">
-      <div className="animate-rise" style={{ animationDelay: "0ms" }}>
-        <Tag>
-          <Sparkles className="size-3" /> {t.home.hero.badge}
-        </Tag>
-      </div>
+    <section className="mx-auto max-w-4xl px-6 pb-16 pt-16 text-center sm:pb-20 sm:pt-28">
       <h1
-        className="animate-rise mt-8 font-display text-5xl font-semibold leading-[1.04] tracking-tight text-foreground sm:text-7xl"
+        className="animate-rise font-display text-5xl font-semibold leading-[1.04] tracking-tight text-foreground sm:text-7xl"
         style={{ animationDelay: "90ms" }}
       >
         {t.home.hero.titleLine1}
@@ -231,14 +211,14 @@ function Hero({ t, onSubmit }: { t: Dict; onSubmit: (sentence: string) => void }
         {t.home.hero.titleLine2}
       </h1>
       <p
-        className="animate-rise mx-auto mt-6 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg"
+        className="animate-rise mx-auto mt-5 max-w-lg text-base leading-relaxed text-muted-foreground"
         style={{ animationDelay: "180ms" }}
       >
         {t.home.hero.lead}
       </p>
 
       <form
-        className="animate-rise mx-auto mt-10 w-full max-w-[560px]"
+        className="animate-rise mx-auto mt-8 w-full max-w-[560px]"
         style={{ animationDelay: "270ms" }}
         onSubmit={(e) => {
           e.preventDefault();
@@ -272,64 +252,6 @@ function Hero({ t, onSubmit }: { t: Dict; onSubmit: (sentence: string) => void }
         >
           {t.home.hero.ctaPrimary}
         </a>
-      </div>
-    </section>
-  );
-}
-
-function Comparison({ t }: { t: Dict }) {
-  const c = t.home.comparison;
-  return (
-    <section className="mx-auto max-w-5xl px-6 py-20">
-      <SectionLabel>{c.label}</SectionLabel>
-      <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
-        {c.title}
-      </h2>
-
-      <div className="mt-12 grid gap-5 md:grid-cols-2">
-        <div className="hairline-card p-6 sm:p-8">
-          <div className="flex items-center justify-between">
-            <h3 className="font-display text-lg font-semibold">{c.withoutTitle}</h3>
-            <Tag>
-              <X className="size-3" /> {c.withoutTag}
-            </Tag>
-          </div>
-          <ul className="mt-6 space-y-3">
-            {c.apps.map((app) => (
-              <li
-                key={app.name}
-                className="flex items-center justify-between gap-3 rounded-lg border border-border bg-background px-4 py-3"
-              >
-                <span className="text-sm font-medium text-foreground">{app.name}</span>
-                <span className="text-xs text-muted-foreground">{app.detail}</span>
-              </li>
-            ))}
-          </ul>
-          <p className="mt-6 border-t border-border pt-4 text-sm text-muted-foreground">
-            {c.withoutFooter}
-          </p>
-        </div>
-
-        <div className="hairline-card relative overflow-hidden p-6 sm:p-8">
-          <div className="flex items-center justify-between">
-            <h3 className="font-display text-lg font-semibold">{c.withTitle}</h3>
-            <Tag accent>
-              <Check className="size-3" /> {c.withTag}
-            </Tag>
-          </div>
-          <div className="mt-6 rounded-lg border border-primary/20 bg-primary/5 px-4 py-5">
-            <p className="text-sm leading-relaxed text-foreground">{c.quote}</p>
-          </div>
-          <div className="mt-4 flex items-center gap-3 rounded-lg border border-border bg-background px-4 py-3">
-            <Plane className="size-4 text-primary" />
-            <BedDouble className="size-4 text-primary" />
-            <CarFront className="size-4 text-primary" />
-            <span className="text-sm font-medium text-foreground">{c.bundle}</span>
-          </div>
-          <p className="mt-6 border-t border-border pt-4 text-sm text-muted-foreground">
-            {c.withFooter} <span className="font-semibold text-primary">€1,240</span>
-          </p>
-        </div>
       </div>
     </section>
   );
@@ -425,9 +347,11 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
   const [match, setMatch] = useState<MatchSummary | null>(null);
   const [budget, setBudget] = useState<BudgetStatus | null>(null);
   // Set when booking far ahead lowered our own fee (leisure trips only).
-  const [earlyBooking, setEarlyBooking] = useState<
-    { daysAhead: number; discountBps: number; savedEur: number } | null
-  >(null);
+  const [earlyBooking, setEarlyBooking] = useState<{
+    daysAhead: number;
+    discountBps: number;
+    savedEur: number;
+  } | null>(null);
   const [amendText, setAmendText] = useState("");
   const [amending, setAmending] = useState(false);
 
@@ -452,7 +376,9 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
     track("line_swapped", { kind, ...(reason ? { reason } : {}) });
     setSwapping(true);
     try {
-      const result = await runSwap({ data: { cardId, kind, index, ...(reason ? { reason } : {}) } });
+      const result = await runSwap({
+        data: { cardId, kind, index, ...(reason ? { reason } : {}) },
+      });
       setMatch(result.match ?? null);
       setBudget(result.budget ?? null);
       setEarlyBooking(result.earlyBooking ?? null);
@@ -463,7 +389,6 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
       setSwapping(false);
     }
   };
-
 
   useEffect(() => {
     let active = true;
@@ -522,7 +447,7 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
         setInsurance(result.insurance);
         setMatch(result.match ?? null);
         setBudget(result.budget ?? null);
-      setEarlyBooking(result.earlyBooking ?? null);
+        setEarlyBooking(result.earlyBooking ?? null);
         setLive(applyPriced(result));
       } else {
         const request = await parseTrip(sentence);
@@ -560,7 +485,7 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
         setInsurance(result.insurance);
         setMatch(result.match ?? null);
         setBudget(result.budget ?? null);
-      setEarlyBooking(result.earlyBooking ?? null);
+        setEarlyBooking(result.earlyBooking ?? null);
         setLive(applyPriced(result));
       } else {
         setLive(await searchTrip(await parseTrip(sentence)));
@@ -583,7 +508,8 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
     try {
       const result = await runLiveSearch({ data: { sentence, stops: next } });
       const priced = result.search;
-      if (priced.flight && result.priced.flight != null) priced.flight.amountEur = result.priced.flight;
+      if (priced.flight && result.priced.flight != null)
+        priced.flight.amountEur = result.priced.flight;
       if (priced.stay && result.priced.stay != null) priced.stay.amountEur = result.priced.stay;
       if (priced.car && result.priced.car != null) priced.car.amountEur = result.priced.car;
       priced.totalEur = result.priced.total;
@@ -632,7 +558,6 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
       setRequestedNames({ hotel: null, car: null });
     }
 
-
     // Kick the real search off immediately; the animation runs alongside it.
     const startedAt = Date.now();
     const search = (async () => {
@@ -656,7 +581,7 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
           setInsurance(result.insurance);
           setMatch(result.match ?? null);
           setBudget(result.budget ?? null);
-      setEarlyBooking(result.earlyBooking ?? null);
+          setEarlyBooking(result.earlyBooking ?? null);
         }
         return priced;
       }
@@ -764,8 +689,7 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
         ),
       )
     : 1;
-  const nightsLabel =
-    nights === 1 ? d.nightsOne : fill(d.nightsMany, { count: String(nights) });
+  const nightsLabel = nights === 1 ? d.nightsOne : fill(d.nightsMany, { count: String(nights) });
 
   const cardTitle = req
     ? `${req.destinationCity} · ${dayLabel(req.departDate, locale)} – ${dayLabel(req.returnDate, locale)}`
@@ -787,7 +711,11 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
   const totalLabel = eur(Math.round((travelTotal + insuranceAdd) * 100) / 100);
   // The saved estimate follows what is actually kept in the card.
   const savedShown = live
-    ? Math.round(live.savedEur * (travelTotal > 0 ? Math.min(1, travelTotal / Math.max(1, live.totalEur)) : 0) * 100) / 100
+    ? Math.round(
+        live.savedEur *
+          (travelTotal > 0 ? Math.min(1, travelTotal / Math.max(1, live.totalEur)) : 0) *
+          100,
+      ) / 100
     : 0;
   const invoiceVisible = req ? req.invoiceToCompany : Boolean(parsed?.invoice);
 
@@ -900,7 +828,6 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                       </div>
                     )}
 
-
                     <MatchNote match={match?.flight} label="flight" />
 
                     {live?.flight && !dropped.flight && (
@@ -927,7 +854,8 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
 
                     {requestedNames.hotel && !dropped.hotel && (
                       <p className="px-5 pt-3 text-xs text-muted-foreground">
-                        Requested: <span className="font-medium text-foreground">{requestedNames.hotel}</span>
+                        Requested:{" "}
+                        <span className="font-medium text-foreground">{requestedNames.hotel}</span>
                       </p>
                     )}
 
@@ -962,7 +890,8 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                     ) : live?.hotelNotFound ? (
                       <div className={`${reveal(2)} px-5 py-4`}>
                         <p className="text-sm font-medium">
-                          We don&apos;t have &lsquo;{live.hotelRequested}&rsquo; in our inventory yet
+                          We don&apos;t have &lsquo;{live.hotelRequested}&rsquo; in our inventory
+                          yet
                         </p>
                         {live.hotelAlternatives.length > 0 && (
                           <>
@@ -1017,8 +946,6 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                       </div>
                     )}
 
-
-
                     <MatchNote match={match?.stay} label="hotel" />
 
                     {live?.stay && !dropped.hotel && (
@@ -1034,7 +961,8 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
 
                     {requestedNames.car && !dropped.car && (
                       <p className="px-5 pt-3 text-xs text-muted-foreground">
-                        Requested: <span className="font-medium text-foreground">{requestedNames.car}</span>
+                        Requested:{" "}
+                        <span className="font-medium text-foreground">{requestedNames.car}</span>
                       </p>
                     )}
 
@@ -1100,7 +1028,6 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                         </p>
                       </div>
                     ) : live ? null : (
-
                       <div className={reveal(3)}>
                         <TripRow
                           icon={<CarFront className="size-4" />}
@@ -1113,7 +1040,6 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                         />
                       </div>
                     )}
-
 
                     <MatchNote match={match?.car} label="car" />
 
@@ -1153,8 +1079,6 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                       </div>
                     )}
 
-
-
                     {signedIn && cardId && <TripExtras cardId={cardId} />}
 
                     {anyDropped && (
@@ -1169,8 +1093,6 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                         </button>
                       </div>
                     )}
-
-
 
                     {earlyBooking && showTotal && (
                       <p className="px-5 py-3 text-xs text-muted-foreground">
@@ -1242,9 +1164,7 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                       {cardId ? (
                         <button
                           type="button"
-                          onClick={() =>
-                            navigate({ to: "/book/$cardId", params: { cardId } })
-                          }
+                          onClick={() => navigate({ to: "/book/$cardId", params: { cardId } })}
                           className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
                         >
                           {d.bookAll} <ChevronRight className="size-4" />
@@ -1268,8 +1188,7 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                           title={d.savedNote}
                           className="cursor-help underline decoration-primary/30 decoration-dotted underline-offset-4"
                         >
-                          {fill(d.savedLive, { amount: eur(savedShown) })} ·{" "}
-                          {d.savedEstimate}
+                          {fill(d.savedLive, { amount: eur(savedShown) })} · {d.savedEstimate}
                         </span>
                       </p>
                     ) : (
@@ -1331,6 +1250,12 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                   </div>
                 )}
 
+                <p
+                  className={`mt-4 text-sm leading-relaxed text-foreground ${showActions ? "animate-rise" : "hidden"}`}
+                >
+                  {t.home.demoLine}
+                </p>
+
                 <div
                   className={`mt-3 flex flex-wrap items-start gap-2 ${showActions ? "animate-rise" : "hidden"}`}
                 >
@@ -1364,229 +1289,22 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
   );
 }
 
-function MyTrips({ t }: { t: Dict }) {
-  const m = t.home.trips;
-  const cards = [
-    {
-      icon: <Plane className="size-4" />,
-      label: m.flight,
-      title: m.flightTitle,
-      detail: m.flightDetail,
-      code: m.flightCode,
-    },
-    {
-      icon: <BedDouble className="size-4" />,
-      label: m.hotel,
-      title: m.hotelTitle,
-      detail: m.hotelDetail,
-      code: m.hotelCode,
-    },
-    {
-      icon: <CarFront className="size-4" />,
-      label: m.car,
-      title: m.carTitle,
-      detail: m.carDetail,
-      code: m.carCode,
-    },
-  ];
-
-  return (
-    <section className="mx-auto max-w-5xl px-6 py-20">
-      <SectionLabel>{m.label}</SectionLabel>
-      <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
-        {m.title}
-      </h2>
-
-      <div className="mt-12 grid gap-5 sm:grid-cols-3">
-        {cards.map((c) => (
-          <div key={c.label} className="hairline-card p-6">
-            <div className="flex items-center justify-between">
-              <div className="flex size-9 items-center justify-center rounded-lg border border-border bg-background">
-                {c.icon}
-              </div>
-              <Tag>{c.label}</Tag>
-            </div>
-            <h3 className="mt-5 text-sm font-semibold text-foreground">{c.title}</h3>
-            <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{c.detail}</p>
-            <p className="mt-4 border-t border-border pt-3 font-mono text-[11px] tracking-wide text-muted-foreground">
-              {c.code}
-            </p>
-          </div>
-        ))}
-      </div>
-
-      <div className="mt-5 hairline-card px-6 py-4">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-muted-foreground">
-            <span className="inline-flex items-center gap-1.5">
-              <CalendarDays className="size-3.5" /> {m.dates}
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <MapPin className="size-3.5" /> {m.place}
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <Clock className="size-3.5" /> {m.departs}
-            </span>
-          </div>
-          <span className="text-sm font-semibold text-primary">€1,240 · {m.paid}</span>
-        </div>
-        <SavedLine t={t} className="mt-3" />
-      </div>
-
-      <div className="mt-5 flex justify-end">
-        <PdfButton t={t} />
-      </div>
-    </section>
-  );
-}
-
-function PdfButton({ t }: { t: Dict }) {
-  const locale = useLocale();
-  const [loading, setLoading] = useState(false);
-  return (
-    <button
-      onClick={async () => {
-        setLoading(true);
-        try {
-          await downloadTripInvoice({
-            documentNumber: "ADR/2026/DEMO/001",
-            issueDate: new Date().toISOString().slice(0, 10),
-            city: "Milan",
-            origin: "Warsaw",
-            startDate: "2026-09-18",
-            endDate: "2026-09-19",
-            currency: "EUR",
-            live: false,
-            locale,
-            buyer: { name: "", company: "", taxId: "", email: "" },
-            items: [
-              {
-                kind: "flight",
-                title: "LOT 391 · Warsaw → Milan Linate",
-                detail: "Thu Sep 18, 6:35 – 8:50 · returns Fri Sep 19, 20:15",
-                provider: "LOT Polish Airlines",
-                offerReference: "LO391-DEMO",
-                amount: 312,
-                currency: "EUR",
-              },
-              {
-                kind: "hotel",
-                title: "Park Hyatt Milano · 1 night",
-                detail: "120 m from the Duomo, Park Deluxe room, breakfast included",
-                provider: "Park Hyatt",
-                offerReference: "PHM-DEMO",
-                amount: 742,
-                currency: "EUR",
-              },
-              {
-                kind: "car",
-                title: "BMW 3 Series · 2 days",
-                detail: "Pickup at Linate airport, return to the same location",
-                provider: "Sixt",
-                offerReference: "CAR-DEMO",
-                amount: 186,
-                currency: "EUR",
-              },
-            ],
-          });
-        } finally {
-          setLoading(false);
-        }
-      }}
-      disabled={loading}
-      className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-60"
-    >
-      <FileDown className="size-4" />
-      {loading ? t.home.trips.pdfBusy : t.home.trips.pdfIdle}
-    </button>
-  );
-}
-
-function TravelProfile({ t }: { t: Dict }) {
-  const p = t.home.profile;
+function AfterYouBook({ t }: { t: Dict }) {
   const icons = [
-    <Plane key="a" className="size-4" />,
-    <Building2 key="b" className="size-4" />,
-    <UtensilsCrossed key="c" className="size-4" />,
-    <Wallet key="d" className="size-4" />,
-  ];
-
-  return (
-    <section className="mx-auto max-w-5xl px-6 py-20">
-      <div className="hairline-card overflow-hidden">
-        <div className="grid md:grid-cols-[1fr_1.4fr]">
-          <div className="border-b border-border bg-cream-deep p-8 sm:p-10 md:border-b-0 md:border-r">
-            <SectionLabel>{p.label}</SectionLabel>
-            <h2 className="mt-3 font-display text-3xl font-semibold leading-tight tracking-tight">
-              {p.titleLine1}
-              <br />
-              {p.titleLine2}
-            </h2>
-            <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{p.lead}</p>
-            <div className="mt-6 inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2.5">
-              <Armchair className="size-4 text-primary" />
-              <span className="text-xs font-medium text-foreground">{p.activeCount}</span>
-            </div>
-          </div>
-
-          <div className="grid sm:grid-cols-2">
-            {p.groups.map((g, i) => (
-              <div
-                key={g.title}
-                className={`p-6 sm:p-7 ${i % 2 === 0 ? "sm:border-r" : ""} ${i < 2 ? "border-b" : ""} border-border max-sm:border-b max-sm:last:border-b-0`}
-              >
-                <div className="flex items-center gap-2.5">
-                  <span className="text-primary">{icons[i]}</span>
-                  <h3 className="text-sm font-semibold text-foreground">{g.title}</h3>
-                </div>
-                <ul className="mt-4 space-y-2">
-                  {g.items.map((item) => (
-                    <li
-                      key={item}
-                      className="flex items-start gap-2 text-xs leading-relaxed text-muted-foreground"
-                    >
-                      <Check className="mt-0.5 size-3 shrink-0 text-primary" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function Principles({ t }: { t: Dict }) {
-  const icons = [
-    <Sparkles key="a" className="size-5" />,
-    <Coffee key="b" className="size-5" />,
-    <MapPin key="c" className="size-5" />,
+    <Receipt key="a" className="size-4" />,
+    <Armchair key="b" className="size-4" />,
+    <ShieldCheck key="c" className="size-4" />,
   ];
   return (
-    <section id="principles" className="mx-auto max-w-5xl px-6 py-20">
-      <SectionLabel>{t.home.principles.label}</SectionLabel>
-      <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
-        {t.home.principles.title}
-      </h2>
-
-      <div className="mt-12 grid gap-5 md:grid-cols-3">
-        {t.home.principles.items.map((p, i) => (
-          <div key={p.title} className="hairline-card p-7">
-            <div className="flex items-center justify-between">
-              <div className="flex size-10 items-center justify-center rounded-lg border border-border bg-background text-primary">
-                {icons[i]}
-              </div>
-              <span className="font-display text-sm font-semibold text-muted-foreground">
-                0{i + 1}
-              </span>
+    <section className="mx-auto max-w-5xl px-6 py-14">
+      <div className="grid gap-5 sm:grid-cols-3">
+        {t.home.after.items.map((item, i) => (
+          <div key={item.title} className="flex items-start gap-3">
+            <span className="mt-0.5 text-primary">{icons[i]}</span>
+            <div>
+              <h3 className="text-sm font-semibold text-foreground">{item.title}</h3>
+              <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{item.text}</p>
             </div>
-            <h3 className="mt-6 font-display text-lg font-semibold leading-snug text-foreground">
-              {p.title}
-            </h3>
-            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{p.text}</p>
           </div>
         ))}
       </div>
@@ -1594,34 +1312,26 @@ function Principles({ t }: { t: Dict }) {
   );
 }
 
-function Teams({ t }: { t: Dict }) {
-  const c = t.home.campaign;
+function Closing({ t }: { t: Dict }) {
+  const c = t.home.close;
   const locale = useLocale();
   return (
-    <section className="mx-auto max-w-5xl px-6 py-20">
-      <SectionLabel>{c.teamsLabel}</SectionLabel>
-      <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
-        {c.teamsTitle}
-      </h2>
-      <div className="hairline-card mt-8 flex flex-col gap-6 p-7 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-start gap-3.5">
-          <div className="flex size-10 shrink-0 items-center justify-center rounded-lg border border-border bg-background text-primary">
-            <Users className="size-5" />
-          </div>
-          <p className="max-w-md text-sm leading-relaxed text-muted-foreground">{c.teamsLine}</p>
-        </div>
-        <div className="flex flex-col gap-3 sm:w-80 sm:shrink-0">
-          <EarlyAccess t={t} type="teams" label={c.teamsCta} />
-          <LocaleLink
-            to="/business"
-            locale={locale}
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-primary transition-colors hover:text-primary/80"
-          >
-            {c.teamsMore}
-            <ArrowRight className="size-4" />
-          </LocaleLink>
-        </div>
+    <section className="mx-auto max-w-3xl px-6 py-16 text-center">
+      <h2 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">{c.title}</h2>
+      <p className="mt-3 text-base text-muted-foreground">{c.line}</p>
+      <div className="mt-7 flex justify-center">
+        <EarlyAccess t={t} type="early_access" label={t.home.campaign.earlyAccess} />
       </div>
+      <p className="mt-5 text-sm text-muted-foreground">
+        {c.teams}{" "}
+        <LocaleLink
+          to="/business"
+          locale={locale}
+          className="font-medium text-primary underline decoration-primary/30 underline-offset-4 hover:text-primary/80"
+        >
+          {c.teamsLink}
+        </LocaleLink>
+      </p>
     </section>
   );
 }
@@ -1660,18 +1370,11 @@ export function HomePage() {
 
       <main>
         <Hero t={t} onSubmit={runDemo} />
-        {divider}
-        <Comparison t={t} />
-        {divider}
         <ChatDemo t={t} submission={submission} />
         {divider}
-        <MyTrips t={t} />
+        <AfterYouBook t={t} />
         {divider}
-        <TravelProfile t={t} />
-        {divider}
-        <Principles t={t} />
-        {divider}
-        <Teams t={t} />
+        <Closing t={t} />
       </main>
 
       <footer className="mx-auto max-w-6xl px-6 pb-10 pt-6">
@@ -1687,6 +1390,18 @@ export function HomePage() {
             >
               {t.nav.business}
             </LocaleLink>
+            <Link
+              to="/privacy"
+              className="text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+            >
+              Privacy
+            </Link>
+            <Link
+              to="/terms"
+              className="text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+            >
+              Terms
+            </Link>
             <p className="text-xs text-muted-foreground">{t.home.footer}</p>
           </div>
         </div>

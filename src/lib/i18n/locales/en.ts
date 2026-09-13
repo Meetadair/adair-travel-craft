@@ -17,43 +17,18 @@ export const en = {
   home: {
     meta: {
       title: "Adair Travel — One sentence. The whole trip.",
-      description:
-        "Adair is an AI travel assistant that bundles your flight, hotel, and car into a single booking — all from one chat window.",
+      description: "Flight, hotel, car and dinner — booked from a single sentence.",
       ogTitle: "Adair Travel — One sentence. The whole trip.",
-      ogDescription:
-        "Flight, hotel, and car in a single booking card. Instead of five apps — one conversation.",
+      ogDescription: "Flight, hotel, car and dinner — booked from a single sentence.",
     },
     hero: {
-      badge: "Your personal travel planner — concept",
       titleLine1: "One sentence.",
       titleLine2: "The whole trip.",
-      lead: "Adair bundles your flight, hotel, and car into a single booking card — all in one chat window. Instead of five apps, one conversation.",
+      lead: "Flight, hotel, car and dinner — booked from a single sentence.",
       ctaPrimary: "See how it works",
-      ctaSecondary: "Three principles",
       inputLabel: "Describe your trip in one sentence",
-      inputPlaceholder:
-        "e.g. Rome, Friday to Sunday, hotel with a terrace, invoice to my company",
+      inputPlaceholder: "e.g. Rome, Friday to Sunday, hotel with a terrace, invoice to my company",
       inputSubmit: "Show me the trip",
-    },
-    comparison: {
-      label: "Why Adair",
-      title: "Five apps, or one window.",
-      withoutTitle: "Without Adair",
-      withoutTag: "5 apps",
-      withoutFooter: "5 bookings · 5 confirmations · 5 places to check",
-      withTitle: "With Adair",
-      withTag: "1 conversation",
-      withFooter: "1 booking · 1 confirmation ·",
-      quote:
-        "\"I need to be in Milan Thursday morning, back Friday evening, somewhere near the Duomo, and a car on the ground.\"",
-      bundle: "Flight + hotel + car — one card",
-      apps: [
-        { name: "Skyscanner", detail: "flight search, 14 tabs" },
-        { name: "Booking.com", detail: "hotel at public rate" },
-        { name: "Rental agency", detail: "separate car booking" },
-        { name: "A ride app", detail: "getting around locally" },
-        { name: "A restaurant app", detail: "restaurants, separately" },
-      ],
     },
     demo: {
       label: "Conversation demo",
@@ -64,8 +39,7 @@ export const en = {
       cardTitle: "Milan · Thu – Fri",
       cardSubtitle: "Composed to match your travel profile",
       flightTitle: "LOT 391 · Warsaw → Milan",
-      flightDetail:
-        "Thu 6:55 – 9:05 AM · returns Fri 7:40 PM · window seat, preferred airline",
+      flightDetail: "Thu 6:55 – 9:05 AM · returns Fri 7:40 PM · window seat, preferred airline",
       flightTagClass: "Premium Economy",
       hotelTitle: "Park Hyatt Milano",
       hotelDetail: "1 night · King room, quiet floor · 200 m from the Duomo",
@@ -78,8 +52,7 @@ export const en = {
       footnote: "3 items · 1 payment · 1 booking number",
       typing: "Adair is building your trip…",
       saved: "You saved €96 and 2 h 40 min vs. booking it yourself",
-      savedNote:
-        "vs. average public rates and time to book the same trip across separate sites",
+      savedNote: "vs. average public rates and time to book the same trip across separate sites",
       invoiceLine: "Invoice → your company",
       share: "Share this trip card",
       shareCopied: "Copied",
@@ -102,15 +75,7 @@ export const en = {
       hotelDetailTpl: "1 night · King room, quiet floor · in the historic centre",
       carTitleTpl: "BMW 3 Series · pickup at {code}",
       carDetailTpl: "{day1} 9:30 AM – {day2} 6:30 PM · full insurance, no deposit",
-      weekdays: [
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-        "Sunday",
-      ],
+      weekdays: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
       weekdaysShort: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
     },
     campaign: {
@@ -132,80 +97,30 @@ export const en = {
       teamsCta: "Join the Teams waitlist",
       teamsMore: "See the offer for companies",
     },
-    trips: {
-      label: "My trips",
-      title: "Everything in one place after you book.",
-      flight: "Flight",
-      hotel: "Hotel",
-      car: "Car",
-      flightTitle: "LOT 391 · WAW → MXP",
-      flightDetail: "Thu, Sep 18 · 6:55 AM · seat 7A",
-      flightCode: "Booking ADR-8K2M4F",
-      hotelTitle: "Park Hyatt Milano",
-      hotelDetail: "Check-in Sep 18 · 1 night · King",
-      hotelCode: "Confirmation PH-55271",
-      carTitle: "BMW 3 Series · Linate",
-      carDetail: "Pickup 9:30 AM · return Fri 6:30 PM",
-      carCode: "Voucher ADR-CAR-0912",
-      dates: "Thu 18 – Fri 19 Sep",
-      place: "Milan, Italy",
-      departs: "departs in 6 days",
-      paid: "paid",
-      pdfIdle: "Download trip card (PDF)",
-      pdfBusy: "Generating PDF…",
-    },
-    profile: {
-      label: "Travel profile",
-      titleLine1: "Set it once.",
-      titleLine2: "It works every time.",
-      lead: "Adair learns your preferences once — and every trip after that honors them automatically. No filters to click, nothing to compare.",
-      activeCount: "18 active preferences",
-      groups: [
-        {
-          title: "Flights",
-          items: [
-            "LOT, Lufthansa, Air France",
-            "Premium Economy for 2h+ flights",
-            "Window seat, front of cabin",
-          ],
-        },
-        {
-          title: "Hotels",
-          items: [
-            "Hyatt, Small Luxury Hotels",
-            "Quiet floor, King bed",
-            "Max 10 min walk from destination",
-          ],
-        },
-        {
-          title: "Diet & timing",
-          items: ["Gluten-free", "Breakfast included", "Late checkout after 11:00 AM"],
-        },
-        {
-          title: "Budget",
-          items: ["Up to €1,500 / 2-day trip", "Company VAT invoice", "EUR, one card"],
-        },
-      ],
-    },
-    principles: {
-      label: "Three principles",
-      title: "This is what Adair stands on.",
+    demoLine: "Five apps, five confirmations, five places to check — or this.",
+    after: {
       items: [
         {
-          title: "One trip, not three bookings",
-          text: "A flight, a hotel, and a car are one trip — so they should be one booking. One window, one payment, one confirmation.",
+          title: "Everything in one place",
+          text: "Confirmations, vouchers and changes, in My trips.",
         },
         {
-          title: "A price no one else gets you",
-          text: "Hotels at our own negotiated rates — not public Booking.com pricing. You see the difference right in the summary.",
+          title: "It learns you",
+          text: "Set preferences once. Every trip after honours them.",
         },
         {
-          title: "One place after you book",
-          text: "Confirmation numbers, vouchers, changes, and cancellations — all in one My Trips view, right up to the last day of your trip.",
+          title: "Someone to call",
+          text: "Support with your booking in front of them.",
         },
       ],
     },
-    footer: "Product concept — sample data. Adair Travel, 2026.",
+    close: {
+      title: "Adair launches in October.",
+      line: "First 100 accounts get 3 months of Signature free.",
+      teams: "Adair for Teams — one policy, one invoice.",
+      teamsLink: "Join the list",
+    },
+    footer: "Adair Kft. · Budapest",
   },
 
   assistant: {
@@ -475,9 +390,27 @@ export const en = {
       savedNote: "this quarter, across 21 trips",
       tripsCount: "trips",
       trips: [
-        { who: "Anna K.", route: "Warsaw → Milan", dates: "18–19 Sep", amount: "€1,240", paid: true },
-        { who: "Tomasz W.", route: "Warsaw → Berlin", dates: "22–23 Sep", amount: "€780", paid: true },
-        { who: "Kitti F.", route: "Budapest → London", dates: "25–27 Sep", amount: "€1,610", paid: false },
+        {
+          who: "Anna K.",
+          route: "Warsaw → Milan",
+          dates: "18–19 Sep",
+          amount: "€1,240",
+          paid: true,
+        },
+        {
+          who: "Tomasz W.",
+          route: "Warsaw → Berlin",
+          dates: "22–23 Sep",
+          amount: "€780",
+          paid: true,
+        },
+        {
+          who: "Kitti F.",
+          route: "Budapest → London",
+          dates: "25–27 Sep",
+          amount: "€1,610",
+          paid: false,
+        },
       ],
       people: [
         { name: "Anna K.", amount: "€4,120", share: 78 },
@@ -523,7 +456,8 @@ export const en = {
 
     plansLabel: "Packages",
     plansTitle: "Pick the frame that fits your team.",
-    plansNote: "Teams starts with a 14-day trial, no card required. Prices exclude VAT. Enterprise is priced on the size of your team and your policy.",
+    plansNote:
+      "Teams starts with a 14-day trial, no card required. Prices exclude VAT. Enterprise is priced on the size of your team and your policy.",
     plansTrial: "14 days free",
     quote: "Request a quote",
     plans: [
@@ -583,7 +517,7 @@ export const en = {
       success: "Thank you — we'll get back to you within one business day.",
       error: "That didn't go through. Please try again.",
     },
-    footer: "Product concept — sample data. Adair Travel, 2026.",
+    footer: "Adair Kft. · Budapest",
   },
 } as const;
 
