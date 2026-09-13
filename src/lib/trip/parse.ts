@@ -6,6 +6,7 @@
 import { CITIES, DEFAULT_DESTINATION, DEFAULT_ORIGIN, findCity, type CityEntry } from "./cities";
 import { airportByIata } from "@/lib/prefs/airports";
 import { passengersFromSentence } from "./passengers";
+import { familyFromSentence } from "./family";
 import type { TripRequest, TripStop } from "./types";
 
 /** Weekday match terms, index 0 = Monday. */
@@ -291,6 +292,8 @@ export function parseTripSentence(
   }
   const mustDepartBy = mustDepartOf(sentence, today, iso(back));
 
+  const family = familyFromSentence(sentence);
+
   const stopEntries = destinations.length ? destinations : [destination];
   const stops: TripStop[] = [
     { city: origin.city, iata: origin.iata, lat: origin.lat, lon: origin.lon },
@@ -307,7 +310,9 @@ export function parseTripSentence(
     departDate: iso(depart),
     returnDate: iso(back),
     cabinClass: cabinOf(text),
-    passengers: passengersOf(text),
+    passengers: Math.max(passengersOf(text), family.children + family.infants + 1),
+    childAges: family.ages.filter((age) => age >= 2),
+    infants: family.infants,
     hotelWish: hotelWishOf(sentence),
     hotelNameExact: namedHotel && !isCityName(namedHotel) ? namedHotel : null,
     carNameExact: carNameExactOf(sentence),

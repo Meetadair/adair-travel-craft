@@ -5,6 +5,31 @@
  */
 import { findByName } from "./match";
 import { guestsPerRoom, roomsFor } from "./passengers";
+
+/** Adults only, for the room split — children never make a room of their own. */
+function adultsOf(req: TripRequest): number {
+  const children = (req.childAges?.length ?? 0) + (req.infants ?? 0);
+  return Math.max(1, req.passengers - children);
+}
+
+function flightPassengers(req: TripRequest): Array<{ type?: string; age?: number }> {
+  const ages = req.childAges ?? [];
+  return [
+    ...Array.from({ length: adultsOf(req) }, () => ({ type: "adult" })),
+    ...ages.map((age) => ({ age })),
+    ...Array.from({ length: req.infants ?? 0 }, () => ({ type: "infant_without_seat" })),
+  ];
+}
+
+function stayGuests(req: TripRequest): Array<{ type: string; age?: number }> {
+  const adults = adultsOf(req);
+  const perRoom = guestsPerRoom(adults);
+  return [
+    ...Array.from({ length: perRoom }, () => ({ type: "adult" })),
+    ...(req.childAges ?? []).map((age) => ({ type: "child", age })),
+    ...Array.from({ length: req.infants ?? 0 }, () => ({ type: "child", age: 1 })),
+  ];
+}
 import {
   carScore,
   carsPassingDealbreakers,
@@ -147,7 +172,9 @@ export async function searchFlight(
             departure_date: req.returnDate,
           },
         ],
-        passengers: Array.from({ length: req.passengers }, () => ({ type: "adult" })),
+        // Age drives the fare: children get a child fare, babies a lap-infant
+        // fare, so the airline prices the family rather than a row of adults.
+        passengers: flightPassengers(req),
         cabin_class: req.cabinClass,
       },
     },
@@ -288,8 +315,10 @@ export async function searchStay(
       check_in_date: req.departDate,
       check_out_date: req.returnDate,
       // Two share a room; three or more get doubles rather than one big room.
-      rooms: roomsFor(req.passengers),
-      guests: Array.from({ length: guestsPerRoom(req.passengers) }, () => ({ type: "adult" })),
+      rooms: roomsFor(adultsOf(req)),
+      // Children's ages go with the occupancy, so the hotel only offers rooms
+      // that actually take this family.
+      guests: stayGuests(req),
       location: sample
         ? {
             radius: TEST_LOCATION.radius,
