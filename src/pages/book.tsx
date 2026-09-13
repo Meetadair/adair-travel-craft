@@ -498,6 +498,9 @@ export function BookPage({ cardId }: { cardId: string }) {
               {(familyLines.length > 0 || seats.length > 0) && (
                 <div className="space-y-2 border-t border-border pt-4">
                   <p className="text-xs font-medium text-muted-foreground">Travelling with children</p>
+                  {search?.familyNote ? (
+                    <p className="text-xs leading-relaxed text-foreground">{search.familyNote}</p>
+                  ) : null}
                   {familyLines.map((line) => (
                     <p key={line.kind} className="text-xs leading-relaxed text-muted-foreground">
                       {line.label} —{" "}
