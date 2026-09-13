@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { parseTripSentence } from "./trip/parse";
 
 const askSchema = z.object({
   message: z.string().min(3).max(1000),
@@ -26,12 +27,13 @@ const REPLY_LANGUAGE: Record<string, string> = {
 };
 
 const parsedSchema = z.object({
-  originCity: z.string().default("Warsaw"),
-  originIata: z.string().default("WAW"),
-  destinationCity: z.string().default("Milan"),
-  destinationIata: z.string().default("MIL"),
-  departDate: z.string(),
-  returnDate: z.string(),
+  originCity: z.string().min(1).default("Warsaw"),
+  originIata: z.string().min(3).default("WAW"),
+  // No default destination: an input without a place is not a trip.
+  destinationCity: z.string().min(1),
+  destinationIata: z.string().min(3),
+  departDate: z.string().min(8),
+  returnDate: z.string().min(8),
   cabinClass: z.string().optional(),
   needsCar: z.boolean().optional(),
   notes: z.string().optional(),
@@ -40,18 +42,22 @@ const parsedSchema = z.object({
 
 type ParsedRequest = z.infer<typeof parsedSchema>;
 
-function fallbackParse(message: string): ParsedRequest {
-  const today = new Date();
-  const depart = new Date(today.getTime() + 7 * 86_400_000);
-  const back = new Date(today.getTime() + 8 * 86_400_000);
-  const iso = (d: Date) => d.toISOString().slice(0, 10);
+/**
+ * The deterministic reading of the sentence. It invents neither a city nor
+ * dates: with no destination in the text it returns null and the chat asks
+ * where the traveller is going.
+ */
+function fallbackParse(message: string): ParsedRequest | null {
+  const request = parseTripSentence(message);
+  if (!request) return null;
   return {
-    originCity: "Warsaw",
-    originIata: "WAW",
-    destinationCity: "Milan",
-    destinationIata: "MIL",
-    departDate: iso(depart),
-    returnDate: iso(back),
+    originCity: request.originCity,
+    originIata: request.originIata,
+    destinationCity: request.destinationCity,
+    destinationIata: request.destinationIata,
+    departDate: request.departDate,
+    returnDate: request.returnDate,
+    ...(request.cabinClass ? { cabinClass: request.cabinClass } : {}),
     needsCar: /auto|samoch|car/i.test(message),
     notes: message,
   };
@@ -115,8 +121,12 @@ async function understandWithClaude(
 }
 
 /** Turns a free-form natural-language request into a structured trip search. */
-async function understand(message: string, locale = "en"): Promise<ParsedRequest> {
+async function understand(message: string, locale = "en"): Promise<ParsedRequest | null> {
   const today = new Date().toISOString().slice(0, 10);
+
+  // No destination in the sentence: nothing is searched and nothing invented.
+  const rules = fallbackParse(message);
+  if (!rules) return null;
 
   const claude = await understandWithClaude(message, locale, today);
   if (claude) return claude;
@@ -161,6 +171,8 @@ export const composeTrip = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => askSchema.parse(data))
   .handler(async ({ data }) => {
     const parsed = await understand(data.message, data.locale ?? "en");
+    // The chat asks "Where are you going?" instead of searching.
+    if (!parsed) return { needsDestination: true as const };
     const { searchTrip } = await import("./travel-search.server");
     const result = await searchTrip({
       originCity: parsed.originCity,
