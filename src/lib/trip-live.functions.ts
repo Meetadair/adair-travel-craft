@@ -556,6 +556,28 @@ export const swapCardAlternative = createServerFn({ method: "POST" })
     });
     if (feedbackError) console.error("Could not log choice feedback", feedbackError);
 
+    // A swap is the clearest statement of taste there is: remember what they
+    // moved *to*, for this city.
+    const chosenName = (chosen as { name?: string; supplier?: string; carrier?: string } | null) ?? null;
+    const memoryKind =
+      data.kind === "stay" ? "hotel" : data.kind === "car" ? "car_supplier" : "airline";
+    const memoryName =
+      data.kind === "stay"
+        ? (chosenName?.name ?? "")
+        : data.kind === "car"
+          ? (chosenName?.supplier ?? "")
+          : (chosenName?.carrier ?? "");
+    if (memoryName) {
+      const { rememberChoice } = await import("@/lib/trip/memory.server");
+      await rememberChoice(supabase, userId, {
+        city: request.destinationCity,
+        iata: request.destinationIata,
+        itemKind: memoryKind,
+        itemName: memoryName,
+        source: "swapped_to",
+      });
+    }
+
     const plan = (profileRes.data as { plan: string } | null)?.plan ?? "free";
     const baseTable = await pricing.loadPricing(supabase, plan);
     // The early-booking reward was earned by the departure date, so it survives
