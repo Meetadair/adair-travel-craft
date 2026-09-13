@@ -1,9 +1,10 @@
 /**
  * Rule-based parser: free-text sentence → structured trip request.
  * No AI call, so it is fast and deterministic. Weekday names resolve relative
- * to today; unparseable input falls back to Milan, next Tuesday–Thursday.
+ * to today. There is no default city: a sentence without a destination cannot
+ * be a trip, so the parser returns null and Adair asks where they are going.
  */
-import { CITIES, DEFAULT_DESTINATION, DEFAULT_ORIGIN, findCity, type CityEntry } from "./cities";
+import { CITIES, DEFAULT_ORIGIN, findCity, type CityEntry } from "./cities";
 import { airportByIata } from "@/lib/prefs/airports";
 import { passengersFromSentence } from "./passengers";
 import { familyFromSentence } from "./family";
@@ -230,15 +231,26 @@ function meetingLocationOf(sentence: string): string | null {
   return match?.[1]?.trim() ?? null;
 }
 
+/** True when the sentence names a place we can actually fly to. */
+export function hasDestination(sentence: string): boolean {
+  const text = ` ${sentence.toLowerCase()} `;
+  return (findCitiesInOrder(text)[0] ?? findCity(text)) != null;
+}
+
+/**
+ * Structured trip request, or null when the sentence names no destination.
+ * Never guesses a city or a set of dates out of nothing.
+ */
 export function parseTripSentence(
   sentence: string,
   today = new Date(),
   homeAirportIata?: string,
-): TripRequest {
+): TripRequest | null {
   const text = ` ${sentence.toLowerCase()} `;
 
   const destinations = findCitiesInOrder(text);
-  const destination = destinations[0] ?? findCity(text) ?? DEFAULT_DESTINATION;
+  const destination = destinations[0] ?? findCity(text);
+  if (!destination) return null;
   const origin = originOf(text, destination, homeAirportIata);
 
   // Weekday hits, in the order they appear in the sentence.
