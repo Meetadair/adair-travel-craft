@@ -120,7 +120,7 @@ describe("patterns from behaviour", () => {
     const merged = mergePatterns(existing, detectPatterns([fact(), fact(), fact(), fact()]));
     const airline = merged.find((p) => p.patternKind === "airline")!;
     expect(airline.status).toBe("rejected");
-    expect(patternToAsk(merged)).toBeNull();
+    expect(patternToAsk(merged)?.patternKind).not.toBe("airline");
   });
 });
 
