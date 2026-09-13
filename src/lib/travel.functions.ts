@@ -132,7 +132,7 @@ async function understand(message: string, locale = "en"): Promise<ParsedRequest
   if (claude) return claude;
 
   const apiKey = process.env["LOVABLE_API_KEY"];
-  if (!apiKey) return fallbackParse(message);
+  if (!apiKey) return rules;
 
   const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
@@ -152,7 +152,7 @@ async function understand(message: string, locale = "en"): Promise<ParsedRequest
 
   if (!res.ok) {
     console.error(`AI gateway failed [${res.status}]: ${await res.text()}`);
-    return fallbackParse(message);
+    return rules;
   }
   const json = (await res.json()) as {
     choices?: Array<{ message?: { content?: string } }>;
@@ -162,7 +162,7 @@ async function understand(message: string, locale = "en"): Promise<ParsedRequest
     return parsedSchema.parse(raw);
   } catch (error) {
     console.error("AI parse failed", error);
-    return fallbackParse(message);
+    return rules;
   }
 }
 
