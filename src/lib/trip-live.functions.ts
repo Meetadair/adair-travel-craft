@@ -570,8 +570,8 @@ export const swapCardAlternative = createServerFn({ method: "POST" })
     if (memoryName) {
       const { rememberChoice } = await import("@/lib/trip/memory.server");
       await rememberChoice(supabase, userId, {
-        city: request.destinationCity,
-        iata: request.destinationIata,
+        city: search.request.destinationCity,
+        iata: search.request.destinationIata,
         itemKind: memoryKind,
         itemName: memoryName,
         source: "swapped_to",
