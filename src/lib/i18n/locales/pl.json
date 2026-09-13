@@ -20,52 +20,52 @@
       "titleLine2": "Cała podróż.",
       "lead": "Lot, hotel, samochód i kolacja — zarezerwowane jednym zdaniem.",
       "ctaPrimary": "Zobacz, jak to działa",
-      "inputLabel": "Opisz podróż jednym zdaniem",
+      "inputLabel": "Opisz swoją podróż w jednym zdaniu",
       "inputPlaceholder": "np. Rzym, od piątku do niedzieli, hotel z tarasem, faktura na firmę",
       "inputSubmit": "Pokaż propozycję"
     },
     "demo": {
-      "label": "Wersja demonstracyjna",
+      "label": "Demo rozmowy",
       "title": "Wystarczy jedna wiadomość.",
-      "userMessage": "Muszę być w Mediolanie w czwartek rano, powrót w piątek wieczorem, gdzieś blisko Duomo i auto na miejscu.",
+      "userMessage": "Muszę być w Mediolanie w czwartek rano, powrót w piątek wieczorem, coś blisko Duomo i auto na miejscu.",
       "you": "Ty",
-      "cardTitle": "Mediolan · Thu – Fri",
+      "cardTitle": "Mediolan · czw. – pt.",
       "cardSubtitle": "Dopasowane do Twojego profilu podróży",
-      "flightTitle": "LOT 391 · Warszawa → Mediolan",
-      "flightDetail": "Thu 6:55 – 9:05 AM · powrót Fri 7:40 PM · miejsce przy oknie, preferowana linia",
+      "flightTitle": "LOT 391 · Warsaw → Milan",
+      "flightDetail": "czw. 6:55 – 9:05 · powrót pt. 19:40 · miejsce przy oknie, preferowana linia",
       "flightTagClass": "Premium Economy",
       "hotelTitle": "Park Hyatt Milano",
-      "hotelDetail": "1 noc · pokój King, ciche piętro · 200 m od Duomo",
+      "hotelDetail": "1 noc · pokój z łóżkiem king, ciche piętro · 200 m od Duomo",
       "hotelTag": "stawka negocjowana",
       "carTitle": "BMW 3 Series · odbiór na Linate",
-      "carDetail": "Thu 9:30 AM – Fri 6:30 PM · pełne ubezpieczenie, bez kaucji",
+      "carDetail": "czw. 9:30 – pt. 18:30 · pełne ubezpieczenie, bez kaucji",
       "carTag": "automat",
-      "total": "Łącznie, jedna rezerwacja",
+      "total": "Razem, jedna rezerwacja",
       "bookAll": "Zarezerwuj całość",
       "footnote": "3 elementy · 1 płatność · 1 numer rezerwacji",
       "typing": "Adair przygotowuje Twoją podróż…",
-      "saved": "Oszczędzasz €96 i 2 h 40 min w porównaniu z samodzielną rezerwacją",
+      "saved": "Oszczędzasz 96 € i 2 godz. 40 min w porównaniu z samodzielną rezerwacją",
       "savedNote": "w porównaniu ze średnimi cenami publicznymi i czasem rezerwacji na osobnych stronach",
       "invoiceLine": "Faktura → Twoja firma",
       "share": "Udostępnij kartę podróży",
       "shareCopied": "Skopiowano",
       "testMode": "Tryb testowy — przykładowe dane linii lotniczych",
-      "bookTooltip": "Rezerwacja dostępna od dnia premiery",
-      "remove": "Usuń tę pozycję",
+      "bookTooltip": "Rezerwacje ruszą w dniu premiery",
+      "remove": "Usuń ten element",
       "removedNote": "Usunięto z tej podróży",
       "restoreAll": "Przywróć wszystko",
       "approx": "ok.",
-      "searchFailed": "Nie udało się pobrać aktualnej dostępności — pokazujemy przykładową podróż.",
-      "savedLive": "Oszczędzasz około {amount} i 2 h 40 min w porównaniu z samodzielną rezerwacją",
+      "searchFailed": "Nie udało się pobrać aktualnej dostępności — pokazujemy naszą przykładową podróż.",
+      "savedLive": "Oszczędzasz około {amount} i 2 godz. 40 min w porównaniu z samodzielną rezerwacją",
       "savedEstimate": "szacunek",
       "nightsOne": "1 noc",
-      "nightsMany": "{count} nocy",
+      "nightsMany": "{count} noce/nocy",
       "cardTitleTpl": "{city} · {day1} – {day2}",
-      "flightTitleTpl": "LOT 391 · Warszawa → {city}",
-      "flightDetailTpl": "{day1} 6:55 – 9:05 AM · powrót {day2} 7:40 PM · miejsce przy oknie, preferowana linia",
-      "hotelDetailTpl": "1 noc · pokój King, ciche piętro · w historycznym centrum",
+      "flightTitleTpl": "LOT 391 · Warsaw → {city}",
+      "flightDetailTpl": "{day1} 6:55 – 9:05 · powrót {day2} 19:40 · miejsce przy oknie, preferowana linia",
+      "hotelDetailTpl": "1 noc · pokój z łóżkiem king, ciche piętro · w historycznym centrum",
       "carTitleTpl": "BMW 3 Series · odbiór na {code}",
-      "carDetailTpl": "{day1} 9:30 AM – {day2} 6:30 PM · pełne ubezpieczenie, bez kaucji",
+      "carDetailTpl": "{day1} 9:30 – {day2} 18:30 · pełne ubezpieczenie, bez kaucji",
       "weekdays": [
         "Poniedziałek",
         "Wtorek",
@@ -76,30 +76,30 @@
         "Niedziela"
       ],
       "weekdaysShort": [
-        "Pn",
-        "Wt",
-        "Śr",
-        "Czw",
-        "Pt",
-        "Sob",
-        "Ndz"
+        "pon.",
+        "wt.",
+        "śr.",
+        "czw.",
+        "pt.",
+        "sob.",
+        "niedz."
       ]
     },
     "campaign": {
-      "earlyAccess": "Uzyskaj wcześniejszy dostęp",
+      "earlyAccess": "Uzyskaj wczesny dostęp",
       "emailLabel": "Twój e-mail",
-      "emailPlaceholder": "twoj@firma.com",
+      "emailPlaceholder": "ty@firma.com",
       "join": "Dołącz",
       "joining": "Chwileczkę…",
-      "success": "Jesteś na liście. Podziel się linkiem — €40 w punktach na podróże dla Ciebie, €20 dla każdego znajomego, który dokona rezerwacji.",
+      "success": "Jesteś na liście. Podziel się linkiem — 40 € środków na podróże dla Ciebie i 20 € dla każdego znajomego, który dokona rezerwacji.",
       "referralLabel": "Twój link polecający",
       "copy": "Kopiuj link",
       "copied": "Skopiowano",
       "error": "Coś poszło nie tak. Spróbuj ponownie.",
       "teamsLabel": "Dla zespołów",
-      "teamsTitle": "Adair for Teams",
-      "teamsLine": "Jedna polityka podróży, jedna faktura, jedno miejsce dla całego zespołu. Wkrótce po premierze.",
-      "teamsCta": "Dołącz do listy oczekujących na Teams",
+      "teamsTitle": "Adair dla Zespołów",
+      "teamsLine": "Jedna polityka podróży, jedna faktura, jedno miejsce dla całego zespołu. Dostępne wkrótce po premierze.",
+      "teamsCta": "Dołącz do listy oczekujących",
       "teamsMore": "Zobacz ofertę dla firm"
     },
     "demoLine": "Pięć aplikacji, pięć potwierdzeń, pięć miejsc do sprawdzenia — albo to.",
@@ -110,48 +110,48 @@
           "text": "Potwierdzenia, vouchery i zmiany — w Moich podróżach."
         },
         {
-          "title": "Uczy się Ciebie",
-          "text": "Wystarczy raz określić preferencje. Każda kolejna podróż je uwzględni."
+          "title": "Uczy się Twoich nawyków",
+          "text": "Ustaw preferencje raz. Każda kolejna podróż będzie je uwzględniać."
         },
         {
-          "title": "Ktoś, do kogo możesz zadzwonić",
-          "text": "Wsparcie z Twoją rezerwacją bezpośrednio przed oczami."
+          "title": "Żywy kontakt",
+          "text": "Wsparcie z Twoją rezerwacją otwartą przed oczami."
         }
       ]
     },
     "close": {
       "title": "Adair startuje w październiku.",
-      "line": "Pierwsze 100 kont otrzymuje 3 miesiące Signature bezpłatnie.",
-      "teams": "Adair for Teams — jedna polityka, jedna faktura.",
+      "line": "Pierwsze 100 kont otrzymuje 3 miesiące pakietu Signature gratis.",
+      "teams": "Adair dla Zespołów — jedna polityka, jedna faktura.",
       "teamsLink": "Dołącz do listy"
     },
-    "footer": "Adair Kft. · Budapeszt"
+    "footer": "Adair Kft. · Budapest"
   },
   "assistant": {
     "meta": {
-      "title": "Asystent Adair — cała podróż w jednej rozmowie",
-      "description": "Powiedz, gdzie i kiedy chcesz być. Adair wyszukuje prawdziwe oferty lotów, hoteli i aut, łącząc je w jedną kartę.",
+      "title": "Asystent Adair — zaplanuj całą podróż w jednej rozmowie",
+      "description": "Powiedz nam, gdzie i kiedy musisz być. Adair wyszuka rzeczywiste oferty lotów, hoteli i aut, łącząc je w jedną kartę.",
       "ogTitle": "Asystent Adair — cała podróż w jednej rozmowie",
-      "ogDescription": "Prawdziwe oferty lotów, hoteli i aut na jednej karcie gotowej do rezerwacji."
+      "ogDescription": "Rzeczywiste oferty lotów, hoteli i samochodów na jednej karcie gotowej do rezerwacji."
     },
-    "title": "Powiedz nam, gdzie chcesz się znaleźć.",
-    "lead": "Adair rozumie naturalny język, sprawdza dostępność u dostawców i łączy lot, hotel oraz samochód w jedną kartę gotową do rezerwacji.",
+    "title": "Powiedz nam, dokąd zmierzasz.",
+    "lead": "Adair rozumie naturalny język, sprawdza dostępność u dostawców i łączy lot, hotel oraz samochód w jedną kartę do natychmiastowej rezerwacji.",
     "placeholder": "np. Muszę być w Mediolanie w czwartek rano, powrót w piątek wieczorem…",
-    "submitIdle": "Zaplanuj podróż",
+    "submitIdle": "Stwórz podróż",
     "submitBusy": "Szukam…",
     "examples": [
-      "Muszę być w Mediolanie w czwartek rano, powrót w piątek wieczorem, coś blisko Duomo i czekające auto.",
-      "Konferencja w Barcelonie Oct 12–14, premium economy, hotel w pobliżu centrum kongresowego.",
-      "Wyjazd do Londynu w poniedziałek, powrót w środę, bez samochodu."
+      "Muszę być w Mediolanie w czwartek rano, powrót w piątek wieczorem, coś blisko Duomo i auto na miejscu.",
+      "Konferencja w Barcelonie 12–14 października, klasa premium economy, hotel blisko centrum targowego.",
+      "Podróż do Londynu w poniedziałek, powrót w środę, bez samochodu."
     ],
-    "error": "Nie udało się zaplanować tej podróży. Spróbuj ponownie lub podaj dokładne daty.",
+    "error": "Nie udało się przygotować tej podróży. Spróbuj ponownie lub podaj dokładne daty.",
     "sourceLive": "ceny z API dostawców",
     "sourcePartial": "część pozycji z API dostawców",
     "sourceDemo": "dane przykładowe",
     "hideAlternatives": "Ukryj alternatywy",
     "showAlternatives": "Pokaż alternatywy",
     "backToRecommendation": "Wróć do rekomendacji Adair",
-    "total": "Łącznie, jedna rezerwacja",
+    "total": "Razem, jedna rezerwacja",
     "saveIdle": "Zapisz podróż",
     "saveBusy": "Zapisywanie…",
     "savedAs": "Zapisano jako",
@@ -159,16 +159,16 @@
     "galleryPrev": "Poprzednie zdjęcie",
     "galleryNext": "Następne zdjęcie",
     "galleryGoTo": "Przejdź do zdjęcia",
-    "remove": "Usuń tę pozycję",
+    "remove": "Usuń ten element",
     "removedNote": "Usunięto z tej podróży",
     "restoreAll": "Przywróć wszystko",
     "intent": {
-      "greeting": "Dzień dobry. Powiedz, gdzie i kiedy chcesz być, a przygotuję całą podróż.",
-      "product": "Planuję całe podróże na podstawie jednego zdania — lot, hotel, auto, transfery — i rezerwuję je w jednym kroku. Opisz wyjazd, a zobaczysz gotową propozycję.",
-      "booking": "Twoje rezerwacje znajdują się w sekcji Moje podróże, wraz z fakturami i możliwością zmian.",
-      "unclear": "Nie wyłapałem w tym planu podróży. Spróbuj na przykład: Mediolan od wtorku do czwartku.",
+      "greeting": "Dzień dobry. Powiedz mi, gdzie i kiedy musisz być, a zajmę się resztą.",
+      "product": "Planuję całe podróże na podstawie jednego zdania — lot, hotel, auto, transfery — i rezerwuję je za jednym razem. Powiedz, dokąd chcesz wyruszyć, a przedstawię plan.",
+      "booking": "Twoje rezerwacje znajdują się w Moich podróżach, wraz z fakturami i możliwością zmian.",
+      "unclear": "Nie udało mi się rozpoznać szczegółów podróży. Spróbuj czegoś w stylu: Mediolan od wtorku do czwartku.",
       "needsDestination": "Dokąd się wybierasz?",
-      "amending": "Aktualizuję podróż poniżej."
+      "amending": "Aktualizuję poniższą propozycję."
     },
     "strip": {
       "heading": "Oto co zrozumiałem.",
@@ -179,72 +179,72 @@
       "arriveBy": "Na miejscu do",
       "travellers": "Podróżujący",
       "travellerOne": "1 osoba",
-      "travellerMany": "{count} osób",
+      "travellerMany": "{count} os.",
       "wishes": "Dodatkowe życzenia",
-      "edit": "Zmień {field}",
-      "find": "Szukaj",
-      "searching": "Szukam…",
+      "edit": "Zmień: {field}",
+      "find": "Wyszukaj",
+      "searching": "Szukanie…",
       "done": "Gotowe",
       "airportSearch": "Szukaj lotnisk",
       "travellersLabel": "Ile osób"
     },
     "questions": {
       "dates": "W jakich terminach?",
-      "arrivalTime": "O której godzinie musisz być na miejscu?",
+      "arrivalTime": "Na którą godzinę musisz dotrzeć?",
       "whichAirport": "{city} ma więcej niż jedno lotnisko. Które wybierasz?",
       "skip": "Pomiń",
       "done": "Gotowe"
     },
     "advice": {
-      "tightFlight": "Ten lot ląduje o {land}, a spotkanie jest o {meeting} — mało czasu. {alt} daje Ci {spare} zapasu za dodatkowe {extra}.",
+      "tightFlight": "Ten lot ląduje o {land}, a spotkanie jest o {meeting} — bardzo mało czasu. Lot {alt} daje Ci {spare} zapasu za dopłatą {extra}.",
       "tightFlightNoOption": "Ten lot ląduje o {land}, a spotkanie jest o {meeting} — to ryzykownie mało czasu.",
       "tightFlightAction": "Wybierz wcześniejszy lot",
       "peak": "Ceny są {ratio}× wyższe niż zwykle{event}.",
-      "peakEvent": " — tydzień {event}",
-      "peakSaving": " {days} dni później pozwala zaoszczędzić {saving}.",
+      "peakEvent": " — tydzień wydarzenia {event}",
+      "peakSaving": " Wyjazd {days} dni później to oszczędność {saving}.",
       "peakAction": "Pokaż tańsze terminy",
-      "transfer": "Hotel jest {minutes} minut od lotniska i nie ma parkingu — transfer będzie wygodniejszy niż samochód.",
-      "transferCheaper": "Hotel jest {minutes} minut od lotniska i nie ma parkingu — transfer jest o {saving} tańszy niż samochód.",
+      "transfer": "Hotel znajduje się {minutes} minut od lotniska i nie ma garażu — transfer będzie wygodniejszy niż samochód.",
+      "transferCheaper": "Hotel znajduje się {minutes} minut od lotniska i nie ma garażu — transfer jest tańszy o {saving} od wynajmu auta.",
       "transferAction": "Zamień samochód na transfer",
-      "breakfast": "Śniadanie nie jest wliczone w tę stawkę; opcja ze śniadaniem kosztuje o {amount} więcej.",
+      "breakfast": "Śniadanie nie jest wliczone w tej cenie; opcja ze śniadaniem kosztuje {amount} więcej.",
       "breakfastAction": "Dodaj śniadanie"
     },
     "nudge": {
-      "connectCalendar": "Następnym razem mogę odczytać to bezpośrednio z Twojego kalendarza — połączenie zajmuje około trzech minut.",
+      "connectCalendar": "Następnym razem mogę pobrać te szczegóły z Twojego kalendarza — połączenie zajmuje około trzech minut.",
       "connectCalendarAction": "Połącz kalendarz",
-      "addLoyalty": "Za ten lot przysługują Ci mile — dodaj numer programu lojalnościowego w Ustawieniach.",
+      "addLoyalty": "Za ten lot przysługują Ci mile — dodaj swój numer lojalnościowy w Ustawieniach.",
       "addLoyaltyAction": "Dodaj numer",
       "saveCompany": "Zapisz dane firmy raz, a faktury będą wystawiane automatycznie.",
       "saveCompanyAction": "Zapisz firmę",
       "dismiss": "Nie teraz"
     },
     "closing": {
-      "invoiceChoose": "Na jaką firmę wystawić fakturę?",
+      "invoiceChoose": "Na którą firmę wystawić fakturę?",
       "invoiceNone": "Bez faktury",
-      "invoiceName": "Jakie są dane firmy do faktury?",
+      "invoiceName": "Na jaką firmę ma zostać wystawiona faktura?",
       "companyPlaceholder": "Nazwa firmy",
       "save": "Zapisz",
-      "detailsOnce": "Potrzebuję Twoich danych do biletu — tylko ten jeden raz.",
+      "detailsOnce": "Potrzebuję Twoich danych do biletu — wystarczy podać je raz.",
       "firstName": "Imię",
       "lastName": "Nazwisko",
       "email": "E-mail",
       "phone": "Telefon",
       "bornOn": "Data urodzenia",
       "saveForNextTime": "Zapisz na przyszłość",
-      "whichCard": "Która karta?",
+      "whichCard": "Którą kartą chcesz zapłacić?",
       "anotherCard": "Inna karta",
-      "bookIt": "Rezerwuj",
+      "bookIt": "Zarezerwuj",
       "changeSomething": "Zmień coś",
-      "opening": "Otwieram bezpieczny formularz karty…",
+      "opening": "Otwieram bezpieczny formularz płatności…",
       "moment": "Chwileczkę…",
-      "booked": "Zarezerwowano. Przenoszę do sekcji Moje podróże — tryb testowy, żadne środki nie zostały pobrane.",
-      "testMode": "Tryb testowy — opłata nie została pobrana i nie wystawiono biletu.",
-      "passport": "Ta trasa wymaga danych paszportowych, więc dokończymy na bezpiecznej stronie.",
-      "continueSecure": "Kontynuuj",
+      "booked": "Zarezerwowano. Przenoszę do Moich podróży — tryb testowy, karta nie została obciążona.",
+      "testMode": "Tryb testowy — nie pobieramy opłat ani nie wystawiamy rzeczywistego biletu.",
+      "passport": "Ta trasa wymaga danych paszportowych — dokończymy rezerwację na bezpiecznej stronie.",
+      "continueSecure": "Dalej",
       "failed": "Płatność nie powiodła się, nie pobrano żadnych środków. Możemy dokończyć na bezpiecznej stronie.",
       "finishSecure": "Dokończ na bezpiecznej stronie",
-      "companyFailed": "Nie udało się zapisać tej firmy. Spróbuj ponownie.",
-      "detailsFailed": "Te dane nie zostały zaakceptowane. Sprawdź je, proszę."
+      "companyFailed": "Nie udało się zapisać danych firmy. Spróbuj ponownie.",
+      "detailsFailed": "Dane nie zostały zaakceptowane. Sprawdź je, proszę."
     }
   },
   "auth": {
@@ -265,35 +265,35 @@
     "signUp": "Zarejestruj się",
     "toSignUp": "Nie mam jeszcze konta",
     "toSignIn": "Mam już konto",
-    "confirmSent": "Sprawdź skrzynkę odbiorczą — wysłaliśmy link potwierdzający.",
+    "confirmSent": "Sprawdź skrzynkę odbiorczą — wysłaliśmy link aktywacyjny.",
     "genericError": "Coś poszło nie tak",
     "demoHint": "Wolisz najpierw zobaczyć wersję demonstracyjną?",
-    "demoLink": "Otwórz asystenta"
+    "demoLink": "Wypróbuj asystenta"
   },
   "dashboard": {
     "meta": {
       "title": "Panel klienta Adair — podróże i faktury",
-      "description": "Twoje zapisane podróże w Adair, preferencje podróżne i faktury gotowe do pobrania w formacie PDF.",
+      "description": "Twoje zapisane podróże w Adair, preferencje i faktury dostępne do pobrania w formacie PDF.",
       "ogTitle": "Panel klienta Adair",
       "ogDescription": "Podróże, preferencje i faktury w jednym miejscu."
     },
     "loadError": "Nie udało się załadować panelu. Odśwież stronę.",
     "title": "Moje podróże",
     "signOut": "Wyloguj się",
-    "loading": "Ładowanie podróży…",
+    "loading": "Wczytywanie podróży…",
     "empty": "Nie masz jeszcze żadnych zapisanych podróży.",
     "emptyCta": "Zarezerwuj pierwszą podróż",
     "invoice": "Pobierz fakturę (PDF)",
     "deleteTrip": "Usuń podróż",
     "profileTitle": "Profil podróży",
-    "profileLead": "Ustaw raz — każda przyszła podróż i faktura uwzględni te preferencje.",
+    "profileLead": "Ustaw go raz — każda przyszła podróż i faktura będzie zgodna z tymi preferencjami.",
     "fields": {
       "fullName": "Imię i nazwisko",
       "company": "Firma (dane do faktury)",
       "taxId": "Numer VAT",
       "airlines": "Preferowane linie lotnicze",
       "cabin": "Klasa podróży",
-      "seat": "Preferencja miejsca",
+      "seat": "Preferowane miejsce",
       "chains": "Sieci hotelowe",
       "diet": "Dieta",
       "budget": "Budżet na podróż",
@@ -306,18 +306,18 @@
   "investors": {
     "meta": {
       "title": "Adair Travel dla inwestorów — model, marża, runda",
-      "description": "Adair Travel łączy lot, hotel i samochód w jedną rezerwację. Model przychodowy, marża ze stawek negocjowanych i warunki rundy seed.",
+      "description": "Adair Travel łączy lot, hotel i samochód w jedną rezerwację. Model przychodowy, marża na negocjowanych stawkach hotelowych i warunki rundy seed.",
       "ogTitle": "Adair Travel dla inwestorów",
-      "ogDescription": "Jeden asystent zamiast pięciu aplikacji. Marża z własnych negocjowanych stawek hotelowych, a nie prowizji OTA."
+      "ogDescription": "Jeden asystent zamiast pięciu aplikacji. Marża z własnych negocjowanych stawek hotelowych, a nie z prowizji OTA."
     },
     "badge": "Runda seed · materiały dla inwestorów",
     "titleLine1": "Podróże służbowe to dziś pięć aplikacji.",
-    "titleLine2": "U nas to jedno zdanie.",
-    "lead": "Adair Travel to asystent, który zamienia jedno zapytanie w lot, hotel i samochód połączone na jednej karcie i jednej fakturze. Zarabiamy na własnych, wynegocjowanych stawkach hotelowych, a nie na prowizjach porównywarek — dlatego nasza cena jest niższa, a marża wyższa.",
+    "titleLine2": "Z nami to tylko jedno zdanie.",
+    "lead": "Adair Travel to asystent, który zamienia jedno zapytanie w pakiet lotu, hotelu i samochodu w ramach jednej karty i jednej faktury. Zarabiamy na własnych, wynegocjowanych stawkach hotelowych, a nie na prowizjach z porównywarek — dzięki temu nasza cena jest niższa, a marża wyższa.",
     "metrics": [
       {
         "label": "Średnia wartość podróży",
-        "value": "€1,240"
+        "value": "1 240 €"
       },
       {
         "label": "Marża brutto na podróż",
@@ -335,46 +335,46 @@
     "revenueTitle": "Źródła przychodów",
     "revenue": [
       {
-        "title": "Negocjowana stawka",
-        "body": "Kupujemy pokoje po własnej stawce korporacyjnej i sprzedajemy poniżej publicznej ceny OTA. Marża zostaje u nas, nie u pośrednika.",
+        "title": "Stawka negocjowana",
+        "body": "Kupujemy pokoje po własnej stawce korporacyjnej i sprzedajemy je taniej niż publiczne ceny w OTA. Marża zostaje u nas, a nie u pośrednika.",
         "margin": "8–14%"
       },
       {
         "title": "Prowizja lotnicza (NDC)",
-        "body": "Loty przez kanał NDC: prowizja dystrybucyjna plus opłata serwisowa za obsługę zmian i zwrotów w jednym oknie.",
+        "body": "Loty przez kanał NDC: prowizja dystrybucyjna oraz opłata serwisowa za obsługę zmian i zwrotów w jednym miejscu.",
         "margin": "1–3%"
       },
       {
-        "title": "Subskrypcja korporacyjna",
-        "body": "Zespoły płacą za profil podróży, politykę wydatków i jedną fakturę VAT za całą podróż zamiast trzech dokumentów.",
-        "margin": "€29 / user / mo."
+        "title": "Subskrypcja firmowa",
+        "body": "Zespoły płacą za profil podróży, kontrolę budżetu i jedną fakturę VAT za całą podróż zamiast trzech osobnych dokumentów.",
+        "margin": "29 € / użytkownik / mies."
       }
     ],
-    "unitTitle": "Przykładowa podróż — unit economics",
+    "unitTitle": "Przykładowa podróż — jednostkowa ekonomika",
     "colItem": "Pozycja",
     "colPrice": "Cena dla klienta",
     "colMargin": "Nasza marża",
     "unit": [
       {
         "item": "Lot (LOT, NDC)",
-        "price": "€312",
-        "margin": "€6"
+        "price": "312 €",
+        "margin": "6 €"
       },
       {
         "item": "Hotel, 1 noc (stawka negocjowana)",
-        "price": "€742",
-        "margin": "€96"
+        "price": "742 €",
+        "margin": "96 €"
       },
       {
         "item": "Samochód, 2 dni",
-        "price": "€186",
-        "margin": "€22"
+        "price": "186 €",
+        "margin": "22 €"
       }
     ],
-    "unitTotal": "Łącznie, jedna rezerwacja",
-    "unitNote": "Trasa Warszawa–Mediolan, dane poglądowe oparte na testowych stawkach dostawców.",
+    "unitTotal": "Razem, jedna rezerwacja",
+    "unitNote": "Trasa Warszawa–Mediolan, dane poglądowe oparte na stawkach testowych dostawców.",
     "askTitle": "Czego szukamy",
-    "askBody": "Zbieramy rundę seed, aby powiększyć bazę negocjowanych stawek hotelowych w dziesięciu miastach biznesowych, zapewnić pełną obsługę zmian rezerwacji w jednym oknie i sprzedawać do zespołów liczących 20–200 osób.",
+    "askBody": "Pozyskujemy rundę seed, aby poszerzyć bazę wynegocjowanych stawek hotelowych w dziesięciu miastach biznesowych, uruchomić pełną obsługę zmian rezerwacji w jednym oknie i wejść do zespołów liczących 20–200 osób.",
     "contact": "Skontaktuj się z nami",
     "seeProduct": "Zobacz produkt na żywo"
   },
@@ -390,27 +390,27 @@
     "totalDue": "Do zapłaty",
     "issued": "wystawiono",
     "number": "Nr",
-    "vatId": "VAT ID",
+    "vatId": "NIP",
     "kindFlight": "Lot",
     "kindHotel": "Hotel",
     "kindCar": "Samochód",
     "demoNote": "Dokument poglądowy — pozycje zawierają dane przykładowe",
-    "liveNote": "Pozycje wycenione na podstawie ofert dostawców pobranych przez API Adair",
-    "paymentNote": "Płatność: jedna transakcja kartą firmową · termin 14 dni",
-    "hotelNote": "Hotel rozliczony według stawki negocjowanej",
+    "liveNote": "Pozycje wycenione na podstawie ofert pobranych przez API Adair",
+    "paymentNote": "Płatność: pojedyncza transakcja kartą firmową · termin 14 dni",
+    "hotelNote": "Hotel rozliczany według stawki negocjowanej",
     "tagline": "Adair Travel · Jedno zapytanie. Cała podróż. · adair.travel"
   },
   "business": {
     "meta": {
-      "title": "Adair dla firm — podróże służbowe, budżety i analityka",
-      "description": "Jedno okno dla całego zespołu: asystent, który rezerwuje lot, hotel i samochód, pilnuje budżetu i zamienia każdą podróż w jedną fakturę i jeden raport.",
+      "title": "Adair dla firm — podróże zespołu, budżety i analityka",
+      "description": "Jedno okno dla całego zespołu: asystent, który rezerwuje lot, hotel i samochód, dba o budżet oraz generuje jedną fakturę i spójny raport.",
       "ogTitle": "Adair dla firm — podróże zespołu w jednym oknie",
       "ogDescription": "Budżety, akceptacje i analityka podróży dla zespołów. Jedna rozmowa zamiast pięciu aplikacji."
     },
     "badge": "Dla firm i zespołów",
-    "titleLine1": "Podróże całego zespołu",
+    "titleLine1": "Wszystkie podróże zespołu",
     "titleLine2": "w jednym oknie.",
-    "lead": "Adair planuje każdą podróż na podstawie jednego zdania, dba o zgodność z polityką podróży i generuje jedną fakturę oraz przejrzysty raport. Asystenci nie muszą żonglować kartami w przeglądarce, a finanse gonić za rachunkami.",
+    "lead": "Adair układa każdą podróż na podstawie jednego zdania, pilnuje zasad firmowych i dostarcza jedną fakturę oraz przejrzysty raport. Asystenci nie tracą czasu w kartach przeglądarki, a księgowość nie musi ścigać rachunków.",
     "ctaPrimary": "Porozmawiajmy o Twoim zespole",
     "ctaSecondary": "Zobacz pakiety",
     "rolesLabel": "Dla kogo",
@@ -418,168 +418,168 @@
     "roles": [
       {
         "role": "Asystent / office manager",
-        "title": "Rezerwacja dla kogoś innego w jednym zdaniu",
+        "title": "Rezerwuj dla innych jednym zdaniem",
         "items": [
-          "Rezerwuj w imieniu dowolnej osoby z zespołu",
-          "Jedna wspólna skrzynka dla wszystkich podróży zespołu",
+          "Rezerwacje w imieniu współpracowników",
+          "Jedna wspólna skrzynka dla wszystkich wyjazdów",
           "Jedna faktura VAT zamiast trzech dokumentów"
         ]
       },
       {
-        "role": "Menedżer / finanse",
-        "title": "Koszty widoczne, zanim powstaną",
+        "role": "Manager / finanse",
+        "title": "Koszty widoczne zanim powstaną",
         "items": [
-          "Limity budżetowe na podróż, osobę i miesiąc",
-          "Akceptacja tylko powyżej wyznaczonego progu",
-          "Wydatki na bieżąco, bez niespodzianek na koniec miesiąca"
+          "Limity na wyjazd, osobę i miesiąc",
+          "Akceptacje tylko powyżej wyznaczonego progu",
+          "Wydatki na żywo, bez niespodzianek na koniec miesiąca"
         ]
       },
       {
         "role": "Podróżujący",
-        "title": "Preferencje uwzględniane za każdym razem",
+        "title": "Preferencje zawsze pod uwagę",
         "items": [
-          "Osobisty profil podróży ustawiany raz",
+          "Osobisty profil podróży konfigurowany raz",
           "Lot, hotel i samochód na jednej karcie",
-          "Potwierdzenia w jednym miejscu do ostatniego dnia"
+          "Potwierdzenia w jednym miejscu do końca podróży"
         ]
       }
     ],
     "budgetLabel": "Koszty i budżety",
-    "budgetTitle": "Zasady wydatków, którymi kieruje się asystent.",
-    "budgetLead": "Ramy definiujesz tylko raz. Każda propozycja Adair od razu je respektuje — niczego nie trzeba weryfikować po fakcie.",
+    "budgetTitle": "Zasady wydatków, których pilnuje asystent.",
+    "budgetLead": "Definiujesz ramy tylko raz. Każda propozycja Adair od razu je uwzględnia — bez konieczności późniejszej weryfikacji.",
     "budgets": [
       {
         "title": "Limit na podróż",
-        "value": "€1,500",
+        "value": "1 500 €",
         "note": "Adair nigdy nie zaproponuje pakietu powyżej limitu"
       },
       {
         "title": "Miesięczny budżet zespołu",
-        "value": "€28,000",
-        "note": "Bieżące wykorzystanie widoczne dla finansów w każdej chwili"
+        "value": "28 000 €",
+        "note": "Bieżące zużycie dostępne dla finansów w każdej chwili"
       },
       {
         "title": "Próg akceptacji",
-        "value": "€900",
+        "value": "900 €",
         "note": "Powyżej tej kwoty wymagane potwierdzenie menedżera"
       },
       {
         "title": "Polityka podróży",
-        "value": "Cabin, chains, radius",
-        "note": "Premium Economy powyżej 2 h, wyłącznie preferowane sieci"
+        "value": "Klasa, sieci, zasięg",
+        "note": "Premium Economy powyżej 2 h, tylko preferowane hotele"
       }
     ],
-    "dashLabel": "Widok dla firmy",
-    "dashTitle": "Wszystko, czego potrzebuje dział finansowy, na jednym ekranie.",
+    "dashLabel": "Widok firmowy",
+    "dashTitle": "Wszystko, czego wymaga księgowość, na jednym ekranie.",
     "dashNote": "Tylko podgląd — dane przykładowe",
     "dash": {
       "budgetTitle": "Budżet na wrzesień",
-      "budgetOf": "z €28,000 wykorzystane",
+      "budgetOf": "z 28 000 € wykorzystane",
       "tripsTitle": "Ostatnie podróże zespołu",
-      "statusPaid": "opłacono",
-      "statusPending": "oczekuje na akceptację",
+      "statusPaid": "opłacone",
+      "statusPending": "czeka na akceptację",
       "peopleTitle": "Wydatki według osób",
       "routesTitle": "Najczęstsze trasy",
-      "savedTitle": "Oszczędność vs. ceny publiczne",
-      "savedValue": "€2,340",
+      "savedTitle": "Oszczędność vs. stawki publiczne",
+      "savedValue": "2 340 €",
       "savedNote": "w tym kwartale, w 21 podróżach",
-      "tripsCount": "podróże",
+      "tripsCount": "podróży",
       "trips": [
         {
           "who": "Anna K.",
-          "route": "Warszawa → Mediolan",
-          "dates": "18–19 Sep",
-          "amount": "€1,240",
+          "route": "Warsaw → Milan",
+          "dates": "18–19 wrz",
+          "amount": "1 240 €",
           "paid": true
         },
         {
           "who": "Tomasz W.",
-          "route": "Warszawa → Berlin",
-          "dates": "22–23 Sep",
-          "amount": "€780",
+          "route": "Warsaw → Berlin",
+          "dates": "22–23 wrz",
+          "amount": "780 €",
           "paid": true
         },
         {
           "who": "Kitti F.",
-          "route": "Budapeszt → Londyn",
-          "dates": "25–27 Sep",
-          "amount": "€1,610",
+          "route": "Budapest → London",
+          "dates": "25–27 wrz",
+          "amount": "1 610 €",
           "paid": false
         }
       ],
       "people": [
         {
           "name": "Anna K.",
-          "amount": "€4,120",
+          "amount": "4 120 €",
           "share": 78
         },
         {
           "name": "Kitti F.",
-          "amount": "€3,480",
+          "amount": "3 480 €",
           "share": 66
         },
         {
           "name": "Tomasz W.",
-          "amount": "€2,260",
+          "amount": "2 260 €",
           "share": 43
         },
         {
           "name": "Marek D.",
-          "amount": "€1,180",
+          "amount": "1 180 €",
           "share": 22
         }
       ],
       "routes": [
         {
-          "route": "Warszawa → Mediolan",
+          "route": "Warsaw → Milan",
           "count": "7",
-          "amount": "€8,190"
+          "amount": "8 190 €"
         },
         {
-          "route": "Budapeszt → Londyn",
+          "route": "Budapest → London",
           "count": "5",
-          "amount": "€7,340"
+          "amount": "7 340 €"
         },
         {
-          "route": "Warszawa → Berlin",
+          "route": "Warsaw → Berlin",
           "count": "4",
-          "amount": "€3,120"
+          "amount": "3 120 €"
         }
       ]
     },
     "analyticsLabel": "Analityka podróży",
-    "analyticsTitle": "Co otrzymujesz w comiesięcznym raporcie.",
+    "analyticsTitle": "Co znajdziesz w comiesięcznym raporcie.",
     "analytics": [
       {
         "title": "Koszt na osobę",
-        "text": "Kto podróżuje, jak często i ile to kosztuje — w podziale na osoby, zespoły lub centra kosztów."
+        "text": "Kto podróżuje, jak często i ile to kosztuje — w podziale na osoby, działy lub centra kosztów."
       },
       {
-        "title": "Wzorce tras",
-        "text": "Trasy, którymi latacie najczęściej — dzięki temu wiemy, gdzie warto wdrożyć stawkę negocjowaną."
+        "title": "Struktura tras",
+        "text": "Najczęściej wybierane połączenia, co pozwala określić, gdzie warto wynegocjować stawkę."
       },
       {
-        "title": "Średnia stawka za dobę",
-        "text": "Ile zespół realnie płaci za nocleg i jak ta kwota zmienia się z miesiąca na miesiąc."
+        "title": "Średni koszt doby hotelowej",
+        "text": "Rzeczywiste stawki płacone przez zespół i ich dynamika miesiąc do miesiąca."
       },
       {
         "title": "Zgodność z polityką",
-        "text": "Które podróże mieściły się w polityce firmy, a które wymagały akceptacji."
+        "text": "Zestawienie wyjazdów mieszczących się w budżecie oraz tych, które wymagały zgody."
       },
       {
-        "title": "Oszczędności vs. ceny publiczne",
-        "text": "Różnica między kwotą zapłaconą a stawką publiczną za tę samą podróż."
+        "title": "Oszczędności względem stawek publicznych",
+        "text": "Różnica między poniesionymi kosztami a cenami rynkowymi za te same podróże."
       },
       {
         "title": "Eksport do księgowości",
-        "text": "Jeden plik w miesiącu ze skojarzonymi fakturami, numerami rezerwacji i pozycjami VAT."
+        "text": "Jeden plik miesięcznie ze wszystkimi fakturami, numerami referencyjnymi i pozycjami VAT."
       }
     ],
     "plansLabel": "Pakiety",
-    "plansTitle": "Wybierz model dopasowany do Twojego zespołu.",
-    "plansNote": "Teams rozpoczyna się od 14-dniowego okresu próbnego, bez konieczności podawania karty. Ceny nie zawierają VAT. Wycena Enterprise zależy od wielkości zespołu i zasad polityki podróży.",
+    "plansTitle": "Wybierz model dopasowany do zespołu.",
+    "plansNote": "Pakiet Teams obejmuje 14-dniowy okres próbny bez podawania karty. Ceny nie zawierają VAT. Wycena Enterprise zależy od wielkości zespołu i potrzeb.",
     "plansTrial": "14 dni za darmo",
-    "quote": "Zapytaj o wycenę",
+    "quote": "Poproś o wycenę",
     "plans": [
       {
         "name": "Starter",
@@ -588,53 +588,53 @@
         "priceNote": "karta nie jest wymagana",
         "features": [
           "Profil podróży dla każdej osoby",
-          "Jedna faktura na podróż",
-          "Archiwum podróży i karty podróży w PDF",
-          "Wsparcie przez e-mail"
+          "Jedna faktura za całą podróż",
+          "Archiwum wyjazdów i karty podróży w PDF",
+          "Wsparcie e-mail"
         ]
       },
       {
         "name": "Teams",
         "forWho": "5–50 podróżujących",
         "price": "19 USD",
-        "priceNote": "za podróżującego / mies. — min. 5",
+        "priceNote": "za osobę / miesiąc — min. 5 osób",
         "features": [
           "Budżety i progi akceptacji",
-          "Rezerwacja w imieniu współpracowników",
-          "Miesięczny raport z podróży",
-          "Wspólny widok podróży zespołu"
+          "Rezerwacje w imieniu współpracowników",
+          "Miesięczny raport podróży",
+          "Wspólny panel wyjazdów zespołu"
         ]
       },
       {
         "name": "Enterprise",
-        "forWho": "50+ podróżujących",
-        "price": "Na zapytanie",
-        "priceNote": "wycena dopasowana do Twojego zespołu",
+        "forWho": "Powyżej 50 podróżujących",
+        "price": "Indywidualnie",
+        "priceNote": "dopasowane do Twojego zespołu",
         "features": [
-          "Centra kosztów i własne reguły polityki",
-          "Eksport księgowy w wybranym formacie",
+          "Centra kosztów i własne zasady polityki",
+          "Eksport do księgowości w wybranym formacie",
           "Negocjowane stawki na kluczowych trasach",
-          "Dedykowany opiekun konta"
+          "Dedykowany opiekun klienta"
         ]
       }
     ],
     "contactLabel": "Porozmawiajmy",
     "contactTitle": "Opowiedz nam o swoim zespole.",
-    "contactLead": "Zostaw swoje dane — skontaktujemy się z wyceną i prezentacją konfiguracji dla Twojej firmy.",
+    "contactLead": "Zostaw swoje dane — skontaktujemy się z wyceną i pokażemy, jak zoptymalizować proces podróży.",
     "form": {
       "email": "Służbowy e-mail",
-      "emailPlaceholder": "twoj@firma.com",
+      "emailPlaceholder": "ty@firma.com",
       "company": "Firma",
       "companyPlaceholder": "Nazwa firmy",
       "size": "Wielkość zespołu",
       "sizePlaceholder": "np. 12 podróżujących",
       "message": "Co warto wiedzieć? (opcjonalnie)",
-      "messagePlaceholder": "Najczęstsze trasy, obecne narzędzia, wymagania fakturowe…",
+      "messagePlaceholder": "Najczęstsze trasy, obecne narzędzia, potrzeby fakturowania…",
       "submit": "Wyślij zapytanie",
       "submitBusy": "Wysyłanie…",
       "success": "Dziękujemy — odezwiemy się w ciągu jednego dnia roboczego.",
       "error": "Coś poszło nie tak. Spróbuj ponownie."
     },
-    "footer": "Adair Kft. · Budapeszt"
+    "footer": "Adair Kft. · Budapest"
   }
 }
