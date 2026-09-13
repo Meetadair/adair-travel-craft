@@ -180,6 +180,8 @@ export function PreferencesPage() {
                     def={def}
                     value={answers[def.field] ?? []}
                     onChange={(next) => setAnswers((p) => ({ ...p, [def.field]: next }))}
+                    homeAirport={homeAirport}
+                    fullList
                   />
                 ))}
                 {q.texts?.map((def) => (

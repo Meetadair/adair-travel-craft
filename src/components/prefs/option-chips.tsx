@@ -1,5 +1,6 @@
 /** Large tappable option buttons used by the onboarding wizard and Preferences. */
 import { Check } from "lucide-react";
+import { BrandPicker } from "@/components/prefs/brand-picker";
 import type { FieldDef, Option, TextDef } from "@/lib/prefs/questions";
 
 const base =
@@ -58,10 +59,16 @@ export function MultiField({
   def,
   value,
   onChange,
+  homeAirport,
+  fullList,
 }: {
   def: FieldDef;
   value: string[];
   onChange: (next: string[]) => void;
+  /** Used to rank the brand short list to the customer's region. */
+  homeAirport?: string;
+  /** Settings shows the whole brand table; onboarding shows the short list. */
+  fullList?: boolean;
 }) {
   const toggle = (v: string) => {
     if (def.noneValue && v === def.noneValue) {
@@ -79,16 +86,27 @@ export function MultiField({
           {def.label}
         </p>
       )}
-      <div className="grid gap-2 sm:grid-cols-2">
-        {def.options.map((option) => (
-          <Chip
-            key={option.value}
-            option={option}
-            selected={value.includes(option.value)}
-            onClick={() => toggle(option.value)}
-          />
-        ))}
-      </div>
+      {def.brandKind ? (
+        <BrandPicker
+          kind={def.brandKind}
+          value={value}
+          onChange={onChange}
+          {...(homeAirport ? { homeAirport } : {})}
+          {...(def.noneValue ? { noneValue: def.noneValue } : {})}
+          fullList={Boolean(fullList)}
+        />
+      ) : (
+        <div className="grid gap-2 sm:grid-cols-2">
+          {def.options.map((option) => (
+            <Chip
+              key={option.value}
+              option={option}
+              selected={value.includes(option.value)}
+              onClick={() => toggle(option.value)}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

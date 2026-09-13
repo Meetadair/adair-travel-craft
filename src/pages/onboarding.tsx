@@ -150,6 +150,7 @@ export function OnboardingPage() {
                   def={def}
                   value={answers[def.field] ?? []}
                   onChange={(next) => setAnswer(def.field, next)}
+                  homeAirport={homeAirport}
                 />
               ))}
               {question.texts?.map((def) => (
