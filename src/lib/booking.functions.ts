@@ -685,7 +685,6 @@ export const bookTripCard = createServerFn({ method: "POST" })
           ...place,
           itemKind: "hotel",
           itemName: search.stay.name,
-          itemRef: search.stay.reference ?? null,
         });
       if (data.include.car && search.car?.supplier)
         await rememberChoice(supabase, userId, {
