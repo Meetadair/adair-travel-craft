@@ -43,7 +43,6 @@ export type TripRequest = {
   stops: TripStop[];
 };
 
-
 export type FlightResult = {
   carrier: string;
   flightNumbers: string[];
@@ -59,6 +58,16 @@ export type FlightResult = {
   approx: boolean;
   offerId: string;
   expiresAt: string | null;
+  /** Airports actually flown, so a secondary airport can be named. */
+  originIata?: string;
+  destinationIata?: string;
+  /** Checked bags the fare includes per passenger; 0 means cabin bag only. */
+  checkedBags?: number;
+  /** What the airline charges to add one, when it publishes a price. */
+  checkedBagPriceEur?: number | null;
+  /** Fare conditions, when the supplier states them. */
+  changeable?: boolean | null;
+  refundable?: boolean | null;
 };
 
 export type StayResult = {
@@ -135,7 +144,6 @@ export type TripSearchResponse = {
   /** Short note per failed part, e.g. { stays: "no availability" }. */
   errors: Partial<Record<"flights" | "stays" | "cars", string>>;
 };
-
 
 /** Nearby-date price comparison for the same trip (real searches only). */
 export type PriceContext = {

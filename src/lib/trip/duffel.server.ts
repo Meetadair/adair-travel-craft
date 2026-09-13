@@ -53,14 +53,7 @@ import {
   type ArrivalPlan,
   type PlanningRules,
 } from "./backwards";
-import type {
-  CarResult,
-  FlightResult,
-  StayResult,
-  TripRequest,
-  TripSearchResponse,
-} from "./types";
-
+import type { CarResult, FlightResult, StayResult, TripRequest, TripSearchResponse } from "./types";
 
 const BASE = "https://api.duffel.com";
 
@@ -113,7 +106,6 @@ function usesTestInventory(): boolean {
   return (duffelKey() ?? "").startsWith("duffel_test_");
 }
 
-
 export function hasDuffelKey(): boolean {
   return Boolean(duffelKey());
 }
@@ -150,16 +142,52 @@ type DuffelOffer = {
   total_currency: string;
   expires_at?: string;
   owner?: { name?: string };
+  conditions?: {
+    change_before_departure?: { allowed?: boolean } | null;
+    refund_before_departure?: { allowed?: boolean } | null;
+  };
   slices?: Array<{
+    origin?: { iata_code?: string };
+    destination?: { iata_code?: string };
     segments?: Array<{
       marketing_carrier?: { name?: string; iata_code?: string };
       marketing_carrier_flight_number?: string;
       departing_at?: string;
       arriving_at?: string;
-      passengers?: Array<{ cabin_class?: string }>;
+      origin?: { iata_code?: string };
+      destination?: { iata_code?: string };
+      passengers?: Array<{
+        cabin_class?: string;
+        baggages?: Array<{ type?: string; quantity?: number }>;
+      }>;
     }>;
   }>;
 };
+
+/**
+ * Checked bags the fare includes per passenger. A fare with none is the one
+ * that catches travellers out at the desk, so we carry the number through to
+ * the comparison rather than leaving it implied.
+ */
+function checkedBagsOf(offer: DuffelOffer): number {
+  const bags = offer.slices?.[0]?.segments?.[0]?.passengers?.[0]?.baggages ?? [];
+  return bags
+    .filter((b) => b.type === "checked")
+    .reduce((total, b) => total + (b.quantity ?? 0), 0);
+}
+
+/** Fare conditions, left null when the airline does not state them. */
+function conditionsOf(offer: DuffelOffer): {
+  changeable: boolean | null;
+  refundable: boolean | null;
+} {
+  const change = offer.conditions?.change_before_departure;
+  const refund = offer.conditions?.refund_before_departure;
+  return {
+    changeable: typeof change?.allowed === "boolean" ? change.allowed : null,
+    refundable: typeof refund?.allowed === "boolean" ? refund.allowed : null,
+  };
+}
 
 export async function searchFlight(
   req: TripRequest,
@@ -230,6 +258,14 @@ export async function searchFlight(
       ...toEur(value, cur),
       offerId: offer.id,
       expiresAt: offer.expires_at ?? null,
+      originIata: head?.origin?.iata_code ?? offer.slices?.[0]?.origin?.iata_code ?? req.originIata,
+      destinationIata:
+        tail?.destination?.iata_code ??
+        offer.slices?.[0]?.destination?.iata_code ??
+        req.destinationIata,
+      checkedBags: checkedBagsOf(offer),
+      checkedBagPriceEur: null,
+      ...conditionsOf(offer),
     };
   };
 
@@ -241,8 +277,7 @@ export async function searchFlight(
     const legs = offer.slices?.[0]?.segments ?? [];
     const numbers = legs
       .map(
-        (s) =>
-          `${s.marketing_carrier?.iata_code ?? ""}${s.marketing_carrier_flight_number ?? ""}`,
+        (s) => `${s.marketing_carrier?.iata_code ?? ""}${s.marketing_carrier_flight_number ?? ""}`,
       )
       .join("-");
     return `${numbers}|${legs[0]?.departing_at ?? ""}|${offer.total_amount}`;
@@ -280,6 +315,14 @@ export async function searchFlight(
     stops: Math.max(0, outbound.length - 1),
     offerId: best.id,
     expiresAt: best.expires_at ?? null,
+    originIata: first?.origin?.iata_code ?? best.slices?.[0]?.origin?.iata_code ?? req.originIata,
+    destinationIata:
+      last?.destination?.iata_code ??
+      best.slices?.[0]?.destination?.iata_code ??
+      req.destinationIata,
+    checkedBags: checkedBagsOf(best),
+    checkedBagPriceEur: null,
+    ...conditionsOf(best),
   };
   return { flight, alternatives };
 }
@@ -378,8 +421,6 @@ function breakfastOf(
   };
 }
 
-
-
 export type StaySearchOutcome = {
   stay: StayResult | null;
   /** Said plainly when a family needs a family room, or a policy is worth knowing. */
@@ -425,29 +466,45 @@ export async function searchStay(
     Number.isFinite(Number(r.cheapest_rate_total_amount)),
   );
   if (!results.length) {
-    return { stay: null, alternatives: [], requested, notFound: Boolean(requested), familyNote: null };
+    return {
+      stay: null,
+      alternatives: [],
+      requested,
+      notFound: Boolean(requested),
+      familyNote: null,
+    };
   }
 
   // Standards we apply for everyone: no hostels, dorms, shared bathrooms,
   // smoking rooms or property types below hotel/apartment/villa/resort. The
   // rules are config, not code, so the team can see and adjust them.
   const globalRules = await loadGlobalStayRules();
-  const allowed = staysPassingGlobalRules(results, (raw) => ({
-    text: [
-      raw.accommodation?.name,
-      raw.accommodation?.description,
-      ...(raw.accommodation?.rooms ?? []).flatMap((room) => [
-        room.name,
-        ...(room.rates ?? []).map((rate) => rate.name),
-      ]),
-    ]
-      .filter(Boolean)
-      .join(" · "),
-    propertyType:
-      raw.accommodation?.accommodation_type ?? raw.accommodation?.property_type ?? null,
-  }), globalRules);
+  const allowed = staysPassingGlobalRules(
+    results,
+    (raw) => ({
+      text: [
+        raw.accommodation?.name,
+        raw.accommodation?.description,
+        ...(raw.accommodation?.rooms ?? []).flatMap((room) => [
+          room.name,
+          ...(room.rates ?? []).map((rate) => rate.name),
+        ]),
+      ]
+        .filter(Boolean)
+        .join(" · "),
+      propertyType:
+        raw.accommodation?.accommodation_type ?? raw.accommodation?.property_type ?? null,
+    }),
+    globalRules,
+  );
   if (!allowed.length) {
-    return { stay: null, alternatives: [], requested, notFound: Boolean(requested), familyNote: null };
+    return {
+      stay: null,
+      alternatives: [],
+      requested,
+      notFound: Boolean(requested),
+      familyNote: null,
+    };
   }
 
   // A family is counted properly: children with ages, babies as infants.
@@ -573,7 +630,6 @@ export async function searchStay(
   };
 }
 
-
 /* --------------------------------- cars -------------------------------- */
 
 type DuffelCar = {
@@ -592,10 +648,7 @@ export type CarSearchOutcome = {
   notFound: boolean;
 };
 
-export async function searchCar(
-  req: TripRequest,
-  prefs?: SearchPrefs,
-): Promise<CarSearchOutcome> {
+export async function searchCar(req: TripRequest, prefs?: SearchPrefs): Promise<CarSearchOutcome> {
   const sample = usesTestInventory();
   const location = sample
     ? {
@@ -686,8 +739,6 @@ export async function searchCar(
     .map((m) => m.result);
   return { car: best.result, alternatives: carOthers, requested: null, notFound: false };
 }
-
-
 
 /* ------------------------------ orchestration --------------------------- */
 
@@ -809,7 +860,10 @@ export async function searchTripWithDuffel(
       const swap = flightAlternatives.find(fits);
       if (swap) {
         const previous = flight;
-        flightAlternatives = [previous, ...flightAlternatives.filter((f) => f !== swap)].slice(0, 3);
+        flightAlternatives = [previous, ...flightAlternatives.filter((f) => f !== swap)].slice(
+          0,
+          3,
+        );
         flight = swap;
         departureNote = `Return moved to ${local(swap.returnDepartAt!)} so you leave before your deadline.`;
       } else if (flight.returnDepartAt) {
@@ -850,4 +904,3 @@ export async function searchTripWithDuffel(
     errors,
   };
 }
-

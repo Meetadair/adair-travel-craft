@@ -132,6 +132,15 @@ function anySelected(text: string, selected: string[], table: Record<string, str
   return selected.some((key) => matchesAny(text, table[key] ?? brandWords(key)));
 }
 
+/**
+ * Whether one airline preference key matches a carrier name, using the same
+ * word table the ranker uses. Exported so the flight comparison can say "your
+ * airline" without a second, drifting copy of the list.
+ */
+export function matchesAirline(key: string, carrierText: string): boolean {
+  return matchesAny(carrierText, AIRLINE_WORDS[key] ?? brandWords(key));
+}
+
 /* ------------------------------ hard filters ------------------------------ */
 
 /**
@@ -210,7 +219,11 @@ export function stayScore(
   if (!prefs) return score;
   if (avoided(name, "hotel", prefs)) score -= 5;
   if (prefs.hotelChains.length && anySelected(name, prefs.hotelChains, CHAIN_WORDS)) score += 6;
-  if (prefs.hotelStars.length && rating != null && prefs.hotelStars.includes(String(Math.round(rating))))
+  if (
+    prefs.hotelStars.length &&
+    rating != null &&
+    prefs.hotelStars.includes(String(Math.round(rating)))
+  )
     score += 3;
   if (rating != null && rating >= prefs.hotelMinRating) score += 2;
   if (prefs.hotelAmenities.length && anySelected(name, prefs.hotelAmenities, AMENITY_WORDS))
@@ -236,7 +249,7 @@ export function carScore(
     score += 4;
   if (!prefs) return score;
   if (prefs.carBrands.length && anySelected(vehicle, prefs.carBrands, CAR_BRAND_WORDS)) score += 5;
-  if (prefs.carCompanies.length && anySelected(supplier, prefs.carCompanies, { })) score += 4;
+  if (prefs.carCompanies.length && anySelected(supplier, prefs.carCompanies, {})) score += 4;
   if (prefs.carClass && matchesAny(vehicle, CAR_CLASS_WORDS[prefs.carClass] ?? [prefs.carClass]))
     score += 3;
   if (remembers(prefs.remembered?.carSuppliers, supplier)) score += 2;
