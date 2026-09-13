@@ -191,7 +191,7 @@ export const QUESTIONS: QuestionDef[] = [
     part: 1,
     kind: "fields",
     skippable: true,
-    title: "How many stars?",
+    title: "Hotels outside these star ratings won't be shown",
     multis: [
       { field: "hotelStars", options: opts(["2", "2 stars"], ["3", "3 stars"], ["4", "4 stars"], ["5", "5 stars"]) },
     ],
@@ -201,7 +201,7 @@ export const QUESTIONS: QuestionDef[] = [
     part: 1,
     kind: "fields",
     skippable: true,
-    title: "Lowest guest score you accept?",
+    title: "Hotels below this rating won't be shown",
     singles: [
       {
         field: "hotelRatingLevel",
@@ -249,7 +249,7 @@ export const QUESTIONS: QuestionDef[] = [
     part: 2,
     kind: "fields",
     skippable: true,
-    title: "How close to the centre or meeting point?",
+    title: "Only show hotels within…",
     singles: [
       {
         field: "hotelMaxKm",
