@@ -296,3 +296,14 @@
 - Greetings ("hey", "cześć", "hello") get one line — "Hi. Where are you going?" — and nothing else is asked. Same copy in all 14 locales.
 - The assistant page now classifies intent before searching (`src/pages/assistant.tsx`), asks one question at a time, and re-checks the sentence after each answer instead of searching blind.
 - Tests (`src/lib/trip/order.test.ts`): greeting produces no search, a date with no city asks for the destination, no code path parses a trip without a destination (345 tests pass).
+
+## Conversational agent with tools — queued, next
+
+Replace the single-purpose parser call with a streaming Claude agent loop (`ANTHROPIC_API_KEY`, claude-sonnet-4-6) that holds the conversation and calls our tools:
+`search_trip`, `amend_card`, `find_places` (Overpass, cached), `get_curated` (editorial + creator picks, ranked above map data), `distance_and_time`, `get_traveller_context`, `get_trip`, and `book_*` proposed only.
+
+Hard rules: live facts (hours, prices, addresses, availability) only from tools, and plain honesty when a tool has nothing; knowledge-based recommendations worded separately from tool facts; no booking without an explicit yes; every answer uses this trip's hotel and the traveller's preferences; two or three sentences then the next step; travel scope only.
+
+Cost and speed: streaming, at most five tool calls per turn, cached map lookups, tight system prompt, token usage per conversation logged to `/admin/analytics`. Without the key: structured trip requests only, stated plainly, never a faked answer.
+
+Tests to write: a restaurant question answers without a flight search; a five-minute-walk taxi request proposes walking first; opening hours never stated without a tool result; no booking without confirmation.
