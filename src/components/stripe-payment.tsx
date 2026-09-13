@@ -106,6 +106,8 @@ export default function StripePayment(props: {
   amountEur: number;
   disabled?: boolean;
   payingLabel?: string | null;
+  /** Stripe's Payment Element manages saved cards itself. */
+  preselectCardId?: string | undefined;
   onAuthorised: (payment: AuthorisedPayment) => void;
 }) {
   const { session } = props;
