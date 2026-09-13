@@ -132,7 +132,6 @@ export function staysPassingDealbreakers<T>(
   return items.filter((item) => {
     const { name, rating } = read(item);
     if (rules.includes("dbStars4") && (rating == null || rating < 4)) return false;
-    if (rules.includes("dbNoHostel") && matchesAny(name, ["hostel"])) return false;
     return true;
   });
 }
@@ -151,8 +150,6 @@ export function carsPassingDealbreakers<T>(
 export function unverifiableDealbreakers(prefs?: SearchPrefs): string[] {
   const shown: Record<string, string> = {
     dbLift: "a lift",
-    dbSharedBath: "a private bathroom",
-    dbNonSmoking: "non-smoking",
     dbStepFree: "step-free access",
     dbPets: "pets allowed",
   };

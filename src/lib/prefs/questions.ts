@@ -451,15 +451,12 @@ export const QUESTIONS: QuestionDef[] = [
     part: 1,
     kind: "fields",
     skippable: true,
-    title: "Anything we should never book?",
+    title: "A few things we should never book for you",
     hint: "Hard rules, not preferences. We filter these out before comparing options — and where a supplier does not publish the detail, we tell you rather than guess.",
     toggles: [
       { field: "dbStars4", label: "Never below 4 stars" },
       { field: "dbLift", label: "Never without a lift" },
-      { field: "dbSharedBath", label: "Never a shared bathroom" },
       { field: "dbAutomatic", label: "Automatic transmission only" },
-      { field: "dbNonSmoking", label: "Non-smoking only" },
-      { field: "dbNoHostel", label: "Never a hostel" },
       { field: "dbStepFree", label: "Step-free access required" },
       { field: "dbPets", label: "Must allow pets" },
     ],
@@ -662,7 +659,7 @@ export type TravelPrefs = {
   interests: string[];
   music: string[];
   budgetBand: string | null;
-  /** Hard rules, e.g. "dbNoHostel" — filtered out before ranking. */
+  /** Hard rules, e.g. "dbStars4" — filtered out before ranking. */
   dealbreakers: string[];
   /** Part 2 profile answers keyed by field, kept open so new questions need no migration. */
   extraAnswers: Record<string, string[]>;
@@ -674,10 +671,7 @@ export type TravelPrefs = {
 export const DEALBREAKER_FIELDS = [
   "dbStars4",
   "dbLift",
-  "dbSharedBath",
   "dbAutomatic",
-  "dbNonSmoking",
-  "dbNoHostel",
   "dbStepFree",
   "dbPets",
 ] as const;
