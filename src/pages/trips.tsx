@@ -14,6 +14,7 @@ import {
   FileDown,
 } from "lucide-react";
 import { AddReservation } from "@/components/add-reservation";
+import { TripPlaces } from "@/components/trip-places";
 import { SiteNav } from "@/components/site-nav";
 import { AppFooter } from "@/components/app-footer";
 import { AddToCalendar } from "@/components/add-to-calendar";
@@ -181,6 +182,8 @@ export function TripsPage() {
                   </li>
                 ))}
               </ul>
+
+              {trip.status === "booked" && <TripPlaces tripId={trip.id} />}
 
               {trip.status === "booked" && (
                 <AddReservation

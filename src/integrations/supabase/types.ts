@@ -1481,6 +1481,24 @@ export type Database = {
           },
         ]
       }
+      place_cache: {
+        Row: {
+          cache_key: string
+          fetched_at: string
+          payload: Json
+        }
+        Insert: {
+          cache_key: string
+          fetched_at?: string
+          payload?: Json
+        }
+        Update: {
+          cache_key?: string
+          fetched_at?: string
+          payload?: Json
+        }
+        Relationships: []
+      }
       planning_rules: {
         Row: {
           active: boolean
