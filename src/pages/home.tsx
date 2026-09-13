@@ -353,6 +353,8 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
   const [insurance, setInsurance] = useState<InsuranceQuote | null>(null);
   const [addInsurance, setAddInsurance] = useState(false);
   const [dropped, setDropped] = useState({ flight: false, hotel: false, car: false });
+  /** True once "Book it all" opened the closing conversation. */
+  const [closing, setClosing] = useState(false);
   const drop = (kind: "flight" | "hotel" | "car") =>
     setDropped((prev) => ({ ...prev, [kind]: true }));
   const anyDropped = dropped.flight || dropped.hotel || dropped.car;
@@ -904,7 +906,7 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
     req?.destinationCity ?? "",
     req ? `${dayLabel(req.departDate, locale)}–${dayLabel(req.returnDate, locale)}` : "",
     !dropped.flight && live?.flight
-      ? `${live.flight.carrier} ${live.flight.departTime ?? ""}`.trim()
+      ? `${live.flight.carrier} ${live.flight.departAt.slice(11, 16)}`.trim()
       : "",
     !dropped.hotel && live?.stay ? live.stay.name : "",
     !dropped.car && live?.car ? live.car.vehicle : "",
