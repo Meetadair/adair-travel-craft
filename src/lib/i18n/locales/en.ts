@@ -159,6 +159,66 @@ export const en = {
     remove: "Remove this item",
     removedNote: "Removed from this trip",
     restoreAll: "Add everything back",
+
+    // What Adair understood, shown before anything is searched.
+    strip: {
+      heading: "Here's what I understood.",
+      from: "From",
+      to: "To",
+      depart: "Out",
+      back: "Back",
+      arriveBy: "There by",
+      travellers: "Travelling",
+      travellerOne: "1 person",
+      travellerMany: "{count} people",
+      wishes: "Also noted",
+      edit: "Change {field}",
+      find: "Find it",
+      searching: "Searching…",
+      done: "Done",
+      airportSearch: "Search airports",
+      travellersLabel: "How many people",
+    },
+
+    // The one or two things Adair asks before searching.
+    questions: {
+      dates: "Which dates?",
+      arrivalTime: "What time do you need to be there?",
+      whichAirport: "{city} has more than one airport. Which one?",
+      skip: "Skip",
+      done: "Done",
+    },
+
+    // What Adair notices about the proposal it just built.
+    advice: {
+      tightFlight:
+        "This flight lands at {land} for a {meeting} meeting — tight. The {alt} gives you {spare} for {extra} more.",
+      tightFlightNoOption: "This flight lands at {land} for a {meeting} meeting — that is tight.",
+      tightFlightAction: "Take the earlier flight",
+      peak: "Prices are {ratio}× the usual{event}.",
+      peakEvent: " — {event} week",
+      peakSaving: " {days} days later saves {saving}.",
+      peakAction: "Show cheaper dates",
+      transfer:
+        "The hotel is {minutes} minutes from the airport and has no garage — a transfer is simpler than the car.",
+      transferCheaper:
+        "The hotel is {minutes} minutes from the airport and has no garage — a transfer is {saving} cheaper than the car.",
+      transferAction: "Swap the car for a transfer",
+      breakfast: "Breakfast isn't included at this rate; the one with breakfast is {amount} more.",
+      breakfastAction: "Add breakfast",
+    },
+
+    // One suggestion that would make next time easier.
+    nudge: {
+      connectCalendar:
+        "Next time I could pick this up from your calendar myself — connecting takes about three minutes.",
+      connectCalendarAction: "Connect the calendar",
+      addLoyalty: "You'd earn miles on this flight — add your frequent flyer number in Settings.",
+      addLoyaltyAction: "Add the number",
+      saveCompany: "Save the company once and I'll invoice it automatically.",
+      saveCompanyAction: "Save the company",
+      dismiss: "Not now",
+    },
   },
 
   auth: {

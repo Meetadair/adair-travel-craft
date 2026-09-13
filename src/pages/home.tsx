@@ -13,7 +13,7 @@ import {
   Copy,
   ShieldCheck,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
@@ -22,11 +22,21 @@ import { ArrivalPlanNote, TransferNote } from "@/components/arrival-plan-note";
 import { track } from "@/lib/track";
 import { TripExtras } from "@/components/trip-extras";
 import { searchLiveTrip, swapCardAlternative } from "@/lib/trip-live.functions";
+import { getConversationContext } from "@/lib/conversation.functions";
 import type { BudgetStatus, MatchSummary } from "@/lib/trip/match";
 import { INSURANCE_DETAIL, INSURANCE_TITLE, type InsuranceQuote } from "@/lib/trip/insurance";
 import { parseTripSentence } from "@/lib/trip/parse";
 import { TripRoute } from "@/components/trip-route";
 import type { TripStop } from "@/lib/trip/types";
+import { UnderstandingStrip } from "@/components/trip/understanding-strip";
+import { ChatQuestions } from "@/components/trip/chat-questions";
+import { AdviceLines } from "@/components/trip/advice-lines";
+import { NudgeLine } from "@/components/trip/nudge-line";
+import { applyOverrides, understand, type TripOverrides } from "@/lib/trip/understanding";
+import { chatQuestions, essentialsMet, isBusinessSentence, type ChatQuestionKind } from "@/lib/trip/questions";
+import { buildAdvice, type AdviceLine } from "@/lib/trip/advice";
+import { pickNudge, readDismissed, rememberDismissed, type Nudge, type NudgeKind } from "@/lib/trip/nudges";
+import { airportDistanceKm, driveMinutes } from "@/lib/trip/airport-geo";
 
 import { SiteNav } from "@/components/site-nav";
 import { LocaleLink, useLocale, useT, type Dict } from "@/lib/i18n";
@@ -321,6 +331,19 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
   const [showSaved, setShowSaved] = useState(true);
   const [showActions, setShowActions] = useState(true);
   const [copied, setCopied] = useState(false);
+  // The conversational layer: Adair first shows what it understood and asks for
+  // what's missing; the search runs only when the traveller taps "Find it".
+  const [pending, setPending] = useState<Submission | null>(null);
+  const [confirmed, setConfirmed] = useState<Submission | null>(null);
+  const [overrides, setOverrides] = useState<TripOverrides>({});
+  const [answered, setAnswered] = useState<ChatQuestionKind[]>([]);
+  const [dismissedNudges, setDismissedNudges] = useState<NudgeKind[]>([]);
+  const [nudgeContext, setNudgeContext] = useState<{
+    calendarConnected: boolean;
+    loyaltyCount: number;
+    hasDefaultCompany: boolean;
+  } | null>(null);
+  const [actedAdvice, setActedAdvice] = useState<string[]>([]);
   const [live, setLive] = useState<TripSearchResponse | null>(null);
   const [liveFailed, setLiveFailed] = useState(false);
   // Optional in-app travel insurance offer (signed-in cards only).
@@ -527,9 +550,24 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
     }
   };
 
-  const runKey = submission?.key ?? 0;
+  // A new sentence is understood first, not searched: the strip and any
+  // questions appear, and the search waits for "Find it".
   useEffect(() => {
     if (!submission) return;
+    setPending(submission);
+    setConfirmed(null);
+    setOverrides({});
+    setAnswered([]);
+    setLive(null);
+    setLiveFailed(false);
+    setCardId(null);
+    setPriceContext(null);
+    setDismissedNudges(readDismissed());
+  }, [submission?.key]);
+
+  const runKey = confirmed?.key ?? 0;
+  useEffect(() => {
+    if (!confirmed) return;
     let cancelled = false;
     const timers: ReturnType<typeof setTimeout>[] = [];
     const wait = (ms: number) =>
@@ -537,7 +575,7 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
         timers.push(setTimeout(resolve, ms));
       });
 
-    const text = submission.sentence.trim() || d.userMessage;
+    const text = confirmed.sentence.trim() || d.userMessage;
 
     setLive(null);
     setRouteStops(null);
@@ -551,6 +589,7 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
     setDropped({ flight: false, hotel: false, car: false });
     setPriceContext(null);
     setDatesKept(false);
+    setActedAdvice([]);
     if (signedIn) {
       const named = parseTripSentence(text);
       setRequestedNames({ hotel: named.hotelNameExact, car: named.carNameExact });
@@ -564,7 +603,7 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
       if (signedIn) {
         // Signed in: real supplier results, priced with this traveller's plan,
         // saved as a trip card that can then be booked.
-        const result = await runLiveSearch({ data: { sentence: text } });
+        const result = await runLiveSearch({ data: { sentence: text, overrides } });
         const priced = result.search;
         if (priced.flight && result.priced.flight != null) {
           priced.flight.amountEur = result.priced.flight;
@@ -586,7 +625,7 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
         return priced;
       }
       const request = await parseTrip(text);
-      return searchTrip(request);
+      return searchTrip(applyOverrides(request, overrides));
     })();
     const settled = search
       .then((result) => {
@@ -654,6 +693,144 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [runKey, reduced]);
+
+  // ---- What Adair understood, and what it still needs to ask -------------
+  const a = t.assistant;
+  const pendingSentence = pending ? pending.sentence.trim() || d.userMessage : "";
+  const pendingRequest = useMemo(
+    () => (pendingSentence ? parseTripSentence(pendingSentence) : null),
+    [pendingSentence],
+  );
+  const effectiveRequest = pendingRequest ? applyOverrides(pendingRequest, overrides) : null;
+  const understanding =
+    pendingRequest && effectiveRequest
+      ? understand(pendingSentence, effectiveRequest, a.strip)
+      : null;
+  const openQuestions = effectiveRequest
+    ? chatQuestions(pendingSentence, effectiveRequest, { answered, copy: a.questions })
+    : [];
+
+  const answerQuestion = (kind: ChatQuestionKind, value: string | number[]) => {
+    setOverrides((prev) => {
+      if (kind === "dates" && typeof value === "string") return { ...prev, departDate: value };
+      if (kind === "arrival_time" && typeof value === "string")
+        return { ...prev, mustArriveBy: value };
+      if (kind === "which_airport" && typeof value === "string")
+        return { ...prev, destinationIata: value };
+      if (kind === "child_ages" && Array.isArray(value)) return { ...prev, childAges: value };
+      return prev;
+    });
+    setAnswered((prev) => (prev.includes(kind) ? prev : [...prev, kind]));
+  };
+
+  /** "Find it": the point at which we go to the suppliers. */
+  const findIt = () => {
+    if (!pending || !essentialsMet(openQuestions)) return;
+    track("understanding_confirmed", { edited: Object.keys(overrides).length });
+    setConfirmed({ sentence: pending.sentence, key: Date.now() });
+  };
+
+  // ---- What Adair noticed about the proposal -----------------------------
+  const advice = useMemo<AdviceLine[]>(() => {
+    if (!live?.request) return [];
+    const stay = live.stay;
+    const car = live.car;
+    const km =
+      stay && stay.lat != null && stay.lon != null
+        ? airportDistanceKm(live.request.destinationIata, stay.lat, stay.lon)
+        : null;
+    const amenities = stay?.amenities ?? [];
+    const plan = live.arrivalPlan;
+    return buildAdvice(
+      {
+        hotel: stay
+          ? {
+              airportMinutes: km != null ? driveMinutes(km) : null,
+              hasParking: amenities.length
+                ? amenities.some((item) => /park|garage/.test(item))
+                : null,
+              breakfastIncluded: stay.breakfastIncluded ?? null,
+              breakfastExtraEur: stay.breakfastExtra ?? null,
+            }
+          : null,
+        car: car ? { priceEur: car.amountEur } : null,
+        arrival: plan
+          ? {
+              tight: plan.tight,
+              landAtLabel: timeLabel(plan.landAt, locale),
+              meetingAtLabel: plan.mustArriveBy,
+              safer: plan.saferOption
+                ? {
+                    title: plan.saferOption.title,
+                    spareLabel: `${Math.max(1, Math.round(plan.saferOption.slackMin / 60))}h`,
+                    extraEur: plan.saferOption.extraEur,
+                    index: plan.saferOption.index,
+                  }
+                : null,
+            }
+          : null,
+        price: priceContext?.peak
+          ? {
+              peak: true,
+              ratio: Number(priceContext.ratio),
+              savingEur: priceContext.savingEur,
+              offsetDays: priceContext.offsetDays ?? null,
+              eventName: priceContext.eventName ?? null,
+            }
+          : null,
+        money: (amount: number) => eur(amount),
+      },
+      a.advice,
+    ).filter((line) => !actedAdvice.includes(line.kind));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [live, priceContext, locale, actedAdvice]);
+
+  const actOnAdvice = (line: AdviceLine) => {
+    track("advice_acted", { kind: line.kind });
+    setActedAdvice((prev) => [...prev, line.kind]);
+    const action = line.action;
+    if (!action) return;
+    if (action.kind === "take_earlier_flight" && action.index != null)
+      void swapAlternative("flight", action.index);
+    else if (action.kind === "add_breakfast" && action.index != null)
+      void swapAlternative("stay", action.index);
+    else if (action.kind === "show_cheaper_dates") void moveDates();
+    else if (action.kind === "swap_car_for_transfer") drop("car");
+  };
+
+  // ---- One suggestion for next time -------------------------------------
+  const loadContext = useServerFn(getConversationContext);
+  useEffect(() => {
+    if (!signedIn) return;
+    let active = true;
+    void loadContext()
+      .then((ctx) => {
+        if (active) setNudgeContext(ctx);
+      })
+      .catch(() => {
+        /* a missing nudge is never worth an error */
+      });
+    return () => {
+      active = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [signedIn]);
+
+  const nudge = useMemo<Nudge | null>(() => {
+    if (!live || !nudgeContext) return null;
+    return pickNudge({
+      business: isBusinessSentence(confirmed?.sentence ?? "", live.request),
+      calendarConnected: nudgeContext.calendarConnected,
+      loyaltyCount: nudgeContext.loyaltyCount,
+      earnsMiles: Boolean(live.flight),
+      askedForInvoice: Boolean(live.request?.invoiceToCompany),
+      hasDefaultCompany: nudgeContext.hasDefaultCompany,
+      dismissed: dismissedNudges,
+      copy: a.nudge,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [live, nudgeContext, dismissedNudges, confirmed]);
+
 
   const parsed = typedSentence ? parseDemoSentence(typedSentence, d.weekdays) : null;
   const days = parsed
@@ -768,7 +945,29 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
           <div className="w-full max-w-lg">
             <p className="mb-2 text-xs font-medium text-muted-foreground">Adair · 9:41</p>
 
-            {thinking ? (
+            {understanding && !confirmed && (
+              <>
+                <UnderstandingStrip
+                  understanding={understanding}
+                  overrides={overrides}
+                  copy={a.strip}
+                  canSearch={essentialsMet(openQuestions)}
+                  onChange={(next) => setOverrides(next)}
+                  onFind={findIt}
+                />
+                <ChatQuestions
+                  questions={openQuestions}
+                  copy={a.questions}
+                  childAges={effectiveRequest?.childAges ?? undefined}
+                  onAnswer={answerQuestion}
+                  onSkip={(kind) =>
+                    setAnswered((prev) => (prev.includes(kind) ? prev : [...prev, kind]))
+                  }
+                />
+              </>
+            )}
+
+            {confirmed && thinking ? (
               <div className="animate-rise inline-flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-3">
                 <span className="flex gap-1">
                   <span className="pulse size-1.5 rounded-full bg-primary" />
@@ -779,7 +978,9 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
               </div>
             ) : (
               <>
+                {revealed > 0 && <AdviceLines lines={advice} onAct={actOnAdvice} />}
                 <div className={`hairline-card overflow-hidden ${revealed > 0 ? "" : "hidden"}`}>
+
                   <div className="border-b border-border px-5 py-4">
                     <p className="text-sm font-semibold text-foreground">{cardTitle}</p>
                     <p className="mt-0.5 text-xs text-muted-foreground">{d.cardSubtitle}</p>
@@ -1279,6 +1480,17 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                 )}
                 {live?.testMode && showActions && (
                   <p className="mt-1 text-xs text-muted-foreground">{d.testMode}</p>
+                )}
+                {nudge && showActions && (
+                  <NudgeLine
+                    nudge={nudge}
+                    dismissLabel={a.nudge.dismiss}
+                    onDismiss={() => {
+                      rememberDismissed(nudge.kind);
+                      setDismissedNudges(readDismissed());
+                      track("nudge_dismissed", { kind: nudge.kind });
+                    }}
+                  />
                 )}
               </>
             )}

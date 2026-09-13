@@ -25,6 +25,11 @@ export const EVENT_NAMES = [
   "match_score",
   "clarify_asked",
   "clarify_answered",
+  // The conversational layer: what was confirmed, what advice was acted on,
+  // and which suggestion was dismissed.
+  "understanding_confirmed",
+  "advice_acted",
+  "nudge_dismissed",
 ] as const;
 
 export type EventName = (typeof EVENT_NAMES)[number];

@@ -298,12 +298,20 @@ type DuffelStay = {
     property_type?: string;
     rating?: number;
     photos?: Array<{ url?: string }>;
+    amenities?: Array<{ type?: string; description?: string }>;
     location?: {
       address?: { line_one?: string; city_name?: string; postal_code?: string };
+      geographic_coordinates?: { latitude?: number; longitude?: number };
     };
     rooms?: Array<{
       name?: string;
-      rates?: Array<{ id?: string; name?: string }>;
+      rates?: Array<{
+        id?: string;
+        name?: string;
+        board_type?: string;
+        total_amount?: string;
+        total_currency?: string;
+      }>;
       // Occupancy limits, where the hotel states them.
       max_occupancy?: number;
       maximum_occupancy?: number;
@@ -330,6 +338,47 @@ function roomPolicyOf(raw: DuffelStay): RoomPolicy {
     childrenFreeUnder: room?.children_free_under ?? null,
   };
 }
+
+/** Amenity types the property lists, lower-cased; empty when it lists none. */
+function amenitiesOf(raw: DuffelStay): string[] {
+  return (raw.accommodation?.amenities ?? [])
+    .map((a) => (a.type ?? a.description ?? "").toLowerCase().trim())
+    .filter(Boolean);
+}
+
+const BREAKFAST_BOARD = /breakfast|bed_and_breakfast|half_board|full_board|all_inclusive/i;
+
+/**
+ * Whether the cheapest rate feeds you, and what the same stay with breakfast
+ * costs on top. Both stay null when the rates say nothing about board.
+ */
+function breakfastOf(
+  raw: DuffelStay,
+  cheapestAmount: number,
+): { included: boolean | null; extra: number | null } {
+  const rates = (raw.accommodation?.rooms ?? []).flatMap((room) => room.rates ?? []);
+  const boards = rates.filter((rate) => typeof rate.board_type === "string" && rate.board_type);
+  if (!boards.length) return { included: null, extra: null };
+
+  const cheapest = boards
+    .slice()
+    .sort((a, b) => Number(a.total_amount ?? Infinity) - Number(b.total_amount ?? Infinity))[0];
+  const included = BREAKFAST_BOARD.test(cheapest?.board_type ?? "");
+  if (included) return { included: true, extra: null };
+
+  const withBreakfast = boards
+    .filter((rate) => BREAKFAST_BOARD.test(rate.board_type ?? ""))
+    .map((rate) => Number(rate.total_amount))
+    .filter((amount) => Number.isFinite(amount) && amount > cheapestAmount)
+    .sort((a, b) => a - b)[0];
+
+  return {
+    included: false,
+    extra: withBreakfast ? round(withBreakfast - cheapestAmount) : null,
+  };
+}
+
+
 
 export type StaySearchOutcome = {
   stay: StayResult | null;
@@ -436,6 +485,8 @@ export async function searchStay(
     const address = raw.accommodation?.location?.address;
     const rawName = raw.accommodation?.name ?? "Hotel";
     const realAddress = [address?.line_one, address?.city_name].filter(Boolean).join(", ");
+    const coords = raw.accommodation?.location?.geographic_coordinates;
+    const breakfast = breakfastOf(raw, amount);
     return {
       rawName,
       result: {
@@ -449,6 +500,11 @@ export async function searchStay(
         photoUrl: raw.accommodation?.photos?.[0]?.url ?? null,
         rateId:
           raw.cheapest_rate_id ?? raw.accommodation?.rooms?.[0]?.rates?.[0]?.id ?? raw.id ?? null,
+        lat: typeof coords?.latitude === "number" ? coords.latitude : null,
+        lon: typeof coords?.longitude === "number" ? coords.longitude : null,
+        amenities: amenitiesOf(raw),
+        breakfastIncluded: breakfast.included,
+        breakfastExtra: breakfast.extra,
       },
     };
   };
