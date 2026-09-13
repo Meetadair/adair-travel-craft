@@ -268,3 +268,11 @@
 
 
 
+
+## Traveller memory — done
+
+- Place memory (`traveller_place_memory`): what was chosen in each city, written on every confirmed booking and every swap-to. The remembered hotel is proposed first on a return trip and mentioned in one line; when it is not available the chat says so and names the closest option.
+- Patterns (`traveller_patterns`): airline, hotel chain, car brand, morning departures, direct-only, lead time, typical length and typical spend, read from real bookings. Three trips is the threshold; Adair asks once and never asks a rejected habit again.
+- Precedence (`src/lib/trip/memory.ts`, `resolvePreferences`): dealbreakers > stated > confirmed patterns > place memory > learned weights > price. Tested, including a dealbreaker beating a learned weight.
+- "What Adair knows about you" in Preferences (`src/components/prefs/knows.tsx`): stated preferences, confirmed habits, place memories and ranking adjustments, each removable, plus "Forget everything you've learned" which keeps stated preferences.
+- Everything is in the GDPR export and in account deletion.
