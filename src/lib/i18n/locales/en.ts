@@ -17,43 +17,19 @@ export const en = {
   home: {
     meta: {
       title: "Adair Travel — One sentence. The whole trip.",
-      description:
-        "Adair is an AI travel assistant that bundles your flight, hotel, and car into a single booking — all from one chat window.",
+      description: "Flight, hotel, car and dinner — booked from a single sentence.",
       ogTitle: "Adair Travel — One sentence. The whole trip.",
-      ogDescription:
-        "Flight, hotel, and car in a single booking card. Instead of five apps — one conversation.",
+      ogDescription: "Flight, hotel, car and dinner — booked from a single sentence.",
     },
     hero: {
-      badge: "Your personal travel planner — concept",
       titleLine1: "One sentence.",
       titleLine2: "The whole trip.",
-      lead: "Adair bundles your flight, hotel, and car into a single booking card — all in one chat window. Instead of five apps, one conversation.",
+      lead: "Flight, hotel, car and dinner — booked from a single sentence.",
       ctaPrimary: "See how it works",
-      ctaSecondary: "Three principles",
       inputLabel: "Describe your trip in one sentence",
       inputPlaceholder:
         "e.g. Rome, Friday to Sunday, hotel with a terrace, invoice to my company",
       inputSubmit: "Show me the trip",
-    },
-    comparison: {
-      label: "Why Adair",
-      title: "Five apps, or one window.",
-      withoutTitle: "Without Adair",
-      withoutTag: "5 apps",
-      withoutFooter: "5 bookings · 5 confirmations · 5 places to check",
-      withTitle: "With Adair",
-      withTag: "1 conversation",
-      withFooter: "1 booking · 1 confirmation ·",
-      quote:
-        "\"I need to be in Milan Thursday morning, back Friday evening, somewhere near the Duomo, and a car on the ground.\"",
-      bundle: "Flight + hotel + car — one card",
-      apps: [
-        { name: "Skyscanner", detail: "flight search, 14 tabs" },
-        { name: "Booking.com", detail: "hotel at public rate" },
-        { name: "Rental agency", detail: "separate car booking" },
-        { name: "A ride app", detail: "getting around locally" },
-        { name: "A restaurant app", detail: "restaurants, separately" },
-      ],
     },
     demo: {
       label: "Conversation demo",
