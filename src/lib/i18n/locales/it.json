@@ -163,7 +163,7 @@
     "removedNote": "Rimosso da questo viaggio",
     "restoreAll": "Ripristina tutto",
     "intent": {
-      "greeting": "Buongiorno. Dimmi dove e quando devi andare, e preparerò l'itinerario per te.",
+      "greeting": "Ciao. Dove sei diretto?",
       "product": "Organizzo viaggi completi da una sola frase — volo, hotel, auto, transfer — e li prenoto in un solo passaggio. Chiedimi un itinerario e te lo mostrerò.",
       "booking": "Trovi le tue prenotazioni ne I miei viaggi, con fatture e modifiche a portata di mano.",
       "unclear": "Non ho individuato un itinerario. Prova qualcosa come: Milano da martedì a giovedì.",
@@ -203,6 +203,7 @@
       }
     },
     "questions": {
+      "destination": "Dove sei diretto?",
       "dates": "Quali date?",
       "arrivalTime": "A che ora devi essere a destinazione?",
       "whichAirport": "{city} ha più di un aeroporto. Quale preferisci?",

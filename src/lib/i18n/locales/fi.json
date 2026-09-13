@@ -163,7 +163,7 @@
     "removedNote": "Poistettu tältä matkalta",
     "restoreAll": "Palauta kaikki",
     "intent": {
-      "greeting": "Hei. Kerro minne ja milloin sinun täytyy matkustaa, niin kokoan matkan sinulle.",
+      "greeting": "Hei. Minne olet matkustamassa?",
       "product": "Suunnittelen kokonaisia matkoja yhdestä lauseesta — lennot, hotellit, vuokra-autot, kuljetukset — ja varaan ne yhdellä kertaa. Pyydä vain matkaa, niin näet sen.",
       "booking": "Varauksesi löytyvät kohdasta Omat matkat, josta löydät myös laskut ja muutokset.",
       "unclear": "En saanut matkasta kiinni. Kokeile esimerkiksi: Milano tiistaista torstaihin.",
@@ -203,6 +203,7 @@
       }
     },
     "questions": {
+      "destination": "Minne olet matkustamassa?",
       "dates": "Mitkä päivämäärät?",
       "arrivalTime": "Mihin aikaan sinun täytyy olla perillä?",
       "whichAirport": "Kohteessa {city} on useampi lentoasema. Mikä niistä?",

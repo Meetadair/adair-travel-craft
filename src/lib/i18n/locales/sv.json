@@ -163,7 +163,7 @@
     "removedNote": "Borttaget från resan",
     "restoreAll": "Återställ allt",
     "intent": {
-      "greeting": "Hej. Berätta var och när du behöver vara, så sätter jag ihop resan.",
+      "greeting": "Hej. Vart ska du resa?",
       "product": "Jag planerar hela resor utifrån en enda mening — flyg, hotell, bil, transfer — och bokar allt i ett steg. Fråga efter en resa så visar jag den.",
       "booking": "Dina bokningar finns under Mina resor, tillsammans med fakturor och ändringar.",
       "unclear": "Jag uppfattade ingen resa i det där. Prova något i stil med: Milano tisdag till torsdag.",
@@ -203,6 +203,7 @@
       }
     },
     "questions": {
+      "destination": "Vart ska du resa?",
       "dates": "Vilka datum?",
       "arrivalTime": "Vilken tid behöver du vara framme?",
       "whichAirport": "{city} har fler än en flygplats. Vilken vill du resa till?",
