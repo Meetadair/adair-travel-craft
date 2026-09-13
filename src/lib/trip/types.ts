@@ -74,6 +74,15 @@ export type StayResult = {
   rateId: string | null;
   /** True when this property is the exact one the traveller named. */
   exact?: boolean;
+  /** Property coordinates, when the supplier gives them. */
+  lat?: number | null;
+  lon?: number | null;
+  /** Amenity types the property lists, lower-cased. */
+  amenities?: string[];
+  /** False when the chosen rate is room only; null when the rate is silent. */
+  breakfastIncluded?: boolean | null;
+  /** What the same stay with breakfast costs extra, in the rate currency. */
+  breakfastExtra?: number | null;
 };
 
 export type CarResult = {

@@ -1,10 +1,10 @@
 {
   "nav": {
     "assistant": "Assistentti",
-    "trips": "Matkani",
+    "trips": "Omat matkat",
     "business": "Yrityksille",
     "investors": "Sijoittajille",
-    "account": "Tilini",
+    "account": "Oma tili",
     "signIn": "Kirjaudu sisään",
     "language": "Kieli"
   },
@@ -21,133 +21,133 @@
       "lead": "Lento, hotelli, auto ja illallinen — varattuna yhdellä lauseella.",
       "ctaPrimary": "Katso miten se toimii",
       "inputLabel": "Kuvaile matkasi yhdellä lauseella",
-      "inputPlaceholder": "esim. Rooma, perjantaista sunnuntaihin, terassillinen hotelli, lasku yritykselleni",
+      "inputPlaceholder": "esim. Rooma, perjantaista sunnuntaihin, hotelli terassilla, lasku yritykselleni",
       "inputSubmit": "Näytä matka"
     },
     "demo": {
-      "label": "Keskusteluesittely",
+      "label": "Keskustelun esittely",
       "title": "Yksi viesti riittää.",
-      "userMessage": "Minun täytyy olla Milanossa torstaiaamuna, paluu perjantai-iltana, majoitus lähellä Duomoa ja auto odottamassa kentällä.",
+      "userMessage": "Minun täytyy olla Milanossa torstaiaamuna, paluu perjantai-iltana, majoitus lähellä Duomoa ja auto valmiina kentällä.",
       "you": "Sinä",
-      "cardTitle": "Milano · To – Pe",
-      "cardSubtitle": "Koottu matkustusprofiilisi mukaan",
+      "cardTitle": "Milano · to – pe",
+      "cardSubtitle": "Räätälöity matkaprofiilisi mukaan",
       "flightTitle": "LOT 391 · Varsova → Milano",
-      "flightDetail": "To 6:55 – 9:05 AM · paluu Pe 7:40 PM · ikkunapaikka, suosikkilentoyhtiö",
+      "flightDetail": "To 6:55 – 9:05 · paluu pe 19:40 · ikkunapaikka, suosikkilentoyhtiö",
       "flightTagClass": "Premium Economy",
       "hotelTitle": "Park Hyatt Milano",
-      "hotelDetail": "1 yö · King-huone, hiljainen kerros · 200 m Duomolta",
-      "hotelTag": "sopimushinta",
-      "carTitle": "BMW 3 Series · nouto: Linate",
-      "carDetail": "To 9:30 AM – Pe 6:30 PM · täysvakuutus, ei omavastuuta",
+      "hotelDetail": "1 yö · King-huone, rauhallinen kerros · 200 m Duomolta",
+      "hotelTag": "neuvoteltu hinta",
+      "carTitle": "BMW 3-sarja · nouto: Linate",
+      "carDetail": "To 9:30 – pe 18:30 · kaskovakuutus, ei omavastuuta",
       "carTag": "automaatti",
       "total": "Yhteensä, yksi varaus",
       "bookAll": "Varaa koko matka",
-      "footnote": "3 kohdetta · 1 maksu · 1 varausnumero",
+      "footnote": "3 osaa · 1 maksu · 1 varausnumero",
       "typing": "Adair kokoaa matkaasi…",
-      "saved": "Säästit €96 ja 2 h 40 min verrattuna itse varaamiseen",
-      "savedNote": "verrattuna julkisiin keskihintoihin ja erillisten sivustojen selaamiseen",
+      "saved": "Säästit 96 € ja 2 t 40 min verrattuna omatoimiseen varaamiseen",
+      "savedNote": "verrattuna julkisiin keskihintoihin ja saman matkan varaamiseen eri sivustoilta",
       "invoiceLine": "Lasku → yrityksellesi",
       "share": "Jaa tämä matkakortti",
       "shareCopied": "Kopioitu",
-      "testMode": "Testitila — esimerkkilentotiedot",
-      "bookTooltip": "Varaaminen avautuu lanseerauksen yhteydessä",
-      "remove": "Poista tämä kohde",
-      "removedNote": "Poistettu matkasta",
-      "restoreAll": "Palauta kaikki",
-      "approx": "noin",
-      "searchFailed": "Reaaliaikaisia saatavuustietoja ei saatu juuri nyt — näytetään esimerkkimatka.",
-      "savedLive": "Säästit noin {amount} ja 2 h 40 min verrattuna itse varaamiseen",
+      "testMode": "Testitila — esimerkkidataa lentoyhtiöiltä",
+      "bookTooltip": "Varaaminen avautuu julkaisun yhteydessä",
+      "remove": "Poista tämä osa",
+      "removedNote": "Poistettu tältä matkalta",
+      "restoreAll": "Palauta kaikki takaisin",
+      "approx": "n.",
+      "searchFailed": "Reaaliaikaista saatavuutta ei saatu juuri nyt — näytetään esimerkkimatka sen sijaan.",
+      "savedLive": "Säästit noin {amount} ja 2 t 40 min verrattuna omatoimiseen varaamiseen",
       "savedEstimate": "arvio",
       "nightsOne": "1 yö",
       "nightsMany": "{count} yötä",
       "cardTitleTpl": "{city} · {day1} – {day2}",
       "flightTitleTpl": "LOT 391 · Varsova → {city}",
-      "flightDetailTpl": "{day1} 6:55 – 9:05 AM · paluu {day2} 7:40 PM · ikkunapaikka, suosikkilentoyhtiö",
-      "hotelDetailTpl": "1 yö · King-huone, hiljainen kerros · historiallisessa keskustassa",
-      "carTitleTpl": "BMW 3 Series · nouto: {code}",
-      "carDetailTpl": "{day1} 9:30 AM – {day2} 6:30 PM · täysvakuutus, ei omavastuuta",
+      "flightDetailTpl": "{day1} 6:55 – 9:05 · paluu {day2} 19:40 · ikkunapaikka, suosikkilentoyhtiö",
+      "hotelDetailTpl": "1 yö · King-huone, rauhallinen kerros · historiallisessa keskustassa",
+      "carTitleTpl": "BMW 3-sarja · nouto: {code}",
+      "carDetailTpl": "{day1} 9:30 – {day2} 18:30 · kaskovakuutus, ei omavastuuta",
       "weekdays": [
-        "Maanantai",
-        "Tiistai",
-        "Keskiviikko",
-        "Torstai",
-        "Perjantai",
-        "Lauantai",
-        "Sunnuntai"
+        "maanantai",
+        "tiistai",
+        "keskiviikko",
+        "torstai",
+        "perjantai",
+        "lauantai",
+        "sunnuntai"
       ],
       "weekdaysShort": [
-        "Ma",
-        "Ti",
-        "Ke",
-        "To",
-        "Pe",
-        "La",
-        "Su"
+        "ma",
+        "ti",
+        "ke",
+        "to",
+        "pe",
+        "la",
+        "su"
       ]
     },
     "campaign": {
-      "earlyAccess": "Hanki ennakkopääsy",
+      "earlyAccess": "Liity ennakkovaraajiin",
       "emailLabel": "Sähköpostiosoitteesi",
-      "emailPlaceholder": "you@company.com",
+      "emailPlaceholder": "sinä@yritys.fi",
       "join": "Liity",
       "joining": "Hetki vain…",
-      "success": "Olet mukana. Jaa linkkisi — €40 matkaluottoa sinulle, €20 jokaisesta varaavasta ystävästä.",
-      "referralLabel": "Kutsulinkkisi",
+      "success": "Olet mukana. Jaa linkkisi — 40 € matkaluottoa sinulle, 20 € jokaiselle varaavalle ystävälle.",
+      "referralLabel": "Suosittelulinkkisi",
       "copy": "Kopioi linkki",
       "copied": "Kopioitu",
       "error": "Jokin meni pieleen. Yritä uudelleen.",
       "teamsLabel": "Tiimeille",
       "teamsTitle": "Adair for Teams",
-      "teamsLine": "Yksi matkustusohjesääntö, yksi lasku, yksi paikka koko tiimille. Tulossa lanseerauksen jälkeen.",
+      "teamsLine": "Yksi matkustusohje, yksi lasku, yksi paikka koko tiimille. Tulossa julkaisun jälkeen.",
       "teamsCta": "Liity Teams-jonotuslistalle",
-      "teamsMore": "Katso tarjous yrityksille"
+      "teamsMore": "Katso yritystarjous"
     },
     "demoLine": "Viisi sovellusta, viisi vahvistusta, viisi tarkistettavaa paikkaa — tai tämä.",
     "after": {
       "items": [
         {
           "title": "Kaikki yhdessä paikassa",
-          "text": "Vahvistukset, kupongit ja muutokset Matkani-osiossa."
+          "text": "Vahvistukset, kupongit ja muutokset Omat matkat -osiossa."
         },
         {
-          "title": "Se oppii tuntemaan sinut",
-          "text": "Määritä mieltymykset kerran. Jokainen matka huomioi ne sen jälkeen."
+          "title": "Oppii toiveesi",
+          "text": "Määritä mieltymykset kerran. Jokainen matka huomioi ne jatkossa."
         },
         {
-          "title": "Oikea ihminen tavoitettavissa",
-          "text": "Asiakastuki näkee varauksesi heti valmiina edessään."
+          "title": "Aina joku vastaamassa",
+          "text": "Tuki, jolla on varauksesi suoraan silmiensä edessä."
         }
       ]
     },
     "close": {
-      "title": "Adair lanseerataan lokakuussa.",
-      "line": "Ensimmäiset 100 tiliä saavat 3 kuukautta Signature-tilausta maksutta.",
-      "teams": "Adair for Teams — yksi ohjesääntö, yksi lasku.",
+      "title": "Adair julkaistaan lokakuussa.",
+      "line": "Ensimmäiset 100 tiliä saavat 3 kuukautta Signature-tasoa maksutta.",
+      "teams": "Adair for Teams — yksi ohjeistus, yksi lasku.",
       "teamsLink": "Liity listalle"
     },
     "footer": "Adair Kft. · Budapest"
   },
   "assistant": {
     "meta": {
-      "title": "Adair Assistant — koko matkasi yhdellä keskustelulla",
-      "description": "Kerro minne ja milloin sinun täytyy päästä. Adair etsii todelliset lento-, hotelli- ja autotarjoukset ja kokoaa ne yhdelle kortille.",
+      "title": "Adair Assistant — kokoa koko matkasi yhdellä keskustelulla",
+      "description": "Kerro minne ja milloin sinun täytyy matkustaa. Adair hakee todelliset lento-, hotelli- ja autotarjoukset ja kokoaa ne yhdeksi kortiksi.",
       "ogTitle": "Adair Assistant — koko matka yhdellä keskustelulla",
       "ogDescription": "Todelliset lento-, hotelli- ja autotarjoukset yhdellä varattavalla kortilla."
     },
-    "title": "Kerro, minne olet menossa.",
-    "lead": "Adair ymmärtää luonnollista kieltä, tarkistaa saatavuuden palveluntarjoajilta ja kokoaa lennon, hotellin ja auton yhdeksi varattavaksi kokonaisuudeksi.",
+    "title": "Kerro minne sinun täytyy matkustaa.",
+    "lead": "Adair ymmärtää luonnollista kieltä, tarkistaa saatavuuden tarjoajilta ja yhdistää lennon, hotellin ja auton yhdeksi varattavaksi kortiksi.",
     "placeholder": "esim. Minun täytyy olla Milanossa torstaiaamuna, paluu perjantai-iltana…",
     "submitIdle": "Kokoa matka",
     "submitBusy": "Etsitään…",
     "examples": [
-      "Minun täytyy olla Milanossa torstaiaamuna, paluu perjantai-iltana, majoitus lähellä Duomoa ja auto odottamassa.",
-      "Konferenssi Barcelonassa Oct 12–14, premium economy, hotelli konferenssikeskuksen lähellä.",
+      "Minun täytyy olla Milanossa torstaiaamuna, paluu perjantai-iltana, hotelli Duomon lähellä ja auto odottamassa.",
+      "Konferenssi Barcelonassa 12.–14. lokakuuta, premium economy, hotelli messukeskuksen lähellä.",
       "Matka Lontooseen maanantaina, paluu keskiviikkona, ei tarvetta autolle."
     ],
-    "error": "Emme saaneet koottua tätä matkaa. Yritä uudelleen tai anna tarkat päivämäärät.",
-    "sourceLive": "hinnat suoraan palveluntarjoajien rajapinnoista",
-    "sourcePartial": "osa kohteista palveluntarjoajien rajapinnoista",
-    "sourceDemo": "esimerkkitiedot",
+    "error": "Tätä matkaa ei voitu koota. Yritä uudelleen tai määritä päivämäärät tarkemmin.",
+    "sourceLive": "hinnat suoraan tarjoajien rajapinnoista",
+    "sourcePartial": "osa kohteista tarjoajien rajapinnoista",
+    "sourceDemo": "esimerkkidataa",
     "hideAlternatives": "Piilota vaihtoehdot",
     "showAlternatives": "Näytä vaihtoehdot",
     "backToRecommendation": "Takaisin Adairin suositukseen",
@@ -159,16 +159,64 @@
     "galleryPrev": "Edellinen kuva",
     "galleryNext": "Seuraava kuva",
     "galleryGoTo": "Siirry kuvaan",
-    "remove": "Poista tämä kohde",
-    "removedNote": "Poistettu matkasta",
-    "restoreAll": "Palauta kaikki"
+    "remove": "Poista tämä osa",
+    "removedNote": "Poistettu tältä matkalta",
+    "restoreAll": "Palauta kaikki takaisin",
+    "strip": {
+      "heading": "Tämän sain selville.",
+      "from": "Lähtöpaikka",
+      "to": "Määränpää",
+      "depart": "Meno",
+      "back": "Paluu",
+      "arriveBy": "Perillä viimeistään",
+      "travellers": "Matkustajat",
+      "travellerOne": "1 henkilö",
+      "travellerMany": "{count} henkilöä",
+      "wishes": "Myös huomioitu",
+      "edit": "Muokkaa: {field}",
+      "find": "Hae",
+      "searching": "Haetaan…",
+      "done": "Valmis",
+      "airportSearch": "Hae lentoasemia",
+      "travellersLabel": "Kuinka monta henkilöä"
+    },
+    "questions": {
+      "dates": "Mitkä päivät?",
+      "arrivalTime": "Mihin aikaan sinun täytyy olla perillä?",
+      "whichAirport": "Kohteessa {city} on useampi lentoasema. Mikä niistä?",
+      "skip": "Ohita",
+      "done": "Valmis"
+    },
+    "advice": {
+      "tightFlight": "Tämä lento laskeutuu klo {land}, ja tapaamisesi on klo {meeting} — aikataulu on tiukka. Vaihtoehto {alt} tuo liikkumavaraa {spare} hintaan {extra} enemmän.",
+      "tightFlightNoOption": "Tämä lento laskeutuu klo {land}, ja tapaamisesi on klo {meeting} — aikataulu on melko tiukka.",
+      "tightFlightAction": "Valitse aiempi lento",
+      "peak": "Hinnat ovat {ratio}× tavanomaista korkeammat{event}.",
+      "peakEvent": " — {event}-viikko",
+      "peakSaving": " Siirtämällä {days} päivää eteenpäin säästät {saving}.",
+      "peakAction": "Näytä edullisemmat päivät",
+      "transfer": "Hotelli on {minutes} minuutin päässä kentältä eikä siellä ole autotallia — kuljetuspalvelu on autoa vaivattomampi.",
+      "transferCheaper": "Hotelli on {minutes} minuutin päässä kentältä eikä siellä ole autotallia — kuljetus on {saving} edullisempi kuin auto.",
+      "transferAction": "Vaihda auto kuljetukseen",
+      "breakfast": "Aamiainen ei sisälly tähän hintaan; aamiaisellinen vaihtoehto on {amount} enemmän.",
+      "breakfastAction": "Lisää aamiainen"
+    },
+    "nudge": {
+      "connectCalendar": "Ensi kerralla voisin lukea nämä tiedot suoraan kalenteristasi — yhdistäminen vie noin kolme minuuttia.",
+      "connectCalendarAction": "Yhdistä kalenteri",
+      "addLoyalty": "Kerryttäisit maileja tältä lennolta — lisää kanta-asiakasnumerosi Asetuksissa.",
+      "addLoyaltyAction": "Lisää numero",
+      "saveCompany": "Tallenna yrityksen tiedot kerran, niin laskutan sitä automaattisesti.",
+      "saveCompanyAction": "Tallenna yritys",
+      "dismiss": "Ei nyt"
+    }
   },
   "auth": {
     "meta": {
-      "title": "Adair-tili — kirjaudu sisään tai rekisteröidy",
-      "description": "Kirjaudu sisään Adair Traveliin hallitaksesi matkojasi, mieltymyksiäsi ja ladataksesi PDF-laskuja.",
-      "ogTitle": "Adair-tili — kirjaudu sisään tai rekisteröidy",
-      "ogDescription": "Matkasi, mieltymyksesi ja laskusi yhdessä asiakaspaneelissa."
+      "title": "Adair-tili — kirjaudu sisään tai luo tili",
+      "description": "Kirjaudu Adair Traveliin tallentaaksesi matkasi ja mieltymyksesi sekä ladataksesi PDF-laskut.",
+      "ogTitle": "Adair-tili — kirjaudu sisään tai luo tili",
+      "ogDescription": "Matkasi, toiveesi ja laskusi yhdessä asiakasnäkymässä."
     },
     "signInTitle": "Kirjaudu sisään",
     "signUpTitle": "Luo tili",
@@ -178,127 +226,127 @@
     "password": "Salasana",
     "submitBusy": "Hetki vain…",
     "signIn": "Kirjaudu sisään",
-    "signUp": "Rekisteröidy",
+    "signUp": "Luo tili",
     "toSignUp": "Minulla ei ole vielä tiliä",
     "toSignIn": "Minulla on jo tili",
-    "confirmSent": "Tarkista sähköpostisi — olemme lähettäneet vahvistuslinkin.",
-    "genericError": "Jokin meni pieleen",
-    "demoHint": "Haluatko nähdä esittelyn ensin?",
+    "confirmSent": "Tarkista saapuneet viestisi — olemme lähettäneet sinulle vahvistuslinkin.",
+    "genericError": "Jokin meni vikaan",
+    "demoHint": "Haluatko mieluummin nähdä esittelyn ensin?",
     "demoLink": "Avaa assistentti"
   },
   "dashboard": {
     "meta": {
-      "title": "Adair-hallintapaneeli — matkat ja laskut",
-      "description": "Tallennetut Adair-matkasi, matkustusmieltymyksesi ja PDF-muodossa ladattavat laskut.",
-      "ogTitle": "Adair-hallintapaneeli",
+      "title": "Adair-asiakasnäkymä — matkat ja laskut",
+      "description": "Tallennetut Adair-matkasi, matkustusmieltymyksesi ja laskusi ladattavissa PDF-muodossa.",
+      "ogTitle": "Adair-asiakasnäkymä",
       "ogDescription": "Matkat, mieltymykset ja laskut yhdessä paikassa."
     },
-    "loadError": "Hallintapaneelin lataus epäonnistui. Päivitä sivu.",
-    "title": "Matkani",
+    "loadError": "Näkymää ei voitu ladata. Päivitä sivu.",
+    "title": "Omat matkat",
     "signOut": "Kirjaudu ulos",
     "loading": "Ladataan matkoja…",
     "empty": "Sinulla ei ole vielä tallennettuja matkoja.",
     "emptyCta": "Varaa ensimmäinen matkasi",
     "invoice": "Lataa lasku (PDF)",
     "deleteTrip": "Poista matka",
-    "profileTitle": "Matkustusprofiili",
-    "profileLead": "Määritä kerran — jokainen tuleva matka ja lasku noudattaa näitä mieltymyksiä.",
+    "profileTitle": "Matkaprofiili",
+    "profileLead": "Määritä kerran — jokainen tuleva matka ja lasku noudattaa näitä toiveita.",
     "fields": {
       "fullName": "Koko nimi",
-      "company": "Yritys (laskutusosoite)",
+      "company": "Yritys (laskutustiedot)",
       "taxId": "VAT-numero",
       "airlines": "Suosikkilentoyhtiöt",
       "cabin": "Matkustusluokka",
-      "seat": "Istumapaikkatoive",
+      "seat": "Istuinhankinta",
       "chains": "Hotelliketjut",
       "diet": "Erityisruokavalio",
       "budget": "Budjetti matkaa kohden",
       "currency": "Valuutta"
     },
-    "saveIdle": "Tallenna mieltymykset",
+    "saveIdle": "Tallenna toiveet",
     "saveBusy": "Tallennetaan…",
     "saved": "Tallennettu."
   },
   "investors": {
     "meta": {
-      "title": "Adair Travel sijoittajille — malli, kate, kierros",
-      "description": "Adair Travel yhdistää lennon, hotellin ja auton yhdeksi varaukseksi. Tulomalli, sopimushotellien kate ja siemenkierroksen ehdot.",
+      "title": "Adair Travel sijoittajille — malli, marginaali, kierros",
+      "description": "Adair Travel yhdistää lennon, hotellin ja auton yhdeksi varaukseksi. Tulomalli, marginaali neuvotelluista hotellihinnoista ja seed-kierroksen ehdot.",
       "ogTitle": "Adair Travel sijoittajille",
-      "ogDescription": "Yksi assistentti viiden sovelluksen sijaan. Kate omista neuvotelluista hotellihinnoista, ei OTA-komissioista."
+      "ogDescription": "Yksi assistentti viiden sovelluksen sijaan. Marginaali suoraan neuvotelluista hotellihinnoista, ei OTA-komissioista."
     },
-    "badge": "Siemenkierros · sijoittajamateriaali",
-    "titleLine1": "Työmatkustus tarkoittaa nykyään viittä sovellusta.",
-    "titleLine2": "Meillä se on yksi lause.",
-    "lead": "Adair Travel on assistentti, joka muuttaa yhden pyynnön lennoksi, hotelliksi ja autoksi yhdellä kortilla ja yhdellä laskulla. Ansaitsemme omilla neuvotelluilla hotellihinnoillamme, emme vertailusivustojen komissioilla — siksi hintamme on edullisempi ja katteemme korkeampi.",
+    "badge": "Seed-kierros · sijoittajamateriaali",
+    "titleLine1": "Liikematkustus vaatii nykyään viisi sovellusta.",
+    "titleLine2": "Meillä se hoituu yhdellä lauseella.",
+    "lead": "Adair Travel on assistentti, joka muuntaa yksittäisen pyynnön lennoksi, hotelliksi ja autoksi yhteen korttiin ja yhdelle laskulle paketoituna. Tuottomme perustuu itse neuvoteltuihin hotellihintoihin, ei vertailusivustojen välityspalkkioihin — siksi hintamme on edullisempi ja marginaalimme korkeampi.",
     "metrics": [
       {
-        "label": "Keskimääräinen matkan arvo",
-        "value": "€1,240"
+        "label": "Matkan keskimääräinen arvo",
+        "value": "1 240 €"
       },
       {
-        "label": "Bruttokate matkaa kohden",
-        "value": "11–17%"
+        "label": "Bruttomarginaali per matka",
+        "value": "11–17 %"
       },
       {
-        "label": "Matkan varausaika",
+        "label": "Matkan varaamiseen kuluva aika",
         "value": "< 40 s"
       },
       {
-        "label": "Korvattua sovellusta",
+        "label": "Korvattujen sovellusten määrä",
         "value": "5"
       }
     ],
-    "revenueTitle": "Mistä liikevaihto syntyy",
+    "revenueTitle": "Mistä liikevaihto muodostuu",
     "revenue": [
       {
-        "title": "Sopimushinta",
-        "body": "Ostamme huoneet omalla yrityshinnallamme ja myymme ne julkista OTA-hintaa edullisemmin. Kate jää meille, ei välikäsille.",
-        "margin": "8–14%"
+        "title": "Neuvoteltu hinta",
+        "body": "Ostamme huoneita omalla yrityshinnallamme ja myymme ne alle julkisten OTA-hintojen. Marginaali jää meille, ei välikäsille.",
+        "margin": "8–14 %"
       },
       {
-        "title": "Lentoyhtiökomissio (NDC)",
-        "body": "Lennot NDC-kanavan kautta: jakelukomissio sekä palvelumaksu muutosten ja hyvitysten hallinnasta yhdessä näkymässä.",
-        "margin": "1–3%"
+        "title": "Lentoyhtiöpalkkio (NDC)",
+        "body": "Lennot NDC-kanavan kautta: jakelukomissio sekä palvelumaksu muutosten ja hyvitysten hoitamisesta yhdessä luukussa.",
+        "margin": "1–3 %"
       },
       {
         "title": "Yritystilaus",
-        "body": "Tiimit maksavat matkustusprofiilista, kulusäännöistä sekä yhdestä koko matkan kattavasta VAT-laskusta kolmen erillisen asiakirjan sijaan.",
-        "margin": "€29 / user / mo."
+        "body": "Tiimit maksavat matkaprofiilista, kulukäytännöstä ja yhdestä koko matkan kattavasta VAT-laskusta kolmen eri tositteen sijaan.",
+        "margin": "29 € / käyttäjä / kk"
       }
     ],
     "unitTitle": "Esimerkkimatka — yksikkötalous",
-    "colItem": "Erä",
+    "colItem": "Kohde",
     "colPrice": "Asiakashinta",
-    "colMargin": "Katteemme",
+    "colMargin": "Marginaalimme",
     "unit": [
       {
         "item": "Lento (LOT, NDC)",
-        "price": "€312",
-        "margin": "€6"
+        "price": "312 €",
+        "margin": "6 €"
       },
       {
-        "item": "Hotelli, 1 yö (sopimushinta)",
-        "price": "€742",
-        "margin": "€96"
+        "item": "Hotelli, 1 yö (neuvoteltu hinta)",
+        "price": "742 €",
+        "margin": "96 €"
       },
       {
         "item": "Auto, 2 päivää",
-        "price": "€186",
-        "margin": "€22"
+        "price": "186 €",
+        "margin": "22 €"
       }
     ],
     "unitTotal": "Yhteensä, yksi varaus",
-    "unitNote": "Varsova–Milano-reitti, havainnollistavat luvut testitoimittajien hintoihin perustuen.",
-    "askTitle": "Mitä haemme",
-    "askBody": "Keräämme siemenkierrosta laajentaaksemme hotellien sopimushintakantaamme kymmeneen keskeiseen yrityskaupunkiin, tarjotaksemme varausmuutosten tuen yhdessä näkymässä ja myydäksemme 20–200 hengen tiimeille.",
+    "unitNote": "Varsova–Milano-reitti, havainnollistavat luvut perustuvat testitoimittajien hintoihin.",
+    "askTitle": "Mitä etsimme",
+    "askBody": "Keräämme seed-rahoituskierrosta laajentaaksemme neuvoteltujen hotellihintojen kantaamme kymmeneen yrityskaupunkiin, toteuttaaksemme täyden varausmuutostuen yhdessä näkymässä ja myydäksemme ratkaisua 20–200 hengen tiimeille.",
     "contact": "Ota yhteyttä",
-    "seeProduct": "Tutustu tuotteeseen käytännössä"
+    "seeProduct": "Tutustu tuotteeseen livenä"
   },
   "invoice": {
     "documentTitle": "LASKU / MATKAKORTTI",
     "seller": "MYYJÄ",
     "buyer": "OSTAJA",
-    "item": "ERÄ",
+    "item": "ERITTELY",
     "reference": "TARJOUSVIITE",
     "net": "VEROTON",
     "netTotal": "Veroton yhteensä",
@@ -306,142 +354,142 @@
     "totalDue": "Maksettava yhteensä",
     "issued": "päivätty",
     "number": "Nro",
-    "vatId": "VAT ID",
+    "vatId": "VAT-tunnus",
     "kindFlight": "Lento",
     "kindHotel": "Hotelli",
     "kindCar": "Auto",
-    "demoNote": "Konseptiasiakirja — kohteet sisältävät esimerkkitietoja",
-    "liveNote": "Kohteiden hinnat perustuvat Adair-rajapinnan kautta haettuihin tarjouksiin",
+    "demoNote": "Konseptiasiakirja — kohteet sisältävät esimerkkidataa",
+    "liveNote": "Kohteiden hinnat perustuvat tarjoajilta Adair-rajapinnan kautta haettuihin tarjouksiin",
     "paymentNote": "Maksu: yksi yrityskorttiveloitus · 14 päivän maksuaika",
-    "hotelNote": "Hotelli laskutettu sopimushintaan",
-    "tagline": "Adair Travel · Yksi pyyntö. Koko matka. · adair.travel"
+    "hotelNote": "Hotelli laskutettu neuvotellulla hinnalla",
+    "tagline": "Adair Travel · Yksi toive. Koko matka. · adair.travel"
   },
   "business": {
     "meta": {
-      "title": "Adair yrityksille — tiimin matkustus, budjetit ja analytiikka",
-      "description": "Yksi näkymä koko tiimille: assistentti, joka varaa lennon, hotellin ja auton, pitää matkustuksen budjetissa ja muuntaa jokaisen matkan yhdeksi laskuksi ja raportiksi.",
-      "ogTitle": "Adair yrityksille — tiimin matkustus yhdessä näkymässä",
-      "ogDescription": "Budjetit, hyväksynnät ja matkustusanalytiikka tiimeille. Yksi keskustelu viiden sovelluksen sijaan."
+      "title": "Adair yrityksille — tiimin matkat, budjetit ja analytiikka",
+      "description": "Yksi näkymä koko tiimille: assistentti, joka varaa lennot, hotellit ja autot, pitää matkat budjetissa ja muuntaa jokaisen reissun yhdeksi laskuksi ja selkeäksi raportiksi.",
+      "ogTitle": "Adair yrityksille — tiimin matkat yhdessä näkymässä",
+      "ogDescription": "Budjetit, hyväksynnät ja matka-analytiikka tiimeille. Yksi keskustelu viiden sovelluksen sijaan."
     },
     "badge": "Yrityksille ja tiimeille",
-    "titleLine1": "Koko tiimin matkustus",
-    "titleLine2": "yhdessä näkymässä.",
-    "lead": "Adair kokoaa jokaisen matkan yhdestä lauseesta, noudattaa matkustusohjesääntöänne ja toimittaa yhden laskun ja selkeän raportin. Assistenttien ei tarvitse vaihdella välilehtiä, eikä taloustiimin etsiä kuitteja.",
-    "ctaPrimary": "Keskustele tiimisi tarpeista",
+    "titleLine1": "Koko tiimin matkat",
+    "titleLine2": "yhdessä ikkunassa.",
+    "lead": "Adair kokoaa jokaisen matkan yhdestä lauseesta, pitää sen matkustusohjesäännön rajoissa ja palauttaa yhden laskun sekä selkeän raportin. Assistenttien ei tarvitse hyppiä välilehdeltä toiselle, eikä talousosaston metsästää kuitteja.",
+    "ctaPrimary": "Keskustellaan tiimisi tarpeista",
     "ctaSecondary": "Katso paketit",
-    "rolesLabel": "Kenelle se on tarkoitettu",
+    "rolesLabel": "Kenelle palvelu on",
     "rolesTitle": "Kolme roolia, yksi näkymä.",
     "roles": [
       {
-        "role": "Assistentti / toimistopäällikkö",
+        "role": "Johdon assistentti / toimistopäällikkö",
         "title": "Varaa toiselle yhdellä lauseella",
         "items": [
           "Varaa kenen tahansa kollegan puolesta",
-          "Yhteinen saapuneet-kansio kaikille tiimin matkoille",
-          "Yksi VAT-lasku kolmen erillisen asiakirjan sijaan"
+          "Yksi jaettu saapuneet-kansio kaikille tiimin matkoille",
+          "Yksi VAT-lasku kolmen erillisen kuitin sijaan"
         ]
       },
       {
         "role": "Esihenkilö / talous",
         "title": "Kulut näkyvissä ennen kuin ne syntyvät",
         "items": [
-          "Budjettikatot matkaa, henkilöä ja kuukautta kohden",
+          "Budjettikatot per matka, henkilö tai kuukausi",
           "Hyväksyntä vain asettamasi rajan ylittyessä",
-          "Reaaliaikainen kerryntä, ei kuukauden vaihteen yllätyksiä"
+          "Reaaliaikainen kuluvalvonta ilman yllätyksiä kuun lopussa"
         ]
       },
       {
         "role": "Matkustaja",
-        "title": "Mieltymykset huomioidaan aina",
+        "title": "Toiveet huomioidaan joka kerta",
         "items": [
-          "Henkilökohtainen matkustusprofiili määritetään vain kerran",
+          "Henkilökohtainen matkaprofiili määritetään vain kerran",
           "Lento, hotelli ja auto yhdellä kortilla",
-          "Vahvistukset yhdessä paikassa kotiinpaluuseen saakka"
+          "Vahvistukset kootusti yhdessä paikassa kotiinpaluuseen asti"
         ]
       }
     ],
-    "budgetLabel": "Kustannukset ja budjetit",
-    "budgetTitle": "Kulusäännöt, joita assistentti noudattaa.",
-    "budgetLead": "Määrität raamit kerran. Jokainen Adairin laatima ehdotus noudattaa niitä heti — jälkivalvonnalle ei ole tarvetta.",
+    "budgetLabel": "Kulut ja budjetit",
+    "budgetTitle": "Kulutussäännöt, joita assistentti noudattaa.",
+    "budgetLead": "Määrität kehyksen kerran. Jokainen Adairin laatima ehdotus ottaa sen valmiiksi huomioon — mitään ei tarvitse vahtia jälkikäteen.",
     "budgets": [
       {
-        "title": "Matkakohtainen katto",
-        "value": "€1,500",
-        "note": "Adair ei koskaan ehdota katon ylittävää kokonaisuutta"
+        "title": "Kattosumma per matka",
+        "value": "1 500 €",
+        "note": "Adair ei koskaan ehdota pakettia, joka ylittää katon"
       },
       {
         "title": "Tiimin kuukausibudjetti",
-        "value": "€28,000",
-        "note": "Reaaliaikainen tilanne aina taloustiimin nähtävillä"
+        "value": "28 000 €",
+        "note": "Reaaliaikainen seuranta taloushallinnon nähtävillä aina"
       },
       {
         "title": "Hyväksyntäraja",
-        "value": "€900",
-        "note": "Rajan ylittyessä esihenkilö vahvistaa varauksen"
+        "value": "900 €",
+        "note": "Tämän ylittävät varaukset esihenkilö vahvistaa etukäteen"
       },
       {
-        "title": "Matkustusohje",
-        "value": "Cabin, chains, radius",
-        "note": "Premium Economy yli 2 h lennoilla, vain suosikkiketjut"
+        "title": "Matkustusohjesääntö",
+        "value": "Matkustusluokka, ketjut, säde",
+        "note": "Premium Economy yli 2 h lennoilla, vain suositut ketjut"
       }
     ],
     "dashLabel": "Yritysnäkymä",
-    "dashTitle": "Kaikki mitä talous tarvitsee, yhdellä näytöllä.",
-    "dashNote": "Vain esikatselu — esimerkkitiedot",
+    "dashTitle": "Kaikki mitä taloushallinto tarvitsee, yhdellä näytöllä.",
+    "dashNote": "Vain esikatselu — esimerkkidataa",
     "dash": {
       "budgetTitle": "Syyskuun budjetti",
-      "budgetOf": "/ €28,000 käytetty",
-      "tripsTitle": "Tiimin viimeisimmät matkat",
+      "budgetOf": "/ 28 000 € käytetty",
+      "tripsTitle": "Viimeisimmät tiimin matkat",
       "statusPaid": "maksettu",
       "statusPending": "odottaa hyväksyntää",
-      "peopleTitle": "Kulut henkilöittäin",
-      "routesTitle": "Suosituimmat reitit",
-      "savedTitle": "Säästö julkisiin hintoihin",
-      "savedValue": "€2,340",
-      "savedNote": "tällä vuosineljänneksellä, 21 matkalla",
+      "peopleTitle": "Kulutus henkilöittäin",
+      "routesTitle": "Yleisimmät reitit",
+      "savedTitle": "Säästetty julkisiin hintoihin verrattuna",
+      "savedValue": "2 340 €",
+      "savedNote": "tällä vuosineljänneksellä, yhteensä 21 matkalta",
       "tripsCount": "matkaa",
       "trips": [
         {
           "who": "Anna K.",
           "route": "Varsova → Milano",
-          "dates": "18–19 Sep",
-          "amount": "€1,240",
+          "dates": "18.–19. syyskuuta",
+          "amount": "1 240 €",
           "paid": true
         },
         {
           "who": "Tomasz W.",
           "route": "Varsova → Berliini",
-          "dates": "22–23 Sep",
-          "amount": "€780",
+          "dates": "22.–23. syyskuuta",
+          "amount": "780 €",
           "paid": true
         },
         {
           "who": "Kitti F.",
           "route": "Budapest → Lontoo",
-          "dates": "25–27 Sep",
-          "amount": "€1,610",
+          "dates": "25.–27. syyskuuta",
+          "amount": "1 610 €",
           "paid": false
         }
       ],
       "people": [
         {
           "name": "Anna K.",
-          "amount": "€4,120",
+          "amount": "4 120 €",
           "share": 78
         },
         {
           "name": "Kitti F.",
-          "amount": "€3,480",
+          "amount": "3 480 €",
           "share": 66
         },
         {
           "name": "Tomasz W.",
-          "amount": "€2,260",
+          "amount": "2 260 €",
           "share": 43
         },
         {
           "name": "Marek D.",
-          "amount": "€1,180",
+          "amount": "1 180 €",
           "share": 22
         }
       ],
@@ -449,107 +497,107 @@
         {
           "route": "Varsova → Milano",
           "count": "7",
-          "amount": "€8,190"
+          "amount": "8 190 €"
         },
         {
           "route": "Budapest → Lontoo",
           "count": "5",
-          "amount": "€7,340"
+          "amount": "7 340 €"
         },
         {
           "route": "Varsova → Berliini",
           "count": "4",
-          "amount": "€3,120"
+          "amount": "3 120 €"
         }
       ]
     },
-    "analyticsLabel": "Matkustusanalytiikka",
+    "analyticsLabel": "Matka-analytiikka",
     "analyticsTitle": "Mitä kuukausiraportti sisältää.",
     "analytics": [
       {
-        "title": "Kustannukset henkilöittäin",
-        "text": "Kuka matkustaa, kuinka usein ja mitä se maksaa — henkilö-, tiimi- tai kustannuspaikkakohtaisesti."
+        "title": "Kustannus per henkilö",
+        "text": "Kuka matkustaa, kuinka usein ja mitä se maksaa — henkilöittäin, tiimeittäin tai kustannuspaikoittain."
       },
       {
-        "title": "Reittiprofiilit",
-        "text": "Tiimin eniten käyttämät reitit, jotta tiedämme mihin sopimushinnat kannattaa neuvotella."
+        "title": "Reittitrendit",
+        "text": "Eniten käytetyt reitit, jotta tiedämme, mihin neuvotellut hinnat kannattaa hankkia."
       },
       {
-        "title": "Yön keskihinta",
-        "text": "Mitä tiimisi todellisuudessa maksaa yöltä ja miten hinta kehittyy kuukausittain."
+        "title": "Keskimääräinen yöhinta",
+        "text": "Mitä tiimisi todellisuudessa maksaa per yö ja miten hinta kehittyy kuukausittain."
       },
       {
         "title": "Ohjesäännön noudattaminen",
-        "text": "Mitkä matkat olivat ohjeistuksen mukaisia ja mitkä vaativat erillisen hyväksynnän."
+        "text": "Mitkä matkat pysyivät raamien sisällä ja mitkä vaativat erillisen hyväksynnän."
       },
       {
-        "title": "Säästöt suhteessa julkisiin hintoihin",
-        "text": "Erotus maksetun hinnan ja vastaavan matkan julkisen hinnan välillä."
+        "title": "Säästöt julkisiin hintoihin",
+        "text": "Maksetun hinnan ja saman matkan julkisen markkinahinnan välinen erotus."
       },
       {
         "title": "Kirjanpitovienti",
-        "text": "Yksi kuukausittainen tiedosto, jossa kaikki laskut, viitteet ja VAT-erittelyt ovat valmiiksi kohdistettuina."
+        "text": "Yksi tiedosto kuukaudessa, jossa jokainen lasku, viite ja VAT-rivi on valmiiksi täsmäytetty."
       }
     ],
     "plansLabel": "Paketit",
-    "plansTitle": "Valitse tiimillesi sopivat puitteet.",
-    "plansNote": "Teams alkaa 14 päivän maksuttomalla kokeilujaksolla, korttia ei vaadita. Hintoihin lisätään VAT. Enterprise hinnoitellaan tiimin koon ja matkustusohjesäännön mukaan.",
+    "plansTitle": "Valitse tiimillesi sopiva malli.",
+    "plansNote": "Teams-paketti sisältää 14 päivän kokeilujakson, luottokorttia ei vaadita. Hintoihin lisätään VAT. Enterprise hinnoitellaan tiimin koon ja tarpeiden mukaan.",
     "plansTrial": "14 päivää maksutta",
     "quote": "Pyydä tarjous",
     "plans": [
       {
         "name": "Starter",
-        "forWho": "Enintään 5 matkustajalle",
-        "price": "Free",
+        "forWho": "Enintään 5 matkustajaa",
+        "price": "Maksuton",
         "priceNote": "ei vaadi luottokorttia",
         "features": [
-          "Henkilökohtainen matkustusprofiili",
-          "Yksi lasku matkaa kohden",
+          "Matkaprofiili kullekin henkilölle",
+          "Yksi lasku per matka",
           "Matka-arkisto ja PDF-matkakortit",
           "Sähköpostituki"
         ]
       },
       {
         "name": "Teams",
-        "forWho": "5–50 matkustajalle",
+        "forWho": "5–50 matkustajaa",
         "price": "19 USD",
-        "priceNote": "per matkustaja / kk — vähintään 5",
+        "priceNote": "per matkustaja, per kuukausi — vähintään 5",
         "features": [
           "Budjetit ja hyväksyntärajat",
-          "Varaaminen kollegojen puolesta",
-          "Kuukausittainen matkustusraportti",
-          "Tiimin jaettu matkanäkymä"
+          "Varaaminen kollegoiden puolesta",
+          "Kuukausittainen matkaraportti",
+          "Tiimin yhteinen matkanäkymä"
         ]
       },
       {
         "name": "Enterprise",
-        "forWho": "50+ matkustajalle",
+        "forWho": "Yli 50 matkustajaa",
         "price": "Pyynnöstä",
-        "priceNote": "räätälöity tarjous tiimillesi",
+        "priceNote": "räätälöity tiimillesi",
         "features": [
           "Kustannuspaikat ja räätälöidyt ohjesäännöt",
           "Kirjanpitovienti haluamassasi muodossa",
-          "Sopimushinnat tärkeimmille reiteillenne",
+          "Neuvotellut hinnat tärkeimmille reiteillenne",
           "Nimetty asiakasvastaava"
         ]
       }
     ],
     "contactLabel": "Ota yhteyttä",
-    "contactTitle": "Kerro meille tiimistänne.",
-    "contactLead": "Jätä yhteystietosi, niin palaamme asiaan tarjouksen ja teille sopivan matkustusratkaisun esittelyn kera.",
+    "contactTitle": "Kerro tiimistäsi.",
+    "contactLead": "Jätä yhteystietosi, niin palaamme asiaan tarjouksen ja matkustusratkaisunne esittelyn kera.",
     "form": {
       "email": "Työsähköposti",
-      "emailPlaceholder": "you@company.com",
+      "emailPlaceholder": "sinä@yritys.fi",
       "company": "Yritys",
       "companyPlaceholder": "Yrityksen nimi",
       "size": "Tiimin koko",
       "sizePlaceholder": "esim. 12 matkustajaa",
-      "message": "Haluatko kertoa jotain muuta? (valinnainen)",
-      "messagePlaceholder": "Eniten käytetyt reitit, nykyiset työkalut, laskutustarpeet…",
+      "message": "Onko muuta mitä meidän tulisi tietää? (valinnainen)",
+      "messagePlaceholder": "Eniten lennettävät reitit, nykyiset työkalut, laskutustarpeet…",
       "submit": "Lähetä pyyntö",
       "submitBusy": "Lähetetään…",
       "success": "Kiitos — otamme yhteyttä yhden arkipäivän kuluessa.",
-      "error": "Jokin meni pieleen. Yritä uudelleen."
+      "error": "Jokin meni vikaan. Yritä uudelleen."
     },
     "footer": "Adair Kft. · Budapest"
   }

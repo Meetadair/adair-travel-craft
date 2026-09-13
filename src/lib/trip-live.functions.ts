@@ -40,12 +40,24 @@ const stopSchema = z.object({
   lon: z.number(),
 });
 
+/** Corrections the traveller made on the understanding strip, or in an answer. */
+const overridesSchema = z.object({
+  originIata: z.string().trim().length(3).optional(),
+  destinationIata: z.string().trim().length(3).optional(),
+  departDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  returnDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  mustArriveBy: z.string().regex(/^\d{2}:\d{2}$/).optional(),
+  passengers: z.number().int().min(1).max(9).optional(),
+  childAges: z.array(z.number().int().min(0).max(17)).max(8).optional(),
+});
+
 const sentenceSchema = z.object({
   sentence: z.string().trim().min(3).max(400),
   /** Reordered stop list from the map view: search the new first leg instead. */
   stops: z.array(stopSchema).min(2).max(8).optional(),
   /** Shift the parsed dates by this many days (cheaper nearby dates). */
   dateShiftDays: z.number().int().min(-60).max(60).optional(),
+  overrides: overridesSchema.optional(),
 });
 
 /** Same date, moved by whole days. */
@@ -139,7 +151,7 @@ export const searchLiveTrip = createServerFn({ method: "POST" })
     const reordered = data.stops?.length ? data.stops : null;
     const origin = reordered?.[0];
     const firstStop = reordered?.[1];
-    const request: TripRequest = {
+    const base: TripRequest = {
       ...parsed,
       cabinClass: (row?.["cabin_class"] as TripRequest["cabinClass"]) ?? parsed.cabinClass,
       ...(data.dateShiftDays
@@ -160,6 +172,12 @@ export const searchLiveTrip = createServerFn({ method: "POST" })
           }
         : {}),
     };
+    // Corrections the traveller made on the strip, or answers to what we asked,
+    // win over what we read from the sentence.
+    const { applyOverrides } = await import("@/lib/trip/understanding");
+    const request: TripRequest = data.overrides
+      ? applyOverrides(base, data.overrides)
+      : base;
 
     const requestRow = await supabase
       .from("trip_requests")
