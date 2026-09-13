@@ -19,6 +19,7 @@ import {
   type PaymentIntent,
   type PaymentOutcome,
   type PaymentResult,
+  type VaultSession,
 } from "./types";
 
 const PROVIDER = "duffel";
@@ -51,6 +52,25 @@ export const duffelPayments: PaymentAdapter = {
   isConfigured: () => Boolean(secret()),
   isTestMode: () => (secret() ?? "").startsWith("duffel_test_"),
   supportedMethods: () => ["card"],
+
+  async vaultSession(_customerRef: string): Promise<PaymentResult<VaultSession>> {
+    void _customerRef;
+    if (!secret()) return paymentUnavailable("missing-key");
+    try {
+      const { createComponentClientKey } = await import("@/lib/trip/duffel-cards.server");
+      return paymentOk({
+        provider: PROVIDER,
+        clientKey: await createComponentClientKey(),
+        publishableKey: null,
+        clientSecret: null,
+        testMode: duffelPayments.isTestMode(),
+      });
+    } catch (error) {
+      const note = error instanceof Error ? error.message : "unknown";
+      console.error(`Duffel vault session failed: ${note}`);
+      return paymentUnavailable("rejected", note);
+    }
+  },
 
   async createIntent(
     amountMinor: number,

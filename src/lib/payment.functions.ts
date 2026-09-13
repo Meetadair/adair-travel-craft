@@ -16,6 +16,7 @@ export type SavedCard = {
   last4: string | null;
   expMonth: number | null;
   expYear: number | null;
+  isDefault: boolean;
 };
 
 export type PaymentSession = {
@@ -62,8 +63,9 @@ export const getPaymentSession = createServerFn({ method: "POST" })
 
     const savedRes = await supabase
       .from("saved_cards")
-      .select("id, provider_card_id, brand, last4, exp_month, exp_year")
+      .select("id, provider_card_id, brand, last4, exp_month, exp_year, is_default")
       .eq("user_id", userId)
+      .order("is_default", { ascending: false })
       .order("created_at", { ascending: false });
     const savedCards = ((savedRes.data ?? []) as Array<Record<string, unknown>>).map((row) => ({
       id: row["id"] as string,
@@ -72,6 +74,7 @@ export const getPaymentSession = createServerFn({ method: "POST" })
       last4: (row["last4"] as string | null) ?? null,
       expMonth: (row["exp_month"] as number | null) ?? null,
       expYear: (row["exp_year"] as number | null) ?? null,
+      isDefault: Boolean(row["is_default"]),
     }));
 
     const row = cardRes.data as { currency?: string; total_minor?: number } | null;
@@ -153,22 +156,48 @@ export const saveCardToken = createServerFn({ method: "POST" })
         providerCardId: z.string().trim().min(3).max(120),
         brand: z.string().trim().max(40).nullable(),
         last4: z.string().trim().regex(/^\d{4}$/).nullable(),
+        expMonth: z.number().int().min(1).max(12).nullable().optional(),
+        expYear: z.number().int().min(2000).max(2100).nullable().optional(),
+        makeDefault: z.boolean().optional(),
       })
       .parse(input),
   )
   .handler(async ({ data, context }): Promise<{ ok: true }> => {
     const { supabase, userId } = context;
+    const { paymentProvider } = await import("@/lib/payments/registry.server");
+    const chosen = await paymentProvider(supabase);
+    // The token belongs to whichever provider collected it.
+    const provider = chosen.status === "ok" ? chosen.data.id : "unknown";
+
+    const existing = await supabase
+      .from("saved_cards")
+      .select("id")
+      .eq("user_id", userId)
+      .limit(1);
+    const first = !(existing.data ?? []).length;
+
     const res = await supabase.from("saved_cards").upsert(
       {
         user_id: userId,
-        provider: "duffel",
+        provider,
         provider_card_id: data.providerCardId,
         brand: data.brand,
         last4: data.last4,
+        exp_month: data.expMonth ?? null,
+        exp_year: data.expYear ?? null,
+        // The first card saved becomes the default, so checkout always has one.
+        is_default: data.makeDefault === true || first,
       },
       { onConflict: "user_id,provider,provider_card_id" },
     );
     if (res.error) throw new Error(res.error.message);
+    if (data.makeDefault === true || first) {
+      await supabase
+        .from("saved_cards")
+        .update({ is_default: false })
+        .eq("user_id", userId)
+        .neq("provider_card_id", data.providerCardId);
+    }
     return { ok: true };
   });
 

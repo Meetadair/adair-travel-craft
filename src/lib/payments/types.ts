@@ -87,6 +87,18 @@ export type PaymentOutcome = {
   failureNote: string | null;
 };
 
+/**
+ * What the browser needs to store a card for later, with no payment attached.
+ * Providers that cannot vault a card outside checkout report `not-supported`.
+ */
+export type VaultSession = {
+  provider: string;
+  clientKey: string | null;
+  publishableKey: string | null;
+  clientSecret: string | null;
+  testMode: boolean;
+};
+
 export type IntentMetadata = Record<string, string | number | null>;
 
 export type PaymentAdapter = {
@@ -99,6 +111,12 @@ export type PaymentAdapter = {
   isTestMode(): boolean;
   /** Which methods this provider can really offer — never a guess. */
   supportedMethods(): PaymentMethodKind[];
+
+  /**
+   * Opens a hosted form session for adding a card ahead of any booking, so
+   * Settings never touches a provider SDK decision of its own.
+   */
+  vaultSession(customerRef: string): Promise<PaymentResult<VaultSession>>;
 
   createIntent(
     amountMinor: number,

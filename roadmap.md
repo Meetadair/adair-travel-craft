@@ -244,3 +244,5 @@
 - [x] Settings → Saved details: each category (airlines, hotels, car rental) keeps its own form, so adding one no longer blocks or clears another; the action reads "Add another … programme" once an entry exists, with "Saved. Add another if you hold more than one." and a per-entry Remove.
 - [x] Every entry is stored, listed masked to the last four with an optional reveal, and checked at booking; where two programmes both earn we pass one and say plainly that only one can be credited.
 - [x] Home screen shows a dismissible reminder to add member numbers when onboarding answered "Yes — I'll add the numbers in Settings" and nothing is saved yet; it disappears once the first programme is saved.
+
+- [x] Step 2(f): add payment cards ahead of time in Settings (hosted form via the payment adapter, default card pre-selected at checkout, honest wallet availability)
