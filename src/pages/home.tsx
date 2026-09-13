@@ -555,6 +555,7 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
       setMatch(result.match ?? null);
       setBudget(result.budget ?? null);
       setEarlyBooking(result.earlyBooking ?? null);
+      setTripMemory(result.memory ?? null);
       setLive(priced);
       setRouteStops(priced.request.stops ?? next);
     } catch {
@@ -674,6 +675,7 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
           setMatch(result.match ?? null);
           setBudget(result.budget ?? null);
           setEarlyBooking(result.earlyBooking ?? null);
+          setTripMemory(result.memory ?? null);
         }
         return priced;
       }
