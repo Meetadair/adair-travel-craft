@@ -181,6 +181,40 @@ export const searchLiveTrip = createServerFn({ method: "POST" })
       ? applyOverrides(base, data.overrides)
       : base;
 
+    // What we remember about this place, and habits they have confirmed. Both
+    // rank below anything they stated; neither can override a dealbreaker.
+    const { loadPlaceMemory, loadPatterns } = await import("@/lib/trip/memory.server");
+    const { placeKey, resolvePreferences, sameAgainQuestion } = await import("@/lib/trip/memory");
+    const [placeMemory, patterns] = await Promise.all([
+      loadPlaceMemory(supabase, userId),
+      loadPatterns(supabase, userId),
+    ]);
+    const currentPlace = placeKey(request.destinationCity, request.destinationIata);
+    const resolved = resolvePreferences(
+      {
+        airlines: searchPrefs.airlines,
+        hotelChains: searchPrefs.hotelChains,
+        carBrands: searchPrefs.carBrands,
+        carCompanies: searchPrefs.carCompanies,
+        dealbreakers: searchPrefs.dealbreakers,
+      },
+      patterns,
+      placeMemory,
+      currentPlace,
+      searchPrefs.learned,
+    );
+    searchPrefs.airlines = resolved.airlines;
+    searchPrefs.hotelChains = resolved.hotelChains;
+    searchPrefs.carBrands = resolved.carBrands;
+    searchPrefs.remembered = {
+      hotels: resolved.rememberedHotels,
+      carSuppliers: resolved.rememberedCarSuppliers,
+    };
+    const sameAgain = sameAgainQuestion(placeMemory, currentPlace, request.destinationCity, {
+      sameAgain: "You stayed at {hotel} last time in {city} — same again?",
+      full: "",
+    });
+
     const requestRow = await supabase
       .from("trip_requests")
       .insert({ user_id: userId, raw_sentence: data.sentence, parsed: request })
@@ -363,6 +397,8 @@ export const searchLiveTrip = createServerFn({ method: "POST" })
       budget,
       earlyBooking,
       expiresAt,
+      memoryNote: sameAgain?.question ?? null,
+      rememberedHotel: sameAgain?.hotel ?? null,
     };
   });
 
