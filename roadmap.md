@@ -135,8 +135,8 @@
 - [x] Multi-passenger booking (parser count, per-passenger details, per-count pricing).
 - [x] Loyalty numbers passed to the supplier / stored on the booking.
 - [x] Change a booked trip (dates, hotel) with price difference and change conditions.
-- [ ] One clarifying question at search time when the sentence is genuinely ambiguous.
-- [ ] Ranking that learns from `choice_feedback`, surfaced and resettable on Preferences.
+- [x] One clarifying question at search time when the sentence is genuinely ambiguous; assumption stated on the card, questions counted in admin analytics.
+- [x] Ranking that learns from `choice_feedback`, surfaced and resettable on Preferences (stated always beats learned).
 
 ## Loyalty programmes (amended item 4)
 - [x] Wallet in Settings ("Saved details"): airlines, hotels, car rental; several per category; programme list + free text; optional tier.
