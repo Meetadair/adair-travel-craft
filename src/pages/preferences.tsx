@@ -29,6 +29,7 @@ import { MultiField, SingleField, TextField, ToggleRow } from "@/components/pref
 import { cleanCompany, type CompanyDraft } from "@/lib/prefs/company-draft";
 import { ConnectedCalendars } from "@/components/prefs/connected-calendars";
 import { MyData } from "@/components/prefs/my-data";
+import { Noticed } from "@/components/prefs/noticed";
 import { WalletLoyalty } from "@/components/prefs/wallet-loyalty";
 import { NotificationChannel } from "@/components/prefs/notification-channel";
 import { AppFooter } from "@/components/app-footer";
@@ -234,6 +235,8 @@ export function PreferencesPage() {
               </p>
               <CompanyEditor companies={companies} onChange={setCompanies} />
             </section>
+
+            <Noticed />
 
             <WalletLoyalty />
             <NotificationChannel />
