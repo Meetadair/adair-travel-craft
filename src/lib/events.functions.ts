@@ -23,6 +23,8 @@ export const EVENT_NAMES = [
   "cheaper_dates_dismissed",
   "line_swapped",
   "match_score",
+  "clarify_asked",
+  "clarify_answered",
 ] as const;
 
 export type EventName = (typeof EVENT_NAMES)[number];
