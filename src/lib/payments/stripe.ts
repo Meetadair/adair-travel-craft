@@ -151,6 +151,22 @@ export const stripePayments: PaymentAdapter = {
   isTestMode: () => (secret() ?? "").startsWith("sk_test_"),
   supportedMethods: () => ["card", "apple-pay", "google-pay"],
 
+  async vaultSession(customerRef) {
+    // A setup intent stores the card with Stripe without charging anything.
+    const res = await call(
+      "/setup_intents",
+      form({ usage: "off_session", "metadata[user_id]": customerRef }),
+    );
+    if (res.status !== "ok") return res;
+    return paymentOk({
+      provider: PROVIDER,
+      clientKey: null,
+      publishableKey: publishable(),
+      clientSecret: (res.data as { client_secret?: string }).client_secret ?? null,
+      testMode: stripePayments.isTestMode(),
+    });
+  },
+
   async createIntent(amountMinor, currency, idempotencyKey, metadata?: IntentMetadata) {
     const fields: Record<string, string | number> = {
       amount: amountMinor,
