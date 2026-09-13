@@ -6,6 +6,38 @@
 import { findByName } from "./match";
 import { guestsPerRoom, roomsFor } from "./passengers";
 import {
+  familyRoomReason,
+  freeChildrenNote,
+  roomFits,
+  type Party,
+  type RoomPolicy,
+} from "./family";
+
+/** Adults only, for the room split — children never make a room of their own. */
+function adultsOf(req: TripRequest): number {
+  const children = (req.childAges?.length ?? 0) + (req.infants ?? 0);
+  return Math.max(1, req.passengers - children);
+}
+
+function flightPassengers(req: TripRequest): Array<{ type?: string; age?: number }> {
+  const ages = req.childAges ?? [];
+  return [
+    ...Array.from({ length: adultsOf(req) }, () => ({ type: "adult" })),
+    ...ages.map((age) => ({ age })),
+    ...Array.from({ length: req.infants ?? 0 }, () => ({ type: "infant_without_seat" })),
+  ];
+}
+
+function stayGuests(req: TripRequest): Array<{ type: string; age?: number }> {
+  const adults = adultsOf(req);
+  const perRoom = guestsPerRoom(adults);
+  return [
+    ...Array.from({ length: perRoom }, () => ({ type: "adult" })),
+    ...(req.childAges ?? []).map((age) => ({ type: "child", age })),
+    ...Array.from({ length: req.infants ?? 0 }, () => ({ type: "child", age: 1 })),
+  ];
+}
+import {
   carScore,
   carsPassingDealbreakers,
   flightScore,
@@ -147,7 +179,9 @@ export async function searchFlight(
             departure_date: req.returnDate,
           },
         ],
-        passengers: Array.from({ length: req.passengers }, () => ({ type: "adult" })),
+        // Age drives the fare: children get a child fare, babies a lap-infant
+        // fare, so the airline prices the family rather than a row of adults.
+        passengers: flightPassengers(req),
         cabin_class: req.cabinClass,
       },
     },
@@ -262,7 +296,16 @@ type DuffelStay = {
     location?: {
       address?: { line_one?: string; city_name?: string; postal_code?: string };
     };
-    rooms?: Array<{ rates?: Array<{ id?: string }> }>;
+    rooms?: Array<{
+      rates?: Array<{ id?: string }>;
+      // Occupancy limits, where the hotel states them.
+      max_occupancy?: number;
+      maximum_occupancy?: number;
+      max_adults?: number;
+      max_children?: number;
+      max_child_age?: number;
+      children_free_under?: number;
+    }>;
   };
 };
 
@@ -270,8 +313,22 @@ function nightsBetween(a: string, b: string): number {
   return Math.max(1, Math.round((new Date(b).getTime() - new Date(a).getTime()) / 86_400_000));
 }
 
+/** Occupancy limits as the hotel states them; unknown stays unknown. */
+function roomPolicyOf(raw: DuffelStay): RoomPolicy {
+  const room = raw.accommodation?.rooms?.[0];
+  return {
+    maxOccupancy: room?.max_occupancy ?? room?.maximum_occupancy ?? null,
+    maxAdults: room?.max_adults ?? null,
+    maxChildren: room?.max_children ?? null,
+    maxChildAge: room?.max_child_age ?? null,
+    childrenFreeUnder: room?.children_free_under ?? null,
+  };
+}
+
 export type StaySearchOutcome = {
   stay: StayResult | null;
+  /** Said plainly when a family needs a family room, or a policy is worth knowing. */
+  familyNote?: string | null;
   /** Up to 3 close options when the named hotel was not found. */
   alternatives: StayResult[];
   requested: string | null;
@@ -288,8 +345,10 @@ export async function searchStay(
       check_in_date: req.departDate,
       check_out_date: req.returnDate,
       // Two share a room; three or more get doubles rather than one big room.
-      rooms: roomsFor(req.passengers),
-      guests: Array.from({ length: guestsPerRoom(req.passengers) }, () => ({ type: "adult" })),
+      rooms: roomsFor(adultsOf(req)),
+      // Children's ages go with the occupancy, so the hotel only offers rooms
+      // that actually take this family.
+      guests: stayGuests(req),
       location: sample
         ? {
             radius: TEST_LOCATION.radius,
@@ -311,8 +370,36 @@ export async function searchStay(
     Number.isFinite(Number(r.cheapest_rate_total_amount)),
   );
   if (!results.length) {
-    return { stay: null, alternatives: [], requested, notFound: Boolean(requested) };
+    return { stay: null, alternatives: [], requested, notFound: Boolean(requested), familyNote: null };
   }
+
+  // A family is counted properly: children with ages, babies as infants.
+  const children = req.childAges ?? [];
+  const infants = req.infants ?? 0;
+  const party: Party = {
+    adults: adultsOf(req),
+    children: children.length,
+    childAges: children,
+    infants,
+    infantsWithSeat: 0,
+    categories: [],
+    total: req.passengers,
+  };
+  const withChildren = children.length + infants > 0;
+
+  // Rooms whose own policy this family exceeds are not offered at all.
+  const fitting = withChildren
+    ? results.filter((raw) => roomFits(roomPolicyOf(raw), party))
+    : results;
+  const familyNote = withChildren
+    ? [
+        fitting.length < results.length ? familyRoomReason(party) : null,
+        freeChildrenNote(roomPolicyOf(fitting[0] ?? results[0]!)),
+      ]
+        .filter(Boolean)
+        .join(" ") || null
+    : null;
+  const usable = fitting.length ? fitting : results;
 
   const nights = nightsBetween(req.departDate, req.returnDate);
   const map = (raw: DuffelStay): { rawName: string; result: StayResult } => {
@@ -340,7 +427,7 @@ export async function searchStay(
 
   // Dealbreakers are hard rules: drop anything that fails one before ranking.
   const mapped = staysPassingDealbreakers(
-    results.map(map),
+    usable.map(map),
     (m) => ({ name: m.rawName, rating: m.result.rating }),
     prefs,
   );
@@ -352,7 +439,13 @@ export async function searchStay(
   if (requested) {
     const hit = findByName(mapped, requested, (m) => m.rawName);
     if (hit) {
-      return { stay: { ...hit.result, exact: true }, alternatives: [], requested, notFound: false };
+      return {
+        stay: { ...hit.result, exact: true },
+        alternatives: [],
+        requested,
+        notFound: false,
+        familyNote,
+      };
     }
     const alternatives = mapped
       .filter((m) => m !== hit)
@@ -360,7 +453,7 @@ export async function searchStay(
       .sort((a, b) => a.result.amount - b.result.amount)
       .slice(0, 3)
       .map((m) => m.result);
-    return { stay: null, alternatives, requested, notFound: true };
+    return { stay: null, alternatives, requested, notFound: true, familyNote };
   }
 
   // Above the 25th price percentile, then ranked by the traveller's hotel
@@ -387,7 +480,13 @@ export async function searchStay(
     )
     .slice(0, 3)
     .map((m) => m.result);
-  return { stay: best.result, alternatives: stayOthers, requested: null, notFound: false };
+  return {
+    stay: best.result,
+    alternatives: stayOthers,
+    requested: null,
+    notFound: false,
+    familyNote,
+  };
 }
 
 
@@ -551,7 +650,9 @@ export async function searchTripWithDuffel(
   let hotelRequested: string | null = req.hotelNameExact?.trim() || null;
   let hotelNotFound = false;
   let hotelAlternatives: StayResult[] = [];
+  let familyNote: string | null = null;
   if (stayRes.status === "fulfilled") {
+    familyNote = stayRes.value.familyNote ?? null;
     stay = stayRes.value.stay;
     hotelNotFound = stayRes.value.notFound;
     hotelAlternatives = stayRes.value.alternatives;
@@ -654,6 +755,7 @@ export async function searchTripWithDuffel(
     testMode: isTestKey(),
     hotelRequested,
     hotelNotFound,
+    familyNote,
     hotelAlternatives,
     carRequested,
     carNotFound,

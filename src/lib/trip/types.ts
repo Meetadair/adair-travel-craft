@@ -19,7 +19,12 @@ export type TripRequest = {
   departDate: string; // YYYY-MM-DD
   returnDate: string; // YYYY-MM-DD
   cabinClass: "economy" | "premium_economy" | "business" | "first";
+  /** Everyone travelling, including children and lap infants. */
   passengers: number;
+  /** Ages of the children travelling, as stated in the sentence. */
+  childAges?: number[];
+  /** Babies under two, on a lap unless a seat is bought. */
+  infants?: number;
   /** Free-text hotel wish, e.g. "near the Duomo". */
   hotelWish: string | null;
   /** A specific property the traveller named, e.g. "Hotel Milano Scala". */
@@ -97,6 +102,8 @@ export type TripSearchResponse = {
   testMode: boolean;
   /** The named hotel we could not find, plus the closest options instead. */
   hotelRequested: string | null;
+  /** Why a family room is needed, or a children's policy worth knowing. */
+  familyNote?: string | null;
   hotelNotFound: boolean;
   hotelAlternatives: StayResult[];
   /** The named car supplier/model we could not find, plus close options. */

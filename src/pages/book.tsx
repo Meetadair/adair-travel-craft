@@ -20,6 +20,13 @@ import { getPaymentSession } from "@/lib/payment.functions";
 import { PaymentStep, type AuthorisedPayment } from "@/components/payment-step";
 import { eur } from "@/lib/trip/client";
 import { isSchengen } from "@/lib/trip/backwards";
+import {
+  bedLines,
+  categoryOn,
+  childSeatsFor,
+  partyOf,
+  CATEGORY_LABEL,
+} from "@/lib/trip/family";
 
 const inputClass =
   "mt-1 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary";
@@ -179,6 +186,19 @@ export function BookPage({ cardId }: { cardId: string }) {
 
 
   const search = card.data?.search;
+  /** Ages count as of the day they fly home: a birthday mid-trip changes the fare. */
+  const returnDate = search?.request.returnDate ?? "";
+  const party = returnDate
+    ? partyOf(
+        [
+          { bornOn: traveller.bornOn || null },
+          ...companions.map((c) => ({ bornOn: c.bornOn || null })),
+        ],
+        returnDate,
+      )
+    : null;
+  const familyLines = party ? bedLines(party) : [];
+  const seats = party ? childSeatsFor(party) : [];
   const paxCount = Math.max(1, search?.request.passengers ?? 1);
   const fetchCompanions = useServerFn(listCompanions);
   const fetchExtras = useServerFn(getFlightAncillaries);
@@ -474,6 +494,27 @@ export function BookPage({ cardId }: { cardId: string }) {
                   </label>
                 </div>
               ))}
+
+              {(familyLines.length > 0 || seats.length > 0) && (
+                <div className="space-y-2 border-t border-border pt-4">
+                  <p className="text-xs font-medium text-muted-foreground">Travelling with children</p>
+                  {search?.familyNote ? (
+                    <p className="text-xs leading-relaxed text-foreground">{search.familyNote}</p>
+                  ) : null}
+                  {familyLines.map((line) => (
+                    <p key={line.kind} className="text-xs leading-relaxed text-muted-foreground">
+                      {line.label} —{" "}
+                      {line.priceEur == null ? line.note : `${eur(line.priceEur)} ${line.note.toLowerCase()}`}
+                    </p>
+                  ))}
+                  {seats.map((seat) => (
+                    <p key={seat.band} className="text-xs leading-relaxed text-muted-foreground">
+                      {seat.count === 1 ? `1 ${seat.band}` : `${seat.count} ${seat.band}s`} for the
+                      hire car — price confirmed by the rental desk.
+                    </p>
+                  ))}
+                </div>
+              )}
 
               {account.data?.companies.length ? (
                 <label className="block">

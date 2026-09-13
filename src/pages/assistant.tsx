@@ -2,6 +2,8 @@ import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
+import { ageQuestion, familyFromSentence } from "@/lib/trip/family";
+import { track } from "@/lib/track";
 import { Plane, BedDouble, CarFront, Sparkles, ChevronRight, Send, X } from "lucide-react";
 import { SiteNav } from "@/components/site-nav";
 import { HotelGallery } from "@/components/hotel-gallery";
@@ -36,6 +38,19 @@ export function AssistantPage() {
   const [hotelRef, setHotelRef] = useState<string | null>(null);
   const [showAlts, setShowAlts] = useState(false);
   const [removed, setRemoved] = useState<string[]>([]);
+  /** The one question we ask before searching, when children's ages are missing. */
+  const [question, setQuestion] = useState<string | null>(null);
+  const [answer, setAnswer] = useState("");
+
+  const runSearch = (sentence: string) => {
+    setAsked(sentence);
+    setSaved(null);
+    setHotelRef(null);
+    setShowAlts(false);
+    setRemoved([]);
+    setQuestion(null);
+    search.mutate(sentence);
+  };
 
   const money = (amount: number, currency: string) =>
     `${amount.toLocaleString(locale, { maximumFractionDigits: 0 })} ${currency}`;
@@ -111,13 +126,19 @@ export function AssistantPage() {
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            if (!input.trim()) return;
-            setAsked(input.trim());
-            setSaved(null);
-            setHotelRef(null);
-            setShowAlts(false);
-            setRemoved([]);
-            search.mutate(input.trim());
+            const sentence = input.trim();
+            if (!sentence) return;
+            const ask = ageQuestion(familyFromSentence(sentence));
+            if (ask) {
+              // Ages change both the fare and the room, so this is the one
+              // question we always ask before searching.
+              setQuestion(ask);
+              setAnswer("");
+              setAsked(sentence);
+              void track("clarify_asked", { kind: "child_ages" });
+              return;
+            }
+            runSearch(sentence);
           }}
           className="hairline-card mt-8 flex items-end gap-3 p-4"
         >
@@ -151,6 +172,34 @@ export function AssistantPage() {
             </button>
           ))}
         </div>
+
+        {question && (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (!answer.trim()) return;
+              void track("clarify_answered", { kind: "child_ages" });
+              runSearch(`${input.trim()} (children aged ${answer.trim()})`);
+            }}
+            className="hairline-card mt-6 p-5"
+          >
+            <p className="text-sm leading-relaxed">{question}</p>
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <input
+                value={answer}
+                onChange={(e) => setAnswer(e.target.value)}
+                placeholder="4 and 7"
+                className="rounded-xl border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
+              />
+              <button
+                type="submit"
+                className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+              >
+                Continue
+              </button>
+            </div>
+          </form>
+        )}
 
         <CalendarTripHints onPlan={(sentence) => setInput(sentence)} />
 
