@@ -24,7 +24,6 @@
 - [x] Test-mode booking at /book/:cardId, confirmation, reprice check, per-line cancel
 - [x] My trips at /trips with real bookings, /plan (paid plans Coming soon), /dev/status
 - [ ] Hotels and cars: supplier account returns not-authorised; stored as requested lines until enabled
-- [ ] Card payments: open at ~1000 active accounts
 
 ## Rich onboarding + map (this round)
 - [x] Part A: one-question-per-screen onboarding (config-driven), searchable home airport, all preference groups, repeatable companies; editable at /preferences; preferences feed search ranking
@@ -43,8 +42,8 @@
 - [x] Task 1: verify typecheck + preview, Invoices/Settings in nav, invoice email after booking
 - [x] Task 2: peak-pricing baseline comparison (±3/7/14 days), Claude event naming, ask-to-move-dates prompt (leisure only)
 - [x] Task 3: swap a line from stored alternatives, choice_feedback table, per-line match score, trip budget status, amend-by-sentence
-- [ ] Task 4: split questionnaire into Part 1 essentials + dealbreakers (hard filters) and Part 2 optional refinement with completion %
-- [ ] Task 5: smaller logo in the top bar (~70-75%)
+- [x] Task 4: split questionnaire into Part 1 essentials + dealbreakers (hard filters) and Part 2 optional refinement with completion %
+- [x] Task 5: smaller logo in the top bar (~70-75%)
 
 ## Round: restaurants + rides (provider-adapter layer)
 - [x] `src/lib/suppliers/` adapter layer: one shared contract per category, one file per provider (uber, bolt, thefork, opentable), each reading its own secret and reporting `unavailable` when absent
@@ -60,12 +59,12 @@
 - Saved cards (provider token only), payment outcomes + idempotency key recorded in payments
 - No Apple Pay / Google Pay: Duffel Cards does not support digital wallets. Add Stripe alongside if wallets are wanted.
 
-## Analytics & admin (in progress)
+## Analytics & admin (done)
 - [x] Database groundwork: admin flag on profiles (self-promotion blocked), events table, error_log table, admin-only report query, admin-editable pricing rules + providers
-- [ ] /admin/analytics page reading the report
-- [ ] /admin panel: pricing rules, bookings, users, providers, secrets status, recent errors
-- [ ] Event logging from the app (typed sentence, search, card, booking start/finish, onboarding steps, cheaper-dates outcome, match scores, failures)
-- [ ] Global error boundary writing to error_log
+- [x] /admin/analytics page reading the report
+- [x] /admin panel: pricing rules, bookings, users, providers, secrets status, recent errors
+- [x] Event logging from the app (typed sentence, search, card, booking start/finish, onboarding steps, cheaper-dates outcome, match scores, failures)
+- [x] Global error boundary writing to error_log
 
 ## Connected calendars (this round)
 - [x] `calendar_connections` (owner-only, tokens encrypted with CALENDAR_TOKEN_KEY), `calendar_feeds`, `calendar_oauth_states`; `trip_items.calendar_event_ids`
@@ -133,11 +132,11 @@
 - [x] GDPR: "Download my data" (JSON + summary, audit-logged) and account deletion in Settings — personal data removed, calendar tokens revoked, tax/payment rows anonymised not deleted, existing supplier bookings must be cancelled first.
 - [x] /privacy and /terms placeholder pages (to be completed by counsel) linked from the signed-in footer.
 - [x] Support: `support_requests` table, Help in the signed-in nav, "Something wrong with this trip?" on every trip, /support form (trip auto-attached, category, urgency, description), admin "Help requests" card with trip context and status changes, optional Resend notification to SUPPORT_EMAIL (skipped silently when unset).
-- [ ] Multi-passenger booking (parser count, per-passenger details, per-count pricing).
-- [ ] Loyalty numbers passed to the supplier / stored on the booking.
-- [ ] Change a booked trip (dates, hotel) with price difference and change conditions.
-- [ ] One clarifying question at search time when the sentence is genuinely ambiguous.
-- [ ] Ranking that learns from `choice_feedback`, surfaced and resettable on Preferences.
+- [x] Multi-passenger booking (parser count, per-passenger details, per-count pricing).
+- [x] Loyalty numbers passed to the supplier / stored on the booking.
+- [x] Change a booked trip (dates, hotel) with price difference and change conditions.
+- [x] One clarifying question at search time when the sentence is genuinely ambiguous; assumption stated on the card, questions counted in admin analytics.
+- [x] Ranking that learns from `choice_feedback`, surfaced and resettable on Preferences (stated always beats learned).
 
 ## Loyalty programmes (amended item 4)
 - [x] Wallet in Settings ("Saved details"): airlines, hotels, car rental; several per category; programme list + free text; optional tier.

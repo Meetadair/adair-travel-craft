@@ -3,6 +3,8 @@ import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { ageQuestion, familyFromSentence } from "@/lib/trip/family";
+import { applyAnswer, assumptionNote, clarify, type Clarification } from "@/lib/trip/clarify";
+import { parseTripSentence } from "@/lib/trip/parse";
 import { track } from "@/lib/track";
 import { Plane, BedDouble, CarFront, Sparkles, ChevronRight, Send, X } from "lucide-react";
 import { SiteNav } from "@/components/site-nav";
@@ -14,6 +16,9 @@ import { getPromptSuggestions } from "@/lib/suggestions.functions";
 import { composeTrip, saveTrip } from "@/lib/travel.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { localeHref, useLocale, useT } from "@/lib/i18n";
+
+/** Airport choices the traveller has already made, remembered in the browser. */
+const AIRPORT_CHOICE_KEY = "adair.airport-choices";
 
 const ICONS: Record<string, React.ReactNode> = {
   flight: <Plane className="size-4" />,
@@ -39,9 +44,41 @@ export function AssistantPage() {
   const [hotelRef, setHotelRef] = useState<string | null>(null);
   const [showAlts, setShowAlts] = useState(false);
   const [removed, setRemoved] = useState<string[]>([]);
-  /** The one question we ask before searching, when children's ages are missing. */
-  const [question, setQuestion] = useState<string | null>(null);
+  /** The one question we may ask before searching. Never more than one. */
+  const [question, setQuestion] = useState<Clarification | null>(null);
   const [answer, setAnswer] = useState("");
+  /** What we assumed when we searched without asking, shown on the card. */
+  const [assumption, setAssumption] = useState<string | null>(null);
+
+  // Airport choices are remembered locally, so the same question is not asked
+  // twice for a city they have already answered for.
+  const knownAirports = (): string[] => {
+    try {
+      const raw = window.localStorage.getItem(AIRPORT_CHOICE_KEY);
+      return raw ? (JSON.parse(raw) as string[]) : [];
+    } catch {
+      return [];
+    }
+  };
+  const rememberAirport = (code: string) => {
+    try {
+      const next = Array.from(new Set([...knownAirports(), code]));
+      window.localStorage.setItem(AIRPORT_CHOICE_KEY, JSON.stringify(next));
+    } catch {
+      /* private browsing — we simply ask again next time */
+    }
+  };
+
+  /** The answer folds back into the sentence; we then search, asking nothing more. */
+  const answerQuestion = (given: string) => {
+    if (!question) return;
+    void track("clarify_answered", { kind: question.kind });
+    if (question.kind === "which_airport") {
+      const code = /\(([A-Z]{3})\)/.exec(given)?.[1];
+      if (code) rememberAirport(code);
+    }
+    runSearch(applyAnswer(input.trim(), question.kind, given));
+  };
 
   const runSearch = (sentence: string) => {
     setAsked(sentence);
@@ -50,6 +87,10 @@ export function AssistantPage() {
     setShowAlts(false);
     setRemoved([]);
     setQuestion(null);
+    const parsed = parseTripSentence(sentence);
+    setAssumption(
+      assumptionNote(sentence, parsed.destinationCity, parsed.destinationIata ?? ""),
+    );
     search.mutate(sentence);
   };
 
@@ -129,14 +170,20 @@ export function AssistantPage() {
             e.preventDefault();
             const sentence = input.trim();
             if (!sentence) return;
-            const ask = ageQuestion(familyFromSentence(sentence));
+            // Ages change both the fare and the room, so they come first; then
+            // the general ambiguities. Only ever one question per sentence.
+            const ages = ageQuestion(familyFromSentence(sentence));
+            const ask: Clarification | null = ages
+              ? { kind: "child_ages", question: ages, options: [], placeholder: "4 and 7" }
+              : clarify(sentence, {
+                  destinationCity: parseTripSentence(sentence).destinationCity,
+                  knownAirports: knownAirports(),
+                });
             if (ask) {
-              // Ages change both the fare and the room, so this is the one
-              // question we always ask before searching.
               setQuestion(ask);
               setAnswer("");
               setAsked(sentence);
-              void track("clarify_asked", { kind: "child_ages" });
+              void track("clarify_asked", { kind: ask.kind });
               return;
             }
             runSearch(sentence);
@@ -179,17 +226,30 @@ export function AssistantPage() {
             onSubmit={(e) => {
               e.preventDefault();
               if (!answer.trim()) return;
-              void track("clarify_answered", { kind: "child_ages" });
-              runSearch(`${input.trim()} (children aged ${answer.trim()})`);
+              answerQuestion(answer);
             }}
             className="hairline-card mt-6 p-5"
           >
-            <p className="text-sm leading-relaxed">{question}</p>
+            <p className="text-sm leading-relaxed">{question.question}</p>
+            {question.options.length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {question.options.map((option) => (
+                  <button
+                    key={option}
+                    type="button"
+                    onClick={() => answerQuestion(option)}
+                    className="tag-pill hover:bg-secondary"
+                  >
+                    {option}
+                  </button>
+                ))}
+              </div>
+            )}
             <div className="mt-3 flex flex-wrap items-center gap-2">
               <input
                 value={answer}
                 onChange={(e) => setAnswer(e.target.value)}
-                placeholder="4 and 7"
+                placeholder={question.placeholder}
                 className="rounded-xl border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
               />
               <button
@@ -229,6 +289,7 @@ export function AssistantPage() {
                     {result.request.originCity} → {result.request.destinationCity}
                   </p>
                   <p className="mt-0.5 text-xs text-muted-foreground">
+                    {assumption ? `${assumption} · ` : ""}
                     {result.request.departDate} – {result.request.returnDate} ·{" "}
                     {result.source === "live"
                       ? t.assistant.sourceLive

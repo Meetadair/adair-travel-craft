@@ -3,7 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { ShieldAlert } from "lucide-react";
 import { SiteNav } from "@/components/site-nav";
-import { getAnalytics } from "@/lib/admin.functions";
+import { getAnalytics, listClarifyQuestions } from "@/lib/admin.functions";
 
 type Row = Record<string, unknown>;
 
@@ -52,9 +52,20 @@ function Table({ head, body }: { head: string[]; body: Array<Array<string | numb
   );
 }
 
+/** Plain-language names for the clarifying questions. */
+const CLARIFY_LABEL: Record<string, string> = {
+  child_ages: "Children's ages",
+  no_dates: "No dates given",
+  vague_week: '"Next week" without a day',
+  which_airport: "City with more than one airport",
+  hotel_unmatched: "Named hotel we could not find",
+};
+
 export function AdminAnalyticsPage() {
   const fetchReport = useServerFn(getAnalytics);
   const report = useQuery({ queryKey: ["admin-analytics"], queryFn: () => fetchReport() });
+  const fetchClarify = useServerFn(listClarifyQuestions);
+  const clarify = useQuery({ queryKey: ["admin-clarify"], queryFn: () => fetchClarify() });
 
   const data = report.data as Row | undefined;
   const funnel = rows(data?.["funnel"]);
@@ -206,6 +217,17 @@ export function AdminAnalyticsPage() {
                   ])}
                 />
               </div>
+            </Section>
+
+            <Section title="Questions we had to ask">
+              <Table
+                head={["Question", "Asked", "Answered"]}
+                body={(clarify.data ?? []).map((row) => [
+                  CLARIFY_LABEL[row.kind] ?? row.kind,
+                  String(row.asked),
+                  String(row.answered),
+                ])}
+              />
             </Section>
 
             <Section title="Failures">

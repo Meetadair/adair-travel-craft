@@ -4,6 +4,7 @@
  */
 import { brandWords } from "@/lib/brands/catalogue";
 import type { TravelPrefs } from "@/lib/prefs/questions";
+import type { Learned } from "@/lib/trip/learning";
 
 /** Search-time subset of the preferences, safe to pass into server search. */
 export type SearchPrefs = Pick<
@@ -24,7 +25,13 @@ export type SearchPrefs = Pick<
   | "maxConnections"
   | "hotelMaxKm"
   | "dealbreakers"
->;
+> & {
+  /**
+   * What we have noticed from their own swaps. Already filtered so that a
+   * stated preference or dealbreaker always wins — see lib/trip/learning.
+   */
+  learned?: Learned;
+};
 
 const fold = (value: string) =>
   value
@@ -161,10 +168,20 @@ export function unverifiableDealbreakers(prefs?: SearchPrefs): string[] {
   return (prefs?.dealbreakers ?? []).flatMap((rule) => (shown[rule] ? [shown[rule]] : []));
 }
 
-/** Preferred carriers rank as if they were 12% cheaper. */
+/** Lower is better: a ranking price, not a real one. */
 export function flightScore(carrierText: string, amount: number, prefs?: SearchPrefs): number {
-  if (!prefs?.airlines.length) return amount;
-  return anySelected(carrierText, prefs.airlines, AIRLINE_WORDS) ? amount * 0.88 : amount;
+  let score = amount * (prefs?.learned?.priceWeight ?? 1);
+  // Preferred carriers rank as if they were 12% cheaper.
+  if (prefs?.airlines.length && anySelected(carrierText, prefs.airlines, AIRLINE_WORDS))
+    score *= 0.88;
+  if (avoided(carrierText, "flight", prefs)) score *= 1.25;
+  return score;
+}
+
+/** Brands they have swapped away from twice or more rank down, never out. */
+function avoided(text: string, kind: "flight" | "hotel" | "car", prefs?: SearchPrefs): boolean {
+  const ids = (prefs?.learned?.avoid ?? []).filter((e) => e.kind === kind).map((e) => e.brandId);
+  return ids.length > 0 && anySelected(text, ids, {});
 }
 
 /** Higher is better. Chain and star matches outweigh a small price difference. */
@@ -174,8 +191,9 @@ export function stayScore(
   amount: number,
   prefs?: SearchPrefs,
 ): number {
-  let score = (rating ?? 0) * 2 - amount / 500;
+  let score = (rating ?? 0) * 2 - (amount / 500) * (prefs?.learned?.priceWeight ?? 1);
   if (!prefs) return score;
+  if (avoided(name, "hotel", prefs)) score -= 5;
   if (prefs.hotelChains.length && anySelected(name, prefs.hotelChains, CHAIN_WORDS)) score += 6;
   if (prefs.hotelStars.length && rating != null && prefs.hotelStars.includes(String(Math.round(rating))))
     score += 3;
@@ -194,7 +212,8 @@ export function carScore(
   amount: number,
   prefs?: SearchPrefs,
 ): number {
-  let score = -amount / 100;
+  let score = (-amount / 100) * (prefs?.learned?.priceWeight ?? 1);
+  if (avoided(`${supplier} ${vehicle}`, "car", prefs)) score -= 4;
   const wantedTransmission = prefs?.carTransmission ?? "automatic";
   if (wantedTransmission !== "any" && new RegExp(wantedTransmission, "i").test(transmission))
     score += 4;
