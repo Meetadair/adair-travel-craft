@@ -200,7 +200,7 @@ export function ClosingChat({
   if (result && result.status !== "failed") {
     return (
       <p className="mt-4 text-sm font-medium text-primary">
-        Booked. Taking you to My trips — test mode, nothing was charged.
+        {c.booked}
       </p>
     );
   }
