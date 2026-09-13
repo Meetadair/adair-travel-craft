@@ -27,8 +27,7 @@ export const en = {
       lead: "Flight, hotel, car and dinner — booked from a single sentence.",
       ctaPrimary: "See how it works",
       inputLabel: "Describe your trip in one sentence",
-      inputPlaceholder:
-        "e.g. Rome, Friday to Sunday, hotel with a terrace, invoice to my company",
+      inputPlaceholder: "e.g. Rome, Friday to Sunday, hotel with a terrace, invoice to my company",
       inputSubmit: "Show me the trip",
     },
     demo: {
@@ -40,8 +39,7 @@ export const en = {
       cardTitle: "Milan · Thu – Fri",
       cardSubtitle: "Composed to match your travel profile",
       flightTitle: "LOT 391 · Warsaw → Milan",
-      flightDetail:
-        "Thu 6:55 – 9:05 AM · returns Fri 7:40 PM · window seat, preferred airline",
+      flightDetail: "Thu 6:55 – 9:05 AM · returns Fri 7:40 PM · window seat, preferred airline",
       flightTagClass: "Premium Economy",
       hotelTitle: "Park Hyatt Milano",
       hotelDetail: "1 night · King room, quiet floor · 200 m from the Duomo",
@@ -54,8 +52,7 @@ export const en = {
       footnote: "3 items · 1 payment · 1 booking number",
       typing: "Adair is building your trip…",
       saved: "You saved €96 and 2 h 40 min vs. booking it yourself",
-      savedNote:
-        "vs. average public rates and time to book the same trip across separate sites",
+      savedNote: "vs. average public rates and time to book the same trip across separate sites",
       invoiceLine: "Invoice → your company",
       share: "Share this trip card",
       shareCopied: "Copied",
@@ -78,15 +75,7 @@ export const en = {
       hotelDetailTpl: "1 night · King room, quiet floor · in the historic centre",
       carTitleTpl: "BMW 3 Series · pickup at {code}",
       carDetailTpl: "{day1} 9:30 AM – {day2} 6:30 PM · full insurance, no deposit",
-      weekdays: [
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-        "Sunday",
-      ],
+      weekdays: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
       weekdaysShort: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
     },
     campaign: {
@@ -401,9 +390,27 @@ export const en = {
       savedNote: "this quarter, across 21 trips",
       tripsCount: "trips",
       trips: [
-        { who: "Anna K.", route: "Warsaw → Milan", dates: "18–19 Sep", amount: "€1,240", paid: true },
-        { who: "Tomasz W.", route: "Warsaw → Berlin", dates: "22–23 Sep", amount: "€780", paid: true },
-        { who: "Kitti F.", route: "Budapest → London", dates: "25–27 Sep", amount: "€1,610", paid: false },
+        {
+          who: "Anna K.",
+          route: "Warsaw → Milan",
+          dates: "18–19 Sep",
+          amount: "€1,240",
+          paid: true,
+        },
+        {
+          who: "Tomasz W.",
+          route: "Warsaw → Berlin",
+          dates: "22–23 Sep",
+          amount: "€780",
+          paid: true,
+        },
+        {
+          who: "Kitti F.",
+          route: "Budapest → London",
+          dates: "25–27 Sep",
+          amount: "€1,610",
+          paid: false,
+        },
       ],
       people: [
         { name: "Anna K.", amount: "€4,120", share: 78 },
@@ -449,7 +456,8 @@ export const en = {
 
     plansLabel: "Packages",
     plansTitle: "Pick the frame that fits your team.",
-    plansNote: "Teams starts with a 14-day trial, no card required. Prices exclude VAT. Enterprise is priced on the size of your team and your policy.",
+    plansNote:
+      "Teams starts with a 14-day trial, no card required. Prices exclude VAT. Enterprise is priced on the size of your team and your policy.",
     plansTrial: "14 days free",
     quote: "Request a quote",
     plans: [
