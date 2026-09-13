@@ -26,6 +26,8 @@ export function PaymentStep(props: {
   amountEur: number;
   disabled?: boolean;
   payingLabel?: string | null;
+  /** Saved card the customer already confirmed in the chat. */
+  preselectCardId?: string | undefined;
   onAuthorised: (payment: AuthorisedPayment) => void;
 }) {
   const { session } = props;

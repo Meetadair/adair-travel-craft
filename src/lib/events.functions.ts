@@ -30,6 +30,9 @@ export const EVENT_NAMES = [
   "understanding_confirmed",
   "advice_acted",
   "nudge_dismissed",
+  // Booking closed inside the chat.
+  "closing_confirmed",
+  "closing_booked_in_chat",
 ] as const;
 
 export type EventName = (typeof EVENT_NAMES)[number];
