@@ -37,6 +37,9 @@ import { chatQuestions, essentialsMet, isBusinessSentence, type ChatQuestionKind
 import { buildAdvice, type AdviceLine } from "@/lib/trip/advice";
 import { pickNudge, readDismissed, rememberDismissed, type Nudge, type NudgeKind } from "@/lib/trip/nudges";
 import { airportDistanceKm, driveMinutes } from "@/lib/trip/airport-geo";
+import { ClosingChat } from "@/components/trip/closing-chat";
+import { wishesFromSentence } from "@/lib/trip/understanding";
+import { isSchengen } from "@/lib/trip/backwards";
 
 import { SiteNav } from "@/components/site-nav";
 import { LocaleLink, useLocale, useT, type Dict } from "@/lib/i18n";
@@ -896,6 +899,21 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
     : 0;
   const invoiceVisible = req ? req.invoiceToCompany : Boolean(parsed?.invoice);
 
+  // Closing the booking in the chat: opened by "Book it all".
+  const closingParts = [
+    req?.destinationCity ?? "",
+    req ? `${dayLabel(req.departDate, locale)}–${dayLabel(req.returnDate, locale)}` : "",
+    !dropped.flight && live?.flight
+      ? `${live.flight.carrier} ${live.flight.departTime ?? ""}`.trim()
+      : "",
+    !dropped.hotel && live?.stay ? live.stay.name : "",
+    !dropped.car && live?.car ? live.car.vehicle : "",
+  ].filter((part) => part.trim().length > 0);
+  const closingExtras = wishesFromSentence(submission?.sentence ?? "").map((wish, index) => ({
+    id: `wish-${index}`,
+    label: wish,
+  }));
+
   const reveal = (index: number) => (revealed >= index ? "animate-rise" : "hidden");
 
   async function shareCard() {
@@ -1365,7 +1383,7 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                       {cardId ? (
                         <button
                           type="button"
-                          onClick={() => navigate({ to: "/book/$cardId", params: { cardId } })}
+                          onClick={() => setClosing(true)}
                           className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
                         >
                           {d.bookAll} <ChevronRight className="size-4" />
