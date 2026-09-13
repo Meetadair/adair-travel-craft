@@ -240,3 +240,8 @@
 - [x] Preference matching in search ranking and the card's match checklist resolves brand ids to their names and aliases.
 - [x] /admin/brands: add, rename, re-rank, set regions and group, hide a brand — no code change.
 - [x] Tests for region-based ranking, search and the group-widened loyalty mapping (240 tests pass).
+
+## Fix: several loyalty programmes per category — done
+- [x] Settings → Saved details: each category (airlines, hotels, car rental) keeps its own form, so adding one no longer blocks or clears another; the action reads "Add another … programme" once an entry exists, with "Saved. Add another if you hold more than one." and a per-entry Remove.
+- [x] Every entry is stored, listed masked to the last four with an optional reveal, and checked at booking; where two programmes both earn we pass one and say plainly that only one can be credited.
+- [x] Home screen shows a dismissible reminder to add member numbers when onboarding answered "Yes — I'll add the numbers in Settings" and nothing is saved yet; it disappears once the first programme is saved.
