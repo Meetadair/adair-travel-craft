@@ -8,7 +8,6 @@ import {
   Armchair,
   Sparkles,
   ChevronRight,
-  FileDown,
   Share2,
   Receipt,
   Copy,
