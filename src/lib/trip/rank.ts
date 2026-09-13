@@ -31,6 +31,11 @@ export type SearchPrefs = Pick<
    * stated preference or dealbreaker always wins — see lib/trip/learning.
    */
   learned?: Learned;
+  /**
+   * What they actually chose in this destination before. Ranks below stated
+   * preferences and confirmed habits, above learned weights and price.
+   */
+  remembered?: { hotels: string[]; carSuppliers: string[] };
 };
 
 const fold = (value: string) =>
