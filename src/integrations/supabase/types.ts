@@ -2137,6 +2137,93 @@ export type Database = {
         }
         Relationships: []
       }
+      traveller_patterns: {
+        Row: {
+          asked_at: string | null
+          confidence: number
+          created_at: string
+          evidence_count: number
+          first_seen: string
+          id: string
+          last_seen: string
+          pattern_kind: string
+          status: string
+          updated_at: string
+          user_id: string
+          value: string
+        }
+        Insert: {
+          asked_at?: string | null
+          confidence?: number
+          created_at?: string
+          evidence_count?: number
+          first_seen?: string
+          id?: string
+          last_seen?: string
+          pattern_kind: string
+          status?: string
+          updated_at?: string
+          user_id: string
+          value: string
+        }
+        Update: {
+          asked_at?: string | null
+          confidence?: number
+          created_at?: string
+          evidence_count?: number
+          first_seen?: string
+          id?: string
+          last_seen?: string
+          pattern_kind?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+          value?: string
+        }
+        Relationships: []
+      }
+      traveller_place_memory: {
+        Row: {
+          created_at: string
+          id: string
+          item_kind: string
+          item_name: string
+          item_ref: string | null
+          last_chosen_at: string
+          place: string
+          source: string
+          times_chosen: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          item_kind: string
+          item_name: string
+          item_ref?: string | null
+          last_chosen_at?: string
+          place: string
+          source?: string
+          times_chosen?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          item_kind?: string
+          item_name?: string
+          item_ref?: string | null
+          last_chosen_at?: string
+          place?: string
+          source?: string
+          times_chosen?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       trip_cards: {
         Row: {
           created_at: string
