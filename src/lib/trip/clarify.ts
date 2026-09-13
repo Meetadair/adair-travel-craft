@@ -102,10 +102,21 @@ export type ClarifyContext = {
 
 /**
  * The single question to ask, or null to search straight away.
- * Priority: dates first (they change everything), then the airport, then a
- * hotel wish we could not place.
+ * Priority: the destination first — without a place, dates mean nothing —
+ * then dates, then the airport, then a hotel wish we could not place.
  */
 export function clarify(sentence: string, context: ClarifyContext): Clarification | null {
+  // The destination outranks everything, including "already asked": we never
+  // search, and never ask a later question, while we do not know the city.
+  if (!context.destinationCity.trim()) {
+    return {
+      kind: "needs_destination",
+      question: "Where are you going?",
+      options: [],
+      placeholder: "e.g. Milan",
+    };
+  }
+
   if (context.alreadyAsked) return null;
 
   if (context.unresolvedHotel) {
