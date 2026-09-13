@@ -71,7 +71,10 @@ export default function CardPayment({
   const { ref, saveCard, createCardForTemporaryUse } = useDuffelCardFormActions();
   const persistCard = useServerFn(saveCardToken);
 
-  const [selected, setSelected] = useState<string>("new");
+  // The default saved card is pre-selected; "Use a different card" is always there.
+  const [selected, setSelected] = useState<string>(
+    session.savedCards.find((card) => card.isDefault)?.id ?? "new",
+  );
   const [saveForNextTime, setSaveForNextTime] = useState(false);
   const [valid, setValid] = useState(false);
   const [stage, setStage] = useState<Stage>("idle");
