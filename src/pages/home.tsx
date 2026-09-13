@@ -35,6 +35,7 @@ import { replyFor, ruleIntent, type IntentKind } from "@/lib/trip/intent";
 import { ChatQuestions } from "@/components/trip/chat-questions";
 import { AdviceLines } from "@/components/trip/advice-lines";
 import { NudgeLine } from "@/components/trip/nudge-line";
+import { MemoryLine } from "@/components/trip/memory-line";
 import { applyOverrides, understand, type TripOverrides } from "@/lib/trip/understanding";
 import { chatQuestions, essentialsMet, isBusinessSentence, type ChatQuestionKind } from "@/lib/trip/questions";
 import { buildAdvice, type AdviceLine } from "@/lib/trip/advice";
@@ -1571,6 +1572,13 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                 )}
                 {live?.testMode && showActions && (
                   <p className="mt-1 text-xs text-muted-foreground">{d.testMode}</p>
+                )}
+                {live?.memory && showActions && (
+                  <MemoryLine
+                    memory={live.memory}
+                    offeredName={live.search.stay?.name ?? null}
+                    copy={a.memory}
+                  />
                 )}
                 {nudge && showActions && (
                   <NudgeLine
