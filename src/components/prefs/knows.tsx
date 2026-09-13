@@ -13,10 +13,10 @@ import {
   forgetMemoryLine,
   getMyMemory,
 } from "@/lib/memory.functions";
-import { useI18n } from "@/lib/i18n/use-i18n";
+import { useT } from "@/lib/i18n";
 
 export function Knows() {
-  const { t } = useI18n();
+  const t = useT();
   const copy = t.assistant.memory;
   const fetchMemory = useServerFn(getMyMemory);
   const answer = useServerFn(answerPattern);
