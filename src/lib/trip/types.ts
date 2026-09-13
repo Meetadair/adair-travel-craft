@@ -102,6 +102,8 @@ export type TripSearchResponse = {
   testMode: boolean;
   /** The named hotel we could not find, plus the closest options instead. */
   hotelRequested: string | null;
+  /** Why a family room is needed, or a children's policy worth knowing. */
+  familyNote?: string | null;
   hotelNotFound: boolean;
   hotelAlternatives: StayResult[];
   /** The named car supplier/model we could not find, plus close options. */

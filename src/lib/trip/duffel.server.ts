@@ -650,7 +650,9 @@ export async function searchTripWithDuffel(
   let hotelRequested: string | null = req.hotelNameExact?.trim() || null;
   let hotelNotFound = false;
   let hotelAlternatives: StayResult[] = [];
+  let familyNote: string | null = null;
   if (stayRes.status === "fulfilled") {
+    familyNote = stayRes.value.familyNote ?? null;
     stay = stayRes.value.stay;
     hotelNotFound = stayRes.value.notFound;
     hotelAlternatives = stayRes.value.alternatives;
@@ -753,6 +755,7 @@ export async function searchTripWithDuffel(
     testMode: isTestKey(),
     hotelRequested,
     hotelNotFound,
+    familyNote,
     hotelAlternatives,
     carRequested,
     carNotFound,
