@@ -11,6 +11,7 @@ import {
   getAdminTrip,
   savePricingRule,
   setProviderEnabled,
+  setGlobalStayRuleEnabled,
   setUserAdmin,
   listWaitlist,
   inviteWaitlist,
@@ -215,6 +216,10 @@ export function AdminPage() {
     mutationFn: (input: { id: string; enabled: boolean }) => toggleProvider({ data: input }),
     onSuccess: refresh,
   });
+  const stayRuleMutation = useMutation({
+    mutationFn: (input: { id: string; enabled: boolean }) => toggleStayRule({ data: input }),
+    onSuccess: refresh,
+  });
   const adminMutation = useMutation({
     mutationFn: (input: { userId: string; isAdmin: boolean }) => flagUser({ data: input }),
     onSuccess: refresh,
@@ -348,6 +353,34 @@ export function AdminPage() {
                       className="rounded-xl border border-border px-3 py-1.5 text-xs font-medium hover:border-primary disabled:opacity-60"
                     >
                       {user.is_admin ? "Remove admin" : "Make admin"}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </Card>
+
+            <Card
+              title="Accommodation standards"
+              hint="Applied to every search for every customer — nobody has to ask for them."
+            >
+              <div className="hairline-card divide-y divide-border">
+                {overview.data.stayRules.map((rule) => (
+                  <div key={rule.id} className="flex flex-wrap items-center gap-3 p-4 text-sm">
+                    <p className="min-w-0 flex-1">
+                      <span className="font-medium">{rule.label}</span>
+                      {rule.hint && (
+                        <span className="block text-xs text-muted-foreground">{rule.hint}</span>
+                      )}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        stayRuleMutation.mutate({ id: rule.id, enabled: !rule.enabled })
+                      }
+                      disabled={stayRuleMutation.isPending}
+                      className="rounded-xl border border-border px-3 py-1.5 text-xs font-medium hover:border-primary disabled:opacity-60"
+                    >
+                      {rule.enabled ? "Turn off" : "Turn on"}
                     </button>
                   </div>
                 ))}
