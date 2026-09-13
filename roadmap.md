@@ -246,3 +246,10 @@
 - [x] Home screen shows a dismissible reminder to add member numbers when onboarding answered "Yes — I'll add the numbers in Settings" and nothing is saved yet; it disappears once the first programme is saved.
 
 - [x] Step 2(f): add payment cards ahead of time in Settings (hosted form via the payment adapter, default card pre-selected at checkout, honest wallet availability)
+
+## My trips: Upcoming / Past split — done
+- [x] Two tabs, "Upcoming" default: return date today or later, soonest first; a trip in progress sits at the top with a subtle "Now" marker.
+- [x] "Past" holds completed and cancelled trips, newest first, moved there automatically the day after the return date.
+- [x] Past actions: invoice download, "Book again" (same sentence handed to the assistant for new dates) and "Same trip, but…" (amend-by-sentence prefilled). Cancel and "Change this trip" stay on Upcoming only (change now routed at /trips/:tripId/change).
+- [x] Month-grid calendar view unchanged and shows both. Empty states: "Nothing booked yet. Describe a trip above to start." / "Your completed trips will appear here."
+- [x] Tests for the return-date boundary, the in-progress marker, cancelled trips and both sort orders (272 tests pass).
