@@ -166,6 +166,7 @@ export function clarify(sentence: string, context: ClarifyContext): Clarificatio
 export function applyAnswer(sentence: string, kind: ClarifyKind, answer: string): string {
   const clean = answer.trim();
   if (!clean) return sentence;
+  if (kind === "needs_destination") return `${sentence} to ${clean}`.trim();
   if (kind === "child_ages") return `${sentence} (children aged ${clean})`;
   if (kind === "which_airport") return `${sentence} from ${clean}`;
   if (kind === "hotel_unmatched") return `${sentence} — ${clean}`;
