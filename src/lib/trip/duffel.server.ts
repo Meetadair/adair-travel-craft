@@ -480,7 +480,13 @@ export async function searchStay(
     )
     .slice(0, 3)
     .map((m) => m.result);
-  return { stay: best.result, alternatives: stayOthers, requested: null, notFound: false };
+  return {
+    stay: best.result,
+    alternatives: stayOthers,
+    requested: null,
+    notFound: false,
+    familyNote,
+  };
 }
 
 
