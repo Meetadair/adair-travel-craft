@@ -179,6 +179,19 @@ export function BookPage({ cardId }: { cardId: string }) {
 
 
   const search = card.data?.search;
+  /** Ages count as of the day they fly home: a birthday mid-trip changes the fare. */
+  const returnDate = search?.request.returnDate ?? "";
+  const party = returnDate
+    ? partyOf(
+        [
+          { bornOn: traveller.bornOn || null },
+          ...companions.map((c) => ({ bornOn: c.bornOn || null })),
+        ],
+        returnDate,
+      )
+    : null;
+  const familyLines = party ? bedLines(party) : [];
+  const seats = party ? childSeatsFor(party) : [];
   const paxCount = Math.max(1, search?.request.passengers ?? 1);
   const fetchCompanions = useServerFn(listCompanions);
   const fetchExtras = useServerFn(getFlightAncillaries);
