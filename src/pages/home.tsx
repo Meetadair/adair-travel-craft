@@ -216,14 +216,9 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 function Hero({ t, onSubmit }: { t: Dict; onSubmit: (sentence: string) => void }) {
   const [value, setValue] = useState("");
   return (
-    <section className="mx-auto max-w-4xl px-6 pt-28 pb-20 text-center sm:pt-36">
-      <div className="animate-rise" style={{ animationDelay: "0ms" }}>
-        <Tag>
-          <Sparkles className="size-3" /> {t.home.hero.badge}
-        </Tag>
-      </div>
+    <section className="mx-auto max-w-4xl px-6 pb-16 pt-16 text-center sm:pb-20 sm:pt-28">
       <h1
-        className="animate-rise mt-8 font-display text-5xl font-semibold leading-[1.04] tracking-tight text-foreground sm:text-7xl"
+        className="animate-rise font-display text-5xl font-semibold leading-[1.04] tracking-tight text-foreground sm:text-7xl"
         style={{ animationDelay: "90ms" }}
       >
         {t.home.hero.titleLine1}
@@ -231,14 +226,14 @@ function Hero({ t, onSubmit }: { t: Dict; onSubmit: (sentence: string) => void }
         {t.home.hero.titleLine2}
       </h1>
       <p
-        className="animate-rise mx-auto mt-6 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg"
+        className="animate-rise mx-auto mt-5 max-w-lg text-base leading-relaxed text-muted-foreground"
         style={{ animationDelay: "180ms" }}
       >
         {t.home.hero.lead}
       </p>
 
       <form
-        className="animate-rise mx-auto mt-10 w-full max-w-[560px]"
+        className="animate-rise mx-auto mt-8 w-full max-w-[560px]"
         style={{ animationDelay: "270ms" }}
         onSubmit={(e) => {
           e.preventDefault();
@@ -272,64 +267,6 @@ function Hero({ t, onSubmit }: { t: Dict; onSubmit: (sentence: string) => void }
         >
           {t.home.hero.ctaPrimary}
         </a>
-      </div>
-    </section>
-  );
-}
-
-function Comparison({ t }: { t: Dict }) {
-  const c = t.home.comparison;
-  return (
-    <section className="mx-auto max-w-5xl px-6 py-20">
-      <SectionLabel>{c.label}</SectionLabel>
-      <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
-        {c.title}
-      </h2>
-
-      <div className="mt-12 grid gap-5 md:grid-cols-2">
-        <div className="hairline-card p-6 sm:p-8">
-          <div className="flex items-center justify-between">
-            <h3 className="font-display text-lg font-semibold">{c.withoutTitle}</h3>
-            <Tag>
-              <X className="size-3" /> {c.withoutTag}
-            </Tag>
-          </div>
-          <ul className="mt-6 space-y-3">
-            {c.apps.map((app) => (
-              <li
-                key={app.name}
-                className="flex items-center justify-between gap-3 rounded-lg border border-border bg-background px-4 py-3"
-              >
-                <span className="text-sm font-medium text-foreground">{app.name}</span>
-                <span className="text-xs text-muted-foreground">{app.detail}</span>
-              </li>
-            ))}
-          </ul>
-          <p className="mt-6 border-t border-border pt-4 text-sm text-muted-foreground">
-            {c.withoutFooter}
-          </p>
-        </div>
-
-        <div className="hairline-card relative overflow-hidden p-6 sm:p-8">
-          <div className="flex items-center justify-between">
-            <h3 className="font-display text-lg font-semibold">{c.withTitle}</h3>
-            <Tag accent>
-              <Check className="size-3" /> {c.withTag}
-            </Tag>
-          </div>
-          <div className="mt-6 rounded-lg border border-primary/20 bg-primary/5 px-4 py-5">
-            <p className="text-sm leading-relaxed text-foreground">{c.quote}</p>
-          </div>
-          <div className="mt-4 flex items-center gap-3 rounded-lg border border-border bg-background px-4 py-3">
-            <Plane className="size-4 text-primary" />
-            <BedDouble className="size-4 text-primary" />
-            <CarFront className="size-4 text-primary" />
-            <span className="text-sm font-medium text-foreground">{c.bundle}</span>
-          </div>
-          <p className="mt-6 border-t border-border pt-4 text-sm text-muted-foreground">
-            {c.withFooter} <span className="font-semibold text-primary">€1,240</span>
-          </p>
-        </div>
       </div>
     </section>
   );
@@ -1331,6 +1268,12 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                   </div>
                 )}
 
+                <p
+                  className={`mt-4 text-sm leading-relaxed text-foreground ${showActions ? "animate-rise" : "hidden"}`}
+                >
+                  {t.home.demoLine}
+                </p>
+
                 <div
                   className={`mt-3 flex flex-wrap items-start gap-2 ${showActions ? "animate-rise" : "hidden"}`}
                 >
@@ -1364,229 +1307,22 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
   );
 }
 
-function MyTrips({ t }: { t: Dict }) {
-  const m = t.home.trips;
-  const cards = [
-    {
-      icon: <Plane className="size-4" />,
-      label: m.flight,
-      title: m.flightTitle,
-      detail: m.flightDetail,
-      code: m.flightCode,
-    },
-    {
-      icon: <BedDouble className="size-4" />,
-      label: m.hotel,
-      title: m.hotelTitle,
-      detail: m.hotelDetail,
-      code: m.hotelCode,
-    },
-    {
-      icon: <CarFront className="size-4" />,
-      label: m.car,
-      title: m.carTitle,
-      detail: m.carDetail,
-      code: m.carCode,
-    },
-  ];
-
-  return (
-    <section className="mx-auto max-w-5xl px-6 py-20">
-      <SectionLabel>{m.label}</SectionLabel>
-      <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
-        {m.title}
-      </h2>
-
-      <div className="mt-12 grid gap-5 sm:grid-cols-3">
-        {cards.map((c) => (
-          <div key={c.label} className="hairline-card p-6">
-            <div className="flex items-center justify-between">
-              <div className="flex size-9 items-center justify-center rounded-lg border border-border bg-background">
-                {c.icon}
-              </div>
-              <Tag>{c.label}</Tag>
-            </div>
-            <h3 className="mt-5 text-sm font-semibold text-foreground">{c.title}</h3>
-            <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{c.detail}</p>
-            <p className="mt-4 border-t border-border pt-3 font-mono text-[11px] tracking-wide text-muted-foreground">
-              {c.code}
-            </p>
-          </div>
-        ))}
-      </div>
-
-      <div className="mt-5 hairline-card px-6 py-4">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-muted-foreground">
-            <span className="inline-flex items-center gap-1.5">
-              <CalendarDays className="size-3.5" /> {m.dates}
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <MapPin className="size-3.5" /> {m.place}
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <Clock className="size-3.5" /> {m.departs}
-            </span>
-          </div>
-          <span className="text-sm font-semibold text-primary">€1,240 · {m.paid}</span>
-        </div>
-        <SavedLine t={t} className="mt-3" />
-      </div>
-
-      <div className="mt-5 flex justify-end">
-        <PdfButton t={t} />
-      </div>
-    </section>
-  );
-}
-
-function PdfButton({ t }: { t: Dict }) {
-  const locale = useLocale();
-  const [loading, setLoading] = useState(false);
-  return (
-    <button
-      onClick={async () => {
-        setLoading(true);
-        try {
-          await downloadTripInvoice({
-            documentNumber: "ADR/2026/DEMO/001",
-            issueDate: new Date().toISOString().slice(0, 10),
-            city: "Milan",
-            origin: "Warsaw",
-            startDate: "2026-09-18",
-            endDate: "2026-09-19",
-            currency: "EUR",
-            live: false,
-            locale,
-            buyer: { name: "", company: "", taxId: "", email: "" },
-            items: [
-              {
-                kind: "flight",
-                title: "LOT 391 · Warsaw → Milan Linate",
-                detail: "Thu Sep 18, 6:35 – 8:50 · returns Fri Sep 19, 20:15",
-                provider: "LOT Polish Airlines",
-                offerReference: "LO391-DEMO",
-                amount: 312,
-                currency: "EUR",
-              },
-              {
-                kind: "hotel",
-                title: "Park Hyatt Milano · 1 night",
-                detail: "120 m from the Duomo, Park Deluxe room, breakfast included",
-                provider: "Park Hyatt",
-                offerReference: "PHM-DEMO",
-                amount: 742,
-                currency: "EUR",
-              },
-              {
-                kind: "car",
-                title: "BMW 3 Series · 2 days",
-                detail: "Pickup at Linate airport, return to the same location",
-                provider: "Sixt",
-                offerReference: "CAR-DEMO",
-                amount: 186,
-                currency: "EUR",
-              },
-            ],
-          });
-        } finally {
-          setLoading(false);
-        }
-      }}
-      disabled={loading}
-      className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-60"
-    >
-      <FileDown className="size-4" />
-      {loading ? t.home.trips.pdfBusy : t.home.trips.pdfIdle}
-    </button>
-  );
-}
-
-function TravelProfile({ t }: { t: Dict }) {
-  const p = t.home.profile;
+function AfterYouBook({ t }: { t: Dict }) {
   const icons = [
-    <Plane key="a" className="size-4" />,
-    <Building2 key="b" className="size-4" />,
-    <UtensilsCrossed key="c" className="size-4" />,
-    <Wallet key="d" className="size-4" />,
-  ];
-
-  return (
-    <section className="mx-auto max-w-5xl px-6 py-20">
-      <div className="hairline-card overflow-hidden">
-        <div className="grid md:grid-cols-[1fr_1.4fr]">
-          <div className="border-b border-border bg-cream-deep p-8 sm:p-10 md:border-b-0 md:border-r">
-            <SectionLabel>{p.label}</SectionLabel>
-            <h2 className="mt-3 font-display text-3xl font-semibold leading-tight tracking-tight">
-              {p.titleLine1}
-              <br />
-              {p.titleLine2}
-            </h2>
-            <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{p.lead}</p>
-            <div className="mt-6 inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2.5">
-              <Armchair className="size-4 text-primary" />
-              <span className="text-xs font-medium text-foreground">{p.activeCount}</span>
-            </div>
-          </div>
-
-          <div className="grid sm:grid-cols-2">
-            {p.groups.map((g, i) => (
-              <div
-                key={g.title}
-                className={`p-6 sm:p-7 ${i % 2 === 0 ? "sm:border-r" : ""} ${i < 2 ? "border-b" : ""} border-border max-sm:border-b max-sm:last:border-b-0`}
-              >
-                <div className="flex items-center gap-2.5">
-                  <span className="text-primary">{icons[i]}</span>
-                  <h3 className="text-sm font-semibold text-foreground">{g.title}</h3>
-                </div>
-                <ul className="mt-4 space-y-2">
-                  {g.items.map((item) => (
-                    <li
-                      key={item}
-                      className="flex items-start gap-2 text-xs leading-relaxed text-muted-foreground"
-                    >
-                      <Check className="mt-0.5 size-3 shrink-0 text-primary" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function Principles({ t }: { t: Dict }) {
-  const icons = [
-    <Sparkles key="a" className="size-5" />,
-    <Coffee key="b" className="size-5" />,
-    <MapPin key="c" className="size-5" />,
+    <Receipt key="a" className="size-4" />,
+    <Armchair key="b" className="size-4" />,
+    <ShieldCheck key="c" className="size-4" />,
   ];
   return (
-    <section id="principles" className="mx-auto max-w-5xl px-6 py-20">
-      <SectionLabel>{t.home.principles.label}</SectionLabel>
-      <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
-        {t.home.principles.title}
-      </h2>
-
-      <div className="mt-12 grid gap-5 md:grid-cols-3">
-        {t.home.principles.items.map((p, i) => (
-          <div key={p.title} className="hairline-card p-7">
-            <div className="flex items-center justify-between">
-              <div className="flex size-10 items-center justify-center rounded-lg border border-border bg-background text-primary">
-                {icons[i]}
-              </div>
-              <span className="font-display text-sm font-semibold text-muted-foreground">
-                0{i + 1}
-              </span>
+    <section className="mx-auto max-w-5xl px-6 py-14">
+      <div className="grid gap-5 sm:grid-cols-3">
+        {t.home.after.items.map((item, i) => (
+          <div key={item.title} className="flex items-start gap-3">
+            <span className="mt-0.5 text-primary">{icons[i]}</span>
+            <div>
+              <h3 className="text-sm font-semibold text-foreground">{item.title}</h3>
+              <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{item.text}</p>
             </div>
-            <h3 className="mt-6 font-display text-lg font-semibold leading-snug text-foreground">
-              {p.title}
-            </h3>
-            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{p.text}</p>
           </div>
         ))}
       </div>
@@ -1594,34 +1330,26 @@ function Principles({ t }: { t: Dict }) {
   );
 }
 
-function Teams({ t }: { t: Dict }) {
-  const c = t.home.campaign;
+function Closing({ t }: { t: Dict }) {
+  const c = t.home.close;
   const locale = useLocale();
   return (
-    <section className="mx-auto max-w-5xl px-6 py-20">
-      <SectionLabel>{c.teamsLabel}</SectionLabel>
-      <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
-        {c.teamsTitle}
-      </h2>
-      <div className="hairline-card mt-8 flex flex-col gap-6 p-7 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-start gap-3.5">
-          <div className="flex size-10 shrink-0 items-center justify-center rounded-lg border border-border bg-background text-primary">
-            <Users className="size-5" />
-          </div>
-          <p className="max-w-md text-sm leading-relaxed text-muted-foreground">{c.teamsLine}</p>
-        </div>
-        <div className="flex flex-col gap-3 sm:w-80 sm:shrink-0">
-          <EarlyAccess t={t} type="teams" label={c.teamsCta} />
-          <LocaleLink
-            to="/business"
-            locale={locale}
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-primary transition-colors hover:text-primary/80"
-          >
-            {c.teamsMore}
-            <ArrowRight className="size-4" />
-          </LocaleLink>
-        </div>
+    <section className="mx-auto max-w-3xl px-6 py-16 text-center">
+      <h2 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">{c.title}</h2>
+      <p className="mt-3 text-base text-muted-foreground">{c.line}</p>
+      <div className="mt-7 flex justify-center">
+        <EarlyAccess t={t} type="early_access" label={t.home.campaign.earlyAccess} />
       </div>
+      <p className="mt-5 text-sm text-muted-foreground">
+        {c.teams}{" "}
+        <LocaleLink
+          to="/business"
+          locale={locale}
+          className="font-medium text-primary underline decoration-primary/30 underline-offset-4 hover:text-primary/80"
+        >
+          {c.teamsLink}
+        </LocaleLink>
+      </p>
     </section>
   );
 }
@@ -1660,18 +1388,11 @@ export function HomePage() {
 
       <main>
         <Hero t={t} onSubmit={runDemo} />
-        {divider}
-        <Comparison t={t} />
-        {divider}
         <ChatDemo t={t} submission={submission} />
         {divider}
-        <MyTrips t={t} />
+        <AfterYouBook t={t} />
         {divider}
-        <TravelProfile t={t} />
-        {divider}
-        <Principles t={t} />
-        {divider}
-        <Teams t={t} />
+        <Closing t={t} />
       </main>
 
       <footer className="mx-auto max-w-6xl px-6 pb-10 pt-6">
@@ -1686,6 +1407,20 @@ export function HomePage() {
               className="text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
             >
               {t.nav.business}
+            </LocaleLink>
+            <LocaleLink
+              to="/privacy"
+              locale={locale}
+              className="text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+            >
+              {t.legal.privacyTitle}
+            </LocaleLink>
+            <LocaleLink
+              to="/terms"
+              locale={locale}
+              className="text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+            >
+              {t.legal.termsTitle}
             </LocaleLink>
             <p className="text-xs text-muted-foreground">{t.home.footer}</p>
           </div>
