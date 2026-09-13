@@ -545,6 +545,12 @@ function DestinationEditor({
             >
               <option value="hotel">hotel</option>
               <option value="restaurant">restaurant</option>
+              <option value="cafe">café</option>
+              <option value="bar">bar</option>
+              <option value="wine_bar">wine bar</option>
+              <option value="cocktail_bar">cocktail bar</option>
+              <option value="rooftop">rooftop</option>
+              <option value="club">club</option>
               <option value="sight">sight</option>
             </select>
           </label>
