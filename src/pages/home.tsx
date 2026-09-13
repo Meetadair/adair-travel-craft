@@ -1415,8 +1415,29 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                     ) : (
                       <SavedLine t={t} className={showSaved ? "animate-rise mt-3" : "hidden"} />
                     )}
+                    {closing && cardId && signedIn && (
+                      <ClosingChat
+                        cardId={cardId}
+                        summaryParts={closingParts}
+                        totalLabel={totalLabel}
+                        totalEur={Math.round((travelTotal + insuranceAdd) * 100) / 100}
+                        include={{
+                          flight: !dropped.flight,
+                          stay: !dropped.hotel,
+                          car: !dropped.car,
+                          insurance: addInsurance,
+                        }}
+                        rides={[]}
+                        extras={closingExtras}
+                        invoiceMentioned={invoiceVisible}
+                        passportRequired={
+                          !!req?.destinationIata && !isSchengen(req.destinationIata)
+                        }
+                      />
+                    )}
                   </div>
                 </div>
+
 
                 {priceContext?.peak && !datesKept && showActions && (
                   <div className="animate-rise mt-4 rounded-2xl border border-border bg-background p-4">
