@@ -108,80 +108,30 @@ export const en = {
       teamsCta: "Join the Teams waitlist",
       teamsMore: "See the offer for companies",
     },
-    trips: {
-      label: "My trips",
-      title: "Everything in one place after you book.",
-      flight: "Flight",
-      hotel: "Hotel",
-      car: "Car",
-      flightTitle: "LOT 391 · WAW → MXP",
-      flightDetail: "Thu, Sep 18 · 6:55 AM · seat 7A",
-      flightCode: "Booking ADR-8K2M4F",
-      hotelTitle: "Park Hyatt Milano",
-      hotelDetail: "Check-in Sep 18 · 1 night · King",
-      hotelCode: "Confirmation PH-55271",
-      carTitle: "BMW 3 Series · Linate",
-      carDetail: "Pickup 9:30 AM · return Fri 6:30 PM",
-      carCode: "Voucher ADR-CAR-0912",
-      dates: "Thu 18 – Fri 19 Sep",
-      place: "Milan, Italy",
-      departs: "departs in 6 days",
-      paid: "paid",
-      pdfIdle: "Download trip card (PDF)",
-      pdfBusy: "Generating PDF…",
-    },
-    profile: {
-      label: "Travel profile",
-      titleLine1: "Set it once.",
-      titleLine2: "It works every time.",
-      lead: "Adair learns your preferences once — and every trip after that honors them automatically. No filters to click, nothing to compare.",
-      activeCount: "18 active preferences",
-      groups: [
-        {
-          title: "Flights",
-          items: [
-            "LOT, Lufthansa, Air France",
-            "Premium Economy for 2h+ flights",
-            "Window seat, front of cabin",
-          ],
-        },
-        {
-          title: "Hotels",
-          items: [
-            "Hyatt, Small Luxury Hotels",
-            "Quiet floor, King bed",
-            "Max 10 min walk from destination",
-          ],
-        },
-        {
-          title: "Diet & timing",
-          items: ["Gluten-free", "Breakfast included", "Late checkout after 11:00 AM"],
-        },
-        {
-          title: "Budget",
-          items: ["Up to €1,500 / 2-day trip", "Company VAT invoice", "EUR, one card"],
-        },
-      ],
-    },
-    principles: {
-      label: "Three principles",
-      title: "This is what Adair stands on.",
+    demoLine: "Five apps, five confirmations, five places to check — or this.",
+    after: {
       items: [
         {
-          title: "One trip, not three bookings",
-          text: "A flight, a hotel, and a car are one trip — so they should be one booking. One window, one payment, one confirmation.",
+          title: "Everything in one place",
+          text: "Confirmations, vouchers and changes, in My trips.",
         },
         {
-          title: "A price no one else gets you",
-          text: "Hotels at our own negotiated rates — not public Booking.com pricing. You see the difference right in the summary.",
+          title: "It learns you",
+          text: "Set preferences once. Every trip after honours them.",
         },
         {
-          title: "One place after you book",
-          text: "Confirmation numbers, vouchers, changes, and cancellations — all in one My Trips view, right up to the last day of your trip.",
+          title: "Someone to call",
+          text: "Support with your booking in front of them.",
         },
       ],
     },
-    footer: "Product concept — sample data. Adair Travel, 2026.",
+    close: {
+      title: "Adair launches in October.",
+      line: "First 100 accounts get 3 months of Signature free.",
+      teams: "Adair for Teams — one policy, one invoice.",
+      teamsLink: "Join the list",
+    },
+    footer: "Adair Kft. · Budapest",
   },
 
   assistant: {
@@ -559,7 +509,7 @@ export const en = {
       success: "Thank you — we'll get back to you within one business day.",
       error: "That didn't go through. Please try again.",
     },
-    footer: "Product concept — sample data. Adair Travel, 2026.",
+    footer: "Adair Kft. · Budapest",
   },
 } as const;
 
