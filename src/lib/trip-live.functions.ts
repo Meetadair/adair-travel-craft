@@ -31,6 +31,8 @@ export type LiveTripResult = {
   /** Set when booking far ahead lowered our own fee. */
   earlyBooking?: { daysAhead: number; discountBps: number; savedEur: number } | null;
   expiresAt: string | null;
+  /** Where they stayed before in this city, so the chat can mention it once. */
+  memory?: { hotel: string; stays: number; city: string; offered: boolean } | null;
 };
 
 const stopSchema = z.object({
