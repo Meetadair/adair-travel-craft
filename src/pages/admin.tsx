@@ -199,6 +199,7 @@ export function AdminPage() {
   const fetchOverview = useServerFn(getAdminOverview);
   const fetchTrip = useServerFn(getAdminTrip);
   const toggleProvider = useServerFn(setProviderEnabled);
+  const toggleStayRule = useServerFn(setGlobalStayRuleEnabled);
   const flagUser = useServerFn(setUserAdmin);
   const cancelTrip = useServerFn(cancelTripAsAdmin);
   const queryClient = useQueryClient();
