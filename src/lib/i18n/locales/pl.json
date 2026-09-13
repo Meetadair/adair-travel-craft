@@ -163,7 +163,7 @@
     "removedNote": "Usunięto z tej podróży",
     "restoreAll": "Przywróć wszystko",
     "intent": {
-      "greeting": "Dzień dobry. Powiedz, gdzie i kiedy chcesz być, a ułożę całą podróż.",
+      "greeting": "Cześć. Dokąd podróżujesz?",
       "product": "Planuję całe podróże na podstawie jednego zdania — lot, hotel, auto, transfery — i rezerwuję je w jednym kroku. Opisz swoją podróż, a przygotuję propozycję.",
       "booking": "Twoje rezerwacje znajdują się w sekcji Moje podróże — tam też znajdziesz faktury i możliwość zmian.",
       "unclear": "Nie dostrzegam w tym planu podróży. Spróbuj czegoś w stylu: Mediolan od wtorku do czwartku.",
@@ -203,6 +203,7 @@
       }
     },
     "questions": {
+      "destination": "Dokąd podróżujesz?",
       "dates": "W jakich terminach?",
       "arrivalTime": "O której godzinie musisz być na miejscu?",
       "whichAirport": "{city} ma więcej niż jedno lotnisko. Które wybierasz?",

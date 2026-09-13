@@ -163,7 +163,7 @@
     "removedNote": "Fjernet fra denne reisen",
     "restoreAll": "Legg til alt igjen",
     "intent": {
-      "greeting": "Hei. Fortell meg hvor du må være og når, så setter jeg sammen reisen.",
+      "greeting": "Hei. Hvor skal du reise?",
       "product": "Jeg planlegger hele reiser ut fra én setning — fly, hotell, bil, transport — og bestiller alt i ett steg. Be meg om en reise, så får du se.",
       "booking": "Bestillingene dine ligger under Mine reiser, sammen med fakturaer og endringer.",
       "unclear": "Jeg oppfattet ingen reise i det der. Prøv noe som: Milano tirsdag til torsdag.",
@@ -203,6 +203,7 @@
       }
     },
     "questions": {
+      "destination": "Hvor skal du reise?",
       "dates": "Hvilke datoer?",
       "arrivalTime": "Når må du være fremme?",
       "whichAirport": "{city} har mer enn én flyplass. Hvilken?",

@@ -12,7 +12,13 @@
  * Pure and browser-safe: the chat, the card and the tests read the same rules.
  */
 
-export type ClarifyKind = "child_ages" | "no_dates" | "vague_week" | "which_airport" | "hotel_unmatched";
+export type ClarifyKind =
+  | "needs_destination"
+  | "child_ages"
+  | "no_dates"
+  | "vague_week"
+  | "which_airport"
+  | "hotel_unmatched";
 
 export type Clarification = {
   kind: ClarifyKind;
@@ -96,10 +102,21 @@ export type ClarifyContext = {
 
 /**
  * The single question to ask, or null to search straight away.
- * Priority: dates first (they change everything), then the airport, then a
- * hotel wish we could not place.
+ * Priority: the destination first — without a place, dates mean nothing —
+ * then dates, then the airport, then a hotel wish we could not place.
  */
 export function clarify(sentence: string, context: ClarifyContext): Clarification | null {
+  // The destination outranks everything, including "already asked": we never
+  // search, and never ask a later question, while we do not know the city.
+  if (!context.destinationCity.trim()) {
+    return {
+      kind: "needs_destination",
+      question: "Where are you going?",
+      options: [],
+      placeholder: "e.g. Milan",
+    };
+  }
+
   if (context.alreadyAsked) return null;
 
   if (context.unresolvedHotel) {
@@ -149,6 +166,7 @@ export function clarify(sentence: string, context: ClarifyContext): Clarificatio
 export function applyAnswer(sentence: string, kind: ClarifyKind, answer: string): string {
   const clean = answer.trim();
   if (!clean) return sentence;
+  if (kind === "needs_destination") return `${sentence} to ${clean}`.trim();
   if (kind === "child_ages") return `${sentence} (children aged ${clean})`;
   if (kind === "which_airport") return `${sentence} from ${clean}`;
   if (kind === "hotel_unmatched") return `${sentence} — ${clean}`;

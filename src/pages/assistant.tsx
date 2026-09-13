@@ -8,6 +8,7 @@ import { AirportAnswer, DateAnswer } from "@/components/trip/answer-controls";
 import { rangeSentence } from "@/lib/trip/answers";
 import { ASSISTANT_PREFILL_KEY } from "@/lib/trips/prefill";
 import { parseTripSentence } from "@/lib/trip/parse";
+import { replyFor, ruleIntent } from "@/lib/trip/intent";
 import { track } from "@/lib/track";
 import { Plane, BedDouble, CarFront, Sparkles, ChevronRight, Send, X } from "lucide-react";
 import { SiteNav } from "@/components/site-nav";
@@ -65,6 +66,8 @@ export function AssistantPage() {
   const [answer, setAnswer] = useState("");
   /** What we assumed when we searched without asking, shown on the card. */
   const [assumption, setAssumption] = useState<string | null>(null);
+  /** A plain answer — a greeting, a question about Adair — instead of a search. */
+  const [reply, setReply] = useState<string | null>(null);
 
   // Airport choices are remembered locally, so the same question is not asked
   // twice for a city they have already answered for.
@@ -93,7 +96,50 @@ export function AssistantPage() {
       const code = /\(([A-Z]{3})\)/.exec(given)?.[1];
       if (code) rememberAirport(code);
     }
-    runSearch(applyAnswer(input.trim(), question.kind, given));
+    handleSentence(applyAnswer(asked ?? input.trim(), question.kind, given), {
+      skipIntent: true,
+    });
+  };
+
+  /**
+   * One entry point for everything typed or tapped. The destination comes
+   * first: with no city we ask for it and never search.
+   */
+  const handleSentence = (raw: string, options: { skipIntent?: boolean } = {}) => {
+    const sentence = raw.trim();
+    if (!sentence) return;
+
+    if (!options.skipIntent) {
+      const kind = ruleIntent(sentence, Boolean(search.data));
+      if (kind !== "trip" && kind !== "amendment") {
+        setQuestion(null);
+        setAsked(sentence);
+        search.reset();
+        setReply(replyFor(kind, t.assistant.intent) ?? t.assistant.intent.unclear);
+        return;
+      }
+    }
+    setReply(null);
+
+    const parsed = parseTripSentence(sentence);
+    // Ages change both the fare and the room, so they come right after the
+    // city; then the general ambiguities. Only ever one question at a time.
+    const ages = parsed ? ageQuestion(familyFromSentence(sentence)) : null;
+    const ask: Clarification | null = ages
+      ? { kind: "child_ages", question: ages, options: [], placeholder: "4 and 7" }
+      : clarify(sentence, {
+          destinationCity: parsed?.destinationCity ?? "",
+          knownAirports: knownAirports(),
+        });
+    if (ask) {
+      setQuestion(ask);
+      setAnswer("");
+      setAsked(sentence);
+      search.reset();
+      void track("clarify_asked", { kind: ask.kind });
+      return;
+    }
+    runSearch(sentence);
   };
 
   const runSearch = (sentence: string) => {
@@ -127,9 +173,21 @@ export function AssistantPage() {
 
   const search = useMutation({
     mutationFn: (message: string) => compose({ data: { message, locale } }),
+    onSuccess: (result) => {
+      if ("needsDestination" in result) {
+        setReply(t.assistant.intent.needsDestination);
+        setQuestion({
+          kind: "needs_destination",
+          question: t.assistant.intent.needsDestination,
+          options: [],
+          placeholder: "e.g. Milan",
+        });
+      }
+    },
   });
 
-  const raw = search.data;
+  const data = search.data;
+  const raw = data && "offers" in data ? data : undefined;
   const offers = (raw?.offers ?? [])
     .filter((o) => !removed.includes(o.kind))
     .map((o) => {
@@ -186,25 +244,7 @@ export function AssistantPage() {
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            const sentence = input.trim();
-            if (!sentence) return;
-            // Ages change both the fare and the room, so they come first; then
-            // the general ambiguities. Only ever one question per sentence.
-            const ages = ageQuestion(familyFromSentence(sentence));
-            const ask: Clarification | null = ages
-              ? { kind: "child_ages", question: ages, options: [], placeholder: "4 and 7" }
-              : clarify(sentence, {
-                  destinationCity: parseTripSentence(sentence)?.destinationCity ?? "",
-                  knownAirports: knownAirports(),
-                });
-            if (ask) {
-              setQuestion(ask);
-              setAnswer("");
-              setAsked(sentence);
-              void track("clarify_asked", { kind: ask.kind });
-              return;
-            }
-            runSearch(sentence);
+            handleSentence(input);
           }}
           className="hairline-card mt-8 flex items-end gap-3 p-4"
         >
@@ -273,6 +313,16 @@ export function AssistantPage() {
               </div>
             )}
 
+            {question.kind === "needs_destination" && (
+              <div className="mt-3">
+                <AirportAnswer
+                  value={null}
+                  copy={t.assistant.strip.controls}
+                  onChange={(iata) => answerQuestion(iata)}
+                />
+              </div>
+            )}
+
             {question.kind === "which_airport" && (
               <div className="mt-3">
                 <AirportAnswer
@@ -309,6 +359,15 @@ export function AssistantPage() {
             <div className="max-w-md rounded-xl rounded-br-sm border border-border bg-card px-5 py-4">
               <p className="text-sm leading-relaxed">{asked}</p>
             </div>
+          </div>
+        )}
+
+        {reply && !question && (
+          <div className="mt-6 flex gap-3">
+            <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
+              <Sparkles className="size-4" />
+            </div>
+            <p className="pt-1.5 text-sm leading-relaxed">{reply}</p>
           </div>
         )}
 

@@ -287,3 +287,12 @@
 - Same controls behind the understanding-strip chips, so anything can still be changed before searching.
 - Fits 390 px with no horizontal scrolling (checked in the browser); the month grid loads on demand.
 - Tests: weekend shortcuts including the Saturday case, sentence folding, calendar bounds, past-date rule and airport search (339 tests pass). All 14 locales regenerated.
+
+## Destination first, no invented city — done
+
+- Question order is fixed: destination, then dates, then the arrival time for a business trip or a mentioned meeting, then anything else. `clarify` (`src/lib/trip/clarify.ts`) returns `needs_destination` before every other question, and `chatQuestions` (`src/lib/trip/questions.ts`) returns the destination question alone while the city is unknown, ranking the rest destination → dates → arrival time → child ages → travellers → airport.
+- The Milan default is gone: `src/lib/travel.functions.ts` no longer defaults a city or dates. The rule parser reads the sentence first; with no destination `composeTrip` returns `needsDestination` and never searches. The AI reading must include a city and dates or the rule reading is used.
+- `/api/trip/parse` and `runLiveSearch` already refused a sentence without a destination; the only remaining Milan is the marketing example copy, the signed-out demo card and the admin supplier probe.
+- Greetings ("hey", "cześć", "hello") get one line — "Hi. Where are you going?" — and nothing else is asked. Same copy in all 14 locales.
+- The assistant page now classifies intent before searching (`src/pages/assistant.tsx`), asks one question at a time, and re-checks the sentence after each answer instead of searching blind.
+- Tests (`src/lib/trip/order.test.ts`): greeting produces no search, a date with no city asks for the destination, no code path parses a trip without a destination (345 tests pass).

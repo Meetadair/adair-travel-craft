@@ -163,7 +163,7 @@
     "removedNote": "Aus dieser Reise entfernt",
     "restoreAll": "Alles wieder hinzufügen",
     "intent": {
-      "greeting": "Guten Tag. Sagen Sie mir, wann und wo Sie sein müssen, und ich plane Ihre Reise.",
+      "greeting": "Hallo. Wohin soll die Reise gehen?",
       "product": "Ich plane vollständige Reisen aus einem Satz — Flug, Hotel, Mietwagen, Transfers — buchbar in einem Schritt. Nennen Sie mir Ihre Reisepläne.",
       "booking": "Ihre Buchungen finden Sie unter Meine Reisen, inklusive Rechnungen und Änderungen.",
       "unclear": "Darin konnte ich keine Reisedaten erkennen. Versuchen Sie es so: Mailand von Dienstag bis Donnerstag.",
@@ -203,6 +203,7 @@
       }
     },
     "questions": {
+      "destination": "Wohin soll die Reise gehen?",
       "dates": "Welche Reisedaten?",
       "arrivalTime": "Um wie viel Uhr müssen Sie vor Ort sein?",
       "whichAirport": "{city} verfügt über mehrere Flughäfen. Welcher soll es sein?",

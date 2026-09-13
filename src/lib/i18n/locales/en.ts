@@ -162,7 +162,7 @@ export const en = {
 
     // What Adair understood, shown before anything is searched.
     intent: {
-      greeting: "Hello. Tell me where you need to be and when, and I will put the trip together.",
+      greeting: "Hi. Where are you going?",
       product:
         "I plan whole trips from one sentence — flight, hotel, car, transfers — and book them in one step. Ask me for a trip and you will see it.",
       booking: "Your bookings are under My trips, with invoices and changes there.",
@@ -205,6 +205,7 @@ export const en = {
 
     // The one or two things Adair asks before searching.
     questions: {
+      destination: "Where are you going?",
       dates: "Which dates?",
       arrivalTime: "What time do you need to be there?",
       whichAirport: "{city} has more than one airport. Which one?",

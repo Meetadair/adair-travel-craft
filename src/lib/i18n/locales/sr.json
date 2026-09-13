@@ -163,7 +163,7 @@
     "removedNote": "Uklonjeno iz ovog putovanja",
     "restoreAll": "Vratite sve nazad",
     "intent": {
-      "greeting": "Zdravo. Recite mi gde i kada treba da budete, i ja ću sastaviti putovanje.",
+      "greeting": "Zdravo. Gde putujete?",
       "product": "Planiram cela putovanja iz jedne rečenice — let, hotel, automobil, transfere — i rezervišem ih u jednom koraku. Zatražite putovanje i videćete ga.",
       "booking": "Vaše rezervacije su u Moja putovanja, zajedno sa računima i izmenama.",
       "unclear": "Nisam prepoznao putovanje u tome. Pokušajte nešto poput: Milano od utorka do četvrtka.",
@@ -203,6 +203,7 @@
       }
     },
     "questions": {
+      "destination": "Gde putujete?",
       "dates": "Koji datumi?",
       "arrivalTime": "U koje vreme treba da budete tamo?",
       "whichAirport": "{city} ima više aerodroma. Koji birate?",

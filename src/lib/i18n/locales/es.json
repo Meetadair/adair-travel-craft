@@ -163,7 +163,7 @@
     "removedNote": "Eliminado de este viaje",
     "restoreAll": "Restablecer todo",
     "intent": {
-      "greeting": "Hola. Dime dónde y cuándo tienes que estar y yo organizo el viaje.",
+      "greeting": "Hola. ¿Adónde vas?",
       "product": "Planifico viajes completos a partir de una sola frase — vuelo, hotel, coche, traslados — y los reservo en un solo paso. Pídeme un viaje y lo verás.",
       "booking": "Tus reservas están en Mis viajes, junto con las facturas y los cambios.",
       "unclear": "No he detectado ningún viaje en tu mensaje. Prueba con algo como: Milán de martes a jueves.",
@@ -203,6 +203,7 @@
       }
     },
     "questions": {
+      "destination": "¿Adónde vas?",
       "dates": "¿Qué fechas?",
       "arrivalTime": "¿A qué hora necesitas llegar?",
       "whichAirport": "{city} tiene más de un aeropuerto. ¿Cuál prefieres?",
