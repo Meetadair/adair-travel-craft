@@ -8,6 +8,7 @@ import { ageQuestion, familyFromSentence } from "./family";
 import type { TripRequest } from "./types";
 
 export type ChatQuestionKind =
+  | "destination"
   | "dates"
   | "arrival_time"
   | "child_ages"
@@ -19,7 +20,7 @@ export type ChatQuestion = {
   /** One short question, in the chat. */
   question: string;
   /** The control shown under it. */
-  control: "calendar" | "time" | "ages" | "options" | "travellers";
+  control: "calendar" | "time" | "ages" | "options" | "travellers" | "destination";
   /** Buttons, for the options control. */
   options: { label: string; value: string }[];
   /** Essential questions block the search; the others only add an assumption. */
@@ -27,12 +28,14 @@ export type ChatQuestion = {
 };
 
 export type QuestionCopy = {
+  destination: string;
   dates: string;
   arrivalTime: string;
   whichAirport: string;
 };
 
 export const QUESTION_COPY: QuestionCopy = {
+  destination: "Where are you going?",
   dates: "Which dates?",
   arrivalTime: "What time do you need to be there?",
   whichAirport: "{city} has more than one airport. Which one?",
@@ -71,6 +74,19 @@ export function chatQuestions(
   const copy = context.copy ?? QUESTION_COPY;
   const answered = context.answered ?? [];
   const out: ChatQuestion[] = [];
+
+  // Without a destination there is no trip: it is the only question we ask.
+  if (!request.destinationCity?.trim()) {
+    return [
+      {
+        kind: "destination",
+        question: copy.destination,
+        control: "destination",
+        options: [],
+        essential: true,
+      },
+    ];
+  }
 
   const ages = ageQuestion(familyFromSentence(sentence));
   if (ages && !answered.includes("child_ages")) {
@@ -114,7 +130,20 @@ export function chatQuestions(
     });
   }
 
-  return out.sort((a, b) => Number(b.essential) - Number(a.essential)).slice(0, 2);
+  // Destination, then dates, then the arrival time, then anything else.
+  const rank: Record<ChatQuestionKind, number> = {
+    destination: 0,
+    dates: 1,
+    arrival_time: 2,
+    child_ages: 3,
+    travellers: 4,
+    which_airport: 5,
+  };
+  return out
+    .sort(
+      (a, b) => Number(b.essential) - Number(a.essential) || rank[a.kind] - rank[b.kind],
+    )
+    .slice(0, 2);
 }
 
 /** True when nothing essential is missing, so the search may run. */
