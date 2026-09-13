@@ -1,71 +1,71 @@
 {
   "nav": {
     "assistant": "アシスタント",
-    "trips": "マイ・トリップ",
-    "business": "法人向け",
-    "investors": "投資家向け",
+    "trips": "マイトリップ",
+    "business": "法人のお客様",
+    "investors": "投資家情報",
     "account": "マイアカウント",
     "signIn": "ログイン",
     "language": "言語"
   },
   "home": {
     "meta": {
-      "title": "Adair Travel — 一言で。旅のすべてを。",
-      "description": "フライト、ホテル、車、ディナーまで — たった一言で手配完了。",
-      "ogTitle": "Adair Travel — 一言で。旅のすべてを。",
-      "ogDescription": "フライト、ホテル、車、ディナーまで — たった一言で手配完了。"
+      "title": "Adair Travel — ひとことで、旅のすべてを。",
+      "description": "フライト、ホテル、車、ディナーまで — ひとことで予約完了。",
+      "ogTitle": "Adair Travel — ひとことで、旅のすべてを。",
+      "ogDescription": "フライト、ホテル、車、ディナーまで — ひとことで予約完了。"
     },
     "hero": {
-      "titleLine1": "一言で。",
+      "titleLine1": "ひとことで、",
       "titleLine2": "旅のすべてを。",
-      "lead": "フライト、ホテル、車、ディナーまで — たった一言で手配完了。",
-      "ctaPrimary": "使い方を見る",
-      "inputLabel": "あなたの旅を一言でお聞かせください",
-      "inputPlaceholder": "例：金曜から日曜までローマ、テラス付きのホテル、請求書は会社宛て",
-      "inputSubmit": "プランを見る"
+      "lead": "フライト、ホテル、車、ディナーまで — ひとことで予約完了。",
+      "ctaPrimary": "仕組みを見る",
+      "inputLabel": "旅の予定をひとことで教えてください",
+      "inputPlaceholder": "例：金曜から日曜までローマ、テラス付きホテル、領収書は会社宛て",
+      "inputSubmit": "旅程を作成"
     },
     "demo": {
-      "label": "会話デモ",
+      "label": "対話デモ",
       "title": "メッセージひとつで、すべて整います。",
-      "userMessage": "木曜の朝にミラノに入って金曜の夜に戻りたい。Duomoの近くで、現地での車も頼むよ。",
+      "userMessage": "木曜の朝にミラノに入り、金曜の夜に戻りたい。Duomoの近くで、現地の手配車も頼む。",
       "you": "あなた",
-      "cardTitle": "Milan · Thu – Fri",
+      "cardTitle": "ミラノ · Thu – Fri",
       "cardSubtitle": "あなたの旅の好みに合わせて作成",
-      "flightTitle": "LOT 391 · Warsaw → Milan",
-      "flightDetail": "Thu 6:55 – 9:05 AM · returns Fri 7:40 PM · 窓側席、お気に入りの航空会社",
+      "flightTitle": "LOT 391 · ワルシャワ → ミラノ",
+      "flightDetail": "Thu 6:55 – 9:05 AM · 復路 Fri 7:40 PM · 窓側席、お好みの航空会社",
       "flightTagClass": "Premium Economy",
       "hotelTitle": "Park Hyatt Milano",
       "hotelDetail": "1 night · キングベッド、静かなフロア · Duomoから200 m",
-      "hotelTag": "提携特別レート",
-      "carTitle": "BMW 3 Series · pickup at Linate",
-      "carDetail": "Thu 9:30 AM – Fri 6:30 PM · フル保険、デポジットなし",
-      "carTag": "オートマ",
+      "hotelTag": "特別提携レート",
+      "carTitle": "BMW 3 Series · Linate空港受取",
+      "carDetail": "Thu 9:30 AM – Fri 6:30 PM · 免責補償込み、デポジットなし",
+      "carTag": "オートマチック",
       "total": "合計（一括予約）",
-      "bookAll": "すべて予約する",
-      "footnote": "3件の手配 · 1回のお支払い · 予約番号は1つ",
-      "typing": "Adairが旅を組み立てています…",
-      "saved": "ご自身で手配するより€96、2 h 40 min節約できました",
-      "savedNote": "各種サイトで個別に手配した場合の平均価格と所要時間との比較",
-      "invoiceLine": "請求書 → 勤務先宛て",
-      "share": "この旅のカードを共有",
+      "bookAll": "まとめて予約",
+      "footnote": "3項目 · 1回の決済 · 1つの予約番号",
+      "typing": "Adairが旅程を作成しています…",
+      "saved": "ご自身で予約する場合と比べ、€96と2 h 40 minを節約",
+      "savedNote": "各予約サイトで個別に手配した場合の平均料金および所要時間との比較",
+      "invoiceLine": "請求書 → 会社宛て",
+      "share": "この旅程カードを共有",
       "shareCopied": "コピーしました",
-      "testMode": "テストモード — サンプル航空データ",
-      "bookTooltip": "正式リリース時に予約受付を開始します",
+      "testMode": "テストモード — サンプル航空会社データ",
+      "bookTooltip": "予約機能はローンチ時に公開されます",
       "remove": "この項目を削除",
-      "removedNote": "この旅から削除されました",
+      "removedNote": "この旅程から削除されました",
       "restoreAll": "すべて元に戻す",
       "approx": "約",
-      "searchFailed": "リアルタイムの空き状況を取得できませんでした — サンプルプランを表示しています。",
-      "savedLive": "ご自身で手配するより約{amount}、2 h 40 min節約できました",
+      "searchFailed": "最新の空き状況を取得できませんでした。代わりにサンプル旅程を表示しています。",
+      "savedLive": "ご自身で手配する場合と比べ、約{amount}と2 h 40 minを節約",
       "savedEstimate": "概算",
       "nightsOne": "1 night",
       "nightsMany": "{count} nights",
       "cardTitleTpl": "{city} · {day1} – {day2}",
-      "flightTitleTpl": "LOT 391 · Warsaw → {city}",
-      "flightDetailTpl": "{day1} 6:55 – 9:05 AM · returns {day2} 7:40 PM · 窓側席、お気に入りの航空会社",
-      "hotelDetailTpl": "1 night · キングベッド、静かなフロア · 旧市街の中心部",
-      "carTitleTpl": "BMW 3 Series · pickup at {code}",
-      "carDetailTpl": "{day1} 9:30 AM – {day2} 6:30 PM · フル保険、デポジットなし",
+      "flightTitleTpl": "LOT 391 · ワルシャワ → {city}",
+      "flightDetailTpl": "{day1} 6:55 – 9:05 AM · 復路 {day2} 7:40 PM · 窓側席、お好みの航空会社",
+      "hotelDetailTpl": "1 night · キングベッド、静かなフロア · 旧市街エリア",
+      "carTitleTpl": "BMW 3 Series · {code}受取",
+      "carDetailTpl": "{day1} 9:30 AM – {day2} 6:30 PM · 免責補償込み、デポジットなし",
       "weekdays": [
         "月曜日",
         "火曜日",
@@ -86,92 +86,92 @@
       ]
     },
     "campaign": {
-      "earlyAccess": "アーリーアクセスに登録",
+      "earlyAccess": "先行アクセスに登録",
       "emailLabel": "メールアドレス",
       "emailPlaceholder": "you@company.com",
       "join": "登録する",
       "joining": "少々お待ちください…",
-      "success": "登録が完了しました。リンクをシェアすると、あなたに€40、予約したご友人にも€20のトラベルクレジットを進呈します。",
+      "success": "登録が完了しました。招待リンクを共有すると、あなたに€40、予約したご友人に€20の旅行クレジットを進呈します。",
       "referralLabel": "あなたの招待リンク",
       "copy": "リンクをコピー",
       "copied": "コピーしました",
-      "error": "送信できませんでした。もう一度お試しください。",
+      "error": "処理を完了できませんでした。もう一度お試しください。",
       "teamsLabel": "チーム向け",
       "teamsTitle": "Adair for Teams",
-      "teamsLine": "チーム全体の出張規程、請求書、すべてを一元管理。リリース後に提供開始予定。",
-      "teamsCta": "Teamsのウェイティングリストに参加",
-      "teamsMore": "法人向けプランを見る"
+      "teamsLine": "出張規程、請求書、すべてを一か所に。ローンチ後に提供予定。",
+      "teamsCta": "Teamsのウェイトリストに登録",
+      "teamsMore": "法人向けプランの詳細を見る"
     },
-    "demoLine": "5つのアプリ、5つの確認メール、5箇所の確認 — または、これひとつ。",
+    "demoLine": "5つのアプリ、5通の確認メール、5箇所の確認作業 — それとも、これひとつ。",
     "after": {
       "items": [
         {
-          "title": "すべてをひとつの場所に",
-          "text": "予約確認も、バウチャーも、変更手続きも「マイ・トリップ」で。"
+          "title": "すべてを一元管理",
+          "text": "予約確認書、バウチャー、変更手続きも「マイトリップ」に集約。"
         },
         {
-          "title": "使えば使うほど、あなた好みに",
-          "text": "好みの設定は一度だけ。次からの旅すべてに自動で反映されます。"
+          "title": "好みを記憶",
+          "text": "一度設定すれば、次回以降のすべての旅程に自動で反映。"
         },
         {
-          "title": "いつでも頼れるサポート",
-          "text": "あなたの予約内容を把握したスタッフが対応します。"
+          "title": "確かなサポート",
+          "text": "手配内容を把握したスタッフがいつでも対応します。"
         }
       ]
     },
     "close": {
-      "title": "Adair、10月にリリース。",
+      "title": "Adairは10月にローンチします。",
       "line": "先着100アカウント限定で、Signatureプランを3ヶ月無料提供。",
-      "teams": "Adair for Teams — 規程も請求書もひとつに。",
+      "teams": "Adair for Teams — 一元化された規定と請求。",
       "teamsLink": "リストに登録"
     },
     "footer": "Adair Kft. · Budapest"
   },
   "assistant": {
     "meta": {
-      "title": "Adair Assistant — 会話ひとつで旅のすべてを組み立てる",
-      "description": "行き先と日程を伝えるだけ。Adairがフライト、ホテル、車の実在するプランを検索し、1枚のカードにまとめます。",
+      "title": "Adair Assistant — ひとつの会話で、旅のすべてを組み立てる",
+      "description": "いつ、どこへ行くかをお知らせください。Adairがフライト、ホテル、レンタカーの実在庫を検索し、1枚のカードにまとめます。",
       "ogTitle": "Adair Assistant — 会話ひとつで旅のすべてを",
-      "ogDescription": "フライト、ホテル、車の最適な組み合わせを、1枚の予約可能なカードに。"
+      "ogDescription": "フライト、ホテル、レンタカーの実プランを、そのまま予約できる1枚のカードに。"
     },
-    "title": "行き先をお聞かせください。",
-    "lead": "Adairは自然な言葉を理解し、各社の空き状況を確認して、フライト、ホテル、車を1枚の予約可能なカードにまとめます。",
-    "placeholder": "例：木曜の朝にミラノに入って金曜の夜に戻りたい…",
-    "submitIdle": "旅を作成",
+    "title": "行き先と日程をお聞かせください。",
+    "lead": "Adairは自然な言葉を理解し、各社の空き状況を確認した上で、フライト・ホテル・車を一括予約できるカードにまとめます。",
+    "placeholder": "例：木曜の朝にミラノに入り、金曜の夜に戻りたい…",
+    "submitIdle": "旅程を作成",
     "submitBusy": "検索中…",
     "examples": [
-      "木曜の朝にミラノに入って金曜の夜に戻りたい。Duomoの近くで、車も手配してほしい。",
-      "10月12–14日のバルセロナのカンファレンス。プレミアムエコノミー、会場近くのホテル希望。",
-      "月曜にロンドンへ行って水曜に戻る。車は不要。"
+      "木曜の朝にミラノへ、金曜の夜に戻る。Duomo近くの宿と送迎車の手配を希望。",
+      "10月12–14日のバルセロナのカンファレンス、プレミアムエコノミー、会場近くのホテルで。",
+      "月曜からロンドンへ、水曜戻り。レンタカーは不要。"
     ],
-    "error": "旅を作成できませんでした。もう一度お試しいただくか、具体的な日付をご指定ください。",
-    "sourceLive": "各社APIからのリアルタイム価格",
-    "sourcePartial": "一部各社APIからの価格",
+    "error": "旅程を作成できませんでした。もう一度お試しいただくか、具体的な日程をご指定ください。",
+    "sourceLive": "提携APIからのリアルタイム料金",
+    "sourcePartial": "一部提携APIからのデータ",
     "sourceDemo": "サンプルデータ",
     "hideAlternatives": "他の候補を非表示",
     "showAlternatives": "他の候補を表示",
     "backToRecommendation": "Adairのおすすめに戻る",
     "total": "合計（一括予約）",
-    "saveIdle": "旅を保存",
+    "saveIdle": "旅程を保存",
     "saveBusy": "保存中…",
-    "savedAs": "保存名",
+    "savedAs": "保存名：",
     "openDashboard": "ダッシュボードを開く",
     "galleryPrev": "前の写真",
     "galleryNext": "次の写真",
     "galleryGoTo": "写真へ移動",
     "remove": "この項目を削除",
-    "removedNote": "この旅から削除されました",
+    "removedNote": "この旅程から削除されました",
     "restoreAll": "すべて元に戻す",
     "intent": {
-      "greeting": "こんにちは。行き先と日程をお知らせいただければ、最適な旅をおまとめします。",
-      "product": "一言のメッセージからフライト、ホテル、車、送迎まで旅全体を計画し、ワンステップで予約します。ご希望の旅をお聞かせください。",
-      "booking": "予約内容は「マイ・トリップ」でご確認いただけます。請求書の発行や予約変更もこちらで行えます。",
-      "unclear": "旅程を把握できませんでした。「火曜から木曜までミラノ」のようにお伝えください。",
-      "needsDestination": "どちらへ行かれますか？",
+      "greeting": "こんにちは。行き先と日程をお知らせいただければ、最適な旅程をご用意いたします。",
+      "product": "メッセージひとつでフライト、ホテル、車、送迎をまとめ、ワンクリックで予約できます。ご希望をお聞かせください。",
+      "booking": "予約内容の確認、領収書の発行、旅程の変更は「マイトリップ」から行えます。",
+      "unclear": "旅程の詳細を読み取れませんでした。例：「火曜から木曜までミラノ」のようにお知らせください。",
+      "needsDestination": "行き先はどちらですか？",
       "amending": "旅程を調整しています。"
     },
     "strip": {
-      "heading": "以下の内容で承りました。",
+      "heading": "こちらのご希望を伺いました。",
       "from": "出発地",
       "to": "目的地",
       "depart": "往路",
@@ -182,198 +182,227 @@
       "travellerMany": "{count}名",
       "wishes": "ご要望",
       "edit": "{field}を変更",
-      "find": "検索する",
+      "find": "再検索",
       "searching": "検索中…",
       "done": "完了",
       "airportSearch": "空港を検索",
-      "travellersLabel": "ご利用人数"
+      "travellersLabel": "ご利用人数",
+      "controls": {
+        "thisWeekend": "今週末",
+        "nextWeekend": "来週末",
+        "tomorrow": "明日",
+        "outbound": "往路",
+        "returnDay": "復路",
+        "oneWay": "片道",
+        "airportSearch": "空港を検索",
+        "airportEmpty": "該当する空港が見つかりません。",
+        "timeLabel": "または時間指定",
+        "travellersLabel": "ご利用人数",
+        "companionsHint": "同行者",
+        "done": "完了"
+      }
     },
     "questions": {
-      "dates": "日程を教えてください。",
-      "arrivalTime": "何時までに到着する必要がありますか？",
-      "whichAirport": "{city}には複数の空港があります。どちらをご希望ですか？",
+      "dates": "日程はいつですか？",
+      "arrivalTime": "何時頃のご到着をご希望ですか？",
+      "whichAirport": "{city}には複数の空港があります。どちらをご利用になりますか？",
+      "travellers": "ご利用人数をお知らせください。",
       "skip": "スキップ",
-      "done": "完了"
+      "done": "完了",
+      "controls": {
+        "thisWeekend": "今週末",
+        "nextWeekend": "来週末",
+        "tomorrow": "明日",
+        "outbound": "往路",
+        "returnDay": "復路",
+        "oneWay": "片道",
+        "airportSearch": "空港を検索",
+        "airportEmpty": "該当する空港が見つかりません。",
+        "timeLabel": "または時間指定",
+        "travellersLabel": "ご利用人数",
+        "companionsHint": "同行者",
+        "done": "完了"
+      }
     },
     "advice": {
-      "tightFlight": "この便は{meeting}のご予定に対して{land}着となります — 少々タイトです。{alt}なら{extra}の追加で{spare}余裕ができます。",
-      "tightFlightNoOption": "この便は{meeting}のご予定に対して{land}着となります — 少々タイトかもしれません。",
+      "tightFlight": "この便の到着時刻は{land}で、{meeting}の予定には余裕がありません。{extra}の追加で、{spare}の余裕ができる{alt}に変更できます。",
+      "tightFlightNoOption": "この便の到着時刻は{land}です。{meeting}の予定に対して少々タイトです。",
       "tightFlightAction": "早い便に変更する",
-      "peak": "価格が通常の{ratio}倍になっています{event}。",
-      "peakEvent": " — {event}期間中",
-      "peakSaving": " 日程を{days}日ずらすと{saving}抑えられます。",
-      "peakAction": "お得な日程を見る",
-      "transfer": "ホテルは空港から{minutes}分で駐車場がありません — レンタカーより送迎の手配がスムーズです。",
-      "transferCheaper": "ホテルは空港から{minutes}分で駐車場がありません — 送迎のほうがレンタカーより{saving}お得です。",
+      "peak": "通常より料金が{ratio}倍に上昇しています{event}。",
+      "peakEvent": "（{event}のため）",
+      "peakSaving": "日程を{days}日ずらすと{saving}お得になります。",
+      "peakAction": "より手頃な日程を表示",
+      "transfer": "ホテルは空港から{minutes}分で駐車場がありません。レンタカーより送迎手配がスムーズです。",
+      "transferCheaper": "ホテルは空港から{minutes}分で駐車場がありません。送迎への変更で{saving}安くなります。",
       "transferAction": "レンタカーを送迎に変更",
-      "breakfast": "このプランに朝食は含まれていません。朝食付きは{amount}追加となります。",
+      "breakfast": "このプランに朝食は含まれていません。朝食付きプランは+{amount}です。",
       "breakfastAction": "朝食を追加"
     },
     "nudge": {
-      "connectCalendar": "カレンダーと連携すれば、次回から予定を自動で読み取れます — 連携は約3分で完了します。",
+      "connectCalendar": "カレンダーを連携すると、次回から予定を自動で読み取ります（所要時間：約3分）。",
       "connectCalendarAction": "カレンダーを連携",
-      "addLoyalty": "この便でマイルが貯まります — 設定からマイレージ番号をご登録ください。",
-      "addLoyaltyAction": "番号を追加",
-      "saveCompany": "会社情報を一度保存しておけば、次回から請求書を自動発行します。",
+      "addLoyalty": "このフライトでマイルが貯まります。設定からマイレージ番号をご登録ください。",
+      "addLoyaltyAction": "番号を登録",
+      "saveCompany": "会社情報を保存すると、請求書が自動で会社名義になります。",
       "saveCompanyAction": "会社情報を保存",
       "dismiss": "今はしない"
     },
     "memory": {
-      "sameAgain": "前回の{city}滞在では{hotel}をご利用でした — 今回も同じホテルにしますか？",
-      "sameAgainYes": "前回と同じにする",
-      "sameAgainOther": "他の候補を見る",
-      "full": "その日程は{hotel}が満室です — 最も雰囲気が近いのは{nearest}です。",
-      "nothingClose": "その日程は{hotel}が満室のため、別の選択肢をご用意しました。",
-      "asUsual": "{items} — いつもの設定です。",
-      "deviation": "その日はこの路線に{expected}の運航がありません — {reason}のため、今回は{actual}をご案内しています。",
-      "askPattern": "{habit} — 今後もご希望として設定しておきますか？",
-      "askYes": "はい、好みに登録する",
-      "askNo": "いいえ、設定しない"
+      "sameAgain": "前回の{city}滞在では{hotel}をご利用でした。今回も同じホテルにしますか？",
+      "sameAgainYes": "同じホテルにする",
+      "sameAgainOther": "別の候補を見る",
+      "full": "{hotel}は該当日に満室です。雰囲気が最も近い{nearest}をご用意しました。",
+      "nothingClose": "{hotel}は該当日に満室のため、別のホテルをご提案します。",
+      "asUsual": "{items} — いつもの設定で手配しました。",
+      "deviation": "該当日この路線に{expected}の運航がありません。{reason}のため、{actual}をご用意しました。",
+      "askPattern": "{habit} — 今後もこちらを優先しますか？",
+      "askYes": "はい、優先設定にする",
+      "askNo": "いいえ、今回だけにします"
     },
     "closing": {
-      "invoiceChoose": "請求書の宛先を選択してください",
-      "invoiceNone": "請求書なし",
-      "invoiceName": "請求書の宛名を入力してください",
+      "invoiceChoose": "請求書の宛名を選択してください",
+      "invoiceNone": "請求書不要",
+      "invoiceName": "請求書の宛先となる会社名を入力してください",
       "companyPlaceholder": "会社名",
       "save": "保存",
-      "detailsOnce": "航空券手配のため、ご搭乗者情報を一度だけ入力してください。",
-      "firstName": "名",
-      "lastName": "姓",
+      "detailsOnce": "発券に必要な情報を一度だけご入力ください。",
+      "firstName": "名（名義）",
+      "lastName": "姓（名義）",
       "email": "メールアドレス",
       "phone": "電話番号",
       "bornOn": "生年月日",
-      "saveForNextTime": "次回のために保存する",
-      "whichCard": "どのカードをご利用ですか？",
-      "anotherCard": "別のカード",
+      "saveForNextTime": "次回のために保存",
+      "whichCard": "使用するカード",
+      "anotherCard": "別のカードを使用",
       "bookIt": "予約を確定する",
       "changeSomething": "内容を変更する",
-      "opening": "安全なカード入力画面を開いています…",
+      "opening": "安全なカード決済フォームを開いています…",
       "moment": "少々お待ちください…",
-      "booked": "予約が完了しました。「マイ・トリップ」へ移動します — テストモードのため請求は発生していません。",
-      "testMode": "テストモード — 実際の請求や航空券の発券は行われません。",
-      "passport": "この路線にはパスポート情報が必要です。安全な専用画面で手続きを完了します。",
-      "continueSecure": "次へ進む",
-      "failed": "処理が完了しませんでした。請求は発生していません。安全な専用画面で完了できます。",
-      "finishSecure": "専用画面で完了する",
+      "booked": "予約が完了しました。「マイトリップ」へ移動します（テストモードのため請求は発生しません）。",
+      "testMode": "テストモード — 実際の請求および発券は行われません。",
+      "passport": "この路線にはパスポート情報が必要です。安全な専用ページで入力を完了します。",
+      "continueSecure": "次へ",
+      "failed": "処理を完了できませんでした。料金の請求は発生していません。安全な専用ページでお手続きを継続できます。",
+      "finishSecure": "専用ページで手続きを完了する",
       "companyFailed": "会社情報を保存できませんでした。もう一度お試しください。",
-      "detailsFailed": "入力情報が承認されませんでした。内容をご確認ください。"
+      "detailsFailed": "入力情報を受け付けられませんでした。内容をご確認ください。"
     }
   },
   "auth": {
     "meta": {
-      "title": "Adairアカウント — ログインまたは新規登録",
-      "description": "Adair Travelにログインして、旅の保存、好みの管理、PDF請求書のダウンロードをご利用ください。",
-      "ogTitle": "Adairアカウント — ログインまたは新規登録",
-      "ogDescription": "旅の予定、好み、請求書をひとつのダッシュボードで管理。"
+      "title": "Adairアカウント — ログイン・新規登録",
+      "description": "Adair Travelにログインして、旅程や好みの管理、PDF領収書のダウンロードをご利用ください。",
+      "ogTitle": "Adairアカウント — ログイン・新規登録",
+      "ogDescription": "旅程、プロファイル、請求書を一元管理。"
     },
     "signInTitle": "ログイン",
     "signUpTitle": "アカウント作成",
-    "lead": "旅の予定、好み、請求書をすべてひとつの場所に。",
+    "lead": "旅程、プロファイル、請求書をひとつの場所に。",
     "fullName": "氏名",
     "email": "メールアドレス",
     "password": "パスワード",
     "submitBusy": "少々お待ちください…",
     "signIn": "ログイン",
-    "signUp": "アカウント作成",
+    "signUp": "新規登録",
     "toSignUp": "アカウントをお持ちでない方",
     "toSignIn": "すでにアカウントをお持ちの方",
-    "confirmSent": "受信トレイをご確認ください — 確認リンクをお送りしました。",
-    "genericError": "エラーが発生しました",
+    "confirmSent": "メールをご確認ください。確認リンクをお送りしました。",
+    "genericError": "問題が発生しました",
     "demoHint": "まずはデモをご覧になりますか？",
     "demoLink": "アシスタントを開く"
   },
   "dashboard": {
     "meta": {
-      "title": "Adair クライアントダッシュボード — 旅行と請求書",
-      "description": "保存したAdairの旅、旅行の好み、ダウンロード可能なPDF請求書。",
-      "ogTitle": "Adair クライアントダッシュボード",
-      "ogDescription": "旅の予定、好み、請求書をひとつの場所に。"
+      "title": "Adairクライアントダッシュボード — 旅程と請求書",
+      "description": "保存したAdairの旅程、トラベルプロファイル、PDF請求書をダウンロードできます。",
+      "ogTitle": "Adairクライアントダッシュボード",
+      "ogDescription": "旅程、プロファイル、請求書を一元管理。"
     },
     "loadError": "ダッシュボードを読み込めませんでした。ページを再読み込みしてください。",
-    "title": "マイ・トリップ",
+    "title": "マイトリップ",
     "signOut": "ログアウト",
-    "loading": "旅行を読み込み中…",
-    "empty": "保存された旅行はまだありません。",
-    "emptyCta": "最初の旅を予約する",
-    "invoice": "請求書をダウンロード (PDF)",
-    "deleteTrip": "旅行を削除",
-    "profileTitle": "トラベルプロフィール",
-    "profileLead": "一度設定すれば、今後のすべての旅と請求書にこの好みが反映されます。",
+    "loading": "旅程を読み込み中…",
+    "empty": "保存された旅程はまだありません。",
+    "emptyCta": "最初の旅程を予約する",
+    "invoice": "請求書をダウンロード（PDF）",
+    "deleteTrip": "旅程を削除",
+    "profileTitle": "トラベルプロファイル",
+    "profileLead": "一度設定すれば、今後のすべての手配や請求書に好みが反映されます。",
     "fields": {
       "fullName": "氏名",
-      "company": "会社名（請求書の宛名）",
-      "taxId": "VAT番号",
-      "airlines": "優先する航空会社",
+      "company": "会社名（請求先）",
+      "taxId": "VAT登録番号",
+      "airlines": "優先航空会社",
       "cabin": "座席クラス",
-      "seat": "座席の好み",
-      "chains": "ホテルチェーン",
+      "seat": "希望座席",
+      "chains": "希望ホテルチェーン",
       "diet": "食事の配慮",
-      "budget": "1回あたりの予算",
+      "budget": "1回あたりの出張予算",
       "currency": "通貨"
     },
-    "saveIdle": "好みを保存",
+    "saveIdle": "設定を保存",
     "saveBusy": "保存中…",
     "saved": "保存しました。"
   },
   "investors": {
     "meta": {
-      "title": "投資家の皆様へ — Adair Travelのビジネスモデル、マージン、調達ラウンド",
-      "description": "Adair Travelはフライト、ホテル、車をひとつの予約に統合します。収益モデル、ホテル独自レートによるマージン、シードラウンドの概要。",
+      "title": "投資家の皆様へ — Adair Travelのビジネスモデル・収益性・調達情報",
+      "description": "Adair Travelはフライト、ホテル、レンタカーを一括手配します。独自の提携ホテルレートによる高収益モデルとシードラウンドの概要。",
       "ogTitle": "投資家の皆様へ — Adair Travel",
-      "ogDescription": "5つのアプリの代わりに、ひとつのアシスタントを。OTAの手数料ではなく、独自のホテル提携レートで高マージンを実現。"
+      "ogDescription": "5つのアプリから、ひとりのアシスタントへ。OTAの手数料ではなく、独自提携ホテルレートによる高マージン。"
     },
     "badge": "シードラウンド · 投資家向け資料",
-    "titleLine1": "これまでの出張手配には、5つのアプリが必要でした。",
-    "titleLine2": "これからは、たった一言で。",
-    "lead": "Adair Travelは、一言の依頼からフライト、ホテル、車を1枚のカードと1枚の請求書にまとめるアシスタントです。比較サイトの仲介手数料ではなく、独自に交渉したホテルレートで収益を得るため、顧客には低価格を、自社には高いマージンを実現します。",
+    "titleLine1": "現代の出張手配には5つのアプリが必要でした。",
+    "titleLine2": "Adairなら、ひとことで完了します。",
+    "lead": "Adair Travelは、1行のリクエストからフライト、ホテル、レンタカーを1枚のカードと1通の請求書にまとめるアシスタントです。比較サイトの手数料ではなく、独自に交渉したホテルレートから収益を得るため、顧客には安く、自社には高いマージンを実現します。",
     "metrics": [
       {
-        "label": "出張あたりの平均単価",
+        "label": "平均旅行単価",
         "value": "€1,240"
       },
       {
-        "label": "出張あたりの粗利率",
+        "label": "1件あたりの粗利益率",
         "value": "11–17%"
       },
       {
-        "label": "手配完了までの時間",
+        "label": "予約完了までの所要時間",
         "value": "< 40 s"
       },
       {
-        "label": "置き換えられるアプリ数",
+        "label": "削減されるアプリ数",
         "value": "5"
       }
     ],
-    "revenueTitle": "収益モデルの仕組み",
+    "revenueTitle": "収益の柱",
     "revenue": [
       {
-        "title": "提携特別レート",
-        "body": "当社独自の法人レートで客室を仕入れ、一般のOTA価格以下で提供。マージンは中間業者ではなく当社に残ります。",
+        "title": "特別提携レート",
+        "body": "法人向け特別レートで客室を仕入れ、OTAの一般価格以下で提供。仲介業者を挟まず、差益を自社で確保します。",
         "margin": "8–14%"
       },
       {
         "title": "航空会社手数料（NDC）",
-        "body": "NDC経由のフライト：流通手数料に加え、変更や払い戻しをワンストップで対応するサービス料。",
+        "body": "NDC規格による航空券流通手数料に加え、変更・払戻の一元対応サービス料を得ます。",
         "margin": "1–3%"
       },
       {
-        "title": "法人サブスクリプション",
-        "body": "トラベルプロフィール、経費規程、3通に分かれていた書類をまとめた1枚のVAT請求書機能をチームに提供。",
+        "title": "法人向けサブスクリプション",
+        "body": "出張ポリシー管理、精算規定、3枚の領収書をまとめた1通のVAT請求書機能をチーム向けに提供。",
         "margin": "€29 / user / mo."
       }
     ],
-    "unitTitle": "モデルケース — ユニットエコノミクス",
+    "unitTitle": "サンプル旅程 — ユニットエコノミクス",
     "colItem": "項目",
-    "colPrice": "販売価格",
-    "colMargin": "当社マージン",
+    "colPrice": "お客様提示価格",
+    "colMargin": "自社マージン",
     "unit": [
       {
-        "item": "フライト (LOT, NDC)",
+        "item": "フライト（LOT、NDC）",
         "price": "€312",
         "margin": "€6"
       },
       {
-        "item": "ホテル 1泊 (提携特別レート)",
+        "item": "ホテル 1泊（特別提携レート）",
         "price": "€742",
         "margin": "€96"
       },
@@ -384,136 +413,136 @@
       }
     ],
     "unitTotal": "合計（一括予約）",
-    "unitNote": "Warsaw–Milan路線、テスト提携先レートに基づく試算値。",
-    "askTitle": "資金調達の目的",
-    "askBody": "主要ビジネス都市10拠点でのホテル提携レートの拡充、ワンストップでの予約変更サポート機能の実装、20〜200名規模のチーム向け法人営業の展開に向けてシードラウンドを実施しています。",
+    "unitNote": "ワルシャワ–ミラノ線、テスト提携先レートに基づく試算値。",
+    "askTitle": "今回の調達について",
+    "askBody": "ビジネス主要10都市での提携ホテルレート拡充、予約変更の完全一元化対応、20〜200名規模の企業へのセールス展開のため、シードラウンドでの資金調達を実施しています。",
     "contact": "お問い合わせ",
     "seeProduct": "実際のプロダクトを見る"
   },
   "invoice": {
     "documentTitle": "INVOICE / TRIP CARD",
-    "seller": "SELLER",
-    "buyer": "BUYER",
-    "item": "ITEM",
-    "reference": "OFFER REFERENCE",
-    "net": "NET",
-    "netTotal": "Net total",
+    "seller": "請求元",
+    "buyer": "請求先",
+    "item": "項目",
+    "reference": "手配番号",
+    "net": "税抜金額",
+    "netTotal": "税抜合計",
     "vat": "VAT",
-    "totalDue": "Total due",
-    "issued": "issued",
-    "number": "No.",
-    "vatId": "VAT ID",
+    "totalDue": "請求合計金額",
+    "issued": "発行日",
+    "number": "番号",
+    "vatId": "VAT登録番号",
     "kindFlight": "フライト",
     "kindHotel": "ホテル",
-    "kindCar": "車",
-    "demoNote": "コンセプト文書 — 項目にはサンプルデータが含まれます",
-    "liveNote": "Adair APIを通じて取得した提携先プランの価格",
-    "paymentNote": "お支払い：法人カード一括決済 · 14日サイト",
-    "hotelNote": "ホテルは提携特別レートにて請求",
-    "tagline": "Adair Travel · One request. The whole trip. · adair.travel"
+    "kindCar": "レンタカー",
+    "demoNote": "サンプル書類 — サンプルデータが含まれています",
+    "liveNote": "Adair APIを通じて取得したプロバイダーの最新提示額",
+    "paymentNote": "お支払い方法：法人カード1回払い · 14日以内決済",
+    "hotelNote": "ホテル代金は特別提携レートにて請求",
+    "tagline": "Adair Travel · ひとつのリクエストで、旅のすべてを。 · adair.travel"
   },
   "business": {
     "meta": {
-      "title": "法人向け Adair — チームの出張、予算、アナリティクス",
-      "description": "チーム全体の出張をひとつの画面で。フライト、ホテル、車を手配し、予算内に収め、あらゆる出張を1枚の請求書とレポートにまとめるアシスタント。",
-      "ogTitle": "法人向け Adair — チーム出張をひとつの画面で",
-      "ogDescription": "チームのための予算管理、承認、出張分析。5つのアプリの代わりに、ひとつの会話を。"
+      "title": "法人向け Adair — チームの出張手配、予算管理、アナリティクス",
+      "description": "チーム全体のためのワンストップ管理：フライト・ホテル・レンタカーを手配し、規定内予算に抑え、1つの請求書とレポートに集約するアシスタント。",
+      "ogTitle": "法人向け Adair — チームの出張をひとつに集約",
+      "ogDescription": "予算管理、承認フロー、出張分析。5つのアプリを開く手間を、ひとつの会話に。"
     },
     "badge": "法人・チーム向け",
-    "titleLine1": "チーム全員の出張を、",
+    "titleLine1": "チーム全体の出張を、",
     "titleLine2": "ひとつの画面で。",
-    "lead": "Adairは一言から出張を組み立て、出張規程の遵守を徹底し、1枚の請求書と明確なレポートをお届けします。アシスタントが多数のタブを行き来することも、経理が領収書を催促することも、もうありません。",
-    "ctaPrimary": "導入について問い合わせる",
-    "ctaSecondary": "プランを見る",
+    "lead": "Adairは自然なメッセージから旅程を組み、社内規定の範囲に収め、1通の請求書と明確なレポートを発行します。アシスタントは画面の行き来から、経理は領収書の回収作業から解放されます。",
+    "ctaPrimary": "導入について相談する",
+    "ctaSecondary": "料金プランを見る",
     "rolesLabel": "対象となる方",
-    "rolesTitle": "3つの役割を、ひとつの画面で。",
+    "rolesTitle": "3つの役割を、ひとつの画面で支援。",
     "roles": [
       {
-        "role": "アシスタント / 総務",
-        "title": "一言で同僚の代理手配が完了",
+        "role": "アシスタント / 総務担当",
+        "title": "メッセージひとつで代理手配",
         "items": [
-          "どのメンバーの出張も代理で予約",
-          "チーム全員の出張を一元管理する受信箱",
-          "3つの書類の代わりに、1枚のVAT請求書"
+          "チームメンバーの代理予約もスムーズに完了",
+          "出張手配の状況をチーム全員で共有",
+          "3枚の書類が1通のVAT請求書に集約"
         ]
       },
       {
-        "role": "マネージャー / 財務",
-        "title": "発生前のコストを事前に可視化",
+        "role": "管理者 / 財務責任者",
+        "title": "発生前にコストを可視化",
         "items": [
-          "出張ごと・メンバーごと・月ごとの上限予算設定",
-          "設定した基準額を超えた場合のみ承認",
-          "リアルタイムな支出把握、月末の想定外をゼロに"
+          "出張ごと・担当者ごと・月ごとの予算上限を設定",
+          "設定金額を超えた場合のみ承認フローへ",
+          "リアルタイムで支出を把握し月末の予期せぬ超過を防止"
         ]
       },
       {
         "role": "出張者",
-        "title": "個人の好みをいつでも反映",
+        "title": "個人の好みを常に反映",
         "items": [
-          "トラベルプロフィールは最初の一度だけ設定",
-          "フライト、ホテル、車を1枚のカードに集約",
-          "旅の最終日まで、確認情報はすべてひとつの場所に"
+          "プロファイルの登録は一度だけ",
+          "フライト・ホテル・車が1枚のカードに",
+          "最終日まで必要な確認書をすべて集約"
         ]
       }
     ],
     "budgetLabel": "コストと予算",
     "budgetTitle": "アシスタントが遵守する支出ルール。",
-    "budgetLead": "一度ルールを定義すれば、Adairが提案するすべてのプランに自動反映。後から監視する必要はありません。",
+    "budgetLead": "ルールを一度設定すれば、Adairが提案するすべてのプランに自動反映。手配後に規程違反をチェックする必要はありません。",
     "budgets": [
       {
-        "title": "出張あたりの上限",
+        "title": "1回の出張上限",
         "value": "€1,500",
-        "note": "上限を超えるプランは提案されません"
+        "note": "上限を超えるプランは提案しません"
       },
       {
         "title": "チームの月間予算",
         "value": "€28,000",
-        "note": "財務担当者がいつでもリアルタイムに利用状況を確認可能"
+        "note": "財務担当者がリアルタイムで消化状況を確認可能"
       },
       {
-        "title": "承認が必要な基準額",
+        "title": "承認が必要な金額",
         "value": "€900",
-        "note": "この金額を超過する場合、予約前にマネージャーが確認"
+        "note": "この金額を超える手配は管理者の事前承認が必要"
       },
       {
-        "title": "出張規程",
-        "value": "Cabin, chains, radius",
-        "note": "2 hを超えるフライトはPremium Economy、指定ホテル系列のみ"
+        "title": "出張規定",
+        "value": "座席・ホテル・立地",
+        "note": "2時間超のフライトはPremium Economy、指定チェーンのみ"
       }
     ],
-    "dashLabel": "法人管理画面",
-    "dashTitle": "経理が求めるすべてを、ひとつの画面に。",
-    "dashNote": "プレビュー — サンプルデータ",
+    "dashLabel": "カンパニービュー",
+    "dashTitle": "財務管理に必要なすべてを、ひとつの画面に。",
+    "dashNote": "プレビュー画面 — サンプルデータ",
     "dash": {
-      "budgetTitle": "9月の予算",
-      "budgetOf": "/ €28,000 利用済み",
-      "tripsTitle": "最近のチーム出張",
-      "statusPaid": "決済済み",
+      "budgetTitle": "9月の予算消化状況",
+      "budgetOf": "/ €28,000 消化",
+      "tripsTitle": "最近の出張",
+      "statusPaid": "決済完了",
       "statusPending": "承認待ち",
       "peopleTitle": "メンバー別支出",
-      "routesTitle": "主な利用路線",
-      "savedTitle": "通常レートに対する削減額",
+      "routesTitle": "利用頻度の高い路線",
+      "savedTitle": "一般レートと比較した削減額",
       "savedValue": "€2,340",
-      "savedNote": "今四半期（出張21件合計）",
+      "savedNote": "今四半期（計21件の出張）",
       "tripsCount": "件の出張",
       "trips": [
         {
           "who": "Anna K.",
-          "route": "Warsaw → Milan",
+          "route": "ワルシャワ → ミラノ",
           "dates": "18–19 Sep",
           "amount": "€1,240",
           "paid": true
         },
         {
           "who": "Tomasz W.",
-          "route": "Warsaw → Berlin",
+          "route": "ワルシャワ → ベルリン",
           "dates": "22–23 Sep",
           "amount": "€780",
           "paid": true
         },
         {
           "who": "Kitti F.",
-          "route": "Budapest → London",
+          "route": "ブダペスト → ロンドン",
           "dates": "25–27 Sep",
           "amount": "€1,610",
           "paid": false
@@ -543,17 +572,17 @@
       ],
       "routes": [
         {
-          "route": "Warsaw → Milan",
+          "route": "ワルシャワ → ミラノ",
           "count": "7",
           "amount": "€8,190"
         },
         {
-          "route": "Budapest → London",
+          "route": "ブダペスト → ロンドン",
           "count": "5",
           "amount": "€7,340"
         },
         {
-          "route": "Warsaw → Berlin",
+          "route": "ワルシャワ → ベルリン",
           "count": "4",
           "amount": "€3,120"
         }
@@ -564,44 +593,44 @@
     "analytics": [
       {
         "title": "メンバー別コスト",
-        "text": "誰が、どれくらいの頻度で出張し、費用がいくらかかったかをメンバー、チーム、コストセンター別に把握。"
+        "text": "誰が、どれくらいの頻度で、いくら利用したかを個人・チーム・コストセンター別に可視化。"
       },
       {
-        "title": "主要路線パターン",
-        "text": "最も頻繁に利用する路線を特定し、提携レートを結ぶべき区間を可視化。"
+        "title": "利用路線の傾向",
+        "text": "利用頻度の高い路線を分析し、特別提携レートの導入余地を特定。"
       },
       {
         "title": "平均宿泊単価",
-        "text": "チームが実際に支払った1泊あたりの平均価格と、その月次推移。"
+        "text": "実際の1泊あたり平均支払額と、その月次推移を把握。"
       },
       {
-        "title": "規程遵守率",
-        "text": "出張規程内に収まった旅程と、個別承認が必要だった旅程の内訳。"
+        "title": "規定遵守率",
+        "text": "規程内で手配された割合と、承認が必要だったケースを可視化。"
       },
       {
-        "title": "通常レートに対する削減額",
-        "text": "実際に支払った金額と、同一旅程の一般公開価格との差額。"
+        "title": "一般価格との差額",
+        "text": "一般公開価格で個別に手配した場合との差額を算出。"
       },
       {
-        "title": "会計データのエクスポート",
-        "text": "すべての請求書、予約番号、VAT項目が紐付いた月次データを1つのファイルで出力。"
+        "title": "会計用データ出力",
+        "text": "すべての請求書、手配番号、VATの内訳を照合済みの単一ファイルで出力。"
       }
     ],
     "plansLabel": "料金プラン",
-    "plansTitle": "チームの規模に合った最適なプランを。",
-    "plansNote": "Teamsプランは14日間の無料トライアル付き。クレジットカードは不要です。価格にVATは含まれません。Enterpriseプランはチーム規模や規程内容に応じて個別にお見積もりします。",
+    "plansTitle": "チームに最適なプランを選択。",
+    "plansNote": "Teamsプランは14日間の無料トライアルから始められます（カード登録不要）。表示価格は税抜です。Enterpriseプランはチーム規模と運用ポリシーに応じてお見積もりします。",
     "plansTrial": "14日間無料",
     "quote": "見積もりを依頼",
     "plans": [
       {
         "name": "Starter",
         "forWho": "出張者5名まで",
-        "price": "Free",
-        "priceNote": "クレジットカード不要",
+        "price": "無料",
+        "priceNote": "カード登録不要",
         "features": [
-          "メンバーごとのトラベルプロフィール",
-          "出張1回につき1枚の請求書",
-          "過去の旅程アーカイブとPDFトリップカード",
+          "メンバーごとのトラベルプロファイル",
+          "出張ごとの一括請求書",
+          "旅程アーカイブとPDF旅程カード",
           "メールサポート"
         ]
       },
@@ -609,42 +638,42 @@
         "name": "Teams",
         "forWho": "出張者5–50名",
         "price": "19 USD",
-        "priceNote": "出張者1名 / 月 — 最低5名から",
+        "priceNote": "出張者1名あたり / 月（5名から）",
         "features": [
-          "予算管理と承認フロー",
-          "同僚の代理予約",
+          "予算設定と承認フロー",
+          "メンバーの代理予約",
           "月次出張レポート",
-          "チーム全体の出張一覧ビュー"
+          "チーム共通の旅程ビュー"
         ]
       },
       {
         "name": "Enterprise",
         "forWho": "出張者50名以上",
-        "price": "個別見積もり",
-        "priceNote": "貴社規模に合わせた個別見積もり",
+        "price": "要お問合せ",
+        "priceNote": "個別見積もり",
         "features": [
-          "コストセンターとカスタム出張規程",
-          "貴社フォーマットに合わせた会計データ出力",
-          "主要路線の提携特別レート",
+          "コストセンターおよびカスタム出張規定",
+          "指定フォーマットでの会計データ出力",
+          "主要路線の特別提携レート適用",
           "専任アカウントマネージャー"
         ]
       }
     ],
     "contactLabel": "お問い合わせ",
-    "contactTitle": "貴社のチームについてお聞かせください。",
-    "contactLead": "必要事項をご入力いただければ、お見積もりと貴社に合わせた出張管理の進め方をご案内します。",
+    "contactTitle": "御社についてお聞かせください。",
+    "contactLead": "情報をご入力いただければ、出張環境に応じたお見積もりとデモをご案内します。",
     "form": {
       "email": "勤務先メールアドレス",
       "emailPlaceholder": "you@company.com",
       "company": "会社名",
-      "companyPlaceholder": "会社名",
+      "companyPlaceholder": "貴社名",
       "size": "チーム規模",
       "sizePlaceholder": "例：出張者12名",
-      "message": "ご要望など（任意）",
-      "messagePlaceholder": "よく利用する路線、現在ご利用中のツール、請求書に関するご要望など…",
-      "submit": "送信する",
+      "message": "ご要望・ご質問（任意）",
+      "messagePlaceholder": "よく利用する路線、現在のツール、請求書に関するご要件など…",
+      "submit": "問い合わせを送信",
       "submitBusy": "送信中…",
-      "success": "ありがとうございます — 1営業日以内にご連絡いたします。",
+      "success": "ありがとうございます。1営業日以内にご連絡いたします。",
       "error": "送信できませんでした。もう一度お試しください。"
     },
     "footer": "Adair Kft. · Budapest"
