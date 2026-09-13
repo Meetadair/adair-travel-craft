@@ -182,6 +182,8 @@ export function TripsPage() {
                 ))}
               </ul>
 
+              {trip.status === "booked" && <TripPlaces tripId={trip.id} />}
+
               {trip.status === "booked" && (
                 <AddReservation
                   tripId={trip.id}
