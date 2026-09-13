@@ -4,6 +4,8 @@
  * failing part returns a short note instead of breaking the response.
  */
 import { findByName } from "./match";
+import { staysPassingGlobalRules } from "./global-stay-rules";
+import { loadGlobalStayRules } from "./global-stay-rules.server";
 import { guestsPerRoom, roomsFor } from "./passengers";
 import {
   familyRoomReason,
@@ -291,13 +293,17 @@ type DuffelStay = {
   cheapest_rate_id?: string;
   accommodation?: {
     name?: string;
+    description?: string;
+    accommodation_type?: string;
+    property_type?: string;
     rating?: number;
     photos?: Array<{ url?: string }>;
     location?: {
       address?: { line_one?: string; city_name?: string; postal_code?: string };
     };
     rooms?: Array<{
-      rates?: Array<{ id?: string }>;
+      name?: string;
+      rates?: Array<{ id?: string; name?: string }>;
       // Occupancy limits, where the hotel states them.
       max_occupancy?: number;
       maximum_occupancy?: number;
@@ -373,6 +379,28 @@ export async function searchStay(
     return { stay: null, alternatives: [], requested, notFound: Boolean(requested), familyNote: null };
   }
 
+  // Standards we apply for everyone: no hostels, dorms, shared bathrooms,
+  // smoking rooms or property types below hotel/apartment/villa/resort. The
+  // rules are config, not code, so the team can see and adjust them.
+  const globalRules = await loadGlobalStayRules();
+  const allowed = staysPassingGlobalRules(results, (raw) => ({
+    text: [
+      raw.accommodation?.name,
+      raw.accommodation?.description,
+      ...(raw.accommodation?.rooms ?? []).flatMap((room) => [
+        room.name,
+        ...(room.rates ?? []).map((rate) => rate.name),
+      ]),
+    ]
+      .filter(Boolean)
+      .join(" · "),
+    propertyType:
+      raw.accommodation?.accommodation_type ?? raw.accommodation?.property_type ?? null,
+  }), globalRules);
+  if (!allowed.length) {
+    return { stay: null, alternatives: [], requested, notFound: Boolean(requested), familyNote: null };
+  }
+
   // A family is counted properly: children with ages, babies as infants.
   const children = req.childAges ?? [];
   const infants = req.infants ?? 0;
@@ -389,17 +417,17 @@ export async function searchStay(
 
   // Rooms whose own policy this family exceeds are not offered at all.
   const fitting = withChildren
-    ? results.filter((raw) => roomFits(roomPolicyOf(raw), party))
-    : results;
+    ? allowed.filter((raw) => roomFits(roomPolicyOf(raw), party))
+    : allowed;
   const familyNote = withChildren
     ? [
-        fitting.length < results.length ? familyRoomReason(party) : null,
-        freeChildrenNote(roomPolicyOf(fitting[0] ?? results[0]!)),
+        fitting.length < allowed.length ? familyRoomReason(party) : null,
+        freeChildrenNote(roomPolicyOf(fitting[0] ?? allowed[0]!)),
       ]
         .filter(Boolean)
         .join(" ") || null
     : null;
-  const usable = fitting.length ? fitting : results;
+  const usable = fitting.length ? fitting : allowed;
 
   const nights = nightsBetween(req.departDate, req.returnDate);
   const map = (raw: DuffelStay): { rawName: string; result: StayResult } => {

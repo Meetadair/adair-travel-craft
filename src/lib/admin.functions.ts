@@ -82,8 +82,17 @@ export type AdminErrorRow = {
   created_at: string;
 };
 
+export type GlobalStayRuleRow = {
+  id: string;
+  rule_key: string;
+  label: string;
+  hint: string | null;
+  enabled: boolean;
+};
+
 export type AdminOverview = {
   pricingRules: PricingRuleRow[];
+  stayRules: GlobalStayRuleRow[];
   providers: ProviderRow[];
   bookings: AdminBooking[];
   users: AdminUser[];
@@ -111,7 +120,7 @@ export const getAdminOverview = createServerFn({ method: "GET" })
     await assertAdmin(context.supabase, context.userId);
     const sb = await admin();
 
-    const [rules, providers, trips, profiles, errors] = await Promise.all([
+    const [rules, providers, trips, profiles, errors, stayRules] = await Promise.all([
       sb
         .from("pricing_rules")
         .select("id, plan, line_type, markup_bps, discount_bps, change_fee_minor, currency")
@@ -137,6 +146,10 @@ export const getAdminOverview = createServerFn({ method: "GET" })
         .select("id, message, route, created_at")
         .order("created_at", { ascending: false })
         .limit(50),
+      sb
+        .from("global_stay_rules")
+        .select("id, rule_key, label, hint, enabled")
+        .order("rule_key"),
     ]);
 
     const emails = new Map<string, string | null>();
@@ -170,6 +183,7 @@ export const getAdminOverview = createServerFn({ method: "GET" })
 
     return {
       pricingRules: (rules.data ?? []) as PricingRuleRow[],
+      stayRules: (stayRules.data ?? []) as GlobalStayRuleRow[],
       providers: (providers.data ?? []) as ProviderRow[],
       bookings: ((trips.data ?? []) as Array<Record<string, unknown>>).map((trip) => ({
         id: String(trip["id"]),
@@ -258,6 +272,25 @@ export const setProviderEnabled = createServerFn({ method: "POST" })
     const { error } = await sb.from("providers").update({ enabled: data.enabled }).eq("id", data.id);
     if (error) throw new Error(error.message);
     await writeAudit(sb, context.userId, "provider.toggle", `providers:${data.id}`, null, {
+      enabled: data.enabled,
+    });
+    return { ok: true };
+  });
+
+export const setGlobalStayRuleEnabled = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ id: z.string().uuid(), enabled: z.boolean() }).parse(input),
+  )
+  .handler(async ({ context, data }): Promise<{ ok: true }> => {
+    await assertAdmin(context.supabase, context.userId);
+    const sb = await admin();
+    const { error } = await sb
+      .from("global_stay_rules")
+      .update({ enabled: data.enabled })
+      .eq("id", data.id);
+    if (error) throw new Error(error.message);
+    await writeAudit(sb, context.userId, "global_stay_rule.toggle", `global_stay_rules:${data.id}`, null, {
       enabled: data.enabled,
     });
     return { ok: true };

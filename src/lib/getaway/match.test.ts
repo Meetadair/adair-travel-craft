@@ -50,12 +50,11 @@ describe("season filtering", () => {
 });
 
 describe("dealbreakers are hard filters, not score deductions", () => {
-  const prefs = { ...DEFAULT_PREFS, dealbreakers: ["dbStars4", "dbNoHostel", "dbAutomatic"] };
+  const prefs = { ...DEFAULT_PREFS, dealbreakers: ["dbStars4", "dbAutomatic"] };
 
   it("removes a candidate outright", () => {
     const stays = [
       { name: "Grand Hotel", rating: 4.6 },
-      { name: "Cheap Hostel", rating: 4.8 },
       { name: "Three Star Inn", rating: 3.2 },
       { name: "Unrated Place", rating: null as number | null },
     ];
@@ -67,7 +66,7 @@ describe("dealbreakers are hard filters, not score deductions", () => {
   });
 
   it("leaves everything in place when no rules are set", () => {
-    const stays = [{ name: "Cheap Hostel", rating: 2 }];
+    const stays = [{ name: "Three Star Inn", rating: 2 }];
     expect(staysPassingDealbreakers(stays, (s) => s, DEFAULT_PREFS)).toEqual(stays);
   });
 });
