@@ -488,6 +488,24 @@ export function BookPage({ cardId }: { cardId: string }) {
                 </div>
               ))}
 
+              {(familyLines.length > 0 || seats.length > 0) && (
+                <div className="space-y-2 border-t border-border pt-4">
+                  <p className="text-xs font-medium text-muted-foreground">Travelling with children</p>
+                  {familyLines.map((line) => (
+                    <p key={line.kind} className="text-xs leading-relaxed text-muted-foreground">
+                      {line.label} —{" "}
+                      {line.priceEur == null ? line.note : `${eur(line.priceEur)} ${line.note.toLowerCase()}`}
+                    </p>
+                  ))}
+                  {seats.map((seat) => (
+                    <p key={seat.band} className="text-xs leading-relaxed text-muted-foreground">
+                      {seat.count === 1 ? `1 ${seat.band}` : `${seat.count} ${seat.band}s`} for the
+                      hire car — price confirmed by the rental desk.
+                    </p>
+                  ))}
+                </div>
+              )}
+
               {account.data?.companies.length ? (
                 <label className="block">
                   <span className="text-xs font-medium text-muted-foreground">Invoice to</span>
