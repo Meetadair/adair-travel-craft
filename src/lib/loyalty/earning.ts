@@ -6,7 +6,7 @@
  * these defaults are only the fallback when the table can't be read.
  */
 import type { Brand } from "@/lib/brands/catalogue";
-import { earnsOnBrandGroup } from "@/lib/brands/ranking";
+import { brandsInSameGroup, earnsOnBrandGroup } from "@/lib/brands/ranking";
 
 export type EarningRule = { category: string; programmeCode: string; matcher: string };
 
@@ -111,6 +111,24 @@ export function earnsOn(
  * read from the brand table. Airlines are matched on the two-letter code, so the
  * group widening only applies to hotels and car rental supplier names.
  */
+/** Carrier code per airline brand, so an alliance card can widen across it. */
+export const BRAND_IATA: Record<string, string> = {
+  lot: "LO", lufthansa: "LH", swiss: "LX", austrian: "OS", brussels: "SN", united: "UA",
+  turkish: "TK", sas: "SK", aegean: "A3", tap: "TP", aircanada: "AC", singapore: "SQ",
+  thai: "TG", ana: "NH", asiana: "OZ", eva: "BR", ethiopian: "ET", egyptair: "MS",
+  airchina: "CA", airindia: "AI", croatia: "OU", avianca: "AV", copa: "CM", airnz: "NZ",
+  southafrican: "SA", shenzhen: "ZH", ba: "BA", iberia: "IB", finnair: "AY", qatar: "QR",
+  american: "AA", cathay: "CX", jal: "JL", qantas: "QF", malaysia: "MH", alaska: "AS",
+  royaljordanian: "RJ", srilankan: "UL", royalairmaroc: "AT", aerlingus: "EI",
+  hawaiian: "HA", delta: "DL", airfrance: "AF", klm: "KL", ita: "AZ", korean: "KE",
+  chinaeastern: "MU", chinaairlines: "CI", vietnam: "VN", garuda: "GA", aeromexico: "AM",
+  aerolineas: "AR", kenya: "KQ", mea: "ME", saudia: "SV", tarom: "RO", virginatlantic: "VS",
+  wizz: "W6", ryanair: "FR", easyjet: "U2", norwegian: "DY", vueling: "VY",
+  airbaltic: "BT", eurowings: "EW", transavia: "HV", emirates: "EK", etihad: "EY",
+  southwest: "WN", jetblue: "B6", spirit: "NK", frontier: "F9", westjet: "WS",
+  latam: "LA", gol: "G3", azul: "AD", chinasouthern: "CZ",
+};
+
 export function earnsOnWithGroup(
   rules: EarningRule[],
   brands: Brand[],
@@ -120,6 +138,11 @@ export function earnsOnWithGroup(
 ): boolean {
   if (earnsOn(rules, category, programmeCode, supplier)) return true;
   const brandId = PROGRAMME_BRAND[programmeCode];
-  if (!brandId || category === "airline") return false;
+  if (!brandId) return false;
+  if (category === "airline") {
+    const code = (supplier ?? "").trim().toUpperCase();
+    if (!code) return false;
+    return brandsInSameGroup(brands, brandId).some((b) => BRAND_IATA[b.id] === code);
+  }
   return earnsOnBrandGroup(brands, brandId, supplier);
 }

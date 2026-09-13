@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { DEFAULT_EARNING_RULES, earnsOn } from "./earning";
+import { BRAND_SEED } from "@/lib/brands/catalogue";
+import { DEFAULT_EARNING_RULES, earnsOn, earnsOnWithGroup } from "./earning";
 
 describe("earnsOn — airlines", () => {
   it("credits Miles & More on a LOT flight, not only Lufthansa", () => {
@@ -30,5 +31,25 @@ describe("earnsOn — hotels and cars", () => {
     expect(earnsOn(DEFAULT_EARNING_RULES, "car", "hertz_gold", "Thrifty · Compact")).toBe(true);
     expect(earnsOn(DEFAULT_EARNING_RULES, "car", "avis_preferred", "Budget · Estate")).toBe(true);
     expect(earnsOn(DEFAULT_EARNING_RULES, "car", "sixt_card", "Europcar · Estate")).toBe(false);
+  });
+});
+
+describe("earnsOnWithGroup — brand table widens the mapping", () => {
+  it("credits a hotel programme across its whole group", () => {
+    expect(
+      earnsOnWithGroup(DEFAULT_EARNING_RULES, BRAND_SEED, "hotel", "marriott_bonvoy", "The Westin Warsaw"),
+    ).toBe(true);
+    expect(
+      earnsOnWithGroup(DEFAULT_EARNING_RULES, BRAND_SEED, "hotel", "marriott_bonvoy", "Hotel Bristol"),
+    ).toBe(false);
+  });
+  it("credits an alliance card on any alliance member", () => {
+    expect(earnsOnWithGroup(DEFAULT_EARNING_RULES, BRAND_SEED, "airline", "lot_miles", "UA")).toBe(true);
+    expect(earnsOnWithGroup(DEFAULT_EARNING_RULES, BRAND_SEED, "airline", "lot_miles", "DL")).toBe(false);
+  });
+  it("credits a car programme across its owning group", () => {
+    expect(
+      earnsOnWithGroup(DEFAULT_EARNING_RULES, BRAND_SEED, "car", "avis_preferred", "Budget · Estate"),
+    ).toBe(true);
   });
 });
