@@ -223,12 +223,12 @@
 - [x] Tests: time-of-day bucketing, family/nightlife exclusion, source ranking, dealbreaker precedence, map tag reading (195 tests pass).
 - [ ] Booking a table inside Adair — blocked: needs a reservation partner agreement and API credentials (adapter layer and UI are already in place).
 
-## Round: children and family travel — next up
-- [ ] Date of birth required for every traveller and for everyone saved under "people I travel with"; category computed as of the return date (infant under 2, child 2–11, adult 12+), including the birthday-during-trip case; category shown per traveller on the confirmation.
-- [ ] Parser reads family phrases in English and Polish ("with two kids aged 4 and 7", "z dwójką dzieci 4 i 7 lat", "with a baby", "z niemowlakiem", "family of four", "we czwórkę z dziećmi"). Children without ages → one mandatory clarifying question before searching.
-- [ ] Flights: infant and child fares requested per category, infant on lap by default with "own seat" where allowed, fare shown per traveller on the card.
-- [ ] Hotels: occupancy sent with children's ages; rooms that break the policy are not shown, family rooms / suites / two connecting rooms offered instead with the reason stated; policies quoted where given; cot and extra bed as explicit lines with price or "on request at check-in".
-- [ ] Cars: child seat as an optional line matched to age and weight band, with the company's price where available.
-- [ ] Rides and restaurants: vehicle capacity for the family size; family-friendly filter respected.
-- [ ] Profile: children stored with birth dates so "same as Rome, with the kids" reprices correctly.
-- [ ] Tests: category by return date incl. birthday during the trip, occupancy exceeding a room policy triggering the family-room path, infant on lap vs own seat pricing.
+## Round: children and family travel — built
+- [x] Date of birth required for every traveller and for everyone saved under "people I travel with"; category computed as of the return date (infant under 2, child 2–11, adult 12+), including the birthday-during-trip case; category shown per traveller on the confirmation.
+- [x] Parser reads family phrases in English and Polish ("with two kids aged 4 and 7", "z dwójką dzieci 4 i 7 lat", "with a baby", "z niemowlakiem", "family of four", "we czwórkę z dziećmi"). Children without ages → one mandatory clarifying question before searching.
+- [x] Flights: infant and child fares requested per category, infant on lap by default with "own seat" where allowed, fare shown per traveller on the card.
+- [x] Hotels: occupancy sent with children's ages; rooms that break the policy are not shown, family rooms / suites / two connecting rooms offered instead with the reason stated; policies quoted where given; cot and extra bed as explicit lines with price or "on request at check-in".
+- [x] Cars: child seat as an optional line matched to age and weight band, with the company's price where available.
+- [x] Rides and restaurants: vehicle capacity for the family size; family-friendly filter respected.
+- [x] Profile: children stored with birth dates so "same as Rome, with the kids" reprices correctly.
+- [x] Tests: category by return date incl. birthday during the trip, occupancy exceeding a room policy triggering the family-room path, infant on lap vs own seat pricing.
