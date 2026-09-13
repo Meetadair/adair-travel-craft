@@ -33,7 +33,6 @@ import { Route as AuthenticatedPreferencesRouteImport } from './routes/_authenti
 import { Route as AuthenticatedSupportRouteImport } from './routes/_authenticated/support'
 import { Route as AuthenticatedTripsRouteImport } from './routes/_authenticated/trips'
 import { Route as CHandleRouteImport } from './routes/c.$handle'
-import { Route as DevAnswersRouteImport } from './routes/dev.answers'
 import { Route as RCodeRouteImport } from './routes/r.$code'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authenticated/admin.analytics'
@@ -176,11 +175,6 @@ const CHandleRoute = CHandleRouteImport.update({
   path: '/c/$handle',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DevAnswersRoute = DevAnswersRouteImport.update({
-  id: '/dev/answers',
-  path: '/dev/answers',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const RCodeRoute = RCodeRouteImport.update({
   id: '/r/$code',
   path: '/r/$code',
@@ -321,7 +315,6 @@ export interface FileRoutesByFullPath {
   '/support': typeof AuthenticatedSupportRoute
   '/trips': typeof AuthenticatedTripsRouteWithChildren
   '/c/$handle': typeof CHandleRoute
-  '/dev/answers': typeof DevAnswersRoute
   '/r/$code': typeof RCodeRoute
   '/$lang/': typeof LangIndexRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
@@ -367,7 +360,6 @@ export interface FileRoutesByTo {
   '/support': typeof AuthenticatedSupportRoute
   '/trips': typeof AuthenticatedTripsRouteWithChildren
   '/c/$handle': typeof CHandleRoute
-  '/dev/answers': typeof DevAnswersRoute
   '/r/$code': typeof RCodeRoute
   '/$lang': typeof LangIndexRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
@@ -416,7 +408,6 @@ export interface FileRoutesById {
   '/_authenticated/support': typeof AuthenticatedSupportRoute
   '/_authenticated/trips': typeof AuthenticatedTripsRouteWithChildren
   '/c/$handle': typeof CHandleRoute
-  '/dev/answers': typeof DevAnswersRoute
   '/r/$code': typeof RCodeRoute
   '/$lang/': typeof LangIndexRoute
   '/_authenticated/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
@@ -465,7 +456,6 @@ export interface FileRouteTypes {
     | '/support'
     | '/trips'
     | '/c/$handle'
-    | '/dev/answers'
     | '/r/$code'
     | '/$lang/'
     | '/admin/analytics'
@@ -511,7 +501,6 @@ export interface FileRouteTypes {
     | '/support'
     | '/trips'
     | '/c/$handle'
-    | '/dev/answers'
     | '/r/$code'
     | '/$lang'
     | '/admin/analytics'
@@ -559,7 +548,6 @@ export interface FileRouteTypes {
     | '/_authenticated/support'
     | '/_authenticated/trips'
     | '/c/$handle'
-    | '/dev/answers'
     | '/r/$code'
     | '/$lang/'
     | '/_authenticated/admin/analytics'
@@ -595,7 +583,6 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   TermsRoute: typeof TermsRoute
   CHandleRoute: typeof CHandleRoute
-  DevAnswersRoute: typeof DevAnswersRoute
   RCodeRoute: typeof RCodeRoute
   ApiPublicGetawayPricesRoute: typeof ApiPublicGetawayPricesRoute
   ApiPublicGetawayWeeklyRoute: typeof ApiPublicGetawayWeeklyRoute
@@ -777,13 +764,6 @@ declare module '@tanstack/react-router' {
       path: '/c/$handle'
       fullPath: '/c/$handle'
       preLoaderRoute: typeof CHandleRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dev/answers': {
-      id: '/dev/answers'
-      path: '/dev/answers'
-      fullPath: '/dev/answers'
-      preLoaderRoute: typeof DevAnswersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/r/$code': {
@@ -1021,7 +1001,6 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   TermsRoute: TermsRoute,
   CHandleRoute: CHandleRoute,
-  DevAnswersRoute: DevAnswersRoute,
   RCodeRoute: RCodeRoute,
   ApiPublicGetawayPricesRoute: ApiPublicGetawayPricesRoute,
   ApiPublicGetawayWeeklyRoute: ApiPublicGetawayWeeklyRoute,
