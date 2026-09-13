@@ -1188,6 +1188,42 @@ export type Database = {
         }
         Relationships: []
       }
+      global_stay_rules: {
+        Row: {
+          allowed_types: string[]
+          created_at: string
+          enabled: boolean
+          hint: string | null
+          id: string
+          label: string
+          rule_key: string
+          terms: string[]
+          updated_at: string
+        }
+        Insert: {
+          allowed_types?: string[]
+          created_at?: string
+          enabled?: boolean
+          hint?: string | null
+          id?: string
+          label: string
+          rule_key: string
+          terms?: string[]
+          updated_at?: string
+        }
+        Update: {
+          allowed_types?: string[]
+          created_at?: string
+          enabled?: boolean
+          hint?: string | null
+          id?: string
+          label?: string
+          rule_key?: string
+          terms?: string[]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       hotel_requests_missed: {
         Row: {
           checkin_date: string | null
