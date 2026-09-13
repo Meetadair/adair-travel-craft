@@ -35,6 +35,9 @@ type Draft = {
 
 const emptyDraft: Draft = { programmeCode: "", customLabel: "", memberNumber: "", tier: "" };
 
+/** Each category keeps its own draft, so opening one never clears another. */
+type Drafts = Partial<Record<LoyaltyCategory, Draft>>;
+
 export function WalletLoyalty() {
   const fetchList = useServerFn(listMemberships);
   const save = useServerFn(saveMembership);
@@ -43,17 +46,23 @@ export function WalletLoyalty() {
   const queryClient = useQueryClient();
 
   const list = useQuery({ queryKey: ["loyalty"], queryFn: () => fetchList() });
-  const [openCategory, setOpenCategory] = useState<LoyaltyCategory | null>(null);
-  const [draft, setDraft] = useState<Draft>(emptyDraft);
+  const [open, setOpen] = useState<Record<string, boolean>>({});
+  const [drafts, setDrafts] = useState<Drafts>({});
+  const [justSaved, setJustSaved] = useState<LoyaltyCategory | null>(null);
   const [revealed, setRevealed] = useState<Record<string, string>>({});
+
+  const draftFor = (category: LoyaltyCategory): Draft => drafts[category] ?? emptyDraft;
+  const patchDraft = (category: LoyaltyCategory, patch: Partial<Draft>) =>
+    setDrafts((prev) => ({ ...prev, [category]: { ...(prev[category] ?? emptyDraft), ...patch } }));
 
   const invalidate = () => queryClient.invalidateQueries({ queryKey: ["loyalty"] });
 
   const addMutation = useMutation({
     mutationFn: async (category: LoyaltyCategory) => {
+      const draft = draftFor(category);
       const option = programmeByCode(category, draft.programmeCode);
       const label = option?.label ?? draft.customLabel.trim();
-      if (!label) throw new Error("incomplete");
+      if (!label) throw new Error("Please choose a programme or type its name.");
       await save({
         data: {
           category,
@@ -64,10 +73,14 @@ export function WalletLoyalty() {
           tier: draft.tier.trim() || null,
         },
       });
+      return category;
     },
-    onSuccess: async () => {
-      setDraft(emptyDraft);
-      setOpenCategory(null);
+    // The form closes and the blank draft is cleared, so the next "Add another"
+    // starts empty rather than repeating the entry that was just saved.
+    onSuccess: async (category) => {
+      setDrafts((prev) => ({ ...prev, [category]: emptyDraft }));
+      setOpen((prev) => ({ ...prev, [category]: false }));
+      setJustSaved(category);
       await invalidate();
     },
   });
@@ -81,6 +94,13 @@ export function WalletLoyalty() {
     mutationFn: (id: string) => reveal({ data: { id } }),
     onSuccess: (result, id) => setRevealed((prev) => ({ ...prev, [id]: result.memberNumber })),
   });
+
+  const openForm = (category: LoyaltyCategory) => {
+    setJustSaved(null);
+    addMutation.reset();
+    setDrafts((prev) => ({ ...prev, [category]: emptyDraft }));
+    setOpen((prev) => ({ ...prev, [category]: true }));
+  };
 
   const forCategory = (category: LoyaltyCategory): Membership[] =>
     (list.data ?? []).filter((m) => m.category === category);
