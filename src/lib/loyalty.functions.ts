@@ -139,3 +139,30 @@ export const revealMembership = createServerFn({ method: "POST" })
       memberNumber: await decryptSecret(stored),
     };
   });
+
+/**
+ * Whether the home screen should remind the traveller to add their numbers:
+ * they said in onboarding that they hold programmes, but nothing is saved yet.
+ */
+export const getLoyaltyReminder = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<{ show: boolean }> => {
+    const prefs = await context.supabase
+      .from("preferences")
+      .select("extra_answers")
+      .eq("user_id", context.userId)
+      .maybeSingle();
+    if (prefs.error) return { show: false };
+    const answers = (prefs.data?.["extra_answers"] ?? {}) as Record<string, unknown>;
+    const said = answers["loyalty"];
+    const holds = Array.isArray(said) ? said.includes("yes") : said === "yes";
+    if (!holds) return { show: false };
+
+    const saved = await context.supabase
+      .from("loyalty_memberships")
+      .select("id")
+      .eq("user_id", context.userId)
+      .limit(1);
+    if (saved.error) return { show: false };
+    return { show: (saved.data ?? []).length === 0 };
+  });
