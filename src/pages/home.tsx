@@ -597,7 +597,10 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
     setActedAdvice([]);
     if (signedIn) {
       const named = parseTripSentence(text);
-      setRequestedNames({ hotel: named.hotelNameExact, car: named.carNameExact });
+      setRequestedNames({
+        hotel: named?.hotelNameExact ?? null,
+        car: named?.carNameExact ?? null,
+      });
     } else {
       setRequestedNames({ hotel: null, car: null });
     }

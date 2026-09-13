@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { parseTripSentence } from "./parse";
+import { parseTripSentence as parseOrNull } from "./parse";
+
+/** Every case below names a destination, so the result is never null. */
+const parseTripSentence = (sentence: string, today?: Date, homeAirportIata?: string) =>
+  parseOrNull(sentence, today, homeAirportIata)!;
 
 /** A fixed Monday, so weekday resolution is deterministic. */
 const TODAY = new Date("2026-03-09T09:00:00Z");

@@ -148,6 +148,8 @@ export const searchLiveTrip = createServerFn({ method: "POST" })
       );
 
     const parsed = parseTripSentence(data.sentence, new Date(), profile?.home_airport);
+    // No destination, no trip: the chat asks where they are going instead.
+    if (!parsed) throw new Error("needs-destination");
     const reordered = data.stops?.length ? data.stops : null;
     const origin = reordered?.[0];
     const firstStop = reordered?.[1];

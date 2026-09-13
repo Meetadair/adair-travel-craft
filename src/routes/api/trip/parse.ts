@@ -18,7 +18,13 @@ export const Route = createFileRoute("/api/trip/parse")({
         const parsed = bodySchema.safeParse(raw);
         if (!parsed.success) return new Response("Invalid body", { status: 400 });
 
-        return Response.json(parseTripSentence(parsed.data.sentence), {
+        const request2 = parseTripSentence(parsed.data.sentence);
+        if (!request2)
+          return Response.json(
+            { error: "needs-destination" },
+            { status: 422, headers: { "cache-control": "no-store" } },
+          );
+        return Response.json(request2, {
           headers: { "cache-control": "no-store" },
         });
       },

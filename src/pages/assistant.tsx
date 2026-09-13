@@ -103,7 +103,9 @@ export function AssistantPage() {
     setQuestion(null);
     const parsed = parseTripSentence(sentence);
     setAssumption(
-      assumptionNote(sentence, parsed.destinationCity, parsed.destinationIata ?? ""),
+      parsed
+        ? assumptionNote(sentence, parsed.destinationCity, parsed.destinationIata ?? "")
+        : null,
     );
     search.mutate(sentence);
   };
@@ -190,7 +192,7 @@ export function AssistantPage() {
             const ask: Clarification | null = ages
               ? { kind: "child_ages", question: ages, options: [], placeholder: "4 and 7" }
               : clarify(sentence, {
-                  destinationCity: parseTripSentence(sentence).destinationCity,
+                  destinationCity: parseTripSentence(sentence)?.destinationCity ?? "",
                   knownAirports: knownAirports(),
                 });
             if (ask) {
