@@ -261,3 +261,5 @@
 - [x] At most one nudge per conversation, never again once dismissed: connect the calendar, add a loyalty number, save the default company. Dismissal remembered in the browser and logged.
 - [x] Copy in en.ts under `assistant.strip/questions/advice/nudge`, plain short sentences, no exclamation marks; all 13 locales regenerated.
 - [x] Tests: understanding strip fields, mandatory arrival-time question for business trips, advice generation and the two-line cap, nudge shown once (295 tests pass).
+- [x] Closing the booking in the chat: "Book it all" stays in the conversation. One saved company and one saved card are used without asking; several ask once; no company plus an invoice mention asks for the name once and saves it; no card renders the secure card form inline. Traveller details asked once and stored on the profile. Extras from the sentence are confirmed in one line with a Remove on each. One summary line and [Book it] / [Change something]. `/book/:cardId` stays for passport capture and payment recovery. Copy in `assistant.closing`, all 14 locales regenerated, 308 tests pass.
+

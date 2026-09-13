@@ -61,11 +61,13 @@ export default function CardPayment({
   disabled,
   onAuthorised,
   payingLabel,
+  preselectCardId,
 }: {
   session: PaymentSession;
   amountEur: number;
   disabled?: boolean;
   payingLabel?: string | null;
+  preselectCardId?: string | undefined;
   onAuthorised: (payment: AuthorisedPayment) => void;
 }) {
   const { ref, saveCard, createCardForTemporaryUse } = useDuffelCardFormActions();
@@ -73,7 +75,7 @@ export default function CardPayment({
 
   // The default saved card is pre-selected; "Use a different card" is always there.
   const [selected, setSelected] = useState<string>(
-    session.savedCards.find((card) => card.isDefault)?.id ?? "new",
+    preselectCardId ?? session.savedCards.find((card) => card.isDefault)?.id ?? "new",
   );
   const [saveForNextTime, setSaveForNextTime] = useState(false);
   const [valid, setValid] = useState(false);

@@ -1782,6 +1782,13 @@ export type Database = {
           preferred_airlines: string | null
           seat_preference: string | null
           tax_id: string | null
+          traveller_born_on: string | null
+          traveller_email: string | null
+          traveller_family_name: string | null
+          traveller_gender: string | null
+          traveller_given_name: string | null
+          traveller_phone: string | null
+          traveller_title: string | null
           updated_at: string
           whatsapp_phone: string | null
           whatsapp_verified_at: string | null
@@ -1804,6 +1811,13 @@ export type Database = {
           preferred_airlines?: string | null
           seat_preference?: string | null
           tax_id?: string | null
+          traveller_born_on?: string | null
+          traveller_email?: string | null
+          traveller_family_name?: string | null
+          traveller_gender?: string | null
+          traveller_given_name?: string | null
+          traveller_phone?: string | null
+          traveller_title?: string | null
           updated_at?: string
           whatsapp_phone?: string | null
           whatsapp_verified_at?: string | null
@@ -1826,6 +1840,13 @@ export type Database = {
           preferred_airlines?: string | null
           seat_preference?: string | null
           tax_id?: string | null
+          traveller_born_on?: string | null
+          traveller_email?: string | null
+          traveller_family_name?: string | null
+          traveller_gender?: string | null
+          traveller_given_name?: string | null
+          traveller_phone?: string | null
+          traveller_title?: string | null
           updated_at?: string
           whatsapp_phone?: string | null
           whatsapp_verified_at?: string | null

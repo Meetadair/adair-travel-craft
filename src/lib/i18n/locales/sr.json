@@ -5,37 +5,37 @@
     "business": "Za kompanije",
     "investors": "Za investitore",
     "account": "Moj nalog",
-    "signIn": "Prijava",
+    "signIn": "Prijavite se",
     "language": "Jezik"
   },
   "home": {
     "meta": {
       "title": "Adair Travel — Jedna rečenica. Celo putovanje.",
-      "description": "Let, hotel, automobil i večera — rezervisani iz samo jedne rečenice.",
+      "description": "Let, hotel, automobil i večera — rezervisani iz jedne rečenice.",
       "ogTitle": "Adair Travel — Jedna rečenica. Celo putovanje.",
-      "ogDescription": "Let, hotel, automobil i večera — rezervisani iz samo jedne rečenice."
+      "ogDescription": "Let, hotel, automobil i večera — rezervisani iz jedne rečenice."
     },
     "hero": {
       "titleLine1": "Jedna rečenica.",
       "titleLine2": "Celo putovanje.",
-      "lead": "Let, hotel, automobil i večera — rezervisani iz samo jedne rečenice.",
+      "lead": "Let, hotel, automobil i večera — rezervisani iz jedne rečenice.",
       "ctaPrimary": "Pogledajte kako funkcioniše",
       "inputLabel": "Opišite svoje putovanje u jednoj rečenici",
-      "inputPlaceholder": "npr. Rim, od petka do nedelje, hotel sa terasom, račun na moju kompaniju",
+      "inputPlaceholder": "npr. Rim, od petka do nedelje, hotel sa terasom, faktura na firmu",
       "inputSubmit": "Prikaži putovanje"
     },
     "demo": {
       "label": "Prikaz razgovora",
-      "title": "Dovoljna je samo jedna poruka.",
-      "userMessage": "Treba da budem u Milanu u četvrtak ujutru, povratak u petak uveče, negde blizu Duomo, i automobil po sletanju.",
+      "title": "Dovoljna je jedna poruka.",
+      "userMessage": "Treba da budem u Milanu u četvrtak ujutru, povratak u petak uveče, negde blizu Duomo i automobil po sletanju.",
       "you": "Vi",
       "cardTitle": "Milan · Thu – Fri",
-      "cardSubtitle": "Prilagođeno vašem profilu putovanja",
+      "cardSubtitle": "Usklađeno sa vašim profilom putovanja",
       "flightTitle": "LOT 391 · Warsaw → Milan",
       "flightDetail": "Thu 6:55 – 9:05 AM · povratak Fri 7:40 PM · sedište do prozora, željena avio-kompanija",
       "flightTagClass": "Premium Economy",
       "hotelTitle": "Park Hyatt Milano",
-      "hotelDetail": "1 noć · King soba, miran sprat · 200 m od Duomo",
+      "hotelDetail": "1 noćenje · King soba, miran sprat · 200 m od Duomo",
       "hotelTag": "ugovorena cena",
       "carTitle": "BMW 3 Series · preuzimanje na Linate",
       "carDetail": "Thu 9:30 AM – Fri 6:30 PM · kasko osiguranje, bez depozita",
@@ -44,26 +44,26 @@
       "bookAll": "Rezervišite sve",
       "footnote": "3 stavke · 1 plaćanje · 1 broj rezervacije",
       "typing": "Adair priprema vaše putovanje…",
-      "saved": "Uštedeli ste €96 i 2 h 40 min u odnosu na samostalnu rezervaciju",
-      "savedNote": "u poređenju sa prosečnim javnim cenama i vremenom potrebnim za rezervaciju na više sajtova",
-      "invoiceLine": "Račun → vaša kompanija",
+      "saved": "Uštedeli ste €96 i 2 h 40 min u poređenju sa samostalnom rezervacijom",
+      "savedNote": "u poređenju sa prosečnim javnim cenama i vremenom za rezervaciju na odvojenim sajtovima",
+      "invoiceLine": "Faktura → vaša kompanija",
       "share": "Podelite ovu karticu putovanja",
       "shareCopied": "Kopirano",
-      "testMode": "Testni režim — primeri avio-podataka",
+      "testMode": "Test režim — uzorak podataka avio-kompanije",
       "bookTooltip": "Rezervacije počinju sa zvaničnim lansiranjem",
       "remove": "Uklonite ovu stavku",
       "removedNote": "Uklonjeno sa ovog putovanja",
       "restoreAll": "Vratite sve nazad",
-      "approx": "pribl.",
-      "searchFailed": "Trenutno ne možemo da proverimo dostupnost u realnom vremenu — prikazujemo primer putovanja.",
-      "savedLive": "Uštedeli ste oko {amount} i 2 h 40 min u odnosu na samostalnu rezervaciju",
+      "approx": "oko",
+      "searchFailed": "Trenutno nismo mogli da pristupimo ponudama uživo — prikazujemo primer putovanja.",
+      "savedLive": "Uštedeli ste oko {amount} i 2 h 40 min u poređenju sa samostalnom rezervacijom",
       "savedEstimate": "procena",
-      "nightsOne": "1 noć",
+      "nightsOne": "1 noćenje",
       "nightsMany": "{count} noćenja",
       "cardTitleTpl": "{city} · {day1} – {day2}",
       "flightTitleTpl": "LOT 391 · Warsaw → {city}",
       "flightDetailTpl": "{day1} 6:55 – 9:05 AM · povratak {day2} 7:40 PM · sedište do prozora, željena avio-kompanija",
-      "hotelDetailTpl": "1 noć · King soba, miran sprat · u istorijskom centru",
+      "hotelDetailTpl": "1 noćenje · King soba, miran sprat · u istorijskom centru",
       "carTitleTpl": "BMW 3 Series · preuzimanje na {code}",
       "carDetailTpl": "{day1} 9:30 AM – {day2} 6:30 PM · kasko osiguranje, bez depozita",
       "weekdays": [
@@ -90,19 +90,19 @@
       "emailLabel": "Vaš imejl",
       "emailPlaceholder": "vi@kompanija.com",
       "join": "Prijavite se",
-      "joining": "Samo trenutak…",
-      "success": "Uspešno ste prijavljeni. Podelite svoj link — €40 putnog kredita za vas, €20 za svakog prijatelja koji rezerviše.",
+      "joining": "Trenutak…",
+      "success": "Prijavljeni ste. Podelite link — dobijate €40 kredita za putovanja, a svaki prijatelj koji rezerviše dobija €20.",
       "referralLabel": "Vaš link za preporuku",
-      "copy": "Kopiraj link",
+      "copy": "Kopirajte link",
       "copied": "Kopirano",
-      "error": "Došlo je do greške. Pokušajte ponovo.",
+      "error": "Nije uspelo. Pokušajte ponovo.",
       "teamsLabel": "Za timove",
-      "teamsTitle": "Adair za timove",
-      "teamsLine": "Jedna politika putovanja, jedan račun, jedno mesto za ceo tim. Uskoro nakon lansiranja.",
-      "teamsCta": "Pridružite se listi čekanja za timove",
+      "teamsTitle": "Adair for Teams",
+      "teamsLine": "Jedinstvena pravila putovanja, jedna faktura, jedno mesto za ceo tim. Stiže nakon lansiranja.",
+      "teamsCta": "Pridružite se listi čekanja za Teams",
       "teamsMore": "Pogledajte ponudu za kompanije"
     },
-    "demoLine": "Pet aplikacija, pet potvrda, pet mesta za proveru — ili samo ovo.",
+    "demoLine": "Pet aplikacija, pet potvrda, pet mesta za proveru — ili sve ovde.",
     "after": {
       "items": [
         {
@@ -114,43 +114,43 @@
           "text": "Podesite željene opcije jednom. Svako sledeće putovanje ih poštuje."
         },
         {
-          "title": "Neko koga možete pozvati",
-          "text": "Podrška koja ima uvid u vašu rezervaciju u svakom trenutku."
+          "title": "Uvek imate koga da pozovete",
+          "text": "Podrška koja ima vašu rezervaciju pred sobom."
         }
       ]
     },
     "close": {
       "title": "Adair počinje sa radom u oktobru.",
       "line": "Prvih 100 naloga dobija 3 meseca Signature paketa besplatno.",
-      "teams": "Adair za timove — jedna politika, jedan račun.",
+      "teams": "Adair for Teams — jedna politika, jedna faktura.",
       "teamsLink": "Pridružite se listi"
     },
     "footer": "Adair Kft. · Budapest"
   },
   "assistant": {
     "meta": {
-      "title": "Adair Asistent — isplanirajte celo putovanje u jednom razgovoru",
+      "title": "Adair Assistant — sastavite celo putovanje u jednom razgovoru",
       "description": "Recite nam gde i kada treba da budete. Adair pretražuje stvarne ponude za letove, hotele i automobile i spaja ih u jednu karticu.",
-      "ogTitle": "Adair Asistent — celo putovanje u jednom razgovoru",
-      "ogDescription": "Stvarne ponude za letove, hotele i automobile na jednoj kartici za rezervaciju."
+      "ogTitle": "Adair Assistant — celo putovanje u jednom razgovoru",
+      "ogDescription": "Stvarne ponude letova, hotela i automobila u jednoj kartici spremnoj za rezervaciju."
     },
     "title": "Recite nam gde treba da budete.",
-    "lead": "Adair razume svakodnevni govor, proverava dostupnost kod pružalaca usluga i spaja let, hotel i automobil u jednu karticu spremnu za rezervaciju.",
+    "lead": "Adair razume svakodnevni govor, proverava dostupnost kod provajdera i spaja let, hotel i automobil u jednu karticu spremnu za rezervaciju.",
     "placeholder": "npr. Treba da budem u Milanu u četvrtak ujutru, povratak u petak uveče…",
     "submitIdle": "Sastavi putovanje",
-    "submitBusy": "Pretraga u toku…",
+    "submitBusy": "Pretraga…",
     "examples": [
-      "Treba da budem u Milanu u četvrtak ujutru, povratak u petak uveče, nešto blizu Duomo i automobil koji me čeka.",
-      "Konferencija u Barseloni Oct 12–14, premium economy, hotel blizu kongresnog centra.",
+      "Treba da budem u Milanu u četvrtak ujutru, povratak u petak uveče, smeštaj blizu Duomo i automobil koji me čeka.",
+      "Konferencija u Barseloni 12–14. oktobra, premium ekonomija, hotel blizu kongresnog centra.",
       "Put u London u ponedeljak, povratak u sredu, bez automobila."
     ],
     "error": "Nismo uspeli da sastavimo ovo putovanje. Pokušajte ponovo ili navedite tačne datume.",
-    "sourceLive": "cene direktno sa API-ja pružalaca usluga",
-    "sourcePartial": "pojedine stavke sa API-ja pružalaca usluga",
-    "sourceDemo": "primeri podataka",
+    "sourceLive": "cene sa API-ja provajdera",
+    "sourcePartial": "pojedine stavke sa API-ja provajdera",
+    "sourceDemo": "primer podataka",
     "hideAlternatives": "Sakrij alternative",
     "showAlternatives": "Prikaži alternative",
-    "backToRecommendation": "Nazad na preporuku Adair asistenta",
+    "backToRecommendation": "Nazad na predlog koji nudi Adair",
     "total": "Ukupno, jedna rezervacija",
     "saveIdle": "Sačuvaj putovanje",
     "saveBusy": "Čuvanje…",
@@ -163,7 +163,7 @@
     "removedNote": "Uklonjeno sa ovog putovanja",
     "restoreAll": "Vratite sve nazad",
     "strip": {
-      "heading": "Evo šta sam zabeležio.",
+      "heading": "Evo šta sam razumeo.",
       "from": "Od",
       "to": "Do",
       "depart": "Polazak",
@@ -175,85 +175,113 @@
       "wishes": "Takođe zabeleženo",
       "edit": "Izmeni {field}",
       "find": "Pronađi",
-      "searching": "Pretraga u toku…",
+      "searching": "Pretraga…",
       "done": "Završeno",
-      "airportSearch": "Pretraži aerodrome",
-      "travellersLabel": "Broj osoba"
+      "airportSearch": "Pretražite aerodrome",
+      "travellersLabel": "Koliko osoba"
     },
     "questions": {
       "dates": "Koji su datumi?",
       "arrivalTime": "U koje vreme treba da stignete?",
       "whichAirport": "{city} ima više aerodroma. Koji birate?",
       "skip": "Preskoči",
-      "done": "Završeno"
+      "done": "Gotovo"
     },
     "advice": {
-      "tightFlight": "Ovaj let sleće u {land} za sastanak u {meeting} — tesno je. Let {alt} vam ostavlja {spare} više za dodatnih {extra}.",
-      "tightFlightNoOption": "Ovaj let sleće u {land} za sastanak u {meeting} — to je prilično tesno.",
+      "tightFlight": "Ovaj let sleće u {land}, a sastanak je u {meeting} — tesno je. Let {alt} vam daje {spare} za dodatnih {extra}.",
+      "tightFlightNoOption": "Ovaj let sleće u {land}, a sastanak je u {meeting} — to je prilično tesno.",
       "tightFlightAction": "Izaberite raniji let",
-      "peak": "Cene su {ratio}× više od uobičajenih{event}.",
+      "peak": "Cene su {ratio}× više nego obično{event}.",
       "peakEvent": " — nedelja događaja {event}",
       "peakSaving": " {days} dana kasnije štedi {saving}.",
       "peakAction": "Prikaži povoljnije datume",
-      "transfer": "Hotel je udaljen {minutes} minuta od aerodroma i nema garažu — transfer je jednostavniji od automobila.",
-      "transferCheaper": "Hotel je udaljen {minutes} minuta od aerodroma i nema garažu — transfer je {saving} jeftiniji od automobila.",
+      "transfer": "Hotel je na {minutes} minuta od aerodroma i nema garažu — transfer je jednostavniji od automobila.",
+      "transferCheaper": "Hotel je na {minutes} minuta od aerodroma i nema garažu — transfer je {saving} jeftiniji od automobila.",
       "transferAction": "Zamenite automobil transferom",
-      "breakfast": "Doručak nije uključen u ovu cenu; opcija sa doručkom je skuplja za {amount}.",
-      "breakfastAction": "Dodaj doručak"
+      "breakfast": "Doručak nije uključen u ovu cenu; opcija sa doručkom je {amount} više.",
+      "breakfastAction": "Dodajte doručak"
     },
     "nudge": {
-      "connectCalendar": "Sledeći put bih ovo mogao automatski da preuzmem iz vašeg kalendara — povezivanje traje oko tri minuta.",
+      "connectCalendar": "Sledeći put bih ovo mogao sam da preuzmem iz vašeg kalendara — povezivanje traje oko tri minuta.",
       "connectCalendarAction": "Povežite kalendar",
-      "addLoyalty": "Na ovom letu možete sakupiti milje — unesite broj programa lojalnosti u Podešavanjima.",
+      "addLoyalty": "Na ovom letu biste osvojili milje — unesite broj kartice lojalnosti u Podešavanjima.",
       "addLoyaltyAction": "Unesite broj",
-      "saveCompany": "Sačuvajte podatke o kompaniji jednom i račun će automatski glasiti na nju.",
-      "saveCompanyAction": "Sačuvaj kompaniju",
+      "saveCompany": "Sačuvajte podatke o kompaniji jednom i račun ću slati automatski.",
+      "saveCompanyAction": "Sačuvajte kompaniju",
       "dismiss": "Ne sada"
+    },
+    "closing": {
+      "invoiceChoose": "Na koju kompaniju glasi faktura?",
+      "invoiceNone": "Bez fakture",
+      "invoiceName": "Kojoj kompaniji treba poslati fakturu?",
+      "companyPlaceholder": "Naziv kompanije",
+      "save": "Sačuvaj",
+      "detailsOnce": "Potrebni su mi vaši podaci za kartu, samo jednom.",
+      "firstName": "Ime",
+      "lastName": "Prezime",
+      "email": "Imejl",
+      "phone": "Telefon",
+      "bornOn": "Datum rođenja",
+      "saveForNextTime": "Sačuvaj za sledeći put",
+      "whichCard": "Koja kartica?",
+      "anotherCard": "Druga kartica",
+      "bookIt": "Potvrdi rezervaciju",
+      "changeSomething": "Promenite nešto",
+      "opening": "Otvaranje bezbednog obrasca za plaćanje…",
+      "moment": "Trenutak…",
+      "booked": "Rezervisano. Preusmeravamo vas na Moja putovanja — u test režimu ništa nije naplaćeno.",
+      "testMode": "Test režim — plaćanje se ne naplaćuje i karta se ne izdaje.",
+      "passport": "Za ovu rutu su potrebni podaci iz pasoša, pa ćemo završiti na bezbednoj stranici.",
+      "continueSecure": "Nastavi",
+      "failed": "Transakcija nije prošla i ništa nije naplaćeno. Možemo završiti na bezbednoj stranici.",
+      "finishSecure": "Završi na bezbednoj stranici",
+      "companyFailed": "Nismo uspeli da sačuvamo tu kompaniju. Pokušajte ponovo.",
+      "detailsFailed": "Navedeni podaci nisu prihvaćeni. Proverite ih."
     }
   },
   "auth": {
     "meta": {
       "title": "Adair nalog — prijava ili registracija",
-      "description": "Prijavite se na Adair Travel da sačuvate svoja putovanja, podešavanja i preuzmete PDF račune.",
+      "description": "Prijavite se na Adair Travel da biste čuvali svoja putovanja, podešavanja i preuzimali PDF fakture.",
       "ogTitle": "Adair nalog — prijava ili registracija",
-      "ogDescription": "Vaša putovanja, podešavanja i računi na jednoj kontrolnoj tabli."
+      "ogDescription": "Vaša putovanja, podešavanja i fakture na jednoj kontrolnoj tabli klijenta."
     },
     "signInTitle": "Prijava",
-    "signUpTitle": "Kreirajte nalog",
-    "lead": "Vaša putovanja, podešavanja i računi na jednom mestu.",
+    "signUpTitle": "Otvorite nalog",
+    "lead": "Vaša putovanja, podešavanja i fakture na jednom mestu.",
     "fullName": "Ime i prezime",
     "email": "Imejl",
     "password": "Lozinka",
-    "submitBusy": "Samo trenutak…",
-    "signIn": "Prijava",
-    "signUp": "Registracija",
+    "submitBusy": "Trenutak…",
+    "signIn": "Prijavite se",
+    "signUp": "Registrujte se",
     "toSignUp": "Nemam nalog",
     "toSignIn": "Već imam nalog",
     "confirmSent": "Proverite sanduče — poslali smo vam link za potvrdu.",
     "genericError": "Došlo je do greške",
-    "demoHint": "Želite li prvo da vidite primer?",
+    "demoHint": "Želite prvo da vidite demo?",
     "demoLink": "Otvorite asistenta"
   },
   "dashboard": {
     "meta": {
-      "title": "Adair kontrolna tabla — putovanja i računi",
-      "description": "Vaša sačuvana Adair putovanja, podešavanja i računi dostupni za PDF preuzimanje.",
+      "title": "Adair kontrolna tabla — putovanja i fakture",
+      "description": "Vaša sačuvana Adair putovanja, podešavanja putovanja i fakture spremne za preuzimanje u PDF formatu.",
       "ogTitle": "Adair kontrolna tabla za klijente",
-      "ogDescription": "Putovanja, podešavanja i računi na jednom mestu."
+      "ogDescription": "Putovanja, podešavanja i fakture na jednom mestu."
     },
-    "loadError": "Ne možemo da učitamo kontrolnu tablu. Molimo osvežite stranicu.",
+    "loadError": "Nismo uspeli da učitamo kontrolnu tablu. Osvežite stranicu.",
     "title": "Moja putovanja",
-    "signOut": "Odjavi se",
+    "signOut": "Odjavite se",
     "loading": "Učitavanje putovanja…",
     "empty": "Još uvek nemate sačuvanih putovanja.",
-    "emptyCta": "Rezervišite svoje prvo putovanje",
-    "invoice": "Preuzmi račun (PDF)",
+    "emptyCta": "Rezervišite prvo putovanje",
+    "invoice": "Preuzmite fakturu (PDF)",
     "deleteTrip": "Obriši putovanje",
     "profileTitle": "Profil putovanja",
-    "profileLead": "Podesite jednom — svako buduće putovanje i račun pratiće ove postavke.",
+    "profileLead": "Podesite jednom — svako buduće putovanje i faktura pratiće ova podešavanja.",
     "fields": {
       "fullName": "Ime i prezime",
-      "company": "Kompanija (primalac računa)",
+      "company": "Kompanija (primalac fakture)",
       "taxId": "VAT broj",
       "airlines": "Željene avio-kompanije",
       "cabin": "Klasa kabine",
@@ -270,14 +298,14 @@
   "investors": {
     "meta": {
       "title": "Adair Travel za investitore — model, marža, runda",
-      "description": "Adair Travel objedinjuje let, hotel i automobil u jednu rezervaciju. Model prihoda, marža na ugovorene hotelske cene i uslovi seed runde.",
+      "description": "Adair Travel spaja let, hotel i automobil u jednu rezervaciju. Model prihoda, marža iz ugovorenih hotelskih cena i uslovi seed runde.",
       "ogTitle": "Adair Travel za investitore",
-      "ogDescription": "Jedan asistent umesto pet aplikacija. Marža na sopstvene ugovorene hotelske cene, a ne provizije od OTA portala."
+      "ogDescription": "Jedan asistent umesto pet aplikacija. Marža iz sopstvenih ugovorenih hotelskih cena, a ne provizija od OTA platformi."
     },
     "badge": "Seed runda · materijal za investitore",
-    "titleLine1": "Poslovna putovanja danas znače pet aplikacija.",
-    "titleLine2": "Sa nama, to je jedna rečenica.",
-    "lead": "Adair Travel je asistent koji jedan zahtev pretvara u let, hotel i automobil objedinjene na jednoj kartici i jednom računu. Zarađujemo na sopstvenim ugovorenim hotelskim cenama, a ne na proviziji sajta za poređenje — zato je naša cena niža, a marža viša.",
+    "titleLine1": "Poslovna putovanja danas traže pet aplikacija.",
+    "titleLine2": "Uz nas, dovoljna je jedna rečenica.",
+    "lead": "Adair Travel je asistent koji jedan zahtev pretvara u let, hotel i automobil objedinjene u jednu karticu i jednu fakturu. Prihod ostvarujemo na sopstvenim ugovorenim cenama hotela, a ne od provizija sa pretraživača — zato je naša cena niža, a naša marža viša.",
     "metrics": [
       {
         "label": "Prosečna vrednost putovanja",
@@ -292,29 +320,29 @@
         "value": "< 40 s"
       },
       {
-        "label": "Zamenjene aplikacije",
+        "label": "Zamenjenih aplikacija",
         "value": "5"
       }
     ],
-    "revenueTitle": "Izvori prihoda",
+    "revenueTitle": "Odakle dolazi prihod",
     "revenue": [
       {
         "title": "Ugovorena cena",
-        "body": "Sobe zakupljujemo po sopstvenim korporativnim cenama i prodajemo ih ispod javne cene na OTA platformama. Marža ostaje nama, a ne posredniku.",
+        "body": "Sobe kupujemo po sopstvenoj korporativnoj ceni i prodajemo ih ispod javne cene na OTA platformama. Marža ostaje nama, a ne posredniku.",
         "margin": "8–14%"
       },
       {
-        "title": "Avio-provizija (NDC)",
-        "body": "Letovi kroz NDC kanal: distributivna provizija plus naknada za obradu izmena i refundacija na jednom mestu.",
+        "title": "Provizija od avio-kompanija (NDC)",
+        "body": "Letovi kroz NDC kanal: distributivna provizija plus naknada za upravljanje izmenama i refundacijama na jednom mestu.",
         "margin": "1–3%"
       },
       {
-        "title": "Korporativna pretplata",
-        "body": "Timovi plaćaju profil putovanja, politiku troškova i jedinstveni VAT račun za celo putovanje umesto tri odvojena dokumenta.",
+        "title": "Pretplata za timove",
+        "body": "Timovi plaćaju profil putovanja, politiku troškova i jedinstvenu fakturu sa iskazanim VAT-om za celo putovanje umesto tri odvojena dokumenta.",
         "margin": "€29 / user / mo."
       }
     ],
-    "unitTitle": "Primer putovanja — jedinična ekonomija",
+    "unitTitle": "Primer putovanja — ekonomija jedinice",
     "colItem": "Stavka",
     "colPrice": "Cena za klijenta",
     "colMargin": "Naša marža",
@@ -325,7 +353,7 @@
         "margin": "€6"
       },
       {
-        "item": "Hotel, 1 noć (ugovorena cena)",
+        "item": "Hotel, 1 noćenje (ugovorena cena)",
         "price": "€742",
         "margin": "€96"
       },
@@ -338,12 +366,12 @@
     "unitTotal": "Ukupno, jedna rezervacija",
     "unitNote": "Ruta Varšava–Milano, ilustrativni podaci zasnovani na testnim cenama dobavljača.",
     "askTitle": "Šta tražimo",
-    "askBody": "Prikupljamo seed rundu kako bismo proširili bazu ugovorenih hotelskih cena u deset poslovnih gradova, pružili punu podršku za izmene rezervacija na jednom mestu i plasirali rešenje timovima od 20–200 ljudi.",
+    "askBody": "Prikupljamo seed rundu kako bismo proširili bazu ugovorenih hotelskih cena u deset poslovnih gradova, ponudili punu podršku za izmene rezervacija na jednom mestu i uveli sistem u timove od 20 do 200 ljudi.",
     "contact": "Stupite u kontakt",
     "seeProduct": "Pogledajte proizvod uživo"
   },
   "invoice": {
-    "documentTitle": "RAČUN / KARTICA PUTOVANJA",
+    "documentTitle": "FAKTURA / KARTICA PUTOVANJA",
     "seller": "PRODAVAC",
     "buyer": "KUPAC",
     "item": "STAVKA",
@@ -352,55 +380,55 @@
     "netTotal": "Ukupno neto",
     "vat": "VAT",
     "totalDue": "Ukupno za uplatu",
-    "issued": "izdato",
+    "issued": "izdati",
     "number": "Br.",
     "vatId": "VAT ID",
     "kindFlight": "Let",
     "kindHotel": "Hotel",
     "kindCar": "Automobil",
-    "demoNote": "Konceptualni dokument — stavke sadrže primere podataka",
-    "liveNote": "Cene stavki formirane na osnovu ponuda dobavljača dobijenih putem Adair API-ja",
-    "paymentNote": "Plaćanje: jedna transakcija službenom karticom · rok plaćanja 14 dana",
+    "demoNote": "Konceptualni dokument — stavke sadrže uzorke podataka",
+    "liveNote": "Cene stavki potiču iz ponuda provajdera preuzetih preko Adair API-ja",
+    "paymentNote": "Plaćanje: jedna transakcija kompanijskom karticom · rok 14 dana",
     "hotelNote": "Hotel obračunat po ugovorenoj ceni",
     "tagline": "Adair Travel · Jedan zahtev. Celo putovanje. · adair.travel"
   },
   "business": {
     "meta": {
       "title": "Adair za kompanije — timska putovanja, budžeti i analitika",
-      "description": "Jedan prozor za ceo tim: asistent koji rezerviše let, hotel i automobil, održava putovanja unutar budžeta i svako putovanje pretvara u jedan račun i jedan izveštaj.",
-      "ogTitle": "Adair za kompanije — timska putovanja u jednom prozoru",
+      "description": "Jedan prozor za ceo tim: asistent koji rezerviše let, hotel i automobil, održava putovanja unutar budžeta i svako putovanje pretvara u jednu fakturu i jedan izveštaj.",
+      "ogTitle": "Adair za kompanije — putovanja tima u jednom prozoru",
       "ogDescription": "Budžeti, odobrenja i analitika putovanja za timove. Jedan razgovor umesto pet aplikacija."
     },
     "badge": "Za kompanije i timove",
     "titleLine1": "Putovanja celog tima",
     "titleLine2": "u jednom prozoru.",
-    "lead": "Adair sastavlja svako putovanje iz jedne rečenice, drži ga u okviru vaše politike putovanja i isporučuje jedan račun i jasan izveštaj. Asistenti prestaju sa žongliranjem karticama u pretraživaču, a finansije više ne jure račune.",
+    "lead": "Adair sastavlja svako putovanje iz jedne rečenice, drži ga unutar politike putovanja i vraća jednu fakturu i jedan jasan izveštaj. Asistenti ne gube vreme među tabovima, a računovodstvo ne juri račune.",
     "ctaPrimary": "Razgovarajte sa nama o vašem timu",
     "ctaSecondary": "Pogledajte pakete",
     "rolesLabel": "Kome je namenjeno",
     "rolesTitle": "Tri uloge, jedan prozor.",
     "roles": [
       {
-        "role": "Asistent / office manager",
-        "title": "Rezervišite za drugoga u jednoj rečenici",
+        "role": "Asistent / menadžer kancelarije",
+        "title": "Rezervišite za kolegu u jednoj rečenici",
         "items": [
           "Rezervišite u ime bilo kog kolege",
           "Jedno zajedničko sanduče za sva putovanja tima",
-          "Jedan VAT račun umesto tri dokumenta"
+          "Jedna faktura sa iskazanim VAT-om umesto tri dokumenta"
         ]
       },
       {
         "role": "Menadžer / finansije",
         "title": "Troškovi vidljivi pre nego što nastanu",
         "items": [
-          "Ograničenja budžeta po putovanju, po osobi, po mesecu",
-          "Odobrenje samo iznad praga koji sami postavite",
-          "Uvid u potrošnju u realnom vremenu, bez iznenađenja na kraju meseca"
+          "Limiti budžeta po putovanju, po osobi, po mesecu",
+          "Odobrenje samo iznad praga koji odredite",
+          "Praćenje potrošnje uživo, bez iznenađenja na kraju meseca"
         ]
       },
       {
         "role": "Putnik",
-        "title": "Vaša podešavanja se uvek poštuju",
+        "title": "Željeni uslovi poštovani svaki put",
         "items": [
           "Lični profil putovanja podešen jednom",
           "Let, hotel i automobil na jednoj kartici",
@@ -409,18 +437,18 @@
       }
     ],
     "budgetLabel": "Troškovi i budžeti",
-    "budgetTitle": "Pravila potrošnje koja asistent dosledno prati.",
-    "budgetLead": "Okvir definišete jednom. Svaki predlog koji Adair sastavi već ga poštuje — nema naknadne kontrole.",
+    "budgetTitle": "Pravila potrošnje koja asistent prati.",
+    "budgetLead": "Okvir postavite jednom. Svaki predlog koji Adair sastavi već ga poštuje — nema potrebe za naknadnom kontrolom.",
     "budgets": [
       {
         "title": "Limit po putovanju",
         "value": "€1,500",
-        "note": "Adair nikada ne predlaže paket iznad ovog limita"
+        "note": "Adair nikada ne predlaže paket iznad limita"
       },
       {
         "title": "Mesečni budžet tima",
         "value": "€28,000",
-        "note": "Trenutna potrošnja vidljiva finansijama u svakom trenutku"
+        "note": "Finansije u svakom trenutku vide trenutnu potrošnju"
       },
       {
         "title": "Prag za odobrenje",
@@ -429,22 +457,22 @@
       },
       {
         "title": "Politika putovanja",
-        "value": "Klasa, lanci, radijus",
-        "note": "Premium Economy za letove duže od 2 h, isključivo željeni lanci"
+        "value": "Kabina, lanci, radijus",
+        "note": "Premium Economy preko 2 h, isključivo željeni lanci"
       }
     ],
-    "dashLabel": "Kompanijski pregled",
+    "dashLabel": "Pogled za kompaniju",
     "dashTitle": "Sve što finansije traže, na jednom ekranu.",
-    "dashNote": "Samo pregled — primeri podataka",
+    "dashNote": "Samo pregled — uzorak podataka",
     "dash": {
-      "budgetTitle": "Septembarski budžet",
+      "budgetTitle": "Budžet za septembar",
       "budgetOf": "od iskorišćenih €28,000",
-      "tripsTitle": "Nedavna putovanja tima",
+      "tripsTitle": "Nedavna timska putovanja",
       "statusPaid": "plaćeno",
       "statusPending": "čeka odobrenje",
       "peopleTitle": "Potrošnja po osobi",
       "routesTitle": "Najčešće rute",
-      "savedTitle": "Ušteđeno u odnosu na javne cene",
+      "savedTitle": "Ušteda u poređenju sa javnim cenama",
       "savedValue": "€2,340",
       "savedNote": "ovog kvartala, na 21 putovanju",
       "tripsCount": "putovanja",
@@ -516,43 +544,43 @@
     "analytics": [
       {
         "title": "Trošak po osobi",
-        "text": "Ko putuje, koliko često i koliko to košta — po osobi, timu ili mestu troška."
+        "text": "Ko putuje, koliko često i koliko to košta — po osobi, timu ili centru troškova."
       },
       {
-        "title": "Učestalost ruta",
-        "text": "Rute kojima najčešće letite, kako bismo znali gde vredi obezbediti ugovorenu cenu."
+        "title": "Modeli ruta",
+        "text": "Rute na kojima letite najčešće, kako bismo znali gde vredi imati ugovorenu cenu."
       },
       {
         "title": "Prosečna cena noćenja",
-        "text": "Koliko vaš tim zaista plaća po noćenju i kako se to menja iz meseca u mesec."
+        "text": "Šta vaš tim stvarno plaća po noći i kako se to kreće iz meseca u mesec."
       },
       {
         "title": "Usklađenost sa politikom",
-        "text": "Koja putovanja su bila u okviru politike, a za koja je bilo potrebno odobrenje."
+        "text": "Koja putovanja su ostala u okviru politike, a za koja je bilo potrebno odobrenje."
       },
       {
         "title": "Ušteda u poređenju sa javnim cenama",
         "text": "Razlika između onoga što ste platili i javne cene za isto putovanje."
       },
       {
-        "title": "Izvoz za računovodstvo",
-        "text": "Jedna datoteka mesečno sa svim povezanim računima, referencama i VAT stavkama."
+        "title": "Računovodstveni izvoz",
+        "text": "Jedan fajl mesečno sa svakom fakturom, referencom i VAT stavkom već uparenim."
       }
     ],
     "plansLabel": "Paketi",
-    "plansTitle": "Izaberite paket po meri vašeg tima.",
-    "plansNote": "Teams paket počinje 14-dnevnim probnim periodom, bez unosa kartice. Cene su bez VAT-a. Enterprise se formira prema veličini vašeg tima i vašoj politici.",
+    "plansTitle": "Izaberite okvir koji odgovara vašem timu.",
+    "plansNote": "Teams paket počinje probnim periodom od 14 dana, bez unosa kartice. Cene su bez VAT-a. Enterprise se formira prema veličini tima i vašoj politici.",
     "plansTrial": "14 dana besplatno",
     "quote": "Zatražite ponudu",
     "plans": [
       {
         "name": "Starter",
         "forWho": "Do 5 putnika",
-        "price": "Besplatno",
+        "price": "Free",
         "priceNote": "kartica nije potrebna",
         "features": [
           "Profil putovanja po osobi",
-          "Jedan račun po putovanju",
+          "Jedna faktura po putovanju",
           "Arhiva putovanja i PDF kartice putovanja",
           "Imejl podrška"
         ]
@@ -561,9 +589,9 @@
         "name": "Teams",
         "forWho": "5–50 putnika",
         "price": "19 USD",
-        "priceNote": "po putniku, mesečno — minimum 5",
+        "priceNote": "po putniku, mesečno — najmanje 5",
         "features": [
-          "Budžeti i pragovi odobrenja",
+          "Budžeti i pragovi za odobrenje",
           "Rezervacija u ime kolega",
           "Mesečni izveštaj o putovanjima",
           "Zajednički pregled putovanja tima"
@@ -572,19 +600,19 @@
       {
         "name": "Enterprise",
         "forWho": "50+ putnika",
-        "price": "Na upit",
+        "price": "On request",
         "priceNote": "prilagođeno vašem timu",
         "features": [
-          "Mesta troška i prilagođena pravila politike",
+          "Centri troškova i prilagođena pravila politike",
           "Izvoz za računovodstvo u vašem formatu",
-          "Ugovorene cene na vašim ključnim rutama",
+          "Ugovorene cene na ključnim rutama",
           "Dodeljeni menadžer naloga"
         ]
       }
     ],
     "contactLabel": "Razgovarajte sa nama",
-    "contactTitle": "Recite nam više o vašem timu.",
-    "contactLead": "Ostavite svoje podatke i javićemo se sa ponudom i demonstracijom podešavanja za vaša putovanja.",
+    "contactTitle": "Ispričajte nam o svom timu.",
+    "contactLead": "Ostavite svoje podatke i javićemo se sa ponudom i demonstracijom za vaša putovanja.",
     "form": {
       "email": "Poslovni imejl",
       "emailPlaceholder": "vi@kompanija.com",
@@ -592,12 +620,12 @@
       "companyPlaceholder": "Naziv kompanije",
       "size": "Veličina tima",
       "sizePlaceholder": "npr. 12 putnika",
-      "message": "Želite li još nešto da navedete? (opciono)",
-      "messagePlaceholder": "Rute kojima najčešće letite, postojeći alati, zahtevi za fakturisanje…",
-      "submit": "Pošalji zahtev",
+      "message": "Ima li još nešto što bi trebalo da znamo? (opciono)",
+      "messagePlaceholder": "Rute na kojima najčešće letite, alati koje koristite, fakturisanje…",
+      "submit": "Pošaljite zahtev",
       "submitBusy": "Slanje…",
       "success": "Hvala vam — javićemo se u roku od jednog radnog dana.",
-      "error": "Došlo je do greške. Pokušajte ponovo."
+      "error": "Nije uspelo. Pokušajte ponovo."
     },
     "footer": "Adair Kft. · Budapest"
   }

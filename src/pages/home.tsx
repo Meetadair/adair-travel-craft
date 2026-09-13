@@ -37,6 +37,9 @@ import { chatQuestions, essentialsMet, isBusinessSentence, type ChatQuestionKind
 import { buildAdvice, type AdviceLine } from "@/lib/trip/advice";
 import { pickNudge, readDismissed, rememberDismissed, type Nudge, type NudgeKind } from "@/lib/trip/nudges";
 import { airportDistanceKm, driveMinutes } from "@/lib/trip/airport-geo";
+import { ClosingChat } from "@/components/trip/closing-chat";
+import { wishesFromSentence } from "@/lib/trip/understanding";
+import { isSchengen } from "@/lib/trip/backwards";
 
 import { SiteNav } from "@/components/site-nav";
 import { LocaleLink, useLocale, useT, type Dict } from "@/lib/i18n";
@@ -350,6 +353,8 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
   const [insurance, setInsurance] = useState<InsuranceQuote | null>(null);
   const [addInsurance, setAddInsurance] = useState(false);
   const [dropped, setDropped] = useState({ flight: false, hotel: false, car: false });
+  /** True once "Book it all" opened the closing conversation. */
+  const [closing, setClosing] = useState(false);
   const drop = (kind: "flight" | "hotel" | "car") =>
     setDropped((prev) => ({ ...prev, [kind]: true }));
   const anyDropped = dropped.flight || dropped.hotel || dropped.car;
@@ -896,6 +901,21 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
     : 0;
   const invoiceVisible = req ? req.invoiceToCompany : Boolean(parsed?.invoice);
 
+  // Closing the booking in the chat: opened by "Book it all".
+  const closingParts = [
+    req?.destinationCity ?? "",
+    req ? `${dayLabel(req.departDate, locale)}–${dayLabel(req.returnDate, locale)}` : "",
+    !dropped.flight && live?.flight
+      ? `${live.flight.carrier} ${live.flight.departAt.slice(11, 16)}`.trim()
+      : "",
+    !dropped.hotel && live?.stay ? live.stay.name : "",
+    !dropped.car && live?.car ? live.car.vehicle : "",
+  ].filter((part) => part.trim().length > 0);
+  const closingExtras = wishesFromSentence(submission?.sentence ?? "").map((wish, index) => ({
+    id: `wish-${index}`,
+    label: wish,
+  }));
+
   const reveal = (index: number) => (revealed >= index ? "animate-rise" : "hidden");
 
   async function shareCard() {
@@ -1365,7 +1385,7 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                       {cardId ? (
                         <button
                           type="button"
-                          onClick={() => navigate({ to: "/book/$cardId", params: { cardId } })}
+                          onClick={() => setClosing(true)}
                           className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
                         >
                           {d.bookAll} <ChevronRight className="size-4" />
@@ -1395,8 +1415,29 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                     ) : (
                       <SavedLine t={t} className={showSaved ? "animate-rise mt-3" : "hidden"} />
                     )}
+                    {closing && cardId && signedIn && (
+                      <ClosingChat
+                        cardId={cardId}
+                        summaryParts={closingParts}
+                        totalLabel={totalLabel}
+                        totalEur={Math.round((travelTotal + insuranceAdd) * 100) / 100}
+                        include={{
+                          flight: !dropped.flight,
+                          stay: !dropped.hotel,
+                          car: !dropped.car,
+                          insurance: addInsurance,
+                        }}
+                        rides={[]}
+                        extras={closingExtras}
+                        invoiceMentioned={invoiceVisible}
+                        passportRequired={
+                          !!req?.destinationIata && !isSchengen(req.destinationIata)
+                        }
+                      />
+                    )}
                   </div>
                 </div>
+
 
                 {priceContext?.peak && !datesKept && showActions && (
                   <div className="animate-rise mt-4 rounded-2xl border border-border bg-background p-4">
