@@ -208,7 +208,8 @@ export const bookTripCard = createServerFn({ method: "POST" })
 
     // Loyalty numbers from the traveller's wallet, decrypted server-side only.
     const { loadEarningRules, loadMemberships } = await import("@/lib/loyalty/booking.server");
-    const { earnsOn } = await import("@/lib/loyalty/earning");
+    const { earnsOn, earnsOnWithGroup } = await import("@/lib/loyalty/earning");
+    const { BRAND_SEED } = await import("@/lib/brands/catalogue");
     const memberships = await loadMemberships(userId);
     const earningRules = await loadEarningRules();
     const mask = (last4: string) => (last4 ? `•••• ${last4}` : "no number");
@@ -255,11 +256,15 @@ export const bookTripCard = createServerFn({ method: "POST" })
     const carSupplier = search.car ? `${search.car.supplier} ${search.car.vehicle}` : null;
     const hotelMembership =
       usable.find(
-        (m) => m.category === "hotel" && earnsOn(earningRules, "hotel", m.programmeCode, hotelName),
+        (m) =>
+          m.category === "hotel" &&
+          earnsOnWithGroup(earningRules, BRAND_SEED, "hotel", m.programmeCode, hotelName),
       ) ?? null;
     const carMembership =
       usable.find(
-        (m) => m.category === "car" && earnsOn(earningRules, "car", m.programmeCode, carSupplier),
+        (m) =>
+          m.category === "car" &&
+          earnsOnWithGroup(earningRules, BRAND_SEED, "car", m.programmeCode, carSupplier),
       ) ?? null;
 
     const lines: BookingResult["lines"] = [];
