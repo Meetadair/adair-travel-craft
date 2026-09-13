@@ -1,8 +1,8 @@
 {
   "nav": {
-    "assistant": "助手",
+    "assistant": "智能助手",
     "trips": "我的行程",
-    "business": "企业方案",
+    "business": "企业版",
     "investors": "投资者",
     "account": "我的账户",
     "signIn": "登录",
@@ -10,70 +10,70 @@
   },
   "home": {
     "meta": {
-      "title": "Adair Travel — 一句话，完整旅程。",
-      "description": "机票、酒店、用车与晚餐 —— 只需一句话，悉数备妥。",
-      "ogTitle": "Adair Travel — 一句话，完整旅程。",
-      "ogDescription": "机票、酒店、用车与晚餐 —— 只需一句话，悉数备妥。"
+      "title": "Adair Travel — 一句话，包揽整趟行程。",
+      "description": "机票、酒店、用车与晚餐——一句话轻松预订。",
+      "ogTitle": "Adair Travel — 一句话，包揽整趟行程。",
+      "ogDescription": "机票、酒店、用车与晚餐——一句话轻松预订。"
     },
     "hero": {
       "titleLine1": "一句话。",
-      "titleLine2": "完整旅程。",
-      "lead": "机票、酒店、用车与晚餐 —— 只需一句话，悉数备妥。",
+      "titleLine2": "包揽整趟行程。",
+      "lead": "机票、酒店、用车与晚餐——一句话轻松预订。",
       "ctaPrimary": "了解运作方式",
-      "inputLabel": "用一句话描述您的行程",
-      "inputPlaceholder": "例如：罗马，周五至周日，带露台的酒店，账单发至公司",
+      "inputLabel": "用一句话描述你的行程",
+      "inputPlaceholder": "例如：罗马，周五去周日回，带露台的酒店，发票开给公司",
       "inputSubmit": "生成行程"
     },
     "demo": {
       "label": "对话演示",
       "title": "只需一条消息。",
-      "userMessage": "我周四上午要到米兰，周五晚上返回，住 Duomo 附近，落地需要一辆车。",
-      "you": "您",
-      "cardTitle": "Milan · Thu – Fri",
-      "cardSubtitle": "依您的出行偏好定制",
-      "flightTitle": "LOT 391 · Warsaw → Milan",
-      "flightDetail": "Thu 6:55 – 9:05 AM · 返程 Fri 7:40 PM · 靠窗座位，优选航司",
-      "flightTagClass": "Premium Economy",
+      "userMessage": "我周四早上需要到米兰，周五晚上回，住在 Duomo 附近，落地要有车。",
+      "you": "你",
+      "cardTitle": "米兰 · 周四 – 周五",
+      "cardSubtitle": "根据你的出行偏好定制",
+      "flightTitle": "LOT 391 · 华沙 → 米兰",
+      "flightDetail": "周四 6:55 – 9:05 AM · 周五 7:40 PM 返回 · 靠窗座位，首选航司",
+      "flightTagClass": "高端经济舱",
       "hotelTitle": "Park Hyatt Milano",
-      "hotelDetail": "1 night · 大床房，安静楼层 · 距 Duomo 200 m",
+      "hotelDetail": "1 晚 · 大床房，安静楼层 · 距 Duomo 200 m",
       "hotelTag": "协议价",
       "carTitle": "BMW 3 Series · Linate 取车",
-      "carDetail": "Thu 9:30 AM – Fri 6:30 PM · 全险，免押金",
+      "carDetail": "周四 9:30 AM – 周五 6:30 PM · 全险，免押金",
       "carTag": "自动挡",
-      "total": "总计（单次预订）",
-      "bookAll": "整单预订",
-      "footnote": "3 项预订 · 1 次支付 · 1 个预订号",
-      "typing": "Adair 正在规划您的旅程…",
-      "saved": "相比自行预订，为您节省 €96 与 2 h 40 min",
-      "savedNote": "对比在不同网站分别预订同一行程的平均公开价与耗时",
-      "invoiceLine": "发票 → 您的公司",
+      "total": "总计，单笔预订",
+      "bookAll": "一键预订全部",
+      "footnote": "3 项预订 · 1 笔付款 · 1 个预订号",
+      "typing": "Adair 正在为你规划行程…",
+      "saved": "相比自行预订，为你节省 €96 与 2 h 40 min",
+      "savedNote": "对比在各平台分别预订同等行程的公开均价与耗时",
+      "invoiceLine": "发票 → 你的公司",
       "share": "分享此行程卡片",
       "shareCopied": "已复制",
       "testMode": "测试模式 — 航司示例数据",
-      "bookTooltip": "预订功能将于正式上线时开放",
+      "bookTooltip": "正式上线后开放预订",
       "remove": "移除此项",
-      "removedNote": "已从本次行程中移除",
+      "removedNote": "已从此行程中移除",
       "restoreAll": "全部恢复",
       "approx": "约",
-      "searchFailed": "暂无法获取实时空位情况 — 当前显示示例行程。",
-      "savedLive": "相比自行预订，约为您节省 {amount} 与 2 h 40 min",
+      "searchFailed": "暂无法获取实时票价与房态 — 已为你展示示例行程。",
+      "savedLive": "相比自行预订，为你节省约 {amount} 与 2 h 40 min",
       "savedEstimate": "预估",
       "nightsOne": "1 晚",
       "nightsMany": "{count} 晚",
       "cardTitleTpl": "{city} · {day1} – {day2}",
-      "flightTitleTpl": "LOT 391 · Warsaw → {city}",
-      "flightDetailTpl": "{day1} 6:55 – 9:05 AM · 返程 {day2} 7:40 PM · 靠窗座位，优选航司",
-      "hotelDetailTpl": "1 晚 · 大床房，安静楼层 · 位于历史城区",
+      "flightTitleTpl": "LOT 391 · 华沙 → {city}",
+      "flightDetailTpl": "{day1} 6:55 – 9:05 AM · {day2} 7:40 PM 返回 · 靠窗座位，首选航司",
+      "hotelDetailTpl": "1 晚 · 大床房，安静楼层 · 位于历史中心",
       "carTitleTpl": "BMW 3 Series · {code} 取车",
       "carDetailTpl": "{day1} 9:30 AM – {day2} 6:30 PM · 全险，免押金",
       "weekdays": [
-        "周一",
-        "周二",
-        "周三",
-        "周四",
-        "周五",
-        "周六",
-        "周日"
+        "星期一",
+        "星期二",
+        "星期三",
+        "星期四",
+        "星期五",
+        "星期六",
+        "星期日"
       ],
       "weekdaysShort": [
         "周一",
@@ -86,230 +86,259 @@
       ]
     },
     "campaign": {
-      "earlyAccess": "申请抢先体验",
-      "emailLabel": "您的电子邮箱",
+      "earlyAccess": "获取抢先体验资格",
+      "emailLabel": "你的电子邮箱",
       "emailPlaceholder": "you@company.com",
       "join": "加入",
       "joining": "请稍候…",
-      "success": "您已加入。分享您的专属链接 — 您可获 €40 旅行礼金，好友首次预订亦可获 €20。",
-      "referralLabel": "您的邀请链接",
+      "success": "已加入。分享你的专属邀请链接 — 每有一位好友完成预订，你可获 €40 差旅基金，好友享 €20。",
+      "referralLabel": "你的专属邀请链接",
       "copy": "复制链接",
       "copied": "已复制",
       "error": "提交未成功，请重试。",
-      "teamsLabel": "团队方案",
+      "teamsLabel": "团队版",
       "teamsTitle": "Adair 团队版",
-      "teamsLine": "统一差旅标准、一张发票、全员共享。上线后推出。",
+      "teamsLine": "全团队统一差旅标准、一张发票、一处搞定。正式发布后推出。",
       "teamsCta": "加入团队版候补名单",
       "teamsMore": "查看企业方案"
     },
-    "demoLine": "打开五个应用，核对五份确认，查阅五个平台 —— 或者，只需如此。",
+    "demoLine": "五个应用、五份确认单、五个核对入口 — 或者，只需这一个。",
     "after": {
       "items": [
         {
-          "title": "一处尽览",
-          "text": "确认函、预订凭证与行程变更，均在「我的行程」中。"
+          "title": "一站尽览",
+          "text": "确认单、凭证与行程变更，尽在“我的行程”。"
         },
         {
-          "title": "懂您所想",
-          "text": "一次设定偏好，后续每一次行程皆依循照办。"
+          "title": "越用越懂你",
+          "text": "只需设置一次偏好，后续每一次出行都依你所愿。"
         },
         {
-          "title": "专属协助",
-          "text": "客服即时调取您的预订全貌，随时随地响应。"
+          "title": "专属人工支持",
+          "text": "真人客服随时待命，你的预订详情一目了然。"
         }
       ]
     },
     "close": {
       "title": "Adair 将于 10 月正式上线。",
-      "line": "前 100 位注册用户享 3 个月免费 Signature 会员权益。",
-      "teams": "Adair 团队版 — 统一标准，单一发票。",
-      "teamsLink": "加入候补"
+      "line": "前 100 位注册用户免费获赠 3 个月 Signature 会员。",
+      "teams": "Adair 团队版 — 统一标准，一张发票。",
+      "teamsLink": "加入候补名单"
     },
     "footer": "Adair Kft. · Budapest"
   },
   "assistant": {
     "meta": {
-      "title": "Adair 助手 — 一次对话，规划完整行程",
-      "description": "告诉我们您的时间和目的地。Adair 搜寻真实的机票、酒店与用车方案，并整合至一张卡片。",
-      "ogTitle": "Adair 助手 — 一次对话，搞定整趟旅程",
-      "ogDescription": "真实的机票、酒店与用车方案，汇聚于一张可直接预订的卡片。"
+      "title": "Adair 助手 — 一次对话，搞定整趟行程",
+      "description": "告诉我你的目的地与时间。Adair 实时搜索航班、酒店与租车方案，整合为一张行程卡片。",
+      "ogTitle": "Adair 助手 — 一次对话，搞定整趟行程",
+      "ogDescription": "真实航班、酒店与租车方案，整合为一张可直接预订的卡片。"
     },
-    "title": "您计划前往哪里？",
-    "lead": "Adair 理解自然语言，实时查询供应商空位，将机票、酒店与用车整合为一张可直接预订的行程卡。",
-    "placeholder": "例如：我周四上午要到米兰，周五晚上返回…",
-    "submitIdle": "规划行程",
+    "title": "告诉我你想去哪里。",
+    "lead": "Adair 能理解日常语言，实时向供应商查询房态与票价，将机票、酒店和租车整合为一张可直接预订的卡片。",
+    "placeholder": "例如：我周四早上需要到米兰，周五晚上回…",
+    "submitIdle": "生成行程",
     "submitBusy": "正在搜索…",
     "examples": [
-      "我周四上午要到米兰，周五晚上返回，住 Duomo 附近，落地需要一辆车。",
-      "10 月 12–14 日巴塞罗那会议，Premium Economy，酒店靠近会展中心。",
-      "周一去伦敦，周三返回，无需用车。"
+      "我周四早上需要到米兰，周五晚上回，住在 Duomo 附近，落地要有车等候。",
+      "10 月 12–14 日去巴塞罗那开会，高端经济舱，会展中心附近的酒店。",
+      "周一去伦敦，周三回，不需要用车。"
     ],
-    "error": "未能生成此行程。请重试或明确指定日期。",
-    "sourceLive": "价格来自供应商 API",
+    "error": "未能生成此行程。请重试或直接提供明确日期。",
+    "sourceLive": "价格来自供应商实时 API",
     "sourcePartial": "部分项目来自供应商 API",
     "sourceDemo": "示例数据",
-    "hideAlternatives": "隐藏其他备选",
-    "showAlternatives": "查看其他备选",
+    "hideAlternatives": "隐藏备选方案",
+    "showAlternatives": "查看备选方案",
     "backToRecommendation": "返回 Adair 推荐方案",
-    "total": "总计（单次预订）",
+    "total": "总计，单笔预订",
     "saveIdle": "保存行程",
     "saveBusy": "正在保存…",
     "savedAs": "已保存为",
     "openDashboard": "打开控制台",
     "galleryPrev": "上一张照片",
     "galleryNext": "下一张照片",
-    "galleryGoTo": "查看照片",
+    "galleryGoTo": "跳转至照片",
     "remove": "移除此项",
-    "removedNote": "已从本次行程中移除",
+    "removedNote": "已从此行程中移除",
     "restoreAll": "全部恢复",
     "intent": {
-      "greeting": "您好。请告诉我您计划何时前往何地，我来为您安排整趟行程。",
-      "product": "只需一句话，我便能规划涵盖机票、酒店、用车及接送的完整行程，并一步完成预订。随时向我提出需求。",
-      "booking": "您的预订、发票与变更均可在「我的行程」中查看。",
-      "unclear": "我未能在其中识别出行程信息。您可以尝试：周二至周四前往米兰。",
-      "needsDestination": "您打算去哪里？",
+      "greeting": "你好。告诉我你的出行目的地与时间，我来为你安排整趟行程。",
+      "product": "只需一句话，我就能规划全套行程 — 机票、酒店、用车及接送 — 并支持一键完成预订。告诉我你的出行想法即可体验。",
+      "booking": "你的预订记录保存在“我的行程”中，发票开具与行程变更也可在此处理。",
+      "unclear": "未能识别你的出行计划。不妨试试这样说：周二到周四去米兰。",
+      "needsDestination": "你打算去哪里？",
       "amending": "正在调整下方行程。"
     },
     "strip": {
-      "heading": "以下是我的理解。",
+      "heading": "已为你确认以下信息：",
       "from": "出发地",
       "to": "目的地",
       "depart": "去程",
       "back": "返程",
-      "arriveBy": "抵达时间",
+      "arriveBy": "到达时间",
       "travellers": "出行人数",
       "travellerOne": "1 人",
       "travellerMany": "{count} 人",
-      "wishes": "其他偏好",
-      "edit": "修改 {field}",
-      "find": "开始查询",
+      "wishes": "特别备注",
+      "edit": "修改{field}",
+      "find": "查找方案",
       "searching": "正在搜索…",
       "done": "完成",
       "airportSearch": "搜索机场",
-      "travellersLabel": "同行人数"
+      "travellersLabel": "出行人数",
+      "controls": {
+        "thisWeekend": "本周末",
+        "nextWeekend": "下周末",
+        "tomorrow": "明天",
+        "outbound": "去程",
+        "returnDay": "返程",
+        "oneWay": "单程",
+        "airportSearch": "搜索机场",
+        "airportEmpty": "未找到该机场。",
+        "timeLabel": "或指定时间",
+        "travellersLabel": "出行人数",
+        "companionsHint": "同行人员",
+        "done": "完成"
+      }
     },
     "questions": {
-      "dates": "具体出行日期？",
-      "arrivalTime": "您需要在几点前抵达？",
-      "whichAirport": "{city} 有多个机场，您希望选择哪一个？",
+      "dates": "出行日期？",
+      "arrivalTime": "需要几点到达？",
+      "whichAirport": "{city}拥有多座机场，你想飞往哪一座？",
+      "travellers": "有谁同行？",
       "skip": "跳过",
-      "done": "完成"
+      "done": "完成",
+      "controls": {
+        "thisWeekend": "本周末",
+        "nextWeekend": "下周末",
+        "tomorrow": "明天",
+        "outbound": "去程",
+        "returnDay": "返程",
+        "oneWay": "单程",
+        "airportSearch": "搜索机场",
+        "airportEmpty": "未找到该机场。",
+        "timeLabel": "或指定时间",
+        "travellersLabel": "出行人数",
+        "companionsHint": "同行人员",
+        "done": "完成"
+      }
     },
     "advice": {
-      "tightFlight": "该航班于 {land} 降落，赶往 {meeting} 会议时间偏紧。选择 {alt} 仅多耗费 {extra}，却能多出 {spare} 宽裕时间。",
-      "tightFlightNoOption": "该航班于 {land} 降落，赶往 {meeting} 会议时间可能偏紧。",
-      "tightFlightAction": "改选更早航班",
-      "peak": "价格是平时的 {ratio} 倍{event}。",
-      "peakEvent": " — {event} 活动周",
+      "tightFlight": "此航班于 {land} 降落，赶往 {meeting} 的会议时间较紧。改选 {alt} 可为你多留出 {spare}，仅需补差价 {extra}。",
+      "tightFlightNoOption": "此航班于 {land} 降落，赶往 {meeting} 的会议时间较为紧张。",
+      "tightFlightAction": "改选更早的航班",
+      "peak": "此时价格为平时的 {ratio} 倍{event}。",
+      "peakEvent": " — 正值 {event} 周",
       "peakSaving": " 延后 {days} 天可节省 {saving}。",
-      "peakAction": "查看更优惠日期",
-      "transfer": "酒店距机场仅 {minutes} 分钟车程且无停车场 — 接送服务比租车更省心。",
-      "transferCheaper": "酒店距机场仅 {minutes} 分钟车程且无停车场 — 接送服务比租车还能节省 {saving}。",
-      "transferAction": "改为接送服务",
-      "breakfast": "当前房价不含早餐；含早房型需额外支付 {amount}。",
+      "peakAction": "查看更便宜的日期",
+      "transfer": "酒店距机场仅 {minutes} 分钟且不设车库 — 相比租车，接送服务更省心。",
+      "transferCheaper": "酒店距机场仅 {minutes} 分钟且不设车库 — 接送服务比租车节省 {saving}。",
+      "transferAction": "将租车替换为接送服务",
+      "breakfast": "此价格不含早餐；含早套餐需加 {amount}。",
       "breakfastAction": "添加早餐"
     },
     "nudge": {
-      "connectCalendar": "下一次我可以自动同步您的日历安排 — 连接仅需约三分钟。",
-      "connectCalendarAction": "连接日历",
-      "addLoyalty": "此航班可累积里程 — 欢迎在「设置」中添加您的常旅客卡号。",
-      "addLoyaltyAction": "添加卡号",
-      "saveCompany": "保存一次公司信息，后续我将自动开具发票。",
-      "saveCompanyAction": "保存公司",
+      "connectCalendar": "下次我可以自动从你的日历中读取行程 — 绑定仅需约三分钟。",
+      "connectCalendarAction": "绑定日历",
+      "addLoyalty": "此航班可累积里程 — 可在“设置”中添加你的常旅客会员号。",
+      "addLoyaltyAction": "添加会员号",
+      "saveCompany": "保存一次公司信息，之后我将自动开具公司发票。",
+      "saveCompanyAction": "保存公司信息",
       "dismiss": "暂不处理"
     },
     "memory": {
-      "sameAgain": "您上次在 {city} 入住了 {hotel} — 这次照旧吗？",
-      "sameAgainYes": "照旧",
+      "sameAgain": "你上次在 {city} 入住了 {hotel} — 这次照旧吗？",
+      "sameAgainYes": "照旧预订",
       "sameAgainOther": "看看其他选择",
-      "full": "{hotel} 在所选日期已订满 — 风格最接近的是 {nearest}。",
-      "nothingClose": "{hotel} 在所选日期已订满，因此为您甄选了另一选择。",
-      "asUsual": "{items} — 均已依惯例安排。",
-      "deviation": "当天该航线没有 {expected} — 已替换为 {actual}，{reason}。",
-      "askPattern": "{habit} — 是否将此设为您的常态偏好？",
-      "askYes": "是，设为偏好",
-      "askNo": "不用，仅限本次"
+      "full": "{hotel} 在所选日期已订满 — 风格最相近的是 {nearest}。",
+      "nothingClose": "{hotel} 在所选日期已订满，为你换了一个不同风格的优质选择。",
+      "asUsual": "{items} — 一如既往。",
+      "deviation": "该航线当天没有 {expected} — 已为你调整为 {actual}，{reason}。",
+      "askPattern": "{habit} — 是否将此设为你的出行偏好？",
+      "askYes": "是的，设为偏好",
+      "askNo": "不用，无需设为偏好"
     },
     "closing": {
-      "invoiceChoose": "发票抬头选择哪家公司？",
-      "invoiceNone": "无需发票",
-      "invoiceName": "发票应开具给哪家公司？",
+      "invoiceChoose": "发票抬头开给哪家公司？",
+      "invoiceNone": "不需要发票",
+      "invoiceName": "发票抬头应开给哪家公司？",
       "companyPlaceholder": "公司名称",
       "save": "保存",
-      "detailsOnce": "出票需要登记您的信息，仅需填写一次。",
+      "detailsOnce": "只需填写一次乘机人信息用于出票。",
       "firstName": "名",
       "lastName": "姓",
       "email": "电子邮箱",
       "phone": "电话",
       "bornOn": "出生日期",
       "saveForNextTime": "保存以便下次使用",
-      "whichCard": "使用哪张卡支付？",
-      "anotherCard": "使用其他卡",
+      "whichCard": "使用哪张卡？",
+      "anotherCard": "更换银行卡",
       "bookIt": "确认预订",
       "changeSomething": "修改内容",
       "opening": "正在打开安全支付页面…",
       "moment": "请稍候…",
-      "booked": "已完成预订。正在前往「我的行程」— 当前为测试模式，未发生实际扣款。",
-      "testMode": "测试模式 — 未扣款，未出票。",
-      "passport": "此航线需要护照信息，我们将在安全页面完成预订。",
+      "booked": "预订成功。正在前往“我的行程” — 当前为测试模式，未产生实际扣款。",
+      "testMode": "测试模式 — 不会产生真实扣款，亦不出票。",
+      "passport": "此航线需要护照信息，请前往安全页面完成最后一步。",
       "continueSecure": "继续",
-      "failed": "操作未成功，未发生扣费。我们可以在安全页面继续完成。",
-      "finishSecure": "在安全页面完成",
-      "companyFailed": "未能保存该企业信息，请重试。",
-      "detailsFailed": "信息有误，请核对后重试。"
+      "failed": "未能完成支付，未产生任何扣款。你可以前往安全页面完成预订。",
+      "finishSecure": "在安全页面完成预订",
+      "companyFailed": "无法保存该公司信息，请重试。",
+      "detailsFailed": "乘机人信息未通过核验，请检查后重试。"
     }
   },
   "auth": {
     "meta": {
       "title": "Adair 账户 — 登录或注册",
-      "description": "登录 Adair Travel 以管理行程、偏好并下载 PDF 发票。",
+      "description": "登录 Adair Travel，管理你的行程、偏好设置并下载 PDF 发票。",
       "ogTitle": "Adair 账户 — 登录或注册",
-      "ogDescription": "行程、偏好与发票，尽在一个客户控制台。"
+      "ogDescription": "行程、偏好与发票，集中于一站式客户后台。"
     },
     "signInTitle": "登录",
     "signUpTitle": "创建账户",
-    "lead": "您的行程、偏好与发票，集中统一管理。",
+    "lead": "你的行程、偏好与发票，尽在一处。",
     "fullName": "姓名",
     "email": "电子邮箱",
     "password": "密码",
     "submitBusy": "请稍候…",
     "signIn": "登录",
     "signUp": "注册",
-    "toSignUp": "还没有账户？去注册",
-    "toSignIn": "已有账户？去登录",
-    "confirmSent": "请查收您的收件箱 — 我们已向您发送确认链接。",
-    "genericError": "发生错误，请重试",
-    "demoHint": "想要先体验演示？",
-    "demoLink": "打开智能助手"
+    "toSignUp": "还没有账户？立即注册",
+    "toSignIn": "已有账户？直接登录",
+    "confirmSent": "请查收收件箱 — 我们已向你发送了确认链接。",
+    "genericError": "出现了一些问题",
+    "demoHint": "想先看演示？",
+    "demoLink": "体验智能助手"
   },
   "dashboard": {
     "meta": {
       "title": "Adair 客户控制台 — 行程与发票",
-      "description": "查看已保存的 Adair 行程、出行偏好，并下载 PDF 发票。",
+      "description": "查看已保存的 Adair 行程、差旅偏好，并支持下载 PDF 发票。",
       "ogTitle": "Adair 客户控制台",
-      "ogDescription": "行程、偏好与发票，一览无余。"
+      "ogDescription": "行程、偏好与发票，一站尽览。"
     },
-    "loadError": "无法加载控制台，请刷新页面。",
+    "loadError": "控制台加载失败，请刷新页面重试。",
     "title": "我的行程",
     "signOut": "退出登录",
     "loading": "正在加载行程…",
-    "empty": "您目前没有已保存的行程。",
-    "emptyCta": "预订您的首次行程",
+    "empty": "暂无保存的行程。",
+    "emptyCta": "预订你的第一趟行程",
     "invoice": "下载发票 (PDF)",
     "deleteTrip": "删除行程",
-    "profileTitle": "出行偏好档案",
-    "profileLead": "一次设置 — 未来的每一次行程与发票都将遵循这些偏好。",
+    "profileTitle": "差旅偏好",
+    "profileLead": "只需设定一次 — 今后的每趟行程与发票都将遵循这些偏好。",
     "fields": {
       "fullName": "姓名",
-      "company": "公司名称（发票抬头）",
+      "company": "公司（发票抬头）",
       "taxId": "VAT 税号",
-      "airlines": "偏好航司",
+      "airlines": "首选航司",
       "cabin": "舱位等级",
       "seat": "座位偏好",
-      "chains": "酒店集团",
-      "diet": "饮食习惯",
+      "chains": "酒店品牌",
+      "diet": "饮食偏好",
       "budget": "单次行程预算",
-      "currency": "货币"
+      "currency": "币种"
     },
     "saveIdle": "保存偏好",
     "saveBusy": "正在保存…",
@@ -317,203 +346,203 @@
   },
   "investors": {
     "meta": {
-      "title": "Adair Travel 投资者资料 — 商业模式、利润率与融资轮次",
-      "description": "Adair Travel 将机票、酒店与用车打包为单次预订。商业变现模型、酒店协议价利润空间及种子轮条款。",
+      "title": "Adair Travel 投资者专区 — 商业模式、利润率与融资轮次",
+      "description": "Adair Travel 将机票、酒店与用车整合为单笔预订。商业模式、协议酒店利润率与种子轮融资条款。",
       "ogTitle": "Adair Travel 投资者专区",
-      "ogDescription": "用一个智能助手替代五个应用。利润来自自有酒店协议价，而非 OTA 佣金。"
+      "ogDescription": "告别五个应用，只需一个智能助手。利润源于专属协议酒店价格，而非 OTA 佣金。"
     },
-    "badge": "种子轮 · 投资人材料",
+    "badge": "种子轮 · 投资者资料",
     "titleLine1": "如今的商务出行需要五个应用。",
     "titleLine2": "在我们这里，只需一句话。",
-    "lead": "Adair Travel 是一款将单条出行需求转化为机票、酒店与用车组合卡片及单一发票的智能助手。我们的利润来自独家酒店协议价，而非比价佣金 —— 因此客户价格更优，我们的利润率更高。",
+    "lead": "Adair Travel 是一款差旅智能助手，能将单次需求直接转化为包含机票、酒店与用车的单张卡片与单张发票。我们的利润源自自主谈判的协议酒店价格，而非比价平台的抽佣 — 这正是我们价格更具优势、利润空间更高的原因。",
     "metrics": [
       {
-        "label": "平均行程价值",
+        "label": "平均客单价",
         "value": "€1,240"
       },
       {
-        "label": "单次行程毛利率",
+        "label": "单笔行程毛利率",
         "value": "11–17%"
       },
       {
-        "label": "预订耗时",
+        "label": "单次预订耗时",
         "value": "< 40 s"
       },
       {
-        "label": "替代应用数",
+        "label": "替代的应用数量",
         "value": "5"
       }
     ],
-    "revenueTitle": "营收来源",
+    "revenueTitle": "收入来源",
     "revenue": [
       {
-        "title": "协议价差额",
-        "body": "我们以自有企业协议价采购客房，并以低于 OTA 公开价格售出。利润归我们所有，无需受制于中间商。",
+        "title": "协议优惠价",
+        "body": "我们以专属企业协议价采购客房，并以低于 OTA 公开零售价销售。利润留在我们手中，而非中间商。",
         "margin": "8–14%"
       },
       {
-        "title": "航司分销佣金 (NDC)",
-        "body": "通过 NDC 渠道订票：获得分销佣金，并通过在单一窗口内处理改签与退款收取服务费。",
+        "title": "航司佣金 (NDC)",
+        "body": "通过 NDC 渠道出票：获取分销佣金，并在单一窗口内提供改签与退订服务费收入。",
         "margin": "1–3%"
       },
       {
-        "title": "企业订阅",
-        "body": "团队为差旅档案、费用规则以及取代三份单据的整程统一 VAT 发票支付订阅费。",
+        "title": "企业订阅费",
+        "body": "企业团队按需付费，获取差旅偏好管理、报销合规政策，以及整趟行程合一的 VAT 发票，告别繁杂的碎片单据。",
         "margin": "€29 / user / mo."
       }
     ],
-    "unitTitle": "典型行程 — 单体经济模型",
+    "unitTitle": "单笔行程样本 — 单位经济效益",
     "colItem": "项目",
-    "colPrice": "客户价格",
-    "colMargin": "利润空间",
+    "colPrice": "客户支付价格",
+    "colMargin": "我方利润",
     "unit": [
       {
-        "item": "机票 (LOT, NDC)",
+        "item": "航班 (LOT, NDC)",
         "price": "€312",
         "margin": "€6"
       },
       {
-        "item": "酒店，1 晚 (协议价)",
+        "item": "酒店，1 晚（协议价）",
         "price": "€742",
         "margin": "€96"
       },
       {
-        "item": "租车，2 天",
+        "item": "用车，2 天",
         "price": "€186",
         "margin": "€22"
       }
     ],
-    "unitTotal": "总计（单次预订）",
-    "unitNote": "华沙–米兰航线，基于测试供应商费率的示意数据。",
-    "askTitle": "我们的融资目标",
-    "askBody": "我们正在筹集种子轮资金，以将酒店协议价网络拓展至十座核心商务城市，实现单一窗口的全程退改保障，并签约 20–200 人规模的企业团队。",
-    "contact": "联系我们",
-    "seeProduct": "体验产品演示"
+    "unitTotal": "总计，单笔预订",
+    "unitNote": "以华沙–米兰航线为例，数据基于测试供应商费率测算。",
+    "askTitle": "本轮融资需求",
+    "askBody": "我们正在进行种子轮融资，旨在将协议酒店网络拓展至十座商务核心城市，实现单一窗口内的全流程改签支持，并向 20–200 人的企业团队规模化推广。",
+    "contact": "与我们取得联系",
+    "seeProduct": "在线体验产品"
   },
   "invoice": {
-    "documentTitle": "发票 / 行程卡",
+    "documentTitle": "发票 / 行程单",
     "seller": "销售方",
     "buyer": "购买方",
     "item": "项目",
-    "reference": "报价编号",
+    "reference": "报价参考号",
     "net": "净额",
     "netTotal": "净额总计",
     "vat": "VAT",
     "totalDue": "应付总额",
     "issued": "开具日期",
-    "number": "发票编号",
+    "number": "编号",
     "vatId": "VAT 税号",
     "kindFlight": "机票",
     "kindHotel": "酒店",
-    "kindCar": "租车",
-    "demoNote": "概念凭证 — 各项包含示例数据",
-    "liveNote": "各项费用来自通过 Adair API 获取的供应商实时报价",
-    "paymentNote": "付款方式：单笔企业卡交易 · 14 天账期",
-    "hotelNote": "酒店按协议价开票",
-    "tagline": "Adair Travel · 一句话，完整旅程。 · adair.travel"
+    "kindCar": "用车",
+    "demoNote": "概念样单 — 所含项目为示例数据",
+    "liveNote": "项目价格基于 Adair API 获取的供应商实时报价",
+    "paymentNote": "付款方式：公司卡单笔支付 · 14-day 账期",
+    "hotelNote": "酒店按协议优惠价结算",
+    "tagline": "Adair Travel · 一句话，包揽整趟行程。 · adair.travel"
   },
   "business": {
     "meta": {
-      "title": "Adair 企业版 — 团队差旅、预算与分析",
-      "description": "面向全团队的统一窗口：智能助手搞定机票、酒店与用车预订，确保差旅合规，并将每趟行程汇聚为一张发票与一份报告。",
-      "ogTitle": "Adair 企业版 — 统一窗口管理团队差旅",
-      "ogDescription": "专为团队打造的预算、审批与差旅分析。一次对话取代五个应用。"
+      "title": "Adair 企业版 — 团队差旅、预算控制与数据分析",
+      "description": "专为团队打造的单一管理窗口：智能助手搞定机票、酒店与租车，严守预算红线，让每次出行归集为一张发票与一份报告。",
+      "ogTitle": "Adair 企业版 — 单一窗口管理团队差旅",
+      "ogDescription": "面向团队的预算管控、审批流程与差旅分析。一次对话替代五个应用。"
     },
-    "badge": "面向企业与团队",
-    "titleLine1": "全团队的差旅管理，",
-    "titleLine2": "尽在一扇窗口。",
-    "lead": "Adair 依据一句话规划每趟行程，确保严守差旅标准，并生成单一发票与明晰报告。行政不再疲于切换标签页，财务无需苦苦催要发票。",
-    "ctaPrimary": "预约团队方案咨询",
-    "ctaSecondary": "查看方案",
-    "rolesLabel": "适用对象",
-    "rolesTitle": "三方协同，一处搞定。",
+    "badge": "专为企业与团队设计",
+    "titleLine1": "全团队的差旅出行，",
+    "titleLine2": "尽在一个窗口。",
+    "lead": "Adair 从一句话出发规划每趟行程，全程符合差旅政策，并汇总为一张发票与一份清晰报表。行政无需多开网页反复比价，财务不再为发票贴票苦恼。",
+    "ctaPrimary": "为你的团队预约咨询",
+    "ctaSecondary": "查看方案套餐",
+    "rolesLabel": "适用角色",
+    "rolesTitle": "三种角色，同一窗口。",
     "roles": [
       {
         "role": "行政 / 办公室经理",
-        "title": "一句话替同事代订行程",
+        "title": "一句话帮同事安排妥当",
         "items": [
-          "代表任何同事预订行程",
-          "全团队差旅共享统一收件箱",
-          "一张 VAT 发票替代三份单据"
+          "轻松代表任何同事预订行程",
+          "全团队行程尽在一个共享收件箱",
+          "一张 VAT 发票搞定全部，告别三份报销单"
         ]
       },
       {
-        "role": "主管 / 财务",
-        "title": "开支发生前，费用已了然",
+        "role": "管理者 / 财务",
+        "title": "费用未发生，开支先掌握",
         "items": [
-          "按单次行程、按人、按月设定预算上限",
-          "超出预设阈值方需审批",
-          "实时支出明细，月末不再有意外超支"
+          "按单次、按人、按月设定预算上限",
+          "仅在超走出自设限额时触发审批",
+          "实时掌握支出动态，月末绝无意外"
         ]
       },
       {
         "role": "出差员工",
-        "title": "每次出行，习惯始终如一",
+        "title": "个人偏好，每次都悉心遵循",
         "items": [
           "个人出行偏好只需设定一次",
-          "机票、酒店与用车汇聚于一张卡片",
-          "所有确认单集中保存至行程结束"
+          "机票、酒店与用车合为单张卡片",
+          "各类确认信息一处备查，直至行程结束"
         ]
       }
     ],
     "budgetLabel": "费用与预算",
-    "budgetTitle": "助手严格遵循的支出规则。",
-    "budgetLead": "您只需设定一次边界。Adair 生成的每一个方案都已严格符合标准 — 事后无需人工复核。",
+    "budgetTitle": "智能助手严格执行的支出规则。",
+    "budgetLead": "设定一次管理框架即可。Adair 提供的所有建议都会严格依此执行 — 事后无需人工审查。",
     "budgets": [
       {
         "title": "单次行程上限",
         "value": "€1,500",
-        "note": "Adair 绝不推荐超出上限的打包方案"
+        "note": "Adair 绝不推荐超过上限的组合方案"
       },
       {
-        "title": "团队月度预算",
+        "title": "月度团队预算",
         "value": "€28,000",
-        "note": "财务人员随时可见实时使用情况"
+        "note": "财务可随时查看实时预算使用进度"
       },
       {
-        "title": "审批阈值",
+        "title": "审批触发阈值",
         "value": "€900",
-        "note": "超过此金额，预订前需主管确认"
+        "note": "超出此金额需经管理者确认方可预订"
       },
       {
         "title": "差旅标准",
         "value": "舱位、酒店品牌、范围",
-        "note": "航程超过 2 h 允许 Premium Economy，限选优选酒店品牌"
+        "note": "航程超过 2 h 选择高端经济舱，仅限首选品牌"
       }
     ],
     "dashLabel": "企业视图",
-    "dashTitle": "财务关注的一切，尽在一个界面。",
+    "dashTitle": "财务关注的一切，聚合于同一屏幕。",
     "dashNote": "仅供预览 — 示例数据",
     "dash": {
       "budgetTitle": "9 月预算",
-      "budgetOf": "已使用（总预算 €28,000）",
-      "tripsTitle": "近期团队行程",
+      "budgetOf": "（总额 €28,000）已使用",
+      "tripsTitle": "团队近期行程",
       "statusPaid": "已支付",
       "statusPending": "待审批",
-      "peopleTitle": "个人支出",
+      "peopleTitle": "个人支出分布",
       "routesTitle": "高频航线",
-      "savedTitle": "相比公开价节省",
+      "savedTitle": "相比公开零售价节省",
       "savedValue": "€2,340",
-      "savedNote": "本季度，共计 21 次行程",
-      "tripsCount": "次行程",
+      "savedNote": "本季度，共计 21 趟行程",
+      "tripsCount": "趟行程",
       "trips": [
         {
           "who": "Anna K.",
-          "route": "Warsaw → Milan",
+          "route": "华沙 → 米兰",
           "dates": "18–19 Sep",
           "amount": "€1,240",
           "paid": true
         },
         {
           "who": "Tomasz W.",
-          "route": "Warsaw → Berlin",
+          "route": "华沙 → 柏林",
           "dates": "22–23 Sep",
           "amount": "€780",
           "paid": true
         },
         {
           "who": "Kitti F.",
-          "route": "Budapest → London",
+          "route": "布达佩斯 → 伦敦",
           "dates": "25–27 Sep",
           "amount": "€1,610",
           "paid": false
@@ -543,108 +572,108 @@
       ],
       "routes": [
         {
-          "route": "Warsaw → Milan",
+          "route": "华沙 → 米兰",
           "count": "7",
           "amount": "€8,190"
         },
         {
-          "route": "Budapest → London",
+          "route": "布达佩斯 → 伦敦",
           "count": "5",
           "amount": "€7,340"
         },
         {
-          "route": "Warsaw → Berlin",
+          "route": "华沙 → 柏林",
           "count": "4",
           "amount": "€3,120"
         }
       ]
     },
-    "analyticsLabel": "差旅分析",
+    "analyticsLabel": "差旅数据分析",
     "analyticsTitle": "月度报告包含的内容。",
     "analytics": [
       {
-        "title": "人均成本",
-        "text": "出差人员、频次与费用明细 — 按个人、团队或成本中心划分。"
+        "title": "人均支出分析",
+        "text": "出行人员、频次及开销 — 支持按员工、团队或成本中心归集。"
       },
       {
-        "title": "航线偏好",
-        "text": "最常搭乘的航线，便于评估协议价谈判价值。"
+        "title": "高频航线规律",
+        "text": "梳理最常搭乘的航线，便于判断何处值得争取专属协议价。"
       },
       {
-        "title": "平均每晚房费",
-        "text": "团队每晚住宿的实际支出及月度变动趋势。"
+        "title": "平均每晚间夜价",
+        "text": "团队每晚实际支付金额，以及按月的价格走势。"
       },
       {
-        "title": "合规分析",
-        "text": "哪些行程符合政策，哪些行程触发了审批。"
+        "title": "政策合规度",
+        "text": "清晰了解哪些行程符合政策，哪些触发了人工审批。"
       },
       {
-        "title": "相比公开价节省",
-        "text": "实际支出与相同行程公开市场价的差额。"
+        "title": "对比公开价节省",
+        "text": "直观展示实际支出与同等行程公开零售价之间的差额。"
       },
       {
-        "title": "财务导出",
-        "text": "每月生成一份文件，发票号、预订参考号与 VAT 税金已全部对齐。"
+        "title": "财务导出报表",
+        "text": "每月生成单一文件，发票号、参考编号与 VAT 税目皆已核对匹配。"
       }
     ],
-    "plansLabel": "套餐方案",
-    "plansTitle": "挑选契合您团队的方案。",
-    "plansNote": "Teams 方案提供 14 天免费试用，无需绑定信用卡。价格不含 VAT。Enterprise 方案依团队规模与差旅规则定制报价。",
+    "plansLabel": "方案套餐",
+    "plansTitle": "选择契合你团队规模的方案。",
+    "plansNote": "团队版享有 14 天免费试用，无需绑定银行卡。价格不含 VAT。企业版根据团队规模与差旅政策定制报价。",
     "plansTrial": "免费试用 14 天",
-    "quote": "获取报价",
+    "quote": "获取定制报价",
     "plans": [
       {
-        "name": "Starter",
-        "forWho": "至多 5 位出行人员",
+        "name": "基础版",
+        "forWho": "最多 5 位出行人员",
         "price": "免费",
-        "priceNote": "无需绑定信用卡",
+        "priceNote": "无需绑定银行卡",
         "features": [
-          "个人差旅偏好档案",
+          "每位员工专属差旅偏好",
           "每次行程一张发票",
-          "行程归档与 PDF 行程卡",
+          "行程存档与 PDF 行程卡片",
           "邮件客服支持"
         ]
       },
       {
-        "name": "Teams",
+        "name": "团队版",
         "forWho": "5–50 位出行人员",
         "price": "19 USD",
-        "priceNote": "每位出行人员 / 月 — 5 人起",
+        "priceNote": "每位员工 / 月 — 5 人起",
         "features": [
-          "预算与审批阈值设置",
-          "代同事预订",
+          "预算管控与审批阈值",
+          "支持代同事预订",
           "月度差旅报告",
-          "团队行程共享视图"
+          "共享团队行程视图"
         ]
       },
       {
-        "name": "Enterprise",
+        "name": "企业版",
         "forWho": "50+ 位出行人员",
-        "price": "定制报价",
-        "priceNote": "按团队需求量身定制",
+        "price": "定制方案",
+        "priceNote": "根据你的团队定制报价",
         "features": [
-          "成本中心与自定义差旅规则",
-          "按指定格式导出财务报表",
-          "核心航线专属协议价",
+          "成本中心与自定义差旅政策",
+          "支持匹配企业专属格式的财务导出",
+          "核心航线专享协议价",
           "专属客户经理"
         ]
       }
     ],
-    "contactLabel": "与我们交流",
-    "contactTitle": "介绍一下您的团队。",
-    "contactLead": "留下您的联络方式，我们将提供定制报价并演示适合您的差旅配置方案。",
+    "contactLabel": "联系我们",
+    "contactTitle": "向我们介绍你的团队。",
+    "contactLead": "留下你的联系方式，我们将为你提供定制报价，并演示如何为你的团队搭建差旅方案。",
     "form": {
       "email": "工作邮箱",
       "emailPlaceholder": "you@company.com",
-      "company": "公司名称",
+      "company": "公司",
       "companyPlaceholder": "公司名称",
       "size": "团队规模",
-      "sizePlaceholder": "例如：12 位出行人员",
-      "message": "其他补充说明？（选填）",
-      "messagePlaceholder": "最常飞的航线、当前使用的工具、发票需求…",
-      "submit": "提交咨询",
+      "sizePlaceholder": "例如：12 位出差人员",
+      "message": "还有什么需要我们了解的吗？（选填）",
+      "messagePlaceholder": "最常搭乘的航线、目前使用的工具、发票需求…",
+      "submit": "发送需求",
       "submitBusy": "正在发送…",
-      "success": "感谢您的咨询 — 我们将在一个工作日内与您联系。",
+      "success": "感谢联系 — 我们将在一个工作日内回复你。",
       "error": "提交未成功，请重试。"
     },
     "footer": "Adair Kft. · Budapest"

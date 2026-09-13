@@ -1,7 +1,13 @@
 import { useState } from "react";
 import { Check, Pencil } from "lucide-react";
-import { AIRPORT_COORDS } from "@/lib/trip/airport-geo";
 import type { PickerKind, TripOverrides, Understanding } from "@/lib/trip/understanding";
+import {
+  AirportAnswer,
+  DateAnswer,
+  TimeAnswer,
+  TravellersAnswer,
+  type AnswerControlsCopy,
+} from "./answer-controls";
 
 export type StripCopy = {
   heading: string;
@@ -12,116 +18,98 @@ export type StripCopy = {
   done: string;
   airportSearch: string;
   travellersLabel: string;
+  controls: AnswerControlsCopy;
 };
 
 const fill = (template: string, values: Record<string, string>) =>
   template.replace(/\{(\w+)\}/g, (_, key: string) => values[key] ?? "");
 
-const AIRPORTS = Object.keys(AIRPORT_COORDS).sort();
-
 function Picker({
   kind,
   value,
   copy,
+  companions,
   onChange,
   onClose,
 }: {
   kind: PickerKind;
   value: TripOverrides;
   copy: StripCopy;
+  companions?: { id: string; label: string }[] | undefined;
   onChange: (next: TripOverrides) => void;
   onClose: () => void;
 }) {
-  const [query, setQuery] = useState("");
   const field =
     kind === "origin" ? "originIata" : kind === "destination" ? "destinationIata" : null;
 
+  const done = (
+    <button
+      type="button"
+      onClick={onClose}
+      className="mt-2 rounded-lg border border-border px-3 py-1.5 text-xs text-foreground hover:border-primary/30"
+    >
+      {copy.done}
+    </button>
+  );
+
   if (field) {
-    const matches = AIRPORTS.filter((code) => code.includes(query.toUpperCase())).slice(0, 8);
     return (
-      <div className="mt-2 w-56 rounded-xl border border-border bg-card p-2 shadow-none">
-        <input
-          autoFocus
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder={copy.airportSearch}
-          className="w-full rounded-lg border border-border bg-background px-3 py-2 text-xs outline-none"
+      <div className="mt-2 w-[17rem] max-w-[calc(100vw-3rem)] rounded-xl border border-border bg-card p-2">
+        <AirportAnswer
+          value={value[field] ?? null}
+          copy={copy.controls}
+          onChange={(iata) => {
+            onChange({ ...value, [field]: iata });
+            onClose();
+          }}
         />
-        <ul className="mt-1 max-h-40 overflow-auto">
-          {matches.map((code) => (
-            <li key={code}>
-              <button
-                type="button"
-                onClick={() => {
-                  onChange({ ...value, [field]: code });
-                  onClose();
-                }}
-                className="w-full rounded-lg px-3 py-1.5 text-left text-xs text-foreground hover:bg-muted"
-              >
-                {code}
-              </button>
-            </li>
-          ))}
-        </ul>
       </div>
     );
   }
 
   if (kind === "travellers") {
     return (
-      <div className="mt-2 w-44 rounded-xl border border-border bg-card p-2">
-        <label className="block text-[11px] text-muted-foreground" htmlFor="strip-travellers">
-          {copy.travellersLabel}
-        </label>
-        <input
-          id="strip-travellers"
-          autoFocus
-          type="number"
-          min={1}
-          max={9}
-          defaultValue={value.passengers ?? 1}
-          onChange={(e) => onChange({ ...value, passengers: Number(e.target.value) || 1 })}
-          className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-xs outline-none"
+      <div className="mt-2 w-[17rem] max-w-[calc(100vw-3rem)] rounded-xl border border-border bg-card p-3">
+        <TravellersAnswer
+          value={value.passengers ?? 1}
+          companions={companions ?? []}
+          copy={copy.controls}
+          onChange={(count) => onChange({ ...value, passengers: count })}
         />
-        <button
-          type="button"
-          onClick={onClose}
-          className="mt-2 w-full rounded-lg border border-border px-3 py-1.5 text-xs text-foreground hover:border-primary/30"
-        >
-          {copy.done}
-        </button>
+        {done}
       </div>
     );
   }
 
-  const inputType = kind === "arriveBy" ? "time" : "date";
-  const current =
-    kind === "arriveBy"
-      ? value.mustArriveBy
-      : kind === "departDate"
-        ? value.departDate
-        : value.returnDate;
+  if (kind === "arriveBy") {
+    return (
+      <div className="mt-2 w-[17rem] max-w-[calc(100vw-3rem)] rounded-xl border border-border bg-card p-3">
+        <TimeAnswer
+          value={value.mustArriveBy ?? null}
+          copy={copy.controls}
+          onChange={(time) => onChange({ ...value, mustArriveBy: time })}
+        />
+        {done}
+      </div>
+    );
+  }
+
+  // Both date chips open the same calendar, so the outbound and the return are
+  // chosen together in one place.
   return (
-    <div className="mt-2 rounded-xl border border-border bg-card p-2">
-      <input
-        autoFocus
-        type={inputType}
-        defaultValue={current ?? ""}
-        onChange={(e) => {
-          const next = e.target.value;
-          if (kind === "arriveBy") onChange({ ...value, mustArriveBy: next });
-          else if (kind === "departDate") onChange({ ...value, departDate: next });
-          else onChange({ ...value, returnDate: next });
-        }}
-        className="rounded-lg border border-border bg-background px-3 py-2 text-xs outline-none"
+    <div className="mt-2 w-[20rem] max-w-[calc(100vw-3rem)] rounded-xl border border-border bg-card p-3">
+      <DateAnswer
+        value={value.departDate ? { departDate: value.departDate, returnDate: value.returnDate ?? undefined } : null}
+        copy={copy.controls}
+        onChange={(range) =>
+          onChange({
+            ...value,
+            departDate: range.departDate,
+            ...(range.returnDate ? { returnDate: range.returnDate } : {}),
+          })
+        }
       />
-      <button
-        type="button"
-        onClick={onClose}
-        className="ml-2 rounded-lg border border-border px-3 py-1.5 text-xs text-foreground hover:border-primary/30"
-      >
-        {copy.done}
-      </button>
+      {done}
     </div>
   );
 }
@@ -135,6 +123,7 @@ export function UnderstandingStrip({
   understanding,
   overrides,
   copy,
+  companions,
   busy = false,
   canSearch = true,
   onChange,
@@ -143,6 +132,7 @@ export function UnderstandingStrip({
   understanding: Understanding;
   overrides: TripOverrides;
   copy: StripCopy;
+  companions?: { id: string; label: string }[] | undefined;
   busy?: boolean;
   canSearch?: boolean;
   onChange: (next: TripOverrides) => void;
@@ -174,6 +164,7 @@ export function UnderstandingStrip({
                 kind={field.key}
                 value={overrides}
                 copy={copy}
+                companions={companions}
                 onChange={onChange}
                 onClose={() => setOpen(null)}
               />

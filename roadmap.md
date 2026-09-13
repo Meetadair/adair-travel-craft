@@ -276,3 +276,14 @@
 - Precedence (`src/lib/trip/memory.ts`, `resolvePreferences`): dealbreakers > stated > confirmed patterns > place memory > learned weights > price. Tested, including a dealbreaker beating a learned weight.
 - "What Adair knows about you" in Preferences (`src/components/prefs/knows.tsx`): stated preferences, confirmed habits, place memories and ranking adjustments, each removable, plus "Forget everything you've learned" which keeps stated preferences.
 - Everything is in the GDPR export and in account deletion.
+
+## Real controls behind every chat question — done
+
+- Shortcut chips first, a real control underneath, on every question with an answer behind it (`src/lib/trip/answers.ts`, `src/components/trip/answer-controls.tsx`).
+- Dates: This weekend / Next weekend / Tomorrow above a compact inline month calendar in the chat — single day or outbound + return, past days disabled, opens on the current month, navigable a year forward. Chosen dates fill the answer and then appear in the understanding strip as tappable chips.
+- Arrival time: 09:00 / 12:00 / 18:00 chips above a real time picker.
+- Airport: known airports as chips above a searchable list matching code, city, country or airport name.
+- Travellers: 1–4 chips above a count field and the saved "people I travel with" list.
+- Same controls behind the understanding-strip chips, so anything can still be changed before searching.
+- Fits 390 px with no horizontal scrolling (checked in the browser); the month grid loads on demand.
+- Tests: weekend shortcuts including the Saturday case, sentence folding, calendar bounds, past-date rule and airport search (339 tests pass). All 14 locales regenerated.

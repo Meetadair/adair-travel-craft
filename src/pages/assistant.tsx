@@ -4,6 +4,8 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { ageQuestion, familyFromSentence } from "@/lib/trip/family";
 import { applyAnswer, assumptionNote, clarify, type Clarification } from "@/lib/trip/clarify";
+import { AirportAnswer, DateAnswer } from "@/components/trip/answer-controls";
+import { rangeSentence } from "@/lib/trip/answers";
 import { ASSISTANT_PREFILL_KEY } from "@/lib/trips/prefill";
 import { parseTripSentence } from "@/lib/trip/parse";
 import { track } from "@/lib/track";
@@ -261,6 +263,26 @@ export function AssistantPage() {
                 ))}
               </div>
             )}
+            {(question.kind === "no_dates" || question.kind === "vague_week") && (
+              <div className="mt-3">
+                <DateAnswer
+                  value={null}
+                  copy={t.assistant.strip.controls}
+                  onChange={(range) => answerQuestion(rangeSentence(range))}
+                />
+              </div>
+            )}
+
+            {question.kind === "which_airport" && (
+              <div className="mt-3">
+                <AirportAnswer
+                  value={null}
+                  copy={t.assistant.strip.controls}
+                  onChange={(iata) => answerQuestion(iata)}
+                />
+              </div>
+            )}
+
             <div className="mt-3 flex flex-wrap items-center gap-2">
               <input
                 value={answer}

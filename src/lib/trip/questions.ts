@@ -7,14 +7,19 @@ import { MULTI_AIRPORT, hasNoDates, isVagueWeek, mentionsAirport } from "./clari
 import { ageQuestion, familyFromSentence } from "./family";
 import type { TripRequest } from "./types";
 
-export type ChatQuestionKind = "dates" | "arrival_time" | "child_ages" | "which_airport";
+export type ChatQuestionKind =
+  | "dates"
+  | "arrival_time"
+  | "child_ages"
+  | "which_airport"
+  | "travellers";
 
 export type ChatQuestion = {
   kind: ChatQuestionKind;
   /** One short question, in the chat. */
   question: string;
   /** The control shown under it. */
-  control: "calendar" | "time" | "ages" | "options";
+  control: "calendar" | "time" | "ages" | "options" | "travellers";
   /** Buttons, for the options control. */
   options: { label: string; value: string }[];
   /** Essential questions block the search; the others only add an assumption. */
