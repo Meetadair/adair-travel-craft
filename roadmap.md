@@ -232,3 +232,11 @@
 - [x] Rides and restaurants: vehicle capacity for the family size; family-friendly filter respected.
 - [x] Profile: children stored with birth dates so "same as Rome, with the kids" reprices correctly.
 - [x] Tests: category by return date incl. birthday during the trip, occupancy exceeding a room policy triggering the family-room path, infant on lap vs own seat pricing.
+
+## Round: brands as data — built
+- [x] `brands` table (id, kind airline/hotel_chain/car_rental, name, alliance_or_group, regions, aliases, popularity_rank, active) seeded with 141 brands: the three alliances, European and US carriers, Gulf and Asian carriers, the hotel groups with their sub-brands, and the car rental groups incl. Panek and Express.
+- [x] Region-aware short list of 14 in onboarding, ranked from the home airport's region, with search across the whole table; Settings shows the full searchable list. "No preference" always available.
+- [x] Loyalty earning widened through alliance/group: Bonvoy earns at Westin and Ritz-Carlton, a Star Alliance card earns on Lufthansa and United, Avis Preferred at Budget.
+- [x] Preference matching in search ranking and the card's match checklist resolves brand ids to their names and aliases.
+- [x] /admin/brands: add, rename, re-rank, set regions and group, hide a brand — no code change.
+- [x] Tests for region-based ranking, search and the group-widened loyalty mapping (240 tests pass).

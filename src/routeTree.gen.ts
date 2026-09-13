@@ -35,6 +35,7 @@ import { Route as CHandleRouteImport } from './routes/c.$handle'
 import { Route as RCodeRouteImport } from './routes/r.$code'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authenticated/admin.analytics'
+import { Route as AuthenticatedAdminBrandsRouteImport } from './routes/_authenticated/admin.brands'
 import { Route as AuthenticatedAdminCreatorsRouteImport } from './routes/_authenticated/admin.creators'
 import { Route as AuthenticatedAdminGetawayRouteImport } from './routes/_authenticated/admin.getaway'
 import { Route as AuthenticatedAdminPaymentsRouteImport } from './routes/_authenticated/admin.payments'
@@ -183,6 +184,12 @@ const AuthenticatedAdminAnalyticsRoute =
     path: '/admin/analytics',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminBrandsRoute =
+  AuthenticatedAdminBrandsRouteImport.update({
+    id: '/admin/brands',
+    path: '/admin/brands',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminCreatorsRoute =
   AuthenticatedAdminCreatorsRouteImport.update({
     id: '/admin/creators',
@@ -297,6 +304,7 @@ export interface FileRoutesByFullPath {
   '/r/$code': typeof RCodeRoute
   '/$lang/': typeof LangIndexRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
+  '/admin/brands': typeof AuthenticatedAdminBrandsRoute
   '/admin/creators': typeof AuthenticatedAdminCreatorsRoute
   '/admin/getaway': typeof AuthenticatedAdminGetawayRoute
   '/admin/payments': typeof AuthenticatedAdminPaymentsRoute
@@ -339,6 +347,7 @@ export interface FileRoutesByTo {
   '/r/$code': typeof RCodeRoute
   '/$lang': typeof LangIndexRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
+  '/admin/brands': typeof AuthenticatedAdminBrandsRoute
   '/admin/creators': typeof AuthenticatedAdminCreatorsRoute
   '/admin/getaway': typeof AuthenticatedAdminGetawayRoute
   '/admin/payments': typeof AuthenticatedAdminPaymentsRoute
@@ -384,6 +393,7 @@ export interface FileRoutesById {
   '/r/$code': typeof RCodeRoute
   '/$lang/': typeof LangIndexRoute
   '/_authenticated/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
+  '/_authenticated/admin/brands': typeof AuthenticatedAdminBrandsRoute
   '/_authenticated/admin/creators': typeof AuthenticatedAdminCreatorsRoute
   '/_authenticated/admin/getaway': typeof AuthenticatedAdminGetawayRoute
   '/_authenticated/admin/payments': typeof AuthenticatedAdminPaymentsRoute
@@ -429,6 +439,7 @@ export interface FileRouteTypes {
     | '/r/$code'
     | '/$lang/'
     | '/admin/analytics'
+    | '/admin/brands'
     | '/admin/creators'
     | '/admin/getaway'
     | '/admin/payments'
@@ -471,6 +482,7 @@ export interface FileRouteTypes {
     | '/r/$code'
     | '/$lang'
     | '/admin/analytics'
+    | '/admin/brands'
     | '/admin/creators'
     | '/admin/getaway'
     | '/admin/payments'
@@ -515,6 +527,7 @@ export interface FileRouteTypes {
     | '/r/$code'
     | '/$lang/'
     | '/_authenticated/admin/analytics'
+    | '/_authenticated/admin/brands'
     | '/_authenticated/admin/creators'
     | '/_authenticated/admin/getaway'
     | '/_authenticated/admin/payments'
@@ -741,6 +754,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminAnalyticsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/brands': {
+      id: '/_authenticated/admin/brands'
+      path: '/admin/brands'
+      fullPath: '/admin/brands'
+      preLoaderRoute: typeof AuthenticatedAdminBrandsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/creators': {
       id: '/_authenticated/admin/creators'
       path: '/admin/creators'
@@ -868,6 +888,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSupportRoute: typeof AuthenticatedSupportRoute
   AuthenticatedTripsRoute: typeof AuthenticatedTripsRoute
   AuthenticatedAdminAnalyticsRoute: typeof AuthenticatedAdminAnalyticsRoute
+  AuthenticatedAdminBrandsRoute: typeof AuthenticatedAdminBrandsRoute
   AuthenticatedAdminCreatorsRoute: typeof AuthenticatedAdminCreatorsRoute
   AuthenticatedAdminGetawayRoute: typeof AuthenticatedAdminGetawayRoute
   AuthenticatedAdminPaymentsRoute: typeof AuthenticatedAdminPaymentsRoute
@@ -889,6 +910,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSupportRoute: AuthenticatedSupportRoute,
   AuthenticatedTripsRoute: AuthenticatedTripsRoute,
   AuthenticatedAdminAnalyticsRoute: AuthenticatedAdminAnalyticsRoute,
+  AuthenticatedAdminBrandsRoute: AuthenticatedAdminBrandsRoute,
   AuthenticatedAdminCreatorsRoute: AuthenticatedAdminCreatorsRoute,
   AuthenticatedAdminGetawayRoute: AuthenticatedAdminGetawayRoute,
   AuthenticatedAdminPaymentsRoute: AuthenticatedAdminPaymentsRoute,

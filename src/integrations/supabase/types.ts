@@ -44,6 +44,45 @@ export type Database = {
         }
         Relationships: []
       }
+      brands: {
+        Row: {
+          active: boolean
+          aliases: string[]
+          alliance_or_group: string | null
+          created_at: string
+          id: string
+          kind: string
+          name: string
+          popularity_rank: number
+          regions: string[]
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          aliases?: string[]
+          alliance_or_group?: string | null
+          created_at?: string
+          id: string
+          kind: string
+          name: string
+          popularity_rank?: number
+          regions?: string[]
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          aliases?: string[]
+          alliance_or_group?: string | null
+          created_at?: string
+          id?: string
+          kind?: string
+          name?: string
+          popularity_rank?: number
+          regions?: string[]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       calendar_connections: {
         Row: {
           access_token: string | null

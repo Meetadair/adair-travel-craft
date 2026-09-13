@@ -2,6 +2,7 @@
  * Turns saved traveller preferences into ranking scores. Duffel cannot filter
  * on most of these, so we use them to sort results rather than drop them.
  */
+import { brandWords } from "@/lib/brands/catalogue";
 import type { TravelPrefs } from "@/lib/prefs/questions";
 
 /** Search-time subset of the preferences, safe to pass into server search. */
@@ -111,8 +112,12 @@ function matchesAny(text: string, words: string[]): boolean {
   return words.some((word) => haystack.includes(fold(word)));
 }
 
+/**
+ * Brand preferences are stored as brand ids, so unknown keys fall back to the
+ * brand catalogue's name and aliases before matching on the raw value.
+ */
 function anySelected(text: string, selected: string[], table: Record<string, string[]>): boolean {
-  return selected.some((key) => matchesAny(text, table[key] ?? [key]));
+  return selected.some((key) => matchesAny(text, table[key] ?? brandWords(key)));
 }
 
 /* ------------------------------ hard filters ------------------------------ */

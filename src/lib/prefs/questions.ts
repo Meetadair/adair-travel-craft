@@ -4,6 +4,9 @@
  * changes needed.
  */
 
+import type { BrandKind } from "@/lib/brands/catalogue";
+import { brandName } from "@/lib/brands/catalogue";
+
 export type Option = { value: string; label: string };
 
 /** Every answer is kept as a list of strings, or a boolean for toggles. */
@@ -14,6 +17,12 @@ export type FieldDef = {
   field: string;
   label?: string;
   options: Option[];
+  /**
+   * Airlines, hotel groups and rental companies come from the `brands` table:
+   * a short list ranked to the customer's home-airport region in onboarding,
+   * the full searchable list in Settings.
+   */
+  brandKind?: BrandKind;
   /** Value that clears every other choice, e.g. "No preference". */
   noneValue?: string;
 };
@@ -75,30 +84,8 @@ export const QUESTIONS: QuestionDef[] = [
       {
         field: "airlines",
         noneValue: "none",
-        options: opts(
-          ["lot", "LOT"],
-          ["lufthansa", "Lufthansa"],
-          ["airfrance", "Air France"],
-          ["klm", "KLM"],
-          ["ba", "British Airways"],
-          ["wizz", "Wizz Air"],
-          ["ryanair", "Ryanair"],
-          ["turkish", "Turkish Airlines"],
-          ["emirates", "Emirates"],
-          ["qatar", "Qatar Airways"],
-          ["swiss", "SWISS"],
-          ["austrian", "Austrian"],
-          ["iberia", "Iberia"],
-          ["ita", "ITA Airways"],
-          ["sas", "SAS"],
-          ["finnair", "Finnair"],
-          ["aegean", "Aegean"],
-          ["easyjet", "easyJet"],
-          ["delta", "Delta"],
-          ["united", "United"],
-          ["american", "American Airlines"],
-          NONE,
-        ),
+        brandKind: "airline",
+        options: [{ value: "none", label: "No preference" }],
       },
     ],
   },
@@ -165,24 +152,8 @@ export const QUESTIONS: QuestionDef[] = [
       {
         field: "hotelChains",
         noneValue: "none",
-        options: opts(
-          ["hyatt", "Hyatt"],
-          ["marriott", "Marriott"],
-          ["hilton", "Hilton"],
-          ["ihg", "IHG"],
-          ["accor", "Accor"],
-          ["radisson", "Radisson"],
-          ["slh", "Small Luxury Hotels"],
-          ["designhotels", "Design Hotels"],
-          ["fourseasons", "Four Seasons"],
-          ["mandarin", "Mandarin Oriental"],
-          ["rosewood", "Rosewood"],
-          ["kempinski", "Kempinski"],
-          ["melia", "Meliá"],
-          ["nh", "NH"],
-          ["scandic", "Scandic"],
-          NONE,
-        ),
+        brandKind: "hotel_chain",
+        options: [{ value: "none", label: "No preference" }],
       },
     ],
   },
@@ -323,16 +294,8 @@ export const QUESTIONS: QuestionDef[] = [
       {
         field: "carCompanies",
         noneValue: "none",
-        options: opts(
-          ["sixt", "Sixt"],
-          ["hertz", "Hertz"],
-          ["avis", "Avis"],
-          ["europcar", "Europcar"],
-          ["enterprise", "Enterprise"],
-          ["budget", "Budget"],
-          ["alamo", "Alamo"],
-          NONE,
-        ),
+        brandKind: "car_rental",
+        options: [{ value: "none", label: "No preference" }],
       },
     ],
   },
@@ -877,7 +840,8 @@ export function labelFor(field: string, value: string): string {
       if (def.field !== field) continue;
       const hit = def.options.find((o) => o.value === value);
       if (hit) return hit.label;
+      if (def.brandKind) return brandName(value) ?? value;
     }
   }
-  return value;
+  return brandName(value) ?? value;
 }

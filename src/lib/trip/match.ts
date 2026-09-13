@@ -54,6 +54,7 @@ export function findByName<T>(
  * Only differentiating criteria count, and only ones they filled in: three
  * stated preferences give "3 of 3", never padded out.
  */
+import { brandWords } from "@/lib/brands/catalogue";
 import type { SearchPrefs } from "./rank";
 import type { CarResult, FlightResult, StayResult, TripSearchResponse } from "./types";
 
@@ -96,7 +97,10 @@ const has = (text: string, needles: string[]) =>
 const pretty = (value: string) =>
   value.replace(/_/g, " ").replace(/^./, (c) => c.toUpperCase());
 
-const wanted = (list: string[]) => list.filter((v) => v && v !== "any" && v !== "nopref");
+const wanted = (list: string[]) => list.filter((v) => v && v !== "any" && v !== "nopref" && v !== "none");
+
+/** Brand ids expand to the brand's name and aliases before matching supplier text. */
+const brandTerms = (list: string[]) => wanted(list).flatMap((id) => brandWords(id));
 
 function summarise(criteria: Criterion[]): LineMatch | null {
   if (!criteria.length) return null;
@@ -105,7 +109,7 @@ function summarise(criteria: Criterion[]): LineMatch | null {
 
 function flightCriteria(flight: FlightResult, prefs: SearchPrefs): Criterion[] {
   const out: Criterion[] = [];
-  const airlines = wanted(prefs.airlines);
+  const airlines = brandTerms(prefs.airlines);
   if (airlines.length) {
     const text = `${flight.carrier} ${flight.flightNumbers.join(" ")}`;
     out.push({
@@ -154,7 +158,7 @@ function stayCriteria(stay: StayResult, prefs: SearchPrefs): Criterion[] {
       label: `Rated ${stay.rating} (your minimum: ${prefs.hotelMinRating})`,
     });
   }
-  const chains = wanted(prefs.hotelChains);
+  const chains = brandTerms(prefs.hotelChains);
   if (chains.length) {
     const ok = has(stay.name, chains);
     out.push({
@@ -211,7 +215,7 @@ function carCriteria(car: CarResult, prefs: SearchPrefs): Criterion[] {
         : `${pretty(car.transmission || "unknown")} gearbox — you prefer ${pretty(prefs.carTransmission)}`,
     });
   }
-  const companies = wanted(prefs.carCompanies);
+  const companies = brandTerms(prefs.carCompanies);
   if (companies.length) {
     const ok = has(car.supplier, companies);
     out.push({
