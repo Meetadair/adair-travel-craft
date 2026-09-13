@@ -219,7 +219,39 @@ export const en = {
       saveCompanyAction: "Save the company",
       dismiss: "Not now",
     },
+
+    // Closing the booking in the conversation.
+    closing: {
+      invoiceChoose: "Which company for the invoice?",
+      invoiceNone: "No invoice",
+      invoiceName: "Which company should the invoice go to?",
+      companyPlaceholder: "Company name",
+      save: "Save",
+      detailsOnce: "I need your details for the ticket, once.",
+      firstName: "First name",
+      lastName: "Last name",
+      email: "Email",
+      phone: "Phone",
+      bornOn: "Date of birth",
+      saveForNextTime: "Save for next time",
+      whichCard: "Which card?",
+      anotherCard: "Another card",
+      bookIt: "Book it",
+      changeSomething: "Change something",
+      opening: "Opening the secure card form…",
+      moment: "One moment…",
+      booked: "Booked. Taking you to My trips — test mode, nothing was charged.",
+      testMode: "Test mode — no real charge is made and no ticket is issued.",
+      passport: "This route needs passport details, so we finish on the secure page.",
+      continueSecure: "Continue",
+      failed:
+        "That did not go through, and nothing was charged. We can finish it on the secure page.",
+      finishSecure: "Finish on the secure page",
+      companyFailed: "We could not save that company. Try again.",
+      detailsFailed: "Those details were not accepted. Please check them.",
+    },
   },
+
 
   auth: {
     meta: {
