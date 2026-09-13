@@ -12,7 +12,13 @@
  * Pure and browser-safe: the chat, the card and the tests read the same rules.
  */
 
-export type ClarifyKind = "child_ages" | "no_dates" | "vague_week" | "which_airport" | "hotel_unmatched";
+export type ClarifyKind =
+  | "needs_destination"
+  | "child_ages"
+  | "no_dates"
+  | "vague_week"
+  | "which_airport"
+  | "hotel_unmatched";
 
 export type Clarification = {
   kind: ClarifyKind;
