@@ -959,6 +959,8 @@ export type MyTrip = {
   }>;
   /** Editorial notes for the destination; empty when the team hasn't written any. */
   tips: Array<{ key: string; label: string; text: string }>;
+  /** The sentence this trip was composed from, for "Book again". */
+  sentence: string | null;
 
 
 };
@@ -970,7 +972,7 @@ export const listMyTrips = createServerFn({ method: "GET" })
     const tripsRes = await supabase
       .from("trips")
       .select(
-        "id, title, city, origin, start_date, end_date, status, total_amount, document_number, data_source, segments, created_at",
+        "id, title, city, origin, start_date, end_date, status, total_amount, document_number, data_source, segments, card_id, created_at",
       )
       .eq("user_id", userId)
       .order("created_at", { ascending: false });
@@ -987,7 +989,25 @@ export const listMyTrips = createServerFn({ method: "GET" })
       document_number: string | null;
       data_source: string | null;
       segments: unknown;
+      card_id: string | null;
     }>;
+
+    // The original sentence, so a past trip can be booked again.
+    const cardIds = trips.map((t) => t.card_id).filter((id): id is string => Boolean(id));
+    const sentenceByCard = new Map<string, string>();
+    if (cardIds.length) {
+      const cardsRes = await supabase
+        .from("trip_cards")
+        .select("id, trip_requests(raw_sentence)")
+        .in("id", cardIds);
+      for (const row of (cardsRes.data ?? []) as Array<{
+        id: string;
+        trip_requests: { raw_sentence: string | null } | Array<{ raw_sentence: string | null }> | null;
+      }>) {
+        const req = Array.isArray(row.trip_requests) ? row.trip_requests[0] : row.trip_requests;
+        if (req?.raw_sentence) sentenceByCard.set(row.id, req.raw_sentence);
+      }
+    }
 
     if (!trips.length) return [];
 
@@ -1045,6 +1065,7 @@ export const listMyTrips = createServerFn({ method: "GET" })
       reference: trip.document_number,
       testMode: (trip.data_source ?? "").includes("test"),
       stops: tripStops(trip.segments, trip.origin, trip.city),
+      sentence: trip.card_id ? (sentenceByCard.get(trip.card_id) ?? null) : null,
 
       items: items
         .filter((i) => i.trip_id === trip.id)

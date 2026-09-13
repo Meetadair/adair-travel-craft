@@ -12,6 +12,8 @@ import {
   X,
   FileText,
   FileDown,
+  RotateCcw,
+  Pencil,
 } from "lucide-react";
 import { AddReservation } from "@/components/add-reservation";
 import { TripPlaces } from "@/components/trip-places";
@@ -27,6 +29,8 @@ import { downloadInvoiceFor } from "@/lib/invoice-download";
 import { useLocale } from "@/lib/i18n";
 import { tripCalendarEvents } from "@/lib/calendar";
 import { eur } from "@/lib/trip/client";
+import { isInProgress, splitTrips, todayIso } from "@/lib/trips/phase";
+import { ASSISTANT_PREFILL_KEY } from "@/lib/trips/prefill";
 
 const ICONS: Record<string, React.ReactNode> = {
   flight: <Plane className="size-4" />,
@@ -66,6 +70,7 @@ export function TripsPage() {
   const invoices = useQuery({ queryKey: ["my-invoices"], queryFn: () => fetchInvoices({}) });
   const cancelItem = useServerFn(cancelTripItem);
   const [view, setView] = useState<"list" | "calendar">("list");
+  const [tab, setTab] = useState<"upcoming" | "past">("upcoming");
   const [mapFor, setMapFor] = useState<string | null>(null);
   const [order, setOrder] = useState<Record<string, MyTrip["stops"]>>({});
 
@@ -76,6 +81,16 @@ export function TripsPage() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["my-trips"] }),
   });
 
+
+  const today = todayIso();
+  const { upcoming, past } = splitTrips(trips.data ?? [], today);
+  const visible = tab === "upcoming" ? upcoming : past;
+
+  /** Hand a sentence to the assistant, where the traveller edits it and searches. */
+  const openInAssistant = (sentence: string) => {
+    window.localStorage.setItem(ASSISTANT_PREFILL_KEY, sentence);
+    navigate({ to: "/assistant" });
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -94,7 +109,27 @@ export function TripsPage() {
           Everything you booked, with its confirmation and status.
         </p>
 
-        <div className="mt-6 inline-flex rounded-xl border border-border p-1">
+        <div className="mt-6 flex flex-wrap items-center gap-3">
+          <div className="inline-flex rounded-xl border border-border p-1">
+            {(["upcoming", "past"] as const).map((name) => (
+              <button
+                key={name}
+                type="button"
+                onClick={() => setTab(name)}
+                aria-pressed={tab === name}
+                className={`rounded-lg px-4 py-1.5 text-xs font-medium capitalize ${
+                  tab === name
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {name}
+                {name === "upcoming" && upcoming.length > 0 ? ` · ${upcoming.length}` : ""}
+              </button>
+            ))}
+          </div>
+
+          <div className="inline-flex rounded-xl border border-border p-1">
           {(["list", "calendar"] as const).map((mode) => (
             <button
               key={mode}
@@ -110,20 +145,27 @@ export function TripsPage() {
               {mode}
             </button>
           ))}
+          </div>
         </div>
 
 
         {trips.isLoading && <p className="mt-10 text-sm text-muted-foreground">Loading…</p>}
 
-        {trips.data?.length === 0 && (
+        {!trips.isLoading && view === "list" && visible.length === 0 && (
           <div className="hairline-card mt-10 p-8 text-center">
-            <p className="text-sm text-muted-foreground">No trips yet.</p>
-            <button
-              onClick={() => navigate({ to: "/" })}
-              className="mt-5 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
-            >
-              Plan a trip
-            </button>
+            <p className="text-sm text-muted-foreground">
+              {tab === "upcoming"
+                ? "Nothing booked yet. Describe a trip above to start."
+                : "Your completed trips will appear here."}
+            </p>
+            {tab === "upcoming" && (
+              <button
+                onClick={() => navigate({ to: "/assistant" })}
+                className="mt-5 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+              >
+                Plan a trip
+              </button>
+            )}
           </div>
         )}
 
@@ -135,11 +177,21 @@ export function TripsPage() {
 
         <div className={`mt-10 space-y-6 ${view === "calendar" ? "hidden" : ""}`}>
 
-          {trips.data?.map((trip) => (
+          {visible.map((trip) => {
+            const isPast = tab === "past";
+            const now = isInProgress(trip, today);
+            return (
             <article key={trip.id} className="hairline-card overflow-hidden">
               <header className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-5 py-4">
                 <div>
-                  <h2 className="font-display text-lg font-semibold">{trip.title}</h2>
+                  <h2 className="flex flex-wrap items-center gap-2 font-display text-lg font-semibold">
+                    {trip.title}
+                    {now && (
+                      <span className="rounded-full border border-primary/40 px-2 py-0.5 text-[11px] font-medium text-primary">
+                        Now
+                      </span>
+                    )}
+                  </h2>
                   <p className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                     <span>
                       {trip.status}
@@ -169,7 +221,7 @@ export function TripsPage() {
                       </span>
                     </span>
                     <span className="text-sm">{eur(item.amountEur)}</span>
-                    {item.status !== "cancelled" && (
+                    {!isPast && item.status !== "cancelled" && (
                       <button
                         onClick={() => cancel.mutate(item.id)}
                         disabled={cancel.isPending}
@@ -271,6 +323,37 @@ export function TripsPage() {
                 );
               })()}
 
+              {!isPast && trip.status === "booked" && (
+                <div className="border-t border-border px-5 py-4">
+                  <Link
+                    to="/trips/$tripId/change"
+                    params={{ tripId: trip.id }}
+                    className="inline-flex items-center gap-2 rounded-xl border border-border px-3 py-2 text-sm hover:bg-secondary"
+                  >
+                    <Pencil className="size-4 text-primary" /> Change this trip
+                  </Link>
+                </div>
+              )}
+
+              {isPast && trip.sentence && (
+                <div className="flex flex-wrap gap-2 border-t border-border px-5 py-4">
+                  <button
+                    type="button"
+                    onClick={() => openInAssistant(trip.sentence ?? "")}
+                    className="inline-flex items-center gap-2 rounded-xl border border-border px-3 py-2 text-sm hover:bg-secondary"
+                  >
+                    <RotateCcw className="size-4 text-primary" /> Book again
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => openInAssistant(`${trip.sentence}, but `)}
+                    className="inline-flex items-center gap-2 rounded-xl border border-border px-3 py-2 text-sm hover:bg-secondary"
+                  >
+                    <Pencil className="size-4 text-primary" /> Same trip, but…
+                  </button>
+                </div>
+              )}
+
               <div className="border-t border-border px-5 py-4">
                 <Link
                   to="/support"
@@ -288,7 +371,8 @@ export function TripsPage() {
               )}
 
             </article>
-          ))}
+            );
+          })}
         </div>
       </main>
       <AppFooter />

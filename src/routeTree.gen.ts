@@ -49,6 +49,7 @@ import { Route as ApiPublicTripRemindersRouteImport } from './routes/api/public/
 import { Route as ApiTripParseRouteImport } from './routes/api/trip/parse'
 import { Route as ApiTripPriceContextRouteImport } from './routes/api/trip/price-context'
 import { Route as ApiTripSearchRouteImport } from './routes/api/trip/search'
+import { Route as AuthenticatedTripsTripIdChangeRouteImport } from './routes/_authenticated/trips.$tripId.change'
 import { Route as ApiPublicGetawayImageSplatRouteImport } from './routes/api/public/getaway-image.$'
 import { Route as ApiPublicSupplierOrderUpdatedRouteImport } from './routes/api/public/supplier/order-updated'
 import { Route as ApiPublicCalendarCallbackProviderRouteImport } from './routes/api/public/calendar/callback.$provider'
@@ -260,6 +261,12 @@ const ApiTripSearchRoute = ApiTripSearchRouteImport.update({
   path: '/api/trip/search',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedTripsTripIdChangeRoute =
+  AuthenticatedTripsTripIdChangeRouteImport.update({
+    id: '/$tripId/change',
+    path: '/$tripId/change',
+    getParentRoute: () => AuthenticatedTripsRoute,
+  } as any)
 const ApiPublicGetawayImageSplatRoute =
   ApiPublicGetawayImageSplatRouteImport.update({
     id: '/api/public/getaway-image/$',
@@ -306,7 +313,7 @@ export interface FileRoutesByFullPath {
   '/plan': typeof AuthenticatedPlanRoute
   '/preferences': typeof AuthenticatedPreferencesRoute
   '/support': typeof AuthenticatedSupportRoute
-  '/trips': typeof AuthenticatedTripsRoute
+  '/trips': typeof AuthenticatedTripsRouteWithChildren
   '/c/$handle': typeof CHandleRoute
   '/r/$code': typeof RCodeRoute
   '/$lang/': typeof LangIndexRoute
@@ -325,6 +332,7 @@ export interface FileRoutesByFullPath {
   '/api/trip/price-context': typeof ApiTripPriceContextRoute
   '/api/trip/search': typeof ApiTripSearchRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/trips/$tripId/change': typeof AuthenticatedTripsTripIdChangeRoute
   '/api/public/getaway-image/$': typeof ApiPublicGetawayImageSplatRoute
   '/api/public/supplier/order-updated': typeof ApiPublicSupplierOrderUpdatedRoute
   '/api/public/calendar/callback/$provider': typeof ApiPublicCalendarCallbackProviderRoute
@@ -350,7 +358,7 @@ export interface FileRoutesByTo {
   '/plan': typeof AuthenticatedPlanRoute
   '/preferences': typeof AuthenticatedPreferencesRoute
   '/support': typeof AuthenticatedSupportRoute
-  '/trips': typeof AuthenticatedTripsRoute
+  '/trips': typeof AuthenticatedTripsRouteWithChildren
   '/c/$handle': typeof CHandleRoute
   '/r/$code': typeof RCodeRoute
   '/$lang': typeof LangIndexRoute
@@ -369,6 +377,7 @@ export interface FileRoutesByTo {
   '/api/trip/price-context': typeof ApiTripPriceContextRoute
   '/api/trip/search': typeof ApiTripSearchRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/trips/$tripId/change': typeof AuthenticatedTripsTripIdChangeRoute
   '/api/public/getaway-image/$': typeof ApiPublicGetawayImageSplatRoute
   '/api/public/supplier/order-updated': typeof ApiPublicSupplierOrderUpdatedRoute
   '/api/public/calendar/callback/$provider': typeof ApiPublicCalendarCallbackProviderRoute
@@ -397,7 +406,7 @@ export interface FileRoutesById {
   '/_authenticated/plan': typeof AuthenticatedPlanRoute
   '/_authenticated/preferences': typeof AuthenticatedPreferencesRoute
   '/_authenticated/support': typeof AuthenticatedSupportRoute
-  '/_authenticated/trips': typeof AuthenticatedTripsRoute
+  '/_authenticated/trips': typeof AuthenticatedTripsRouteWithChildren
   '/c/$handle': typeof CHandleRoute
   '/r/$code': typeof RCodeRoute
   '/$lang/': typeof LangIndexRoute
@@ -416,6 +425,7 @@ export interface FileRoutesById {
   '/api/trip/price-context': typeof ApiTripPriceContextRoute
   '/api/trip/search': typeof ApiTripSearchRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/trips/$tripId/change': typeof AuthenticatedTripsTripIdChangeRoute
   '/api/public/getaway-image/$': typeof ApiPublicGetawayImageSplatRoute
   '/api/public/supplier/order-updated': typeof ApiPublicSupplierOrderUpdatedRoute
   '/api/public/calendar/callback/$provider': typeof ApiPublicCalendarCallbackProviderRoute
@@ -463,6 +473,7 @@ export interface FileRouteTypes {
     | '/api/trip/price-context'
     | '/api/trip/search'
     | '/admin/'
+    | '/trips/$tripId/change'
     | '/api/public/getaway-image/$'
     | '/api/public/supplier/order-updated'
     | '/api/public/calendar/callback/$provider'
@@ -507,6 +518,7 @@ export interface FileRouteTypes {
     | '/api/trip/price-context'
     | '/api/trip/search'
     | '/admin'
+    | '/trips/$tripId/change'
     | '/api/public/getaway-image/$'
     | '/api/public/supplier/order-updated'
     | '/api/public/calendar/callback/$provider'
@@ -553,6 +565,7 @@ export interface FileRouteTypes {
     | '/api/trip/price-context'
     | '/api/trip/search'
     | '/_authenticated/admin/'
+    | '/_authenticated/trips/$tripId/change'
     | '/api/public/getaway-image/$'
     | '/api/public/supplier/order-updated'
     | '/api/public/calendar/callback/$provider'
@@ -865,6 +878,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiTripSearchRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/trips/$tripId/change': {
+      id: '/_authenticated/trips/$tripId/change'
+      path: '/$tripId/change'
+      fullPath: '/trips/$tripId/change'
+      preLoaderRoute: typeof AuthenticatedTripsTripIdChangeRouteImport
+      parentRoute: typeof AuthenticatedTripsRoute
+    }
     '/api/public/getaway-image/$': {
       id: '/api/public/getaway-image/$'
       path: '/api/public/getaway-image/$'
@@ -896,6 +916,17 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedTripsRouteChildren {
+  AuthenticatedTripsTripIdChangeRoute: typeof AuthenticatedTripsTripIdChangeRoute
+}
+
+const AuthenticatedTripsRouteChildren: AuthenticatedTripsRouteChildren = {
+  AuthenticatedTripsTripIdChangeRoute: AuthenticatedTripsTripIdChangeRoute,
+}
+
+const AuthenticatedTripsRouteWithChildren =
+  AuthenticatedTripsRoute._addFileChildren(AuthenticatedTripsRouteChildren)
+
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedCreatorRoute: typeof AuthenticatedCreatorRoute
   AuthenticatedCreditRoute: typeof AuthenticatedCreditRoute
@@ -906,7 +937,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedPlanRoute: typeof AuthenticatedPlanRoute
   AuthenticatedPreferencesRoute: typeof AuthenticatedPreferencesRoute
   AuthenticatedSupportRoute: typeof AuthenticatedSupportRoute
-  AuthenticatedTripsRoute: typeof AuthenticatedTripsRoute
+  AuthenticatedTripsRoute: typeof AuthenticatedTripsRouteWithChildren
   AuthenticatedAdminAnalyticsRoute: typeof AuthenticatedAdminAnalyticsRoute
   AuthenticatedAdminBrandsRoute: typeof AuthenticatedAdminBrandsRoute
   AuthenticatedAdminCreatorsRoute: typeof AuthenticatedAdminCreatorsRoute
@@ -928,7 +959,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPlanRoute: AuthenticatedPlanRoute,
   AuthenticatedPreferencesRoute: AuthenticatedPreferencesRoute,
   AuthenticatedSupportRoute: AuthenticatedSupportRoute,
-  AuthenticatedTripsRoute: AuthenticatedTripsRoute,
+  AuthenticatedTripsRoute: AuthenticatedTripsRouteWithChildren,
   AuthenticatedAdminAnalyticsRoute: AuthenticatedAdminAnalyticsRoute,
   AuthenticatedAdminBrandsRoute: AuthenticatedAdminBrandsRoute,
   AuthenticatedAdminCreatorsRoute: AuthenticatedAdminCreatorsRoute,
