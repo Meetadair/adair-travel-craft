@@ -19,7 +19,6 @@ export type ClosingCard = {
 export type ClosingExtra = { id: string; label: string };
 
 export type ClosingQuestionKind =
-  | "invoice_confirm"
   | "invoice_choose"
   | "invoice_company_name"
   | "card_confirm"
@@ -51,6 +50,9 @@ export type ClosingInput = {
 
 export type Closing = {
   questions: ClosingQuestion[];
+  /** Chosen without asking, because only one was saved. */
+  companyId: string | null;
+  cardId: string | null;
   /** One line confirming extras from the sentence, with a Remove on each. */
   extras: ClosingExtra[];
   extrasLine: string | null;
@@ -81,19 +83,10 @@ export function buildClosing(input: ClosingInput): Closing {
   const questions: ClosingQuestion[] = [];
 
   // ---- invoice ----
-  if (input.companies.length === 1) {
-    const only = input.companies[0]!;
-    questions.push({
-      kind: "invoice_confirm",
-      question: `Invoice to ${only.name}?`,
-      options: [
-        { value: only.id, label: "Yes" },
-        { value: "none", label: "No" },
-        { value: "other", label: "Other" },
-      ],
-      essential: false,
-    });
-  } else if (input.companies.length > 1) {
+  // One company saved: take it, and say so in the summary. Nothing to ask.
+  let companyId: string | null =
+    input.companies.length === 1 ? (input.companies[0]!.id) : null;
+  if (input.companies.length > 1) {
     questions.push({
       kind: "invoice_choose",
       question: "Which company for the invoice?",
@@ -103,7 +96,7 @@ export function buildClosing(input: ClosingInput): Closing {
       ],
       essential: false,
     });
-  } else if (input.invoiceMentioned) {
+  } else if (input.companies.length === 0 && input.invoiceMentioned) {
     questions.push({
       kind: "invoice_company_name",
       question: "Which company should the invoice go to?",
@@ -124,17 +117,9 @@ export function buildClosing(input: ClosingInput): Closing {
   }
 
   // ---- payment ----
+  let cardId: string | null = null;
   if (input.cards.length === 1) {
-    const only = input.cards[0]!;
-    questions.push({
-      kind: "card_confirm",
-      question: `Pay with the ${cardLabel(only)}?`,
-      options: [
-        { value: only.id, label: "Yes" },
-        { value: "new", label: "Use another" },
-      ],
-      essential: true,
-    });
+    cardId = pickDefault(input.cards)!.id;
   } else if (input.cards.length > 1) {
     questions.push({
       kind: "card_choose",
@@ -156,6 +141,8 @@ export function buildClosing(input: ClosingInput): Closing {
 
   return {
     questions,
+    companyId,
+    cardId,
     extras: input.extras,
     extrasLine: extrasSentence(input.extras),
     fallback: input.passportRequired ? "passport" : null,
