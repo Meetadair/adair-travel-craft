@@ -253,8 +253,8 @@ export function familyFromSentence(sentence: string): FamilyRead {
   // "aged 4 and 7", "4 i 7 lat", "4 and 7 years old"
   const ages: number[] = [];
   const ageBlock =
-    /(?:aged|ages?|w\s+wieku)\s+([\d\s,ainokrz]+?)(?:\b(?:years?|lat\w*)\b|[.,;]|$)/u.exec(text) ??
-    /(?:kids?|child(?:ren)?|dzieci\w*)\s+([\d\s,ainokrz]{2,20}?)\s*(?:years?\s*old|lat\w*)/u.exec(text);
+    /(?:aged|ages?|w\s+wieku)\s+([\d\s,adiknorz]+?)(?:\b(?:years?|lat\w*)\b|[.,;]|$)/u.exec(text) ??
+    /(?:kids?|child(?:ren)?|dzieci\w*)\s+([\d\s,adiknorz]{2,20}?)\s*(?:years?\s*old|lat\w*)/u.exec(text);
   if (ageBlock?.[1]) {
     for (const found of ageBlock[1].matchAll(/\d+/g)) {
       const age = Number(found[0]);
