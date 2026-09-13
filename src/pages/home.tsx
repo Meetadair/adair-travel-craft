@@ -3,23 +3,14 @@ import {
   Plane,
   BedDouble,
   CarFront,
-  Check,
   X,
   ArrowRight,
-  UtensilsCrossed,
-  Wallet,
   Armchair,
-  Building2,
   Sparkles,
-  MapPin,
-  CalendarDays,
-  Clock,
   ChevronRight,
-  Coffee,
   FileDown,
   Share2,
   Receipt,
-  Users,
   Copy,
   ShieldCheck,
 } from "lucide-react";
@@ -38,7 +29,6 @@ import { parseTripSentence } from "@/lib/trip/parse";
 import { TripRoute } from "@/components/trip-route";
 import type { TripStop } from "@/lib/trip/types";
 
-import { downloadTripInvoice } from "@/lib/trip-pdf";
 import { SiteNav } from "@/components/site-nav";
 import { LocaleLink, useLocale, useT, type Dict } from "@/lib/i18n";
 import { parseDemoSentence, fill, referralCode } from "@/lib/demo-sentence";
