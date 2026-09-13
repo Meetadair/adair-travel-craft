@@ -248,6 +248,9 @@ export function AdminPage() {
           <Link to="/admin/payments" className="text-primary underline-offset-4 hover:underline">
             Payments
           </Link>
+          <Link to="/admin/brands" className="text-primary underline-offset-4 hover:underline">
+            Brands
+          </Link>
           <Link to="/admin/creators" className="text-primary underline-offset-4 hover:underline">
             Creators
           </Link>
