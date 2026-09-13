@@ -54,6 +54,7 @@ export function findByName<T>(
  * Only differentiating criteria count, and only ones they filled in: three
  * stated preferences give "3 of 3", never padded out.
  */
+import { brandWords } from "@/lib/brands/catalogue";
 import type { SearchPrefs } from "./rank";
 import type { CarResult, FlightResult, StayResult, TripSearchResponse } from "./types";
 
