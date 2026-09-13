@@ -35,6 +35,9 @@ type Draft = {
 
 const emptyDraft: Draft = { programmeCode: "", customLabel: "", memberNumber: "", tier: "" };
 
+/** Each category keeps its own draft, so opening one never clears another. */
+type Drafts = Partial<Record<LoyaltyCategory, Draft>>;
+
 export function WalletLoyalty() {
   const fetchList = useServerFn(listMemberships);
   const save = useServerFn(saveMembership);
@@ -43,17 +46,23 @@ export function WalletLoyalty() {
   const queryClient = useQueryClient();
 
   const list = useQuery({ queryKey: ["loyalty"], queryFn: () => fetchList() });
-  const [openCategory, setOpenCategory] = useState<LoyaltyCategory | null>(null);
-  const [draft, setDraft] = useState<Draft>(emptyDraft);
+  const [open, setOpen] = useState<Record<string, boolean>>({});
+  const [drafts, setDrafts] = useState<Drafts>({});
+  const [justSaved, setJustSaved] = useState<LoyaltyCategory | null>(null);
   const [revealed, setRevealed] = useState<Record<string, string>>({});
+
+  const draftFor = (category: LoyaltyCategory): Draft => drafts[category] ?? emptyDraft;
+  const patchDraft = (category: LoyaltyCategory, patch: Partial<Draft>) =>
+    setDrafts((prev) => ({ ...prev, [category]: { ...(prev[category] ?? emptyDraft), ...patch } }));
 
   const invalidate = () => queryClient.invalidateQueries({ queryKey: ["loyalty"] });
 
   const addMutation = useMutation({
     mutationFn: async (category: LoyaltyCategory) => {
+      const draft = draftFor(category);
       const option = programmeByCode(category, draft.programmeCode);
       const label = option?.label ?? draft.customLabel.trim();
-      if (!label) throw new Error("incomplete");
+      if (!label) throw new Error("Please choose a programme or type its name.");
       await save({
         data: {
           category,
@@ -64,10 +73,14 @@ export function WalletLoyalty() {
           tier: draft.tier.trim() || null,
         },
       });
+      return category;
     },
-    onSuccess: async () => {
-      setDraft(emptyDraft);
-      setOpenCategory(null);
+    // The form closes and the blank draft is cleared, so the next "Add another"
+    // starts empty rather than repeating the entry that was just saved.
+    onSuccess: async (category) => {
+      setDrafts((prev) => ({ ...prev, [category]: emptyDraft }));
+      setOpen((prev) => ({ ...prev, [category]: false }));
+      setJustSaved(category);
       await invalidate();
     },
   });
@@ -81,6 +94,13 @@ export function WalletLoyalty() {
     mutationFn: (id: string) => reveal({ data: { id } }),
     onSuccess: (result, id) => setRevealed((prev) => ({ ...prev, [id]: result.memberNumber })),
   });
+
+  const openForm = (category: LoyaltyCategory) => {
+    setJustSaved(null);
+    addMutation.reset();
+    setDrafts((prev) => ({ ...prev, [category]: emptyDraft }));
+    setOpen((prev) => ({ ...prev, [category]: true }));
+  };
 
   const forCategory = (category: LoyaltyCategory): Membership[] =>
     (list.data ?? []).filter((m) => m.category === category);
@@ -142,13 +162,19 @@ export function WalletLoyalty() {
             </div>
           ))}
 
-          {openCategory === category ? (
+          {justSaved === category && !open[category] && (
+            <p className="text-xs text-muted-foreground">
+              Saved. Add another if you hold more than one.
+            </p>
+          )}
+
+          {open[category] ? (
             <div className="space-y-3 rounded-xl border border-border p-4">
               <label className="block">
                 <span className="text-xs font-medium text-muted-foreground">Programme</span>
                 <select
-                  value={draft.programmeCode}
-                  onChange={(e) => setDraft((p) => ({ ...p, programmeCode: e.target.value }))}
+                  value={draftFor(category).programmeCode}
+                  onChange={(e) => patchDraft(category, { programmeCode: e.target.value })}
                   className={inputClass}
                 >
                   <option value="">Other (type the name)</option>
@@ -160,12 +186,12 @@ export function WalletLoyalty() {
                 </select>
               </label>
 
-              {!draft.programmeCode && (
+              {!draftFor(category).programmeCode && (
                 <label className="block">
                   <span className="text-xs font-medium text-muted-foreground">Programme name</span>
                   <input
-                    value={draft.customLabel}
-                    onChange={(e) => setDraft((p) => ({ ...p, customLabel: e.target.value }))}
+                    value={draftFor(category).customLabel}
+                    onChange={(e) => patchDraft(category, { customLabel: e.target.value })}
                     placeholder="Programme name"
                     className={inputClass}
                   />
@@ -175,13 +201,13 @@ export function WalletLoyalty() {
               <label className="block">
                 <span className="text-xs font-medium text-muted-foreground">Member number</span>
                 <input
-                  value={draft.memberNumber}
-                  onChange={(e) => setDraft((p) => ({ ...p, memberNumber: e.target.value }))}
+                  value={draftFor(category).memberNumber}
+                  onChange={(e) => patchDraft(category, { memberNumber: e.target.value })}
                   inputMode="text"
                   autoComplete="off"
                   className={inputClass}
                 />
-                {draft.memberNumber.trim().length < 4 && (
+                {draftFor(category).memberNumber.trim().length < 4 && (
                   <span className="mt-1 block text-xs text-primary">
                     Without your member number, miles won't be credited.
                   </span>
@@ -193,17 +219,15 @@ export function WalletLoyalty() {
                   Tier or status — optional
                 </span>
                 <input
-                  value={draft.tier}
-                  onChange={(e) => setDraft((p) => ({ ...p, tier: e.target.value }))}
+                  value={draftFor(category).tier}
+                  onChange={(e) => patchDraft(category, { tier: e.target.value })}
                   placeholder={COMMON_TIERS.join(", ")}
                   className={inputClass}
                 />
               </label>
 
               {addMutation.isError && (
-                <p className="text-sm text-primary">
-                  Please choose a programme or type its name.
-                </p>
+                <p className="text-sm text-primary">{(addMutation.error as Error).message}</p>
               )}
 
               <div className="flex items-center gap-4">
@@ -218,8 +242,8 @@ export function WalletLoyalty() {
                 <button
                   type="button"
                   onClick={() => {
-                    setOpenCategory(null);
-                    setDraft(emptyDraft);
+                    setOpen((prev) => ({ ...prev, [category]: false }));
+                    setDrafts((prev) => ({ ...prev, [category]: emptyDraft }));
                   }}
                   className="text-sm text-muted-foreground underline decoration-border underline-offset-4"
                 >
@@ -230,13 +254,13 @@ export function WalletLoyalty() {
           ) : (
             <button
               type="button"
-              onClick={() => {
-                setOpenCategory(category);
-                setDraft(emptyDraft);
-              }}
+              onClick={() => openForm(category)}
               className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-border px-4 py-2 text-sm hover:border-primary"
             >
-              <Plus className="size-4" /> Add {CATEGORY_LABEL[category].toLowerCase()} programme
+              <Plus className="size-4" />{" "}
+              {forCategory(category).length
+                ? `Add another ${CATEGORY_LABEL[category].toLowerCase()} programme`
+                : `Add ${CATEGORY_LABEL[category].toLowerCase()} programme`}
             </button>
           )}
         </div>

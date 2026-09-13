@@ -9,6 +9,7 @@ import { SiteNav } from "@/components/site-nav";
 import { HotelGallery } from "@/components/hotel-gallery";
 import { VoiceInput } from "@/components/voice-input";
 import { CalendarTripHints } from "@/components/calendar-trip-hints";
+import { LoyaltyReminder } from "@/components/prefs/loyalty-reminder";
 import { getPromptSuggestions } from "@/lib/suggestions.functions";
 import { composeTrip, saveTrip } from "@/lib/travel.functions";
 import { supabase } from "@/integrations/supabase/client";
@@ -200,6 +201,8 @@ export function AssistantPage() {
             </div>
           </form>
         )}
+
+        <LoyaltyReminder />
 
         <CalendarTripHints onPlan={(sentence) => setInput(sentence)} />
 

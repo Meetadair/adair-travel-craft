@@ -254,18 +254,21 @@ export const bookTripCard = createServerFn({ method: "POST" })
 
     const hotelName = search.stay?.name ?? null;
     const carSupplier = search.car ? `${search.car.supplier} ${search.car.vehicle}` : null;
-    const hotelMembership =
-      usable.find(
-        (m) =>
-          m.category === "hotel" &&
-          earnsOnWithGroup(earningRules, BRAND_SEED, "hotel", m.programmeCode, hotelName),
-      ) ?? null;
-    const carMembership =
-      usable.find(
-        (m) =>
-          m.category === "car" &&
-          earnsOnWithGroup(earningRules, BRAND_SEED, "car", m.programmeCode, carSupplier),
-      ) ?? null;
+    // A traveller may hold several hotel or rental programmes. All of them are
+    // checked; the desk can only credit one, so the first match is passed on and
+    // the other matching ones are reported honestly rather than as "no earn".
+    const hotelMatches = usable.filter(
+      (m) =>
+        m.category === "hotel" &&
+        earnsOnWithGroup(earningRules, BRAND_SEED, "hotel", m.programmeCode, hotelName),
+    );
+    const carMatches = usable.filter(
+      (m) =>
+        m.category === "car" &&
+        earnsOnWithGroup(earningRules, BRAND_SEED, "car", m.programmeCode, carSupplier),
+    );
+    const hotelMembership = hotelMatches[0] ?? null;
+    const carMembership = carMatches[0] ?? null;
 
     const lines: BookingResult["lines"] = [];
     let repriced: BookingResult["repriced"] = null;
@@ -430,14 +433,18 @@ export const bookTripCard = createServerFn({ method: "POST" })
       loyaltyNotApplied.push({
         programme: m.programmeLabel,
         masked: mask(m.last4),
-        note: "this hotel doesn't earn in this programme",
+        note: hotelMatches.includes(m)
+          ? "only one hotel programme can be credited per stay"
+          : "this hotel doesn't earn in this programme",
       });
     }
     for (const m of usable.filter((m) => m.category === "car" && m !== carMembership)) {
       loyaltyNotApplied.push({
         programme: m.programmeLabel,
         masked: mask(m.last4),
-        note: "this rental company doesn't earn in this programme",
+        note: carMatches.includes(m)
+          ? "only one rental programme can be credited per booking"
+          : "this rental company doesn't earn in this programme",
       });
     }
 
