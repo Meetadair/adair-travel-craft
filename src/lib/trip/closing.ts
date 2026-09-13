@@ -84,7 +84,7 @@ export function buildClosing(input: ClosingInput): Closing {
 
   // ---- invoice ----
   // One company saved: take it, and say so in the summary. Nothing to ask.
-  let companyId: string | null =
+  const companyId: string | null =
     input.companies.length === 1 ? (input.companies[0]!.id) : null;
   if (input.companies.length > 1) {
     questions.push({
@@ -117,9 +117,9 @@ export function buildClosing(input: ClosingInput): Closing {
   }
 
   // ---- payment ----
-  let cardId: string | null = null;
+  let cardIdChosen: string | null = null;
   if (input.cards.length === 1) {
-    cardId = pickDefault(input.cards)!.id;
+    cardIdChosen = pickDefault(input.cards)!.id;
   } else if (input.cards.length > 1) {
     questions.push({
       kind: "card_choose",
@@ -142,7 +142,7 @@ export function buildClosing(input: ClosingInput): Closing {
   return {
     questions,
     companyId,
-    cardId,
+    cardId: cardIdChosen,
     extras: input.extras,
     extrasLine: extrasSentence(input.extras),
     fallback: input.passportRequired ? "passport" : null,
