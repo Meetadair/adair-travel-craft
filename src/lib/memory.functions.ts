@@ -137,18 +137,41 @@ export const forgetMemoryLine = createServerFn({ method: "POST" })
   });
 
 /**
- * Clears everything Adair worked out by itself. Stated preferences are kept:
- * those are the traveller's own words.
+ * Clears everything Adair worked out by itself: habits, place memory and the
+ * ranking adjustments from past swaps. Stated preferences are kept — those are
+ * the traveller's own words. The swap history itself is a record of what
+ * happened and stays, but it stops affecting any ranking.
  */
 export const forgetEverythingLearned = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
+    const { loadLearned } = await import("@/lib/trip/learned.server");
+    const learned = await loadLearned(supabase, userId, {
+      airlines: [],
+      hotelChains: [],
+      carBrands: [],
+      carCompanies: [],
+      dealbreakers: [],
+    });
+    const subjects = [
+      ...learned.avoid.map((entry) => `${entry.kind}:${entry.brandId}`),
+      ...(learned.distanceWeight > 1 ? ["distance"] : []),
+      ...(learned.priceWeight > 1 ? ["price"] : []),
+    ];
     await Promise.all([
       supabase.from("traveller_patterns" as never).delete().eq("user_id", userId),
       supabase.from("traveller_place_memory" as never).delete().eq("user_id", userId),
-      supabase.from("choice_feedback").delete().eq("user_id", userId),
-      supabase.from("learned_overrides").delete().eq("user_id", userId),
+      subjects.length
+        ? supabase.from("learned_overrides").insert(
+            subjects.map((subject) => ({
+              user_id: userId,
+              kind: "ranking",
+              subject,
+              action: "ignore",
+            })) as never,
+          )
+        : Promise.resolve({ error: null }),
     ]);
     return { ok: true };
   });
