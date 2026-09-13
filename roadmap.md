@@ -253,3 +253,11 @@
 - [x] Past actions: invoice download, "Book again" (same sentence handed to the assistant for new dates) and "Same trip, but…" (amend-by-sentence prefilled). Cancel and "Change this trip" stay on Upcoming only (change now routed at /trips/:tripId/change).
 - [x] Month-grid calendar view unchanged and shows both. Empty states: "Nothing booked yet. Describe a trip above to start." / "Your completed trips will appear here."
 - [x] Tests for the return-date boundary, the in-progress marker, cancelled trips and both sort orders (272 tests pass).
+
+## Conversational layer — done
+- [x] Parse, then confirm: an understanding strip under the input shows from → to, dates, must-arrive-by, travellers and free-text wishes; every structured chip opens an inline picker (calendar, time, searchable airport list, travellers). Search runs only on "Find it".
+- [x] Adair asks for what's missing in the chat, at most two questions, with the control under the question: dates, arrival time (mandatory for business trips), child ages, which airport in two-airport cities. Non-essential questions can be skipped and the assumption is stated on the card.
+- [x] Advice above the card, capped at two lines, generated from real data: hotel→airport distance and parking vs car price, tight arrival with the calmer flight, peak-week pricing with the cheaper offset, breakfast not included. Each carries one action (Swap, Take the earlier flight, Show cheaper dates, Add breakfast) and logs `advice_acted`.
+- [x] At most one nudge per conversation, never again once dismissed: connect the calendar, add a loyalty number, save the default company. Dismissal remembered in the browser and logged.
+- [x] Copy in en.ts under `assistant.strip/questions/advice/nudge`, plain short sentences, no exclamation marks; all 13 locales regenerated.
+- [x] Tests: understanding strip fields, mandatory arrival-time question for business trips, advice generation and the two-line cap, nudge shown once (295 tests pass).
