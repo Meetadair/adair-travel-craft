@@ -31,6 +31,8 @@ const TABLES: Array<{ table: string; column: string }> = [
   { table: "events", column: "user_id" },
   { table: "saved_cards", column: "user_id" },
   { table: "loyalty_memberships", column: "user_id" },
+  { table: "traveller_place_memory", column: "user_id" },
+  { table: "traveller_patterns", column: "user_id" },
 ];
 
 /** Columns we must never hand back, even though we store a reference. */
@@ -115,6 +117,8 @@ export const deleteMyAccount = createServerFn({ method: "POST" })
       "calendar_feeds",
       "calendar_oauth_states",
       "choice_feedback",
+      "traveller_place_memory",
+      "traveller_patterns",
       "saved_cards",
       "loyalty_memberships",
       "preferences",

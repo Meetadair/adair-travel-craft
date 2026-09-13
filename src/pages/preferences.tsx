@@ -30,6 +30,7 @@ import { cleanCompany, type CompanyDraft } from "@/lib/prefs/company-draft";
 import { ConnectedCalendars } from "@/components/prefs/connected-calendars";
 import { MyData } from "@/components/prefs/my-data";
 import { Noticed } from "@/components/prefs/noticed";
+import { Knows } from "@/components/prefs/knows";
 import { PaymentCards } from "@/components/prefs/payment-cards";
 import { WalletLoyalty } from "@/components/prefs/wallet-loyalty";
 import { NotificationChannel } from "@/components/prefs/notification-channel";
@@ -236,6 +237,8 @@ export function PreferencesPage() {
               </p>
               <CompanyEditor companies={companies} onChange={setCompanies} />
             </section>
+
+            <Knows />
 
             <Noticed />
 
