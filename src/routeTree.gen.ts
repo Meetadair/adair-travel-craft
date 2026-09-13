@@ -15,6 +15,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AssistantRouteImport } from './routes/assistant'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as BusinessRouteImport } from './routes/business'
+import { Route as CreatorsRouteImport } from './routes/creators'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as LangIndexRouteImport } from './routes/$lang.index'
@@ -80,6 +81,11 @@ const AuthRoute = AuthRouteImport.update({
 const BusinessRoute = BusinessRouteImport.update({
   id: '/business',
   path: '/business',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CreatorsRoute = CreatorsRouteImport.update({
+  id: '/creators',
+  path: '/creators',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -285,6 +291,7 @@ export interface FileRoutesByFullPath {
   '/assistant': typeof AssistantRoute
   '/auth': typeof AuthRoute
   '/business': typeof BusinessRoute
+  '/creators': typeof CreatorsRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/$lang/assistant': typeof LangAssistantRoute
@@ -328,6 +335,7 @@ export interface FileRoutesByTo {
   '/assistant': typeof AssistantRoute
   '/auth': typeof AuthRoute
   '/business': typeof BusinessRoute
+  '/creators': typeof CreatorsRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/$lang/assistant': typeof LangAssistantRoute
@@ -374,6 +382,7 @@ export interface FileRoutesById {
   '/assistant': typeof AssistantRoute
   '/auth': typeof AuthRoute
   '/business': typeof BusinessRoute
+  '/creators': typeof CreatorsRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/$lang/assistant': typeof LangAssistantRoute
@@ -420,6 +429,7 @@ export interface FileRouteTypes {
     | '/assistant'
     | '/auth'
     | '/business'
+    | '/creators'
     | '/privacy'
     | '/terms'
     | '/$lang/assistant'
@@ -463,6 +473,7 @@ export interface FileRouteTypes {
     | '/assistant'
     | '/auth'
     | '/business'
+    | '/creators'
     | '/privacy'
     | '/terms'
     | '/$lang/assistant'
@@ -508,6 +519,7 @@ export interface FileRouteTypes {
     | '/assistant'
     | '/auth'
     | '/business'
+    | '/creators'
     | '/privacy'
     | '/terms'
     | '/$lang/assistant'
@@ -554,6 +566,7 @@ export interface RootRouteChildren {
   AssistantRoute: typeof AssistantRoute
   AuthRoute: typeof AuthRoute
   BusinessRoute: typeof BusinessRoute
+  CreatorsRoute: typeof CreatorsRoute
   PrivacyRoute: typeof PrivacyRoute
   TermsRoute: typeof TermsRoute
   CHandleRoute: typeof CHandleRoute
@@ -612,6 +625,13 @@ declare module '@tanstack/react-router' {
       path: '/business'
       fullPath: '/business'
       preLoaderRoute: typeof BusinessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/creators': {
+      id: '/creators'
+      path: '/creators'
+      fullPath: '/creators'
+      preLoaderRoute: typeof CreatorsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy': {
@@ -946,6 +966,7 @@ const rootRouteChildren: RootRouteChildren = {
   AssistantRoute: AssistantRoute,
   AuthRoute: AuthRoute,
   BusinessRoute: BusinessRoute,
+  CreatorsRoute: CreatorsRoute,
   PrivacyRoute: PrivacyRoute,
   TermsRoute: TermsRoute,
   CHandleRoute: CHandleRoute,
