@@ -544,3 +544,77 @@ export const setSupportStatus = createServerFn({ method: "POST" })
     });
     return { ok: true };
   });
+
+export type AdminBrandRow = {
+  id: string;
+  kind: string;
+  name: string;
+  alliance_or_group: string | null;
+  regions: string[];
+  popularity_rank: number;
+  active: boolean;
+};
+
+/** Every brand, active or not, so the team can rank and retire them. */
+export const listBrands = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<AdminBrandRow[]> => {
+    await assertAdmin(context.supabase, context.userId);
+    const sb = await admin();
+    const { data, error } = await sb
+      .from("brands")
+      .select("id, kind, name, alliance_or_group, regions, popularity_rank, active")
+      .order("kind", { ascending: true })
+      .order("popularity_rank", { ascending: true });
+    if (error) throw new Error(error.message);
+    return (data ?? []).map((row) => ({
+      id: String(row["id"]),
+      kind: String(row["kind"]),
+      name: String(row["name"]),
+      alliance_or_group: (row["alliance_or_group"] as string | null) ?? null,
+      regions: (row["regions"] as string[] | null) ?? [],
+      popularity_rank: Number(row["popularity_rank"] ?? 100),
+      active: Boolean(row["active"]),
+    }));
+  });
+
+const brandInput = z.object({
+  id: z
+    .string()
+    .min(2)
+    .regex(/^[a-z0-9]+$/, "Use lower-case letters and digits only"),
+  kind: z.enum(["airline", "hotel_chain", "car_rental"]),
+  name: z.string().min(2),
+  group: z.string().trim().optional(),
+  regions: z.array(z.enum(["eu", "us", "ca", "mea", "apac", "latam"])).min(1),
+  rank: z.number().int().min(1).max(999),
+  active: z.boolean(),
+});
+
+/** Add a brand or edit an existing one — no code change needed. */
+export const saveBrand = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => brandInput.parse(input))
+  .handler(async ({ context, data }): Promise<{ ok: true }> => {
+    await assertAdmin(context.supabase, context.userId);
+    const sb = await admin();
+    const { error } = await sb.from("brands").upsert(
+      {
+        id: data.id,
+        kind: data.kind,
+        name: data.name,
+        alliance_or_group: data.group?.length ? data.group : null,
+        regions: data.regions,
+        popularity_rank: data.rank,
+        active: data.active,
+      },
+      { onConflict: "id" },
+    );
+    if (error) throw new Error(error.message);
+    await writeAudit(sb, context.userId, "brand.save", `brands:${data.id}`, null, {
+      name: data.name,
+      rank: data.rank,
+      active: data.active,
+    });
+    return { ok: true };
+  });
