@@ -20,6 +20,13 @@ import { getPaymentSession } from "@/lib/payment.functions";
 import { PaymentStep, type AuthorisedPayment } from "@/components/payment-step";
 import { eur } from "@/lib/trip/client";
 import { isSchengen } from "@/lib/trip/backwards";
+import {
+  bedLines,
+  categoryOn,
+  childSeatsFor,
+  partyOf,
+  CATEGORY_LABEL,
+} from "@/lib/trip/family";
 
 const inputClass =
   "mt-1 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary";
