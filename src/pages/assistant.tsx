@@ -1,9 +1,10 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ageQuestion, familyFromSentence } from "@/lib/trip/family";
 import { applyAnswer, assumptionNote, clarify, type Clarification } from "@/lib/trip/clarify";
+import { ASSISTANT_PREFILL_KEY } from "@/lib/trips/prefill";
 import { parseTripSentence } from "@/lib/trip/parse";
 import { track } from "@/lib/track";
 import { Plane, BedDouble, CarFront, Sparkles, ChevronRight, Send, X } from "lucide-react";
@@ -39,6 +40,19 @@ export function AssistantPage() {
   const compose = useServerFn(composeTrip);
   const persist = useServerFn(saveTrip);
   const [input, setInput] = useState("");
+
+  // A sentence handed over from My trips ("Book again" / "Same trip, but…").
+  useEffect(() => {
+    try {
+      const handed = window.localStorage.getItem(ASSISTANT_PREFILL_KEY);
+      if (handed) {
+        window.localStorage.removeItem(ASSISTANT_PREFILL_KEY);
+        setInput(handed);
+      }
+    } catch {
+      /* private browsing — nothing to hand over */
+    }
+  }, []);
   const [asked, setAsked] = useState<string | null>(null);
   const [saved, setSaved] = useState<string | null>(null);
   const [hotelRef, setHotelRef] = useState<string | null>(null);
