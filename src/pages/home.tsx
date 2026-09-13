@@ -24,7 +24,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { LineOptions, MatchNote } from "@/components/trip-line-options";
@@ -1408,20 +1408,18 @@ export function HomePage() {
             >
               {t.nav.business}
             </LocaleLink>
-            <LocaleLink
+            <Link
               to="/privacy"
-              locale={locale}
               className="text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
             >
-              {t.legal.privacyTitle}
-            </LocaleLink>
-            <LocaleLink
+              Privacy
+            </Link>
+            <Link
               to="/terms"
-              locale={locale}
               className="text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
             >
-              {t.legal.termsTitle}
-            </LocaleLink>
+              Terms
+            </Link>
             <p className="text-xs text-muted-foreground">{t.home.footer}</p>
           </div>
         </div>
