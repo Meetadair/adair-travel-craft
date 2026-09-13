@@ -37,6 +37,7 @@ export function ClosingChat({
   cardId,
   summaryParts,
   totalLabel,
+  totalEur,
   include,
   rides,
   extras,
@@ -48,6 +49,8 @@ export function ClosingChat({
   /** "Milan", "Thu–Fri", "LOT 6:55", "Park Hyatt" … */
   summaryParts: string[];
   totalLabel: string;
+  /** Trip total in euros, for the card form's own label. */
+  totalEur: number;
   include: { flight: boolean; stay: boolean; car: boolean; insurance?: boolean };
   rides: Array<"arrival" | "departure">;
   extras: ClosingExtra[];
@@ -409,7 +412,7 @@ export function ClosingChat({
         <div data-testid="inline-card-form">
           <PaymentStep
             session={payment.data}
-            amountEur={0}
+            amountEur={totalEur}
             preselectCardId={chosenCardId ?? undefined}
             disabled={mutation.isPending}
             payingLabel={mutation.isPending ? "Booking…" : null}
