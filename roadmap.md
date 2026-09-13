@@ -214,10 +214,11 @@
 - [x] Tests cover accrual (attribution, curation, expired window, paused creator, markup-derived margin, extras mapping, skipped failed lines) and reversal
 - [ ] Flat subscription commission (€10/€25) pays out when paid plans go live
 
-## Round: places to go out (amended from "restaurants") — next up
-- [ ] Categories: restaurants, bars, wine bars, cocktail bars, rooftops, cafés, clubs. OpenStreetMap via Overpass: amenity=restaurant/bar/pub/cafe/nightclub + cuisine/drink tags. Curated places in /admin/getaway can carry any of these category tags.
-- [ ] Time-of-day buckets per trip day: morning → cafés, evening → restaurants, late evening → bars/wine bars/rooftops, night → clubs. Rendered as "Tonight in <city>" / "Tomorrow morning" sections, not one flat list.
-- [ ] Profile matching beyond cuisine: interests (Nightlife, Wine & gastronomy, Live music), companions (family → cafés and family-friendly restaurants up, nightlife excluded entirely), travel style, budget, distance from the hotel.
-- [ ] One-line reason per place ("Wine bar 400 m from your hotel, matches your interest in wine") + source label (Adair pick / creator partner / from OpenStreetMap). Curated and creator places always outrank map data. Attribution "Map data © OpenStreetMap contributors"; no price when unknown.
-- [ ] "Reserve" = venue's own site or phone until a partner is live; bars and cafés get "Open in maps" + opening hours where known. Manual "Going there" marks the itinerary, .ics and reminder.
-- [ ] Tests: time-of-day bucketing and the family/nightlife exclusion.
+## Round: places to go out (amended from "restaurants") — built
+- [x] Categories: restaurants, cafés, bars, wine bars, cocktail bars, rooftops, clubs. OpenStreetMap via Overpass (no key, 7-day cache in `place_cache`) mapping amenity=restaurant/bar/pub/cafe/nightclub plus cuisine/drink/rooftop tags. Curated places in /admin/getaway can be tagged with any category.
+- [x] Time-of-day sections per trip day: morning cafés, evening restaurants, late bars/wine bars/cocktail bars/rooftops, night clubs. Rendered as "Tonight in <city>" / "Tomorrow morning in <city>".
+- [x] Profile matching: cuisines, interests (wine, gastronomy, nightlife, live music), family travel (nightlife removed entirely, family-friendly boosted), budget band, distance from the hotel; stated dealbreakers remove a place outright.
+- [x] One-line reason per place plus a source label (Adair pick / Creator partner / from OpenStreetMap); curated and creator entries always outrank map data. "Map data © OpenStreetMap contributors" shown; "Price not known" where we have no price.
+- [x] Restaurants: "Reserve" opens the venue's own site or phone with "Reservation directly with the restaurant". Bars and cafés get "Open in maps" and opening hours where known. "Going there" writes the place onto the trip, the .ics and the reminder.
+- [x] Tests: time-of-day bucketing, family/nightlife exclusion, source ranking, dealbreaker precedence, map tag reading (195 tests pass).
+- [ ] Booking a table inside Adair — blocked: needs a reservation partner agreement and API credentials (adapter layer and UI are already in place).
