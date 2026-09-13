@@ -1391,6 +1391,12 @@ export function HomePage() {
               {t.nav.business}
             </LocaleLink>
             <Link
+              to="/creators"
+              className="text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+            >
+              For creators
+            </Link>
+            <Link
               to="/privacy"
               className="text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
             >
