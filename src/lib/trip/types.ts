@@ -19,7 +19,12 @@ export type TripRequest = {
   departDate: string; // YYYY-MM-DD
   returnDate: string; // YYYY-MM-DD
   cabinClass: "economy" | "premium_economy" | "business" | "first";
+  /** Everyone travelling, including children and lap infants. */
   passengers: number;
+  /** Ages of the children travelling, as stated in the sentence. */
+  childAges?: number[];
+  /** Babies under two, on a lap unless a seat is bought. */
+  infants?: number;
   /** Free-text hotel wish, e.g. "near the Duomo". */
   hotelWish: string | null;
   /** A specific property the traveller named, e.g. "Hotel Milano Scala". */
