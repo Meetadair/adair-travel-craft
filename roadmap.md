@@ -262,4 +262,9 @@
 - [x] Copy in en.ts under `assistant.strip/questions/advice/nudge`, plain short sentences, no exclamation marks; all 13 locales regenerated.
 - [x] Tests: understanding strip fields, mandatory arrival-time question for business trips, advice generation and the two-line cap, nudge shown once (295 tests pass).
 - [x] Closing the booking in the chat: "Book it all" stays in the conversation. One saved company and one saved card are used without asking; several ask once; no company plus an invoice mention asks for the name once and saves it; no card renders the secure card form inline. Traveller details asked once and stored on the profile. Extras from the sentence are confirmed in one line with a Remove on each. One summary line and [Book it] / [Change something]. `/book/:cardId` stays for passport capture and payment recovery. Copy in `assistant.closing`, all 14 locales regenerated, 308 tests pass.
+- [x] Understand the intent before anything else: greeting, trip, amendment, product question, booking question or unclear. Rules decide the clear cases instantly (`src/lib/trip/intent.ts`), a short cached model call settles the doubtful ones (`src/lib/intent.functions.ts`), and only a trip or an amendment reaches the parser. Everything else gets a short answer in the chat.
+- [x] The parser no longer invents a destination: `parseTripSentence` returns null when no city is named, `/api/trip/parse` answers 422, and the chat asks "Where are you going?" instead of proposing Milan.
+- [x] Copy in `assistant.intent`, all 14 locales regenerated; intent and no-guessed-destination tests added (318 tests pass).
+
+
 

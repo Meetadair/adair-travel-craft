@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { parseTripSentence } from "./parse";
+import { parseTripSentence as parseOrNull } from "./parse";
+
+/** These fixtures all name a destination, so the parse never returns null. */
+const parseTripSentence = (sentence: string, today?: Date, home?: string) =>
+  parseOrNull(sentence, today, home)!;
 import { applyOverrides, understand, wishesFromSentence } from "./understanding";
 
 const req = (sentence: string) => parseTripSentence(sentence, new Date("2026-09-13T09:00:00Z"), "WAW");

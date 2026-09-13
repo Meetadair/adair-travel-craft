@@ -29,6 +29,9 @@ import { parseTripSentence } from "@/lib/trip/parse";
 import { TripRoute } from "@/components/trip-route";
 import type { TripStop } from "@/lib/trip/types";
 import { UnderstandingStrip } from "@/components/trip/understanding-strip";
+import { classifyIntent } from "@/lib/intent.functions";
+import { hasDestination } from "@/lib/trip/parse";
+import { replyFor, ruleIntent, type IntentKind } from "@/lib/trip/intent";
 import { ChatQuestions } from "@/components/trip/chat-questions";
 import { AdviceLines } from "@/components/trip/advice-lines";
 import { NudgeLine } from "@/components/trip/nudge-line";
@@ -353,6 +356,8 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
   const [insurance, setInsurance] = useState<InsuranceQuote | null>(null);
   const [addInsurance, setAddInsurance] = useState(false);
   const [dropped, setDropped] = useState({ flight: false, hotel: false, car: false });
+  /** What Adair says when there is nothing to search for yet. */
+  const [reply, setReply] = useState<string | null>(null);
   /** True once "Book it all" opened the closing conversation. */
   const [closing, setClosing] = useState(false);
   const drop = (kind: "flight" | "hotel" | "car") =>
@@ -559,15 +564,51 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
   // questions appear, and the search waits for "Find it".
   useEffect(() => {
     if (!submission) return;
-    setPending(submission);
-    setConfirmed(null);
-    setOverrides({});
-    setAnswered([]);
-    setLive(null);
-    setLiveFailed(false);
-    setCardId(null);
-    setPriceContext(null);
-    setDismissedNudges(readDismissed());
+    const text = submission.sentence.trim();
+    let cancelled = false;
+    setReply(null);
+
+    const start = (kind: IntentKind) => {
+      if (cancelled) return;
+      // Anything that isn't a trip gets an answer, not a search.
+      if (kind !== "trip" && kind !== "amendment") {
+        setPending(null);
+        setReply(replyFor(kind, a.intent) ?? a.intent.unclear);
+        return;
+      }
+      // A change to the trip already on screen keeps that trip.
+      if (kind === "amendment" && live) {
+        setAmendText(text);
+        setReply(a.intent.amending);
+        return;
+      }
+      if (!hasDestination(text)) {
+        setPending(null);
+        setReply(a.intent.needsDestination);
+        return;
+      }
+      setPending(submission);
+      setConfirmed(null);
+      setOverrides({});
+      setAnswered([]);
+      setLive(null);
+      setLiveFailed(false);
+      setCardId(null);
+      setPriceContext(null);
+      setDismissedNudges(readDismissed());
+    };
+
+    // The rules answer instantly; the model only refines the doubtful cases.
+    const guess = ruleIntent(text, live != null);
+    if (guess === "trip" || guess === "greeting") start(guess);
+    else
+      classifyIntent({ data: { sentence: text, hasCard: live != null } })
+        .then((result) => start(result.kind))
+        .catch(() => start(guess));
+
+    return () => {
+      cancelled = true;
+    };
   }, [submission?.key]);
 
   const runKey = confirmed?.key ?? 0;
@@ -597,7 +638,10 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
     setActedAdvice([]);
     if (signedIn) {
       const named = parseTripSentence(text);
-      setRequestedNames({ hotel: named.hotelNameExact, car: named.carNameExact });
+      setRequestedNames({
+        hotel: named?.hotelNameExact ?? null,
+        car: named?.carNameExact ?? null,
+      });
     } else {
       setRequestedNames({ hotel: null, car: null });
     }
@@ -964,6 +1008,12 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
           </div>
           <div className="w-full max-w-lg">
             <p className="mb-2 text-xs font-medium text-muted-foreground">Adair · 9:41</p>
+
+            {reply && (
+              <div className="animate-rise rounded-xl rounded-tl-sm border border-border bg-card px-5 py-4">
+                <p className="text-sm leading-relaxed text-foreground">{reply}</p>
+              </div>
+            )}
 
             {understanding && !confirmed && (
               <>

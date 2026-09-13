@@ -60,7 +60,6 @@ export const CITIES: CityEntry[] = [
 ];
 
 export const DEFAULT_ORIGIN = CITIES.find((c) => c.iata === "WAW")!;
-export const DEFAULT_DESTINATION = CITIES.find((c) => c.iata === "LIN")!;
 
 export function findCity(text: string, exclude?: string): CityEntry | null {
   let best: { city: CityEntry; at: number } | null = null;

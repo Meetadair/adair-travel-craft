@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { parseTripSentence } from "./parse";
+import { parseTripSentence as parseOrNull } from "./parse";
+
+/** Every case below names a destination, so the result is never null. */
+const parseTripSentence = (sentence: string, today?: Date, homeAirportIata?: string) =>
+  parseOrNull(sentence, today, homeAirportIata)!;
 
 /** A fixed Monday, so weekday resolution is deterministic. */
 const TODAY = new Date("2026-03-09T09:00:00Z");
@@ -88,11 +92,16 @@ describe("parsing Polish sentences", () => {
 });
 
 describe("fallbacks", () => {
-  it("never returns an unusable request for nonsense input", () => {
-    const r = parseTripSentence("asdf qwer", TODAY);
+  it("returns nothing for nonsense input instead of guessing a city", () => {
+    expect(parseOrNull("asdf qwer", TODAY)).toBeNull();
+  });
+
+  it("fills in sensible dates once a destination is named", () => {
+    const r = parseTripSentence("asdf qwer Milan", TODAY);
     expect(r.destinationIata).toMatch(/^[A-Z]{3}$/);
     expect(r.originIata).not.toBe(r.destinationIata);
     expect(Date.parse(r.returnDate)).toBeGreaterThan(Date.parse(r.departDate));
     expect(r.passengers).toBe(1);
   });
 });
+

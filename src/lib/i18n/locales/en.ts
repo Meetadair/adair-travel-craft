@@ -161,6 +161,15 @@ export const en = {
     restoreAll: "Add everything back",
 
     // What Adair understood, shown before anything is searched.
+    intent: {
+      greeting: "Hello. Tell me where you need to be and when, and I will put the trip together.",
+      product:
+        "I plan whole trips from one sentence — flight, hotel, car, transfers — and book them in one step. Ask me for a trip and you will see it.",
+      booking: "Your bookings are under My trips, with invoices and changes there.",
+      unclear: "I did not catch a trip in that. Try something like: Milan Tuesday to Thursday.",
+      needsDestination: "Where are you going?",
+      amending: "Adjusting the trip below.",
+    },
     strip: {
       heading: "Here's what I understood.",
       from: "From",
