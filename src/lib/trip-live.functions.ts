@@ -9,6 +9,7 @@ import type { TripRequest, TripSearchResponse } from "@/lib/trip/types";
 import type { BudgetStatus, MatchSummary } from "@/lib/trip/match";
 import type { InsuranceQuote } from "@/lib/trip/insurance";
 import type { SearchPrefs } from "@/lib/trip/rank";
+import { loadLearned as loadLearnedFor } from "@/lib/trip/learned.server";
 
 export type LiveTripResult = {
   cardId: string;
@@ -126,6 +127,13 @@ export const searchLiveTrip = createServerFn({ method: "POST" })
       hotelMaxKm: (row?.["hotel_max_km"] as number | null) ?? null,
       dealbreakers: list(row?.["dealbreakers"]),
     };
+    searchPrefs.learned = await loadLearnedFor(context.supabase, userId, searchPrefs);
+    // Repeated "too far" keeps hotels closer than the stated limit.
+    if (searchPrefs.hotelMaxKm && searchPrefs.learned.distanceWeight > 1)
+      searchPrefs.hotelMaxKm = Math.max(
+        1,
+        Math.round(searchPrefs.hotelMaxKm / searchPrefs.learned.distanceWeight),
+      );
 
     const parsed = parseTripSentence(data.sentence, new Date(), profile?.home_airport);
     const reordered = data.stops?.length ? data.stops : null;
@@ -550,6 +558,7 @@ export const swapCardAlternative = createServerFn({ method: "POST" })
       hotelMaxKm: (prefRow?.["hotel_max_km"] as number | null) ?? null,
       dealbreakers: list(prefRow?.["dealbreakers"]),
     };
+    searchPrefs.learned = await loadLearnedFor(context.supabase, userId, searchPrefs);
     const { matchSummary, budgetStatus } = await import("@/lib/trip/match");
     const match = matchSummary(search, searchPrefs);
     const cheapestAlt = (

@@ -618,3 +618,33 @@ export const saveBrand = createServerFn({ method: "POST" })
     });
     return { ok: true };
   });
+
+export type ClarifyCountRow = { kind: string; asked: number; answered: number };
+
+/**
+ * Which clarifying question we have to ask most often. A question that keeps
+ * coming up is a parser gap, so this is the list to work through.
+ */
+export const listClarifyQuestions = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<ClarifyCountRow[]> => {
+    await assertAdmin(context.supabase, context.userId);
+    const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+    const res = await context.supabase
+      .from("events")
+      .select("name, props")
+      .in("name", ["clarify_asked", "clarify_answered"])
+      .gte("created_at", since)
+      .limit(5000);
+    if (res.error) throw res.error;
+    const counts = new Map<string, ClarifyCountRow>();
+    for (const row of res.data ?? []) {
+      const props = (row["props"] ?? {}) as Record<string, unknown>;
+      const kind = typeof props["kind"] === "string" ? props["kind"] : "unknown";
+      const entry = counts.get(kind) ?? { kind, asked: 0, answered: 0 };
+      if (row["name"] === "clarify_asked") entry.asked += 1;
+      else entry.answered += 1;
+      counts.set(kind, entry);
+    }
+    return [...counts.values()].sort((a, b) => b.asked - a.asked);
+  });

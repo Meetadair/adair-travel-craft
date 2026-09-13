@@ -399,3 +399,56 @@ export const savePreferences = createServerFn({ method: "POST" })
     if (res.error) throw new Error(res.error.message);
     return { ok: true };
   });
+
+export type Noticed = { subject: string; sentence: string };
+
+/**
+ * "Adair has noticed…" — the adjustments learned from the traveller's own
+ * swaps, each one resettable. Stated preferences already win over these.
+ */
+export const getNoticed = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<Noticed[]> => {
+    const { loadLearned } = await import("@/lib/trip/learned.server");
+    const { brandName } = await import("@/lib/brands/catalogue");
+    const prefsRes = await context.supabase
+      .from("preferences")
+      .select("airlines, hotel_chains, car_brands, car_companies, dealbreakers")
+      .eq("user_id", context.userId)
+      .maybeSingle();
+    const row = (prefsRes.data ?? {}) as Record<string, unknown>;
+    const list = (value: unknown): string[] =>
+      Array.isArray(value) ? value.filter((v): v is string => typeof v === "string") : [];
+    const learned = await loadLearned(context.supabase, context.userId, {
+      airlines: list(row["airlines"]),
+      hotelChains: list(row["hotel_chains"]),
+      carBrands: list(row["car_brands"]),
+      carCompanies: list(row["car_companies"]),
+      dealbreakers: list(row["dealbreakers"]),
+    });
+    const { noticedSentences } = await import("@/lib/trip/learning");
+    const subjects = [
+      ...learned.avoid.map((entry) => `${entry.kind}:${entry.brandId}`),
+      ...(learned.distanceWeight > 1 ? ["distance"] : []),
+      ...(learned.priceWeight > 1 ? ["price"] : []),
+    ];
+    return noticedSentences(learned, (id) => brandName(id) ?? id).map((sentence, index) => ({
+      subject: subjects[index] ?? String(index),
+      sentence,
+    }));
+  });
+
+/** Forget one learned adjustment. The traveller always has the last word. */
+export const resetNoticed = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => z.object({ subject: z.string().min(1).max(80) }).parse(data))
+  .handler(async ({ context, data }) => {
+    const { error } = await context.supabase.from("learned_overrides").insert({
+      user_id: context.userId,
+      kind: "ranking",
+      subject: data.subject,
+      action: "ignore",
+    });
+    if (error) throw error;
+    return { ok: true };
+  });
