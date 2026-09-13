@@ -229,6 +229,20 @@ export const en = {
       dismiss: "Not now",
     },
 
+    // What Adair remembers by itself, and how it says it.
+    memory: {
+      sameAgain: "You stayed at {hotel} last time in {city} — same again?",
+      sameAgainYes: "Same again",
+      sameAgainOther: "Show me something else",
+      full: "{hotel} is full on those dates — the closest in character is {nearest}.",
+      nothingClose: "{hotel} is full on those dates, so this is a different choice.",
+      asUsual: "{items} — as usual.",
+      deviation: "No {expected} on this route that day — this is {actual}, {reason}.",
+      askPattern: "{habit} — should I treat that as a preference?",
+      askYes: "Yes, that's a preference",
+      askNo: "No, don't assume that",
+    },
+
     // Closing the booking in the conversation.
     closing: {
       invoiceChoose: "Which company for the invoice?",

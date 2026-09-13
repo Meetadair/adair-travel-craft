@@ -35,6 +35,7 @@ import { replyFor, ruleIntent, type IntentKind } from "@/lib/trip/intent";
 import { ChatQuestions } from "@/components/trip/chat-questions";
 import { AdviceLines } from "@/components/trip/advice-lines";
 import { NudgeLine } from "@/components/trip/nudge-line";
+import { MemoryLine, type TripMemory } from "@/components/trip/memory-line";
 import { applyOverrides, understand, type TripOverrides } from "@/lib/trip/understanding";
 import { chatQuestions, essentialsMet, isBusinessSentence, type ChatQuestionKind } from "@/lib/trip/questions";
 import { buildAdvice, type AdviceLine } from "@/lib/trip/advice";
@@ -352,6 +353,7 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
   const [actedAdvice, setActedAdvice] = useState<string[]>([]);
   const [live, setLive] = useState<TripSearchResponse | null>(null);
   const [liveFailed, setLiveFailed] = useState(false);
+  const [tripMemory, setTripMemory] = useState<TripMemory | null>(null);
   // Optional in-app travel insurance offer (signed-in cards only).
   const [insurance, setInsurance] = useState<InsuranceQuote | null>(null);
   const [addInsurance, setAddInsurance] = useState(false);
@@ -481,6 +483,7 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
         setMatch(result.match ?? null);
         setBudget(result.budget ?? null);
         setEarlyBooking(result.earlyBooking ?? null);
+        setTripMemory(result.memory ?? null);
         setLive(applyPriced(result));
       } else {
         const request = await parseTrip(sentence);
@@ -519,6 +522,7 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
         setMatch(result.match ?? null);
         setBudget(result.budget ?? null);
         setEarlyBooking(result.earlyBooking ?? null);
+        setTripMemory(result.memory ?? null);
         setLive(applyPriced(result));
       } else {
         setLive(await searchTrip(await parseTrip(sentence)));
@@ -551,6 +555,7 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
       setMatch(result.match ?? null);
       setBudget(result.budget ?? null);
       setEarlyBooking(result.earlyBooking ?? null);
+      setTripMemory(result.memory ?? null);
       setLive(priced);
       setRouteStops(priced.request.stops ?? next);
     } catch {
@@ -670,6 +675,7 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
           setMatch(result.match ?? null);
           setBudget(result.budget ?? null);
           setEarlyBooking(result.earlyBooking ?? null);
+          setTripMemory(result.memory ?? null);
         }
         return priced;
       }
@@ -1571,6 +1577,13 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                 )}
                 {live?.testMode && showActions && (
                   <p className="mt-1 text-xs text-muted-foreground">{d.testMode}</p>
+                )}
+                {tripMemory && showActions && (
+                  <MemoryLine
+                    memory={tripMemory}
+                    offeredName={live?.stay?.name ?? null}
+                    copy={a.memory}
+                  />
                 )}
                 {nudge && showActions && (
                   <NudgeLine

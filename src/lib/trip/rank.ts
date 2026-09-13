@@ -31,6 +31,11 @@ export type SearchPrefs = Pick<
    * stated preference or dealbreaker always wins — see lib/trip/learning.
    */
   learned?: Learned;
+  /**
+   * What they actually chose in this destination before. Ranks below stated
+   * preferences and confirmed habits, above learned weights and price.
+   */
+  remembered?: { hotels: string[]; carSuppliers: string[] };
 };
 
 const fold = (value: string) =>
@@ -178,6 +183,16 @@ export function flightScore(carrierText: string, amount: number, prefs?: SearchP
   return score;
 }
 
+/** A name we remember from this city, matched loosely on the supplier text. */
+function remembers(names: string[] | undefined, text: string): boolean {
+  if (!names?.length) return false;
+  const haystack = fold(text);
+  return names.some((name) => {
+    const needle = fold(name).trim();
+    return needle.length > 3 && haystack.includes(needle);
+  });
+}
+
 /** Brands they have swapped away from twice or more rank down, never out. */
 function avoided(text: string, kind: "flight" | "hotel" | "car", prefs?: SearchPrefs): boolean {
   const ids = (prefs?.learned?.avoid ?? []).filter((e) => e.kind === kind).map((e) => e.brandId);
@@ -201,6 +216,8 @@ export function stayScore(
   if (prefs.hotelAmenities.length && anySelected(name, prefs.hotelAmenities, AMENITY_WORDS))
     score += 1;
   if (prefs.hotelTypes.length && anySelected(name, prefs.hotelTypes, AMENITY_WORDS)) score += 1;
+  // Where they stayed before in this city, when nothing stated says otherwise.
+  if (remembers(prefs.remembered?.hotels, name)) score += 4;
   return score;
 }
 
@@ -222,5 +239,6 @@ export function carScore(
   if (prefs.carCompanies.length && anySelected(supplier, prefs.carCompanies, { })) score += 4;
   if (prefs.carClass && matchesAny(vehicle, CAR_CLASS_WORDS[prefs.carClass] ?? [prefs.carClass]))
     score += 3;
+  if (remembers(prefs.remembered?.carSuppliers, supplier)) score += 2;
   return score;
 }

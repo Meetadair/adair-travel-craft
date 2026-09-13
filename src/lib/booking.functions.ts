@@ -671,6 +671,37 @@ export const bookTripCard = createServerFn({ method: "POST" })
       .eq("id", card.id)
       .eq("user_id", userId);
 
+    // What they actually booked, remembered against this city, so the next
+    // trip here can start from it.
+    try {
+      const { rememberChoice } = await import("@/lib/trip/memory.server");
+      const place = {
+        city: request.destinationCity,
+        iata: request.destinationIata,
+        source: "booked" as const,
+      };
+      if (data.include.stay && search.stay?.name)
+        await rememberChoice(supabase, userId, {
+          ...place,
+          itemKind: "hotel",
+          itemName: search.stay.name,
+        });
+      if (data.include.car && search.car?.supplier)
+        await rememberChoice(supabase, userId, {
+          ...place,
+          itemKind: "car_supplier",
+          itemName: search.car.supplier,
+        });
+      if (data.include.flight && search.flight?.carrier)
+        await rememberChoice(supabase, userId, {
+          ...place,
+          itemKind: "airline",
+          itemName: search.flight.carrier,
+        });
+    } catch (error) {
+      console.error("place memory write failed", error);
+    }
+
     // Remember the people travelling along, encrypted, for the next booking.
     try {
       const remembered = (data.companions ?? []).filter((c) => c.remember);

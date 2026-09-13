@@ -31,6 +31,8 @@ export type LiveTripResult = {
   /** Set when booking far ahead lowered our own fee. */
   earlyBooking?: { daysAhead: number; discountBps: number; savedEur: number } | null;
   expiresAt: string | null;
+  /** Where they stayed before in this city, so the chat can mention it once. */
+  memory?: { hotel: string; stays: number; city: string; offered: boolean } | null;
 };
 
 const stopSchema = z.object({
@@ -180,6 +182,40 @@ export const searchLiveTrip = createServerFn({ method: "POST" })
     const request: TripRequest = data.overrides
       ? applyOverrides(base, data.overrides)
       : base;
+
+    // What we remember about this place, and habits they have confirmed. Both
+    // rank below anything they stated; neither can override a dealbreaker.
+    const { loadPlaceMemory, loadPatterns } = await import("@/lib/trip/memory.server");
+    const { placeKey, resolvePreferences } = await import("@/lib/trip/memory");
+    const [placeMemory, patterns] = await Promise.all([
+      loadPlaceMemory(supabase, userId),
+      loadPatterns(supabase, userId),
+    ]);
+    const currentPlace = placeKey(request.destinationCity, request.destinationIata);
+    const resolved = resolvePreferences(
+      {
+        airlines: searchPrefs.airlines,
+        hotelChains: searchPrefs.hotelChains,
+        carBrands: searchPrefs.carBrands,
+        carCompanies: searchPrefs.carCompanies,
+        dealbreakers: searchPrefs.dealbreakers,
+      },
+      patterns,
+      placeMemory,
+      currentPlace,
+      searchPrefs.learned,
+    );
+    searchPrefs.airlines = resolved.airlines;
+    searchPrefs.hotelChains = resolved.hotelChains;
+    searchPrefs.carBrands = resolved.carBrands;
+    searchPrefs.remembered = {
+      hotels: resolved.rememberedHotels,
+      carSuppliers: resolved.rememberedCarSuppliers,
+    };
+    const rememberedHotel =
+      placeMemory
+        .filter((row) => row.place === currentPlace && row.itemKind === "hotel")
+        .sort((a, b) => b.timesChosen - a.timesChosen)[0] ?? null;
 
     const requestRow = await supabase
       .from("trip_requests")
@@ -363,6 +399,17 @@ export const searchLiveTrip = createServerFn({ method: "POST" })
       budget,
       earlyBooking,
       expiresAt,
+      // The UI turns this into one sentence in the traveller's language.
+      memory: rememberedHotel
+        ? {
+            hotel: rememberedHotel.itemName,
+            stays: rememberedHotel.timesChosen,
+            city: request.destinationCity,
+            offered: (search.stay?.name ?? "").toLowerCase().includes(
+              rememberedHotel.itemName.toLowerCase(),
+            ),
+          }
+        : null,
     };
   });
 
@@ -510,6 +557,28 @@ export const swapCardAlternative = createServerFn({ method: "POST" })
       ...(data.reason ? { reason: data.reason } : {}),
     });
     if (feedbackError) console.error("Could not log choice feedback", feedbackError);
+
+    // A swap is the clearest statement of taste there is: remember what they
+    // moved *to*, for this city.
+    const chosenName = (chosen as { name?: string; supplier?: string; carrier?: string } | null) ?? null;
+    const memoryKind =
+      data.kind === "stay" ? "hotel" : data.kind === "car" ? "car_supplier" : "airline";
+    const memoryName =
+      data.kind === "stay"
+        ? (chosenName?.name ?? "")
+        : data.kind === "car"
+          ? (chosenName?.supplier ?? "")
+          : (chosenName?.carrier ?? "");
+    if (memoryName) {
+      const { rememberChoice } = await import("@/lib/trip/memory.server");
+      await rememberChoice(supabase, userId, {
+        city: search.request.destinationCity,
+        iata: search.request.destinationIata,
+        itemKind: memoryKind,
+        itemName: memoryName,
+        source: "swapped_to",
+      });
+    }
 
     const plan = (profileRes.data as { plan: string } | null)?.plan ?? "free";
     const baseTable = await pricing.loadPricing(supabase, plan);
