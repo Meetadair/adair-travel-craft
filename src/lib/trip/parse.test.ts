@@ -92,11 +92,16 @@ describe("parsing Polish sentences", () => {
 });
 
 describe("fallbacks", () => {
-  it("never returns an unusable request for nonsense input", () => {
-    const r = parseTripSentence("asdf qwer", TODAY);
+  it("returns nothing for nonsense input instead of guessing a city", () => {
+    expect(parseOrNull("asdf qwer", TODAY)).toBeNull();
+  });
+
+  it("fills in sensible dates once a destination is named", () => {
+    const r = parseTripSentence("asdf qwer Milan", TODAY);
     expect(r.destinationIata).toMatch(/^[A-Z]{3}$/);
     expect(r.originIata).not.toBe(r.destinationIata);
     expect(Date.parse(r.returnDate)).toBeGreaterThan(Date.parse(r.departDate));
     expect(r.passengers).toBe(1);
   });
 });
+
