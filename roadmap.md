@@ -220,7 +220,7 @@
 - [x] Profile matching: cuisines, interests (wine, gastronomy, nightlife, live music), family travel (nightlife removed entirely, family-friendly boosted), budget band, distance from the hotel; stated dealbreakers remove a place outright.
 - [x] One-line reason per place plus a source label (Adair pick / Creator partner / from OpenStreetMap); curated and creator entries always outrank map data. "Map data © OpenStreetMap contributors" shown; "Price not known" where we have no price.
 - [x] Restaurants: "Reserve" opens the venue's own site or phone with "Reservation directly with the restaurant". Bars and cafés get "Open in maps" and opening hours where known. "Going there" writes the place onto the trip, the .ics and the reminder.
-- [x] Tests: time-of-day bucketing, family/nightlife exclusion, source ranking, dealbreaker precedence, map tag reading (195 tests pass).
+- [x] Tests: time-of-day bucketing, family/nightlife exclusion, source ranking, dealbreaker precedence, map tag reading (215 tests pass).
 - [ ] Booking a table inside Adair — blocked: needs a reservation partner agreement and API credentials (adapter layer and UI are already in place).
 
 ## Round: children and family travel — built
