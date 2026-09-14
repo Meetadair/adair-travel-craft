@@ -199,7 +199,8 @@
         "timeLabel": "Oder eine Uhrzeit",
         "travellersLabel": "Anzahl der Reisenden",
         "companionsHint": "Mitreisende Personen",
-        "done": "Fertig"
+        "done": "Fertig",
+        "roundTrip": "Hin und zurück"
       }
     },
     "questions": {
@@ -222,7 +223,8 @@
         "timeLabel": "Oder eine Uhrzeit",
         "travellersLabel": "Anzahl der Reisenden",
         "companionsHint": "Mitreisende Personen",
-        "done": "Fertig"
+        "done": "Fertig",
+        "roundTrip": "Hin und zurück"
       }
     },
     "advice": {

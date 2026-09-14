@@ -199,7 +199,8 @@
         "timeLabel": "Eller et klokkeslett",
         "travellersLabel": "Hvor mange personer",
         "companionsHint": "Personer du reiser med",
-        "done": "Ferdig"
+        "done": "Ferdig",
+        "roundTrip": "Tur-retur"
       }
     },
     "questions": {
@@ -222,7 +223,8 @@
         "timeLabel": "Eller et klokkeslett",
         "travellersLabel": "Hvor mange personer",
         "companionsHint": "Personer du reiser med",
-        "done": "Ferdig"
+        "done": "Ferdig",
+        "roundTrip": "Tur-retur"
       }
     },
     "advice": {

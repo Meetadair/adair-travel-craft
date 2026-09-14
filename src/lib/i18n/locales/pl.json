@@ -202,7 +202,8 @@
         "done": "Gotowe",
         "pickReturn": "Wybierz też dzień powrotu.",
         "nightsLabel": "albo liczba nocy:",
-        "nightsWord": "nocy"
+        "nightsWord": "nocy",
+        "roundTrip": "W obie strony"
       }
     },
     "questions": {
@@ -228,7 +229,8 @@
         "done": "Gotowe",
         "pickReturn": "Wybierz też dzień powrotu.",
         "nightsLabel": "albo liczba nocy:",
-        "nightsWord": "nocy"
+        "nightsWord": "nocy",
+        "roundTrip": "W obie strony"
       },
       "needsCar": "Chcesz mieć tam samochód?",
       "returnTime": "O której chcesz wracać?",

@@ -199,7 +199,8 @@
         "timeLabel": "Або час",
         "travellersLabel": "Кількість людей",
         "companionsHint": "Люди, з якими ви подорожуєте",
-        "done": "Готово"
+        "done": "Готово",
+        "roundTrip": "Туди й назад"
       }
     },
     "questions": {
@@ -222,7 +223,8 @@
         "timeLabel": "Або час",
         "travellersLabel": "Кількість людей",
         "companionsHint": "Люди, з якими ви подорожуєте",
-        "done": "Готово"
+        "done": "Готово",
+        "roundTrip": "Туди й назад"
       }
     },
     "advice": {

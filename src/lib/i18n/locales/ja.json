@@ -199,7 +199,8 @@
         "timeLabel": "または時間指定",
         "travellersLabel": "ご利用人数",
         "companionsHint": "同行者",
-        "done": "完了"
+        "done": "完了",
+        "roundTrip": "往復"
       }
     },
     "questions": {
@@ -222,7 +223,8 @@
         "timeLabel": "または時間指定",
         "travellersLabel": "ご利用人数",
         "companionsHint": "同行者",
-        "done": "完了"
+        "done": "完了",
+        "roundTrip": "往復"
       }
     },
     "advice": {

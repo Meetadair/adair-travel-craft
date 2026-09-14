@@ -199,7 +199,8 @@
         "timeLabel": "Tai kellonaika",
         "travellersLabel": "Kuinka monta henkilöä",
         "companionsHint": "Kanssamatkustajat",
-        "done": "Valmis"
+        "done": "Valmis",
+        "roundTrip": "Meno-paluu"
       }
     },
     "questions": {
@@ -222,7 +223,8 @@
         "timeLabel": "Tai kellonaika",
         "travellersLabel": "Kuinka monta henkilöä",
         "companionsHint": "Kanssamatkustajat",
-        "done": "Valmis"
+        "done": "Valmis",
+        "roundTrip": "Meno-paluu"
       }
     },
     "advice": {

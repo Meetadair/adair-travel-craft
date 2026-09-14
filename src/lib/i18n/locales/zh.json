@@ -199,7 +199,8 @@
         "timeLabel": "或指定时间",
         "travellersLabel": "出行人数",
         "companionsHint": "同行人员",
-        "done": "完成"
+        "done": "完成",
+        "roundTrip": "往返"
       }
     },
     "questions": {
@@ -222,7 +223,8 @@
         "timeLabel": "或指定时间",
         "travellersLabel": "出行人数",
         "companionsHint": "同行人员",
-        "done": "完成"
+        "done": "完成",
+        "roundTrip": "往返"
       }
     },
     "advice": {

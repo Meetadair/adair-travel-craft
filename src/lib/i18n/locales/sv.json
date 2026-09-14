@@ -199,7 +199,8 @@
         "timeLabel": "Eller en tid",
         "travellersLabel": "Hur många personer",
         "companionsHint": "Personer du reser med",
-        "done": "Klar"
+        "done": "Klar",
+        "roundTrip": "Tur och retur"
       }
     },
     "questions": {
@@ -222,7 +223,8 @@
         "timeLabel": "Eller en tid",
         "travellersLabel": "Hur många personer",
         "companionsHint": "Personer du reser med",
-        "done": "Klar"
+        "done": "Klar",
+        "roundTrip": "Tur och retur"
       }
     },
     "advice": {

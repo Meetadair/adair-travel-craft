@@ -199,7 +199,8 @@
         "timeLabel": "Ou une heure",
         "travellersLabel": "Nombre de personnes",
         "companionsHint": "Personnes voyageant avec vous",
-        "done": "Terminé"
+        "done": "Terminé",
+        "roundTrip": "Aller-retour"
       }
     },
     "questions": {
@@ -222,7 +223,8 @@
         "timeLabel": "Ou une heure",
         "travellersLabel": "Nombre de personnes",
         "companionsHint": "Personnes voyageant avec vous",
-        "done": "Terminé"
+        "done": "Terminé",
+        "roundTrip": "Aller-retour"
       }
     },
     "advice": {

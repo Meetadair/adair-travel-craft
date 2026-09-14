@@ -500,7 +500,8 @@ export function AssistantPage() {
             }}
             className="hairline-card mt-6 p-5"
           >
-            <p className="text-sm leading-relaxed">{question.question}</p>
+            {/* Adair already asked this in the conversation just above; a card
+                that repeats the same sentence reads as a rendering bug. */}
             {question.options.length > 0 && (
               <div className="mt-3 flex flex-wrap gap-2">
                 {question.options.map((option) => (

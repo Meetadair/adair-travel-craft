@@ -7,7 +7,15 @@
  */
 import { AIRPORTS } from "@/lib/prefs/airports";
 
-export type DateRange = { departDate: string; returnDate?: string | undefined };
+export type DateRange = {
+  departDate: string;
+  returnDate?: string | undefined;
+  /**
+   * Chosen deliberately, not inferred from a missing return date - one tap
+   * on a calendar is an unfinished answer, not a decision to fly one way.
+   */
+  oneWay?: boolean | undefined;
+};
 
 export type DateShortcutId = "tomorrow" | "this_weekend" | "next_weekend";
 
@@ -75,7 +83,10 @@ export function monthRange(from: string = today()): { start: string; end: string
  * find out at the airport. Anything that accepts a range checks this first.
  */
 export function isCompleteRange(range: DateRange | null | undefined): boolean {
-  if (!range?.departDate || !range.returnDate) return false;
+  if (!range?.departDate) return false;
+  // A one-way is finished the moment the outbound day is picked.
+  if (range.oneWay) return true;
+  if (!range.returnDate) return false;
   return range.returnDate >= range.departDate;
 }
 
@@ -94,6 +105,9 @@ export function nightsBetween(depart: string, back: string): number {
 }
 
 export function rangeSentence(range: DateRange): string {
+  // "one way" is spelled out so the parser reads the choice back out of the
+  // sentence, exactly as it would from something the traveller typed.
+  if (range.oneWay) return `on ${range.departDate}, one way`;
   if (!range.returnDate || range.returnDate === range.departDate) {
     return `on ${range.departDate}`;
   }

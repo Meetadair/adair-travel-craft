@@ -1,10 +1,7 @@
-import { Suspense, lazy, useState } from "react";
+import { useState } from "react";
 
-// The month grid is only needed once a date question is on screen, so it loads
-// on demand and keeps the first chat render light.
-const Calendar = lazy(async () => ({
-  default: (await import("@/components/ui/calendar")).Calendar,
-}));
+import { TripDates } from "@/components/trip/trip-dates";
+
 import {
   TIME_SHORTCUTS,
   addDaysIso,
@@ -25,6 +22,7 @@ export type AnswerControlsCopy = {
   outbound: string;
   returnDay: string;
   oneWay: string;
+  roundTrip: string;
   pickReturn: string;
   nightsLabel: string;
   nightsWord: string;
@@ -93,30 +91,9 @@ export function DateAnswer({
         })}
       </div>
 
-      <div className="mt-3 max-w-full overflow-hidden rounded-xl border border-border bg-background">
-        <Suspense fallback={<div className="h-64" aria-hidden />}>
-          <Calendar
-            mode="range"
-            selected={selected as never}
-            defaultMonth={dateOf(value?.departDate) ?? new Date(`${from}T00:00:00`)}
-            startMonth={new Date(`${bounds.start}T00:00:00`)}
-            endMonth={new Date(`${bounds.end}T00:00:00`)}
-            disabled={{ before: new Date(`${from}T00:00:00`) }}
-            onSelect={
-              ((range: { from?: Date | undefined; to?: Date | undefined } | undefined) => {
-                if (!range?.from) return;
-                onChange({
-                  departDate: isoOf(range.from),
-                  returnDate: range.to ? isoOf(range.to) : undefined,
-                });
-              }) as never
-            }
-            className="pointer-events-auto w-full p-2 [--cell-size:2rem] sm:[--cell-size:2.25rem]"
-          />
-        </Suspense>
-      </div>
+      <TripDates value={value} copy={copy} onChange={onChange} />
 
-      {value?.departDate && !value.returnDate && (
+      {value?.departDate && !value.returnDate && !value.oneWay && (
         <div className="mt-2 flex flex-wrap items-center gap-2">
           <span className="text-[11px] text-muted-foreground">{copy.nightsLabel}</span>
           {[1, 2, 3, 5, 7].map((nights) => (
@@ -146,9 +123,11 @@ export function DateAnswer({
       >
         {!value
           ? copy.outbound
-          : isCompleteRange(value)
-            ? `${copy.outbound} ${value.departDate} · ${copy.returnDay} ${value.returnDate} · ${nightsBetween(value.departDate, value.returnDate ?? value.departDate)} ${copy.nightsWord}`
-            : copy.pickReturn}
+          : value.oneWay
+            ? `${copy.outbound} ${value.departDate} · ${copy.oneWay}`
+            : isCompleteRange(value)
+              ? `${copy.outbound} ${value.departDate} · ${copy.returnDay} ${value.returnDate} · ${nightsBetween(value.departDate, value.returnDate ?? value.departDate)} ${copy.nightsWord}`
+              : copy.pickReturn}
       </p>
     </div>
   );

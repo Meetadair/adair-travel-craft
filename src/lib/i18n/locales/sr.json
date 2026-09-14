@@ -199,7 +199,8 @@
         "timeLabel": "Ili vreme",
         "travellersLabel": "Koliko osoba",
         "companionsHint": "Osobe sa kojima putujete",
-        "done": "Završeno"
+        "done": "Završeno",
+        "roundTrip": "Povratna"
       }
     },
     "questions": {
@@ -222,7 +223,8 @@
         "timeLabel": "Ili vreme",
         "travellersLabel": "Koliko osoba",
         "companionsHint": "Osobe sa kojima putujete",
-        "done": "Završeno"
+        "done": "Završeno",
+        "roundTrip": "Povratna"
       }
     },
     "advice": {

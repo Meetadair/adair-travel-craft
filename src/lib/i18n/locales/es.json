@@ -199,7 +199,8 @@
         "timeLabel": "O una hora",
         "travellersLabel": "Cuántas personas",
         "companionsHint": "Personas con las que viajas",
-        "done": "Listo"
+        "done": "Listo",
+        "roundTrip": "Ida y vuelta"
       }
     },
     "questions": {
@@ -222,7 +223,8 @@
         "timeLabel": "O una hora",
         "travellersLabel": "Cuántas personas",
         "companionsHint": "Personas con las que viajas",
-        "done": "Listo"
+        "done": "Listo",
+        "roundTrip": "Ida y vuelta"
       }
     },
     "advice": {
