@@ -1622,6 +1622,7 @@ export type Database = {
           airlines: Json
           avoid_note: string | null
           budget_band: string | null
+          business_prefs: Json
           cabin_class: string
           cabin_rule: string | null
           car_brands: Json
@@ -1658,6 +1659,7 @@ export type Database = {
           airlines?: Json
           avoid_note?: string | null
           budget_band?: string | null
+          business_prefs?: Json
           cabin_class?: string
           cabin_rule?: string | null
           car_brands?: Json
@@ -1694,6 +1696,7 @@ export type Database = {
           airlines?: Json
           avoid_note?: string | null
           budget_band?: string | null
+          business_prefs?: Json
           cabin_class?: string
           cabin_rule?: string | null
           car_brands?: Json
