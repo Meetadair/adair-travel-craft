@@ -37,9 +37,20 @@ import { AdviceLines } from "@/components/trip/advice-lines";
 import { NudgeLine } from "@/components/trip/nudge-line";
 import { MemoryLine, type TripMemory } from "@/components/trip/memory-line";
 import { applyOverrides, understand, type TripOverrides } from "@/lib/trip/understanding";
-import { chatQuestions, essentialsMet, isBusinessSentence, type ChatQuestionKind } from "@/lib/trip/questions";
+import {
+  chatQuestions,
+  essentialsMet,
+  isBusinessSentence,
+  type ChatQuestionKind,
+} from "@/lib/trip/questions";
 import { buildAdvice, type AdviceLine } from "@/lib/trip/advice";
-import { pickNudge, readDismissed, rememberDismissed, type Nudge, type NudgeKind } from "@/lib/trip/nudges";
+import {
+  pickNudge,
+  readDismissed,
+  rememberDismissed,
+  type Nudge,
+  type NudgeKind,
+} from "@/lib/trip/nudges";
 import { airportDistanceKm, driveMinutes } from "@/lib/trip/airport-geo";
 import { ClosingChat } from "@/components/trip/closing-chat";
 import { wishesFromSentence } from "@/lib/trip/understanding";
@@ -58,6 +69,7 @@ import {
   dayLabel,
 } from "@/lib/trip/client";
 import type { PriceContext, TripSearchResponse } from "@/lib/trip/types";
+import { AppFooter } from "@/components/app-footer";
 
 type Submission = { sentence: string; key: number };
 
@@ -886,7 +898,6 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [live, nudgeContext, dismissedNudges, confirmed]);
 
-
   const parsed = typedSentence ? parseDemoSentence(typedSentence, d.weekdays) : null;
   const days = parsed
     ? { day1: d.weekdaysShort[parsed.day1] ?? "", day2: d.weekdaysShort[parsed.day2] ?? "" }
@@ -1056,7 +1067,6 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
               <>
                 {revealed > 0 && <AdviceLines lines={advice} onAct={actOnAdvice} />}
                 <div className={`hairline-card overflow-hidden ${revealed > 0 ? "" : "hidden"}`}>
-
                   <div className="border-b border-border px-5 py-4">
                     <p className="text-sm font-semibold text-foreground">{cardTitle}</p>
                     <p className="mt-0.5 text-xs text-muted-foreground">{d.cardSubtitle}</p>
@@ -1494,7 +1504,6 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                   </div>
                 </div>
 
-
                 {priceContext?.peak && !datesKept && showActions && (
                   <div className="animate-rise mt-4 rounded-2xl border border-border bg-background p-4">
                     <p className="text-sm leading-relaxed text-foreground">
@@ -1728,6 +1737,7 @@ export function HomePage() {
           </div>
         </div>
       </footer>
+      <AppFooter />
     </div>
   );
 }

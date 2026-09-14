@@ -34,6 +34,10 @@ export function OnboardingPage() {
   // Screen 0 = name, 1..N = questions, N+1 = summary.
   const [step, setStep] = useState(0);
   const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [phoneTouched, setPhoneTouched] = useState(false);
+  // Country code plus 7–14 digits; spaces and dashes are people, not errors.
+  const phoneLooksValid = /^\+\d[\d\s-]{6,17}\d$/.test(phone.trim());
   const [homeAirport, setHomeAirport] = useState("WAW");
   const [answers, setAnswers] = useState<Answers>({});
   const [toggles, setToggles] = useState<Toggles>({});
@@ -53,6 +57,7 @@ export function OnboardingPage() {
       save({
         data: {
           fullName: fullName.trim() || "Traveller",
+          phone: phone.trim(),
           homeAirport: homeAirport.toUpperCase(),
           preferences: prefs,
           companies: companies.map(cleanCompany).filter((c) => c.name.length > 0),
@@ -70,7 +75,14 @@ export function OnboardingPage() {
         : null;
   const isBridge = step === bridgeStep;
   const isSummary = step === total - 1;
-  const canContinue = !question ? true : question.kind === "airport" ? Boolean(homeAirport) : true;
+  const canContinue =
+    step === 0
+      ? phoneLooksValid
+      : !question
+        ? true
+        : question.kind === "airport"
+          ? Boolean(homeAirport)
+          : true;
 
   const setAnswer = (field: string, value: string[]) =>
     setAnswers((prev) => ({ ...prev, [field]: value }));
@@ -105,9 +117,9 @@ export function OnboardingPage() {
         {question?.hint && <p className="mt-2 text-sm text-muted-foreground">{question.hint}</p>}
         {isBridge && (
           <p className="mt-2 text-sm text-muted-foreground">
-            We can plan a trip from here. The rest is taste — favourite airlines, hotel style,
-            food, music — and it makes every suggestion fit you better. About two more minutes,
-            and you can always add it later under Preferences.
+            We can plan a trip from here. The rest is taste — favourite airlines, hotel style, food,
+            music — and it makes every suggestion fit you better. About two more minutes, and you
+            can always add it later under Preferences.
           </p>
         )}
         {isSummary && (
@@ -118,16 +130,39 @@ export function OnboardingPage() {
 
         <div className="hairline-card mt-6 space-y-5 p-5 sm:p-6">
           {step === 0 && (
-            <label className="block">
-              <span className="text-xs font-medium text-muted-foreground">Your name</span>
-              <input
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                autoComplete="name"
-                placeholder="Anna Kowalska"
-                className="mt-1 w-full rounded-xl border border-border bg-background px-4 py-3 text-sm outline-none focus:border-primary"
-              />
-            </label>
+            <>
+              <label className="block">
+                <span className="text-xs font-medium text-muted-foreground">Your name</span>
+                <input
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  autoComplete="name"
+                  placeholder="Anna Kowalska"
+                  className="mt-1 w-full rounded-xl border border-border bg-background px-4 py-3 text-sm outline-none focus:border-primary"
+                />
+              </label>
+              <label className="block">
+                <span className="text-xs font-medium text-muted-foreground">Mobile number</span>
+                <input
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  type="tel"
+                  autoComplete="tel"
+                  inputMode="tel"
+                  placeholder="+48 600 000 000"
+                  className="mt-1 w-full rounded-xl border border-border bg-background px-4 py-3 text-sm outline-none focus:border-primary"
+                />
+                <span className="mt-1 block text-xs text-muted-foreground">
+                  Only for your bookings: the airline's gate change, the hotel confirming a late
+                  arrival, us reaching you when something moves. Never marketing.
+                </span>
+                {phoneTouched && !phoneLooksValid && (
+                  <span className="mt-1 block text-xs text-primary">
+                    A number with the country code, please — like +48 600 000 000.
+                  </span>
+                )}
+              </label>
+            </>
           )}
 
           {question?.kind === "airport" && (
@@ -194,9 +229,7 @@ export function OnboardingPage() {
               {QUESTIONS.filter((q) => q.kind === "fields").map((q) => {
                 const parts = [...(q.singles ?? []), ...(q.multis ?? [])]
                   .flatMap((def) => (answers[def.field] ?? []).map((v) => labelFor(def.field, v)))
-                  .concat(
-                    (q.toggles ?? []).filter((t) => toggles[t.field]).map((t) => t.label),
-                  );
+                  .concat((q.toggles ?? []).filter((t) => toggles[t.field]).map((t) => t.label));
                 if (!parts.length) return null;
                 return (
                   <div key={q.id} className="flex flex-wrap items-baseline gap-x-2">
@@ -286,7 +319,10 @@ export function OnboardingPage() {
           {isSummary && (
             <button
               type="button"
-              onClick={() => setStep(1)}
+              onClick={() => {
+                setPhoneTouched(true);
+                if (phoneLooksValid) setStep(1);
+              }}
               className="text-sm text-muted-foreground underline decoration-border underline-offset-4"
             >
               Edit answers

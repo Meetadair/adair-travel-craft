@@ -13,6 +13,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { htmlLang, isLocale } from "@/lib/i18n";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { CookieNotice } from "@/components/cookie-notice";
 
 function NotFoundComponent() {
   return (
@@ -159,7 +160,8 @@ function RootComponent() {
   // Installable app with an offline shell. Booking always needs the network.
   useEffect(() => {
     if (!("serviceWorker" in navigator) || import.meta.env.DEV) return;
-    const register = () => void navigator.serviceWorker.register("/service-worker.js").catch(() => {});
+    const register = () =>
+      void navigator.serviceWorker.register("/service-worker.js").catch(() => {});
     if (document.readyState === "complete") register();
     else window.addEventListener("load", register, { once: true });
   }, []);
@@ -168,6 +170,8 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
+      {/* Asked once, on whatever page they arrive at. */}
+      <CookieNotice />
     </QueryClientProvider>
   );
 }

@@ -68,6 +68,13 @@ export type FlightResult = {
   /** Fare conditions, when the supplier states them. */
   changeable?: boolean | null;
   refundable?: boolean | null;
+  /**
+   * What the airline keeps if the traveller refunds or changes. A refundable
+   * fare with a €100 penalty is not the same as a free one, and saying only
+   * "refundable" would repeat the mistake this module exists to prevent.
+   */
+  refundPenaltyEur?: number | null;
+  changePenaltyEur?: number | null;
 };
 
 export type StayResult = {

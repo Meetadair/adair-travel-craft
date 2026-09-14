@@ -75,11 +75,10 @@ export function WalletLoyalty() {
       });
       return category;
     },
-    // The form closes and the blank draft is cleared, so the next "Add another"
-    // starts empty rather than repeating the entry that was just saved.
+    // The form stays open and the draft is cleared, so the next programme is
+    // typed straight away rather than hunted for behind a button.
     onSuccess: async (category) => {
       setDrafts((prev) => ({ ...prev, [category]: emptyDraft }));
-      setOpen((prev) => ({ ...prev, [category]: false }));
       setJustSaved(category);
       await invalidate();
     },
@@ -162,9 +161,9 @@ export function WalletLoyalty() {
             </div>
           ))}
 
-          {justSaved === category && !open[category] && (
+          {justSaved === category && (
             <p className="text-xs text-muted-foreground">
-              Saved. Add another if you hold more than one.
+              Saved. Add another if you hold more than one, or close this when you're done.
             </p>
           )}
 
@@ -244,10 +243,11 @@ export function WalletLoyalty() {
                   onClick={() => {
                     setOpen((prev) => ({ ...prev, [category]: false }));
                     setDrafts((prev) => ({ ...prev, [category]: emptyDraft }));
+                    setJustSaved(null);
                   }}
                   className="text-sm text-muted-foreground underline decoration-border underline-offset-4"
                 >
-                  Cancel
+                  {justSaved === category ? "Done" : "Cancel"}
                 </button>
               </div>
             </div>

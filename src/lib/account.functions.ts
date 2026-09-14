@@ -30,6 +30,8 @@ export type Account = {
   plan: string;
   onboarded: boolean;
   preferences: Preferences;
+  /** Overrides for work trips. Empty object means business uses the base. */
+  businessPrefs: BusinessPrefsPayload;
   companies: Company[];
 };
 
@@ -41,6 +43,21 @@ const asAnswerMap = (value: unknown): Record<string, string[]> => {
   return Object.fromEntries(
     Object.entries(value as Record<string, unknown>).map(([key, val]) => [key, asList(val)]),
   );
+};
+
+export type BusinessPrefsPayload = {
+  cabinClass?: "economy" | "premium_economy" | "business" | "first";
+  seat?: "window" | "aisle" | "any";
+  maxConnections?: number;
+  hotelTypes?: string[];
+  hotelChains?: string[];
+  hotelStars?: string[];
+  hotelMinRating?: number;
+  hotelAmenities?: string[];
+  hotelMaxKm?: number | null;
+  carClass?: string | null;
+  carTransmission?: "automatic" | "manual" | "any";
+  budgetBand?: string | null;
 };
 
 type PrefRow = Record<string, unknown>;
@@ -147,7 +164,7 @@ const COMPANY_COLUMNS =
   "id, name, legal_form, country, city, postcode, street, building, address_extra, vat_id, address, invoice_email, invoice_emails, is_default";
 
 const PREF_COLUMNS =
-  "seat, cabin_class, max_connections, hotel_min_rating, hotel_rules, car_transmission, trip_purpose, airlines, cabin_rule, seat_front, seat_legroom, hotel_types, hotel_chains, hotel_stars, hotel_rating_level, hotel_amenities, hotel_max_km, car_brands, car_class, car_navigation, car_child_seat, car_companies, cuisines, diets, interests, music, budget_band, dealbreakers, extra_answers, accessibility_note, avoid_note";
+  "seat, cabin_class, max_connections, hotel_min_rating, hotel_rules, car_transmission, trip_purpose, airlines, cabin_rule, seat_front, seat_legroom, hotel_types, hotel_chains, hotel_stars, hotel_rating_level, hotel_amenities, hotel_max_km, car_brands, car_class, car_navigation, car_child_seat, car_companies, cuisines, diets, interests, music, budget_band, dealbreakers, extra_answers, accessibility_note, avoid_note, business_prefs";
 
 export const getAccount = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -168,9 +185,12 @@ export const getAccount = createServerFn({ method: "GET" })
         .order("created_at", { ascending: true }),
     ]);
 
-    const profile = profileRes.data as
-      | { full_name: string | null; home_airport: string; plan: string; onboarded: boolean }
-      | null;
+    const profile = profileRes.data as {
+      full_name: string | null;
+      home_airport: string;
+      plan: string;
+      onboarded: boolean;
+    } | null;
 
     return {
       userId,
@@ -179,6 +199,8 @@ export const getAccount = createServerFn({ method: "GET" })
       plan: profile?.plan ?? "free",
       onboarded: profile?.onboarded ?? false,
       preferences: rowToPrefs((prefsRes.data as PrefRow | null) ?? null),
+      businessPrefs:
+        ((prefsRes.data as PrefRow | null)?.["business_prefs"] as BusinessPrefsPayload) ?? {},
       companies: ((companiesRes.data ?? []) as CompanyRow[]).map(rowToCompany),
     };
   });
@@ -261,7 +283,19 @@ function companyToRow(userId: string, c: CompanyInput, isDefault: boolean) {
 
 const onboardingSchema = z.object({
   fullName: z.string().trim().min(1).max(120),
-  homeAirport: z.string().trim().regex(/^[A-Za-z]{3}$/),
+  /**
+   * Required, and validated the same way the form validates it: country code
+   * plus digits. Bookings depend on it — the airline's gate change, the hotel
+   * confirming a late arrival — so an account without one cannot be served.
+   */
+  phone: z
+    .string()
+    .trim()
+    .regex(/^\+\d[\d\s-]{6,17}\d$/),
+  homeAirport: z
+    .string()
+    .trim()
+    .regex(/^[A-Za-z]{3}$/),
   preferences: prefsSchema,
   companies: z.array(companySchema).max(20).default([]),
   complete: z.boolean().default(true),
@@ -280,6 +314,7 @@ export const saveOnboarding = createServerFn({ method: "POST" })
       .upsert({
         id: userId,
         full_name: data.fullName,
+        traveller_phone: data.phone,
         home_airport: data.homeAirport.toUpperCase(),
         onboarded: data.complete,
       })
@@ -327,9 +362,7 @@ export const addCompany = createServerFn({ method: "POST" })
 
 export const updateCompany = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
-    companySchema.extend({ id: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input: unknown) => companySchema.extend({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const { id, ...rest } = data;
@@ -337,11 +370,7 @@ export const updateCompany = createServerFn({ method: "POST" })
       await supabase.from("companies").update({ is_default: false }).eq("user_id", userId);
     }
     const row = companyToRow(userId, rest, rest.isDefault);
-    const res = await supabase
-      .from("companies")
-      .update(row)
-      .eq("user_id", userId)
-      .eq("id", id);
+    const res = await supabase.from("companies").update(row).eq("user_id", userId).eq("id", id);
     if (res.error) throw new Error(res.error.message);
     return { ok: true };
   });
@@ -380,7 +409,12 @@ export const savePreferences = createServerFn({ method: "POST" })
     z
       .object({
         fullName: z.string().trim().min(1).max(120).nullable().default(null),
-        homeAirport: z.string().trim().regex(/^[A-Za-z]{3}$/).nullable().default(null),
+        homeAirport: z
+          .string()
+          .trim()
+          .regex(/^[A-Za-z]{3}$/)
+          .nullable()
+          .default(null),
         preferences: prefsSchema,
       })
       .parse(input),
@@ -396,6 +430,38 @@ export const savePreferences = createServerFn({ method: "POST" })
       if (up.error) throw new Error(up.error.message);
     }
     const res = await supabase.from("preferences").upsert(prefsToRow(userId, data.preferences));
+    if (res.error) throw new Error(res.error.message);
+    return { ok: true };
+  });
+
+/** The overlay schema: only the fields business may change, all optional. */
+const businessPrefsSchema = z
+  .object({
+    cabinClass: z.enum(["economy", "premium_economy", "business", "first"]).optional(),
+    seat: z.enum(["window", "aisle", "any"]).optional(),
+    maxConnections: z.number().int().min(0).max(3).optional(),
+    hotelTypes: strList.optional(),
+    hotelChains: strList.optional(),
+    hotelStars: strList.optional(),
+    hotelMinRating: z.number().min(0).max(5).optional(),
+    hotelAmenities: strList.optional(),
+    hotelMaxKm: z.number().int().min(1).max(50).nullable().optional(),
+    carClass: z.string().trim().max(40).nullable().optional(),
+    carTransmission: z.enum(["automatic", "manual", "any"]).optional(),
+    budgetBand: z.string().trim().max(40).nullable().optional(),
+  })
+  .strict();
+
+export const saveBusinessPrefs = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ overlay: businessPrefsSchema }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    // Replace, not merge: the form sends the whole overlay, and a field the
+    // traveller cleared must actually clear.
+    const res = await supabase
+      .from("preferences")
+      .upsert({ user_id: userId, business_prefs: data.overlay });
     if (res.error) throw new Error(res.error.message);
     return { ok: true };
   });

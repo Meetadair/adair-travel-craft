@@ -17,7 +17,8 @@ const DAY = 86_400_000;
 
 const iso = (date: Date): string => date.toISOString().slice(0, 10);
 
-const at = (from: string, days: number): string => iso(new Date(Date.parse(`${from}T00:00:00Z`) + days * DAY));
+const at = (from: string, days: number): string =>
+  iso(new Date(Date.parse(`${from}T00:00:00Z`) + days * DAY));
 
 /** Today, in the traveller's own day, as an ISO date. */
 export function today(now: Date = new Date()): string {
@@ -68,6 +69,30 @@ export function monthRange(from: string = today()): { start: string; end: string
  * A chosen range, folded back into the sentence so the parser stays the one
  * reader of what the traveller wants.
  */
+/**
+ * A trip has two ends. A one-way date is an unfinished answer, not a choice:
+ * the search would run with a return date we invented, and the traveller would
+ * find out at the airport. Anything that accepts a range checks this first.
+ */
+export function isCompleteRange(range: DateRange | null | undefined): boolean {
+  if (!range?.departDate || !range.returnDate) return false;
+  return range.returnDate >= range.departDate;
+}
+
+/** The date n nights after the departure, in ISO. */
+export function addDaysIso(iso: string, nights: number): string {
+  const date = new Date(`${iso}T00:00:00Z`);
+  date.setUTCDate(date.getUTCDate() + nights);
+  return date.toISOString().slice(0, 10);
+}
+
+/** Whole nights between two ISO dates. A day trip is zero. */
+export function nightsBetween(depart: string, back: string): number {
+  const a = new Date(`${depart}T00:00:00Z`).getTime();
+  const b = new Date(`${back}T00:00:00Z`).getTime();
+  return Math.max(0, Math.round((b - a) / 86_400_000));
+}
+
 export function rangeSentence(range: DateRange): string {
   if (!range.returnDate || range.returnDate === range.departDate) {
     return `on ${range.departDate}`;
@@ -93,7 +118,8 @@ export function searchAirports(query: string, limit = 8): AirportMatch[] {
     if (!needle) return { iata: airport.iata, label, score: 2 };
     const code = airport.iata.toLowerCase();
     if (code === needle) return { iata: airport.iata, label, score: 0 };
-    if (airport.city.toLowerCase().startsWith(needle)) return { iata: airport.iata, label, score: 1 };
+    if (airport.city.toLowerCase().startsWith(needle))
+      return { iata: airport.iata, label, score: 1 };
     if (
       code.includes(needle) ||
       airport.city.toLowerCase().includes(needle) ||

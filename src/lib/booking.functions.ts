@@ -90,8 +90,14 @@ export type BookingResult = {
     reference: string | null;
     note: string | null;
     payload?: ItemCalendarPayload;
+    /** Supplier-side id for this line, when the supplier issued one. */
+    supplierOrderId?: string | null;
+    /** What the supplier charges us for this line, in EUR. */
+    netEur?: number;
   }>;
   repriced: { from: number; to: number } | null;
+  /** The hotel quoted a different total than the search showed. */
+  stayRepriced: { from: number; to: number } | null;
   /** Machine-readable failure reason, e.g. "offer-expired". */
   reason: string | null;
   testMode: boolean;
@@ -272,6 +278,8 @@ export const bookTripCard = createServerFn({ method: "POST" })
 
     const lines: BookingResult["lines"] = [];
     let repriced: BookingResult["repriced"] = null;
+    let stayRepriced: BookingResult["stayRepriced"] = null;
+    let stayLoyaltySent = false;
     let flightOrderId: string | null = null;
     let flightReference: string | null = null;
     let flightGross = 0;
@@ -337,6 +345,8 @@ export const bookTripCard = createServerFn({ method: "POST" })
           amountEur: flightGross,
           reference: order.bookingReference,
           note: null,
+          supplierOrderId: order.id,
+          netEur: flightNet,
           payload: {
             route: `${request.originIata} → ${request.destinationIata}`,
             returnRoute: `${request.destinationIata} → ${request.originIata}`,
@@ -383,24 +393,95 @@ export const bookTripCard = createServerFn({ method: "POST" })
     }
 
 
-    // Stays and cars are not bookable on this supplier account yet: they are
-    // stored as requested lines so nothing is silently charged.
+    // Stays go through Duffel Stays: quote the rate, then book it. Until the
+    // product is enabled on the account the supplier answers 401/403 and the
+    // stay stays a requested line, exactly as before — nothing is charged.
+    // Cars are not bookable on this supplier account yet and stay requested.
     if (data.include.stay && search.stay) {
-      lines.push({
-        kind: "stay",
-        title: search.stay.name,
-        status: "requested",
-        amountEur: priced.stay ?? 0,
-        reference: null,
-        note: "supplier-not-enabled",
-        payload: {
-          checkin: request.departDate,
-          checkout: request.returnDate,
-          address: search.stay.address ?? request.destinationCity,
-          loyaltyProgramme: hotelMembership?.programmeLabel ?? null,
-          loyaltyMemberMasked: hotelMembership ? mask(hotelMembership.last4) : null,
-        },
-      });
+      const stay = search.stay;
+      const stayPayload: ItemCalendarPayload = {
+        checkin: request.departDate,
+        checkout: request.returnDate,
+        address: stay.address ?? request.destinationCity,
+        loyaltyProgramme: hotelMembership?.programmeLabel ?? null,
+        loyaltyMemberMasked: hotelMembership ? mask(hotelMembership.last4) : null,
+      };
+      const pushRequested = () =>
+        lines.push({
+          kind: "stay",
+          title: stay.name,
+          status: "requested",
+          amountEur: priced.stay ?? 0,
+          reference: null,
+          note: "supplier-not-enabled",
+          payload: stayPayload,
+        });
+
+      if (!stay.rateId) {
+        pushRequested();
+      } else {
+        const { bookStay, freeCancellationUntil } = await import(
+          "@/lib/trip/duffel-stays.server"
+        );
+        const outcome = await bookStay({
+          rateId: stay.rateId,
+          expectedAmount: stay.amount,
+          guests: [
+            { givenName: data.traveller.givenName, familyName: data.traveller.familyName },
+            ...(data.companions ?? []).map((c) => ({
+              givenName: c.givenName,
+              familyName: c.familyName,
+            })),
+          ],
+          email: data.traveller.email,
+          phone: data.traveller.phone,
+          loyaltyProgrammeAccountNumber: hotelMembership?.memberNumber ?? null,
+          idempotencyKey: `${card.id}-stay`,
+          cardPayment,
+        });
+
+        if (outcome.status === "not-enabled") {
+          pushRequested();
+        } else if (outcome.status === "failed") {
+          // A live product that could not book: the line fails, the trip is
+          // partial, and the hotel amount never reaches the total.
+          failed = true;
+          reason = reason ?? `stay-${outcome.reason}`;
+          lines.push({
+            kind: "stay",
+            title: stay.name,
+            status: "failed",
+            amountEur: 0,
+            reference: null,
+            note: outcome.reason,
+            payload: stayPayload,
+          });
+        } else {
+          stayRepriced = outcome.repriced;
+          stayLoyaltySent = outcome.loyaltySent;
+          // Net follows the quote when the hotel repriced; gross is what the
+          // card already showed the traveller, recomputed only when missing.
+          const ratio = outcome.repriced ? outcome.repriced.to / outcome.repriced.from : 1;
+          const stayNet = Math.round(stay.amountEur * ratio * 100) / 100;
+          const stayGross =
+            priced.stay ?? pricing.fromMinor(pricing.grossMinor(stayNet, table.stay));
+          const freeUntil = freeCancellationUntil(outcome.quote.cancellationTimeline);
+          lines.push({
+            kind: "stay",
+            title: stay.name,
+            status: "confirmed",
+            amountEur: stayGross,
+            reference: outcome.booking.bookingReference,
+            note: null,
+            supplierOrderId: outcome.booking.id,
+            netEur: stayNet,
+            payload: {
+              ...stayPayload,
+              note: freeUntil ? `Free cancellation until ${freeUntil}` : null,
+            },
+          });
+        }
+      }
     }
     if (data.include.car && search.car) {
       lines.push({
@@ -453,7 +534,9 @@ export const bookTripCard = createServerFn({ method: "POST" })
         programme: hotelMembership.programmeLabel,
         masked: mask(hotelMembership.last4),
         tier: hotelMembership.tier,
-        where: "stored on the stay, quote it at check-in",
+        where: stayLoyaltySent
+          ? "sent to the hotel with the booking"
+          : "stored on the stay, quote it at check-in",
       });
     }
     if (carMembership && lines.some((l) => l.kind === "car")) {
@@ -584,6 +667,7 @@ export const bookTripCard = createServerFn({ method: "POST" })
         totalEur: 0,
         lines,
         repriced,
+        stayRepriced,
         reason,
         testMode: isTestKey(),
         calendar: [],
@@ -636,15 +720,17 @@ export const bookTripCard = createServerFn({ method: "POST" })
           : line.kind === "ride" || line.kind === "restaurant"
             ? "partner"
             : "duffel",
-      supplier_order_id: line.kind === "flight" ? flightOrderId : null,
+      supplier_order_id: line.supplierOrderId ?? (line.kind === "flight" ? flightOrderId : null),
       offer_reference: line.reference,
       amount: line.amountEur,
       net_minor:
-        line.kind === "flight"
-          ? Math.round(flightNet * 100)
-          : line.kind === "insurance"
-            ? Math.round((insurance?.netEur ?? 0) * 100)
-            : 0,
+        typeof line.netEur === "number"
+          ? Math.round(line.netEur * 100)
+          : line.kind === "flight"
+            ? Math.round(flightNet * 100)
+            : line.kind === "insurance"
+              ? Math.round((insurance?.netEur ?? 0) * 100)
+              : 0,
       gross_minor: Math.round(line.amountEur * 100),
       position: index,
       payload: (line.payload ?? {}) as never,
@@ -928,6 +1014,7 @@ export const bookTripCard = createServerFn({ method: "POST" })
       totalEur: confirmedTotal,
       lines,
       repriced,
+      stayRepriced,
       reason,
       testMode: isTestKey(),
       calendar,
@@ -1146,6 +1233,15 @@ export const cancelTripItem = createServerFn({ method: "POST" })
       const { cancelFlightOrder } = await import("@/lib/trip/duffel-book.server");
       try {
         const result = await cancelFlightOrder(item.supplier_order_id);
+        status = result.status;
+      } catch {
+        status = "cancel-requested";
+      }
+    }
+    if (item.kind === "stay" && item.supplier_order_id) {
+      const { cancelStayBooking } = await import("@/lib/trip/duffel-stays.server");
+      try {
+        const result = await cancelStayBooking(item.supplier_order_id);
         status = result.status;
       } catch {
         status = "cancel-requested";

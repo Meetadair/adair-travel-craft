@@ -35,6 +35,7 @@ import { PaymentCards } from "@/components/prefs/payment-cards";
 import { WalletLoyalty } from "@/components/prefs/wallet-loyalty";
 import { NotificationChannel } from "@/components/prefs/notification-channel";
 import { AppFooter } from "@/components/app-footer";
+import { BusinessTrips } from "@/components/prefs/business-trips";
 
 const toDraft = (company: Company): CompanyDraft => ({
   name: company.name,
@@ -167,51 +168,53 @@ export function PreferencesPage() {
                       )}
                     </div>
                   )}
-              <section className="hairline-card space-y-4 p-5 sm:p-6">
-                <h2 className="font-display text-lg font-semibold">{q.title}</h2>
-                {q.singles?.map((def) => (
-                  <SingleField
-                    key={def.field}
-                    def={def}
-                    value={answers[def.field] ?? []}
-                    onChange={(next) => setAnswers((p) => ({ ...p, [def.field]: next }))}
-                  />
-                ))}
-                {q.multis?.map((def) => (
-                  <MultiField
-                    key={def.field}
-                    def={def}
-                    value={answers[def.field] ?? []}
-                    onChange={(next) => setAnswers((p) => ({ ...p, [def.field]: next }))}
-                    homeAirport={homeAirport}
-                    fullList
-                  />
-                ))}
-                {q.texts?.map((def) => (
-                  <TextField
-                    key={def.field}
-                    def={def}
-                    value={answers[def.field]?.[0] ?? ""}
-                    onChange={(next) =>
-                      setAnswers((p) => ({ ...p, [def.field]: next.trim() ? [next] : [] }))
-                    }
-                  />
-                ))}
-                {q.toggles?.length ? (
-                  <div className="grid gap-2 sm:grid-cols-2">
-                    {q.toggles.map((t) => (
-                      <ToggleRow
-                        key={t.field}
-                        label={t.label}
-                        checked={Boolean(toggles[t.field])}
-                        onChange={(next) => setToggles((p) => ({ ...p, [t.field]: next }))}
+                  <section className="hairline-card space-y-4 p-5 sm:p-6">
+                    <h2 className="font-display text-lg font-semibold">{q.title}</h2>
+                    {q.singles?.map((def) => (
+                      <SingleField
+                        key={def.field}
+                        def={def}
+                        value={answers[def.field] ?? []}
+                        onChange={(next) => setAnswers((p) => ({ ...p, [def.field]: next }))}
                       />
                     ))}
-                  </div>
-                ) : null}
-              </section>
+                    {q.multis?.map((def) => (
+                      <MultiField
+                        key={def.field}
+                        def={def}
+                        value={answers[def.field] ?? []}
+                        onChange={(next) => setAnswers((p) => ({ ...p, [def.field]: next }))}
+                        homeAirport={homeAirport}
+                        fullList
+                      />
+                    ))}
+                    {q.texts?.map((def) => (
+                      <TextField
+                        key={def.field}
+                        def={def}
+                        value={answers[def.field]?.[0] ?? ""}
+                        onChange={(next) =>
+                          setAnswers((p) => ({ ...p, [def.field]: next.trim() ? [next] : [] }))
+                        }
+                      />
+                    ))}
+                    {q.toggles?.length ? (
+                      <div className="grid gap-2 sm:grid-cols-2">
+                        {q.toggles.map((t) => (
+                          <ToggleRow
+                            key={t.field}
+                            label={t.label}
+                            checked={Boolean(toggles[t.field])}
+                            onChange={(next) => setToggles((p) => ({ ...p, [t.field]: next }))}
+                          />
+                        ))}
+                      </div>
+                    ) : null}
+                  </section>
                 </div>
               ))}
+
+            <BusinessTrips />
 
             <ConnectedCalendars />
 
@@ -233,7 +236,11 @@ export function PreferencesPage() {
                 >
                   Credit &amp; referrals
                 </Link>{" "}
-                — {referral.data ? `${eur(referral.data.balanceMinor / 100)} available` : "invite friends and earn travel credit"}.
+                —{" "}
+                {referral.data
+                  ? `${eur(referral.data.balanceMinor / 100)} available`
+                  : "invite friends and earn travel credit"}
+                .
               </p>
               <CompanyEditor companies={companies} onChange={setCompanies} />
             </section>

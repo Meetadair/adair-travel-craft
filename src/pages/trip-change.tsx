@@ -17,6 +17,7 @@ import {
   differenceSentence,
   type ChangeKind,
 } from "@/lib/trip/change";
+import { AppFooter } from "@/components/app-footer";
 
 export const CHANGE_STORAGE_KEY = "adair.trip-change";
 
@@ -98,12 +99,10 @@ export function TripChangePage({ tripId }: { tripId: string }) {
 
         <div className="hairline-card mt-8 space-y-5 p-6">
           <div className="flex gap-2">
-            {(
-              [
-                { value: "dates" as ChangeKind, label: "Dates", icon: CalendarDays },
-                { value: "stay" as ChangeKind, label: "Hotel", icon: BedDouble },
-              ]
-            ).map((option) => (
+            {[
+              { value: "dates" as ChangeKind, label: "Dates", icon: CalendarDays },
+              { value: "stay" as ChangeKind, label: "Hotel", icon: BedDouble },
+            ].map((option) => (
               <button
                 key={option.value}
                 onClick={() => {
@@ -198,6 +197,7 @@ export function TripChangePage({ tripId }: { tripId: string }) {
           </div>
         )}
       </main>
+      <AppFooter />
     </div>
   );
 }

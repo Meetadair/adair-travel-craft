@@ -10,6 +10,7 @@ import { BedDouble, Compass, MapPin, UtensilsCrossed, Landmark } from "lucide-re
 import { SiteNav } from "@/components/site-nav";
 import { GetawayDayImage, GetawayHero } from "@/components/getaway-image";
 import { getWeeklyGetaway, muteGetawayTheme } from "@/lib/getaway.functions";
+import { AppFooter } from "@/components/app-footer";
 
 const KIND_ICON = {
   hotel: <BedDouble className="size-4" />,
@@ -18,7 +19,9 @@ const KIND_ICON = {
 } as const;
 
 const money = (minor: number | null, currency: string) =>
-  minor === null ? null : `${(minor / 100).toLocaleString("en", { maximumFractionDigits: 0 })} ${currency}`;
+  minor === null
+    ? null
+    : `${(minor / 100).toLocaleString("en", { maximumFractionDigits: 0 })} ${currency}`;
 
 export function GetawayPage() {
   const fetchGetaway = useServerFn(getWeeklyGetaway);
@@ -245,32 +248,32 @@ export function GetawayPage() {
                             />
                           )}
                           <div className="min-w-0 flex-1">
-                          <p className="text-sm font-medium">Day {day.dayNumber}</p>
-                          {day.morning && (
-                            <p className="mt-2 text-sm text-muted-foreground">
-                              Morning · {day.morning}
-                            </p>
-                          )}
-                          {day.afternoon && (
-                            <p className="mt-1 text-sm text-muted-foreground">
-                              Afternoon · {day.afternoon}
-                            </p>
-                          )}
-                          {day.evening && (
-                            <p className="mt-1 text-sm text-muted-foreground">
-                              Evening · {day.evening}
-                            </p>
-                          )}
-                          {day.sleepPlace && (
-                            <p className="mt-1 text-xs text-muted-foreground">
-                              Sleep · {day.sleepPlace}
-                            </p>
-                          )}
-                          {day.mealPlaces.length > 0 && (
-                            <p className="mt-1 text-xs text-muted-foreground">
-                              Table · {day.mealPlaces.join(", ")}
-                            </p>
-                          )}
+                            <p className="text-sm font-medium">Day {day.dayNumber}</p>
+                            {day.morning && (
+                              <p className="mt-2 text-sm text-muted-foreground">
+                                Morning · {day.morning}
+                              </p>
+                            )}
+                            {day.afternoon && (
+                              <p className="mt-1 text-sm text-muted-foreground">
+                                Afternoon · {day.afternoon}
+                              </p>
+                            )}
+                            {day.evening && (
+                              <p className="mt-1 text-sm text-muted-foreground">
+                                Evening · {day.evening}
+                              </p>
+                            )}
+                            {day.sleepPlace && (
+                              <p className="mt-1 text-xs text-muted-foreground">
+                                Sleep · {day.sleepPlace}
+                              </p>
+                            )}
+                            {day.mealPlaces.length > 0 && (
+                              <p className="mt-1 text-xs text-muted-foreground">
+                                Table · {day.mealPlaces.join(", ")}
+                              </p>
+                            )}
                           </div>
                         </li>
                       ))}
@@ -281,6 +284,7 @@ export function GetawayPage() {
             );
           })()}
       </main>
+      <AppFooter />
     </div>
   );
 }

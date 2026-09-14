@@ -6,6 +6,7 @@ import { Copy, Check, Gift } from "lucide-react";
 import { SiteNav } from "@/components/site-nav";
 import { getMyReferral } from "@/lib/referrals.functions";
 import { eur } from "@/lib/trip/client";
+import { AppFooter } from "@/components/app-footer";
 
 export function CreditPage() {
   const fetchReferral = useServerFn(getMyReferral);
@@ -91,7 +92,10 @@ export function CreditPage() {
               ) : (
                 <ul className="mt-3 divide-y divide-border rounded-xl border border-border">
                   {data.entries.map((entry) => (
-                    <li key={entry.id} className="flex items-baseline justify-between gap-3 px-4 py-3">
+                    <li
+                      key={entry.id}
+                      className="flex items-baseline justify-between gap-3 px-4 py-3"
+                    >
                       <span className="min-w-0 text-sm">
                         {entry.reason}
                         <span className="block text-xs text-muted-foreground">
@@ -110,6 +114,7 @@ export function CreditPage() {
           </>
         )}
       </main>
+      <AppFooter />
     </div>
   );
 }

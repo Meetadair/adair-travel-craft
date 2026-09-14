@@ -87,18 +87,18 @@ function hotelNameExactOf(sentence: string): string | null {
 
 /** "from Sixt", "a Tesla", "Sixt automatic". */
 function carNameExactOf(sentence: string): string | null {
-  const explicit = /(?:from|with|z|od|u)\s+(sixt|hertz|avis|europcar|enterprise|budget|alamo|thrifty|national|dollar)\b/i.exec(
-    sentence,
-  );
+  const explicit =
+    /(?:from|with|z|od|u)\s+(sixt|hertz|avis|europcar|enterprise|budget|alamo|thrifty|national|dollar)\b/i.exec(
+      sentence,
+    );
   if (explicit?.[1]) return explicit[1];
   const brand = CAR_BRANDS.exec(sentence);
   if (!brand?.[1]) return null;
-  const after = sentence.slice((brand.index ?? 0) + brand[1].length).match(/^\s+([\p{L}\d-]{2,14})/u);
-  return after?.[1] && /^[a-z0-9]/i.test(after[1])
-    ? `${brand[1]} ${after[1]}`.trim()
-    : brand[1];
+  const after = sentence
+    .slice((brand.index ?? 0) + brand[1].length)
+    .match(/^\s+([\p{L}\d-]{2,14})/u);
+  return after?.[1] && /^[a-z0-9]/i.test(after[1]) ? `${brand[1]} ${after[1]}`.trim() : brand[1];
 }
-
 
 /** The traveller's saved home airport, as a city entry we can search from. */
 function homeAirportEntry(iata: string | undefined): CityEntry | null {
@@ -157,7 +157,6 @@ function findCitiesInOrder(text: string): CityEntry[] {
       return true;
     });
 }
-
 
 /** 24-hour clock time in a sentence: "3pm", "15:00", "o 15.00". */
 function clockOf(text: string): { hour: number; minute: number } | null {
@@ -237,6 +236,88 @@ export function hasDestination(sentence: string): boolean {
   return (findCitiesInOrder(text)[0] ?? findCity(text)) != null;
 }
 
+/** Month names we accept, in the languages the product speaks. */
+const MONTH_NAMES: string[][] = [
+  ["january", "jan", "styczeń", "stycznia", "styczen", "januar"],
+  ["february", "feb", "luty", "lutego", "februar"],
+  ["march", "mar", "marzec", "marca", "märz", "marz"],
+  ["april", "apr", "kwiecień", "kwietnia", "kwiecien"],
+  ["may", "maj", "maja", "mai"],
+  ["june", "jun", "czerwiec", "czerwca", "juni"],
+  ["july", "jul", "lipiec", "lipca", "juli"],
+  ["august", "aug", "sierpień", "sierpnia", "sierpien"],
+  ["september", "sep", "sept", "wrzesień", "września", "wrzesnia"],
+  ["october", "oct", "październik", "października", "pazdziernika", "oktober"],
+  ["november", "nov", "listopad", "listopada"],
+  ["december", "dec", "grudzień", "grudnia", "dezember"],
+];
+
+/** A calendar date found in the sentence, with where it sat. */
+type DateHit = { at: number; date: Date };
+
+/**
+ * Calendar dates the traveller wrote out: "8 October", "October 8", "8.10",
+ * "08/10", "2026-10-08".
+ *
+ * Ambiguity is resolved the European way — 8.10 is the eighth of October, not
+ * the tenth of August — because that is how the markets we serve write dates.
+ * A date already past is read as next year rather than refused, since nobody
+ * books a trip to last month.
+ */
+export function calendarDates(sentence: string, from: Date): DateHit[] {
+  const text = sentence.toLowerCase();
+  const hits: DateHit[] = [];
+  const seen = new Set<number>();
+
+  const push = (at: number, year: number, month: number, day: number) => {
+    if (month < 0 || month > 11 || day < 1 || day > 31) return;
+    const candidate = new Date(Date.UTC(year, month, day));
+    // A real date only: 31 February rolls over, and that is not what they meant.
+    if (candidate.getUTCMonth() !== month || candidate.getUTCDate() !== day) return;
+    if (seen.has(at)) return;
+    seen.add(at);
+    hits.push({ at, date: candidate });
+  };
+
+  // 2026-10-08
+  for (const match of text.matchAll(/\b(\d{4})-(\d{2})-(\d{2})\b/g)) {
+    push(match.index ?? 0, Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+  }
+
+  // 8.10, 08/10, 8.10.2026
+  for (const match of text.matchAll(/\b(\d{1,2})[./](\d{1,2})(?:[./](\d{2,4}))?\b/g)) {
+    const day = Number(match[1]);
+    const month = Number(match[2]) - 1;
+    const rawYear = match[3];
+    const year = rawYear
+      ? Number(rawYear.length === 2 ? `20${rawYear}` : rawYear)
+      : from.getUTCFullYear();
+    const at = match.index ?? 0;
+    const candidate = new Date(Date.UTC(year, month, day));
+    push(at, !rawYear && candidate < from ? year + 1 : year, month, day);
+  }
+
+  // 8 October, October 8, 8 października
+  MONTH_NAMES.forEach((names, month) => {
+    for (const name of names) {
+      for (const match of text.matchAll(
+        new RegExp(
+          `(?:(\\d{1,2})\\s*(?:st|nd|rd|th)?\\s+)?${name}\\b(?:\\s+(\\d{1,2})(?:st|nd|rd|th)?)?`,
+          "g",
+        ),
+      )) {
+        const day = Number(match[1] ?? match[2]);
+        if (!Number.isFinite(day) || day < 1) continue;
+        const at = match.index ?? 0;
+        const thisYear = new Date(Date.UTC(from.getUTCFullYear(), month, day));
+        push(at, thisYear < from ? from.getUTCFullYear() + 1 : from.getUTCFullYear(), month, day);
+      }
+    }
+  });
+
+  return hits.sort((a, b) => a.at - b.at);
+}
+
 /**
  * Structured trip request, or null when the sentence names no destination.
  * Never guesses a city or a set of dates out of nothing.
@@ -267,9 +348,18 @@ export function parseTripSentence(
 
   const isWeekend = /weekend|week-end|wochenende/.test(text);
 
+  const written = calendarDates(sentence, today);
+
   let depart: Date;
   let back: Date;
-  if (hits.length >= 2) {
+  if (written.length >= 2) {
+    // They wrote both ends. Nothing else in the sentence overrides that.
+    depart = written[0]!.date;
+    back = written[1]!.date;
+  } else if (written.length === 1) {
+    depart = written[0]!.date;
+    back = addDays(depart, isWeekend ? 2 : 1);
+  } else if (hits.length >= 2) {
     depart = nextWeekday(today, hits[0]!.index);
     back = nextWeekday(depart, hits[1]!.index);
   } else if (hits.length === 1) {
@@ -328,12 +418,13 @@ export function parseTripSentence(
     hotelWish: hotelWishOf(sentence),
     hotelNameExact: namedHotel && !isCityName(namedHotel) ? namedHotel : null,
     carNameExact: carNameExactOf(sentence),
-    needsCar: /\bcar\b|auto|samoch|rental|mietwagen|voiture/.test(text) && !/no car|without a car|bez auta|bez samoch/.test(text),
+    needsCar:
+      /\bcar\b|auto|samoch|rental|mietwagen|voiture/.test(text) &&
+      !/no car|without a car|bez auta|bez samoch/.test(text),
     mustArriveBy,
     mustDepartBy,
     meetingLocation: meetingLocationOf(sentence) ?? hotelWishOf(sentence),
     invoiceToCompany: /invoice|company|vat|faktur|firm|rechnung|societ|empresa/.test(text),
     stops,
   };
-
 }

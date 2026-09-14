@@ -95,7 +95,10 @@ export function SupportPage() {
           </div>
 
           <div>
-            <label className="mb-1.5 block text-xs text-muted-foreground" htmlFor="support-category">
+            <label
+              className="mb-1.5 block text-xs text-muted-foreground"
+              htmlFor="support-category"
+            >
               What do you need?
             </label>
             <select

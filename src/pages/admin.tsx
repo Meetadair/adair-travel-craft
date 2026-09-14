@@ -20,7 +20,15 @@ import {
   type PricingRuleRow,
 } from "@/lib/admin.functions";
 
-function Card({ title, hint, children }: { title: string; hint?: string; children: React.ReactNode }) {
+function Card({
+  title,
+  hint,
+  children,
+}: {
+  title: string;
+  hint?: string;
+  children: React.ReactNode;
+}) {
   return (
     <section className="mt-10">
       <h2 className="font-display text-xl font-semibold tracking-tight">{title}</h2>
@@ -57,15 +65,27 @@ function RuleRow({ rule, onSaved }: { rule: PricingRuleRow; onSaved: () => void 
       </p>
       <label className="text-xs text-muted-foreground">
         Markup bps
-        <input className={`${field} mt-1 block`} value={markup} onChange={(e) => setMarkup(e.target.value)} />
+        <input
+          className={`${field} mt-1 block`}
+          value={markup}
+          onChange={(e) => setMarkup(e.target.value)}
+        />
       </label>
       <label className="text-xs text-muted-foreground">
         Discount bps
-        <input className={`${field} mt-1 block`} value={discount} onChange={(e) => setDiscount(e.target.value)} />
+        <input
+          className={`${field} mt-1 block`}
+          value={discount}
+          onChange={(e) => setDiscount(e.target.value)}
+        />
       </label>
       <label className="text-xs text-muted-foreground">
         Change fee (minor)
-        <input className={`${field} mt-1 block`} value={fee} onChange={(e) => setFee(e.target.value)} />
+        <input
+          className={`${field} mt-1 block`}
+          value={fee}
+          onChange={(e) => setFee(e.target.value)}
+        />
       </label>
       <button
         type="button"
@@ -148,7 +168,9 @@ function WaitlistCard() {
   const send = useMutation({
     mutationFn: (ids: string[]) => invite({ data: { ids } }),
     onSuccess: (result) => {
-      setNote(`${result.invited} invited · ${result.skipped} already done · ${result.failed} failed`);
+      setNote(
+        `${result.invited} invited · ${result.skipped} already done · ${result.failed} failed`,
+      );
       void queryClient.invalidateQueries({ queryKey: ["admin-waitlist"] });
     },
     onError: () => setNote("Invitations could not be sent just now."),
@@ -176,7 +198,10 @@ function WaitlistCard() {
           <p className="p-4 text-sm text-muted-foreground">Nobody on the waitlist yet.</p>
         )}
         {(rows.data ?? []).slice(0, 40).map((row) => (
-          <p key={row.id} className="flex flex-wrap items-baseline justify-between gap-2 p-3 text-sm">
+          <p
+            key={row.id}
+            className="flex flex-wrap items-baseline justify-between gap-2 p-3 text-sm"
+          >
             <span className="min-w-0 truncate">{row.email}</span>
             <span className="text-xs text-muted-foreground">
               {row.type} ·{" "}
@@ -344,15 +369,21 @@ export function AdminPage() {
                   <div key={user.id} className="flex flex-wrap items-center gap-3 p-4 text-sm">
                     <p className="min-w-0 flex-1">
                       <span className="font-medium">{user.full_name ?? user.email ?? user.id}</span>
-                      <span className="text-muted-foreground">
-                        {" "}
-                        · {user.plan} · onboarding {user.onboarded ? "done" : "not finished"} ·
+                      <span className="block text-xs text-muted-foreground">
+                        {user.email ?? "no email"} · {user.phone ?? "no phone"}
+                        {user.registered_at && ` · joined ${user.registered_at.slice(0, 10)}`}
+                      </span>
+                      <span className="block text-xs text-muted-foreground">
+                        {user.trips_booked} {user.trips_booked === 1 ? "trip" : "trips"} booked ·{" "}
+                        {user.plan} · onboarding {user.onboarded ? "done" : "not finished"} ·
                         preferences {user.preferences_filled}%
                       </span>
                     </p>
                     <button
                       type="button"
-                      onClick={() => adminMutation.mutate({ userId: user.id, isAdmin: !user.is_admin })}
+                      onClick={() =>
+                        adminMutation.mutate({ userId: user.id, isAdmin: !user.is_admin })
+                      }
                       disabled={adminMutation.isPending}
                       className="rounded-xl border border-border px-3 py-1.5 text-xs font-medium hover:border-primary disabled:opacity-60"
                     >
@@ -443,7 +474,8 @@ export function AdminPage() {
                 {overview.data.errors.map((error) => (
                   <p key={error.id} className="p-3 text-xs">
                     <span className="text-muted-foreground">
-                      {new Date(error.created_at).toLocaleString()} · {error.route ?? "unknown route"}
+                      {new Date(error.created_at).toLocaleString()} ·{" "}
+                      {error.route ?? "unknown route"}
                     </span>
                     <br />
                     {error.message}

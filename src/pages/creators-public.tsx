@@ -2,6 +2,7 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 import { SiteNav } from "@/components/site-nav";
+import { AppFooter } from "@/components/app-footer";
 
 const STEPS = [
   "Apply with your handle and where you publish.",
@@ -34,6 +35,7 @@ export function CreatorsPublicPage() {
           Apply <ArrowRight className="size-4" />
         </Link>
       </main>
+      <AppFooter />
     </div>
   );
 }

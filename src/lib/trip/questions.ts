@@ -4,6 +4,7 @@
  * ignored and the assumption is then printed on the card.
  */
 import { MULTI_AIRPORT, hasNoDates, isVagueWeek, mentionsAirport } from "./clarify";
+import { calendarDates } from "./parse";
 import { ageQuestion, familyFromSentence } from "./family";
 import type { TripRequest } from "./types";
 
@@ -13,7 +14,10 @@ export type ChatQuestionKind =
   | "arrival_time"
   | "child_ages"
   | "which_airport"
-  | "travellers";
+  | "travellers"
+  | "needs_car"
+  | "return_time"
+  | "airport_transfer";
 
 export type ChatQuestion = {
   kind: ChatQuestionKind;
@@ -32,6 +36,9 @@ export type QuestionCopy = {
   dates: string;
   arrivalTime: string;
   whichAirport: string;
+  needsCar: string;
+  returnTime: string;
+  airportTransfer: string;
 };
 
 export const QUESTION_COPY: QuestionCopy = {
@@ -39,7 +46,20 @@ export const QUESTION_COPY: QuestionCopy = {
   dates: "Which dates?",
   arrivalTime: "What time do you need to be there?",
   whichAirport: "{city} has more than one airport. Which one?",
+  needsCar: "Do you want a car there?",
+  returnTime: "What time do you want to come back?",
+  airportTransfer: "Shall I arrange the transfer from the airport?",
 };
+
+/** True when the sentence already settles the car question either way. */
+export function mentionsCar(sentence: string): boolean {
+  return /\b(car|hire car|rental|rent a car|drive|driving|no car|without a car)\b/i.test(sentence)
+    ? true
+    : /samoch|auto|wypożycz|bez auta/i.test(sentence);
+}
+
+const DAY_TERMS_G =
+  /\b(monday|tuesday|wednesday|thursday|friday|saturday|sunday|poniedzia[łl]ek|wtorek|[śs]rod[aę]|czwartek|pi[ąa]tek|sobot[aę]|niedziel[aę])\b/gi;
 
 const BUSINESS_TERMS =
   /\b(meeting|meetings|conference|congress|client|customer|board|interview|kick-?off|workshop|trade fair|business trip|on business|invoice|vat)\b|spotkanie|spotkani|konferencj|klient|delegacj|faktur/i;
@@ -57,7 +77,44 @@ export type QuestionContext = {
   /** Kinds already answered in this conversation. */
   answered?: ChatQuestionKind[];
   copy?: QuestionCopy;
+  /**
+   * What we already know about this traveller, so we stop asking it.
+   *
+   * This is how the conversation shortens over time: on the first trip almost
+   * nothing is known and we ask properly; by the fifth, most of it is on file
+   * and the same sentence goes almost straight to a card.
+   */
+  known?: KnownProfile;
 };
+
+export type KnownProfile = {
+  /** Cabin class, seat, hotel type, car — anything they set in preferences. */
+  statedPreferences?: number;
+  /** Trips already booked. A returning traveller has taught us things. */
+  tripsBooked?: number;
+  /** True when they have told us whether they usually take a car. */
+  knowsCarHabit?: boolean;
+  /** True when we know how they like to travel for work. */
+  knowsBusinessHabit?: boolean;
+};
+
+/**
+ * How many questions we may ask in one exchange.
+ *
+ * A first trip earns four: without them the card is a guess, and a guessed card
+ * is what makes someone leave. Once a traveller has booked a few times and
+ * filled in preferences, two is plenty, then one. We never go to zero — there
+ * is always something only this trip can answer.
+ */
+export function questionBudget(known: KnownProfile = {}): number {
+  const trips = known.tripsBooked ?? 0;
+  const stated = known.statedPreferences ?? 0;
+
+  if (trips === 0 && stated < 3) return 4;
+  if (trips <= 2 || stated < 8) return 3;
+  if (trips <= 5) return 2;
+  return 1;
+}
 
 const fill = (template: string, values: Record<string, string>) =>
   template.replace(/\{(\w+)\}/g, (_, key: string) => values[key] ?? "");
@@ -93,8 +150,29 @@ export function chatQuestions(
     out.push({ kind: "child_ages", question: ages, control: "ages", options: [], essential: true });
   }
 
-  if ((hasNoDates(sentence) || isVagueWeek(sentence)) && !answered.includes("dates")) {
-    out.push({ kind: "dates", question: copy.dates, control: "calendar", options: [], essential: true });
+  // Three ways the dates are not settled: none in the sentence, a vague week,
+  // or a departure with no way home. All three block the search.
+  const returnMissing = !request.returnDate || request.returnDate <= request.departDate;
+
+  // One day named, no range, no nights: the return date on the request is our
+  // default, not their decision. Asking beats booking a night they never chose.
+  const singleDay =
+    (sentence.match(DAY_TERMS_G) ?? []).length === 1 &&
+    !/\b(to|until|till|through|do|bis|–|-)\b/i.test(sentence) &&
+    !/\b(night|nights|noc|nocy|nächte)\b/i.test(sentence) &&
+    calendarDates(sentence, new Date()).length === 0;
+
+  if (
+    (hasNoDates(sentence) || isVagueWeek(sentence) || returnMissing || singleDay) &&
+    !answered.includes("dates")
+  ) {
+    out.push({
+      kind: "dates",
+      question: copy.dates,
+      control: "calendar",
+      options: [],
+      essential: true,
+    });
   }
 
   if (
@@ -130,6 +208,56 @@ export function chatQuestions(
     });
   }
 
+  // A car changes the whole shape of a trip, and guessing it wrong wastes the
+  // search. The request always carries a boolean, so silence in the sentence —
+  // not the parsed value — is what tells us the traveller has not decided.
+  if (!mentionsCar(sentence) && !answered.includes("needs_car")) {
+    out.push({
+      kind: "needs_car",
+      question: copy.needsCar,
+      control: "options",
+      options: [
+        { label: "Yes, a car", value: "car" },
+        { label: "No car", value: "no car" },
+      ],
+      essential: false,
+    });
+  }
+
+  // Without a car, someone still has to get them from the airport. Only once
+  // they have actually told us they do not want one.
+  if (
+    !request.needsCar &&
+    answered.includes("needs_car") &&
+    !answered.includes("airport_transfer")
+  ) {
+    out.push({
+      kind: "airport_transfer",
+      question: copy.airportTransfer,
+      control: "options",
+      options: [
+        { label: "Yes, please", value: "with a transfer from the airport" },
+        { label: "I'll sort it", value: "no transfer" },
+      ],
+      essential: false,
+    });
+  }
+
+  // A business trip has a meeting to reach and a train to catch home.
+  if (
+    isBusinessSentence(sentence, request) &&
+    !request.mustDepartBy &&
+    !answered.includes("return_time")
+  ) {
+    out.push({
+      kind: "return_time",
+      question: copy.returnTime,
+      control: "time",
+      options: [],
+      essential: false,
+    });
+  }
+
   // Destination, then dates, then the arrival time, then anything else.
   const rank: Record<ChatQuestionKind, number> = {
     destination: 0,
@@ -138,12 +266,22 @@ export function chatQuestions(
     child_ages: 3,
     travellers: 4,
     which_airport: 5,
+    needs_car: 6,
+    return_time: 7,
+    airport_transfer: 8,
   };
-  return out
-    .sort(
-      (a, b) => Number(b.essential) - Number(a.essential) || rank[a.kind] - rank[b.kind],
-    )
-    .slice(0, 2);
+  const profile = context.known ?? {};
+
+  // Anything the profile already answers is not worth a traveller's time.
+  const worthAsking = out.filter((question) => {
+    if (question.kind === "needs_car" && profile.knowsCarHabit) return false;
+    if (question.kind === "return_time" && profile.knowsBusinessHabit) return false;
+    return true;
+  });
+
+  return worthAsking
+    .sort((a, b) => Number(b.essential) - Number(a.essential) || rank[a.kind] - rank[b.kind])
+    .slice(0, questionBudget(profile));
 }
 
 /** True when nothing essential is missing, so the search may run. */

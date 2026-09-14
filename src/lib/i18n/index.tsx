@@ -117,7 +117,7 @@ export function htmlLang(locale: Locale): string {
   return locale === "zh" ? "zh-Hans" : locale;
 }
 
-export type SitePath = "/" | "/assistant" | "/business" | "/auth";
+export type SitePath = "/" | "/assistant" | "/business" | "/auth" | "/reset-password";
 
 /** Link that keeps the visitor inside the current language. */
 export function LocaleLink({
@@ -148,6 +148,7 @@ export function LocaleLink({
     "/assistant": "/$lang/assistant",
     "/business": "/$lang/business",
     "/auth": "/$lang/auth",
+    "/reset-password": "/$lang/reset-password",
   } as const;
 
   return (

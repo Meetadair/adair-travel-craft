@@ -132,9 +132,14 @@ function laterCosts(
 
   if (option.refundable === false && against.refundable === true) {
     lines.push("non-refundable");
+  } else if (option.refundable === true && option.refundPenaltyEur) {
+    lines.push(`refundable, but the airline keeps ${eur(option.refundPenaltyEur)}`);
   }
+
   if (option.changeable === false && against.changeable === true) {
     lines.push("cannot be changed");
+  } else if (option.changeable === true && option.changePenaltyEur) {
+    lines.push(`changes cost ${eur(option.changePenaltyEur)} plus the fare difference`);
   }
 
   return { lines, pricedEur, unpriced };
@@ -150,7 +155,8 @@ function advantages(option: FlightResult, prefs: OptionPrefs): string[] {
   }
   if (earnsMiles(option, prefs)) out.push("earns miles");
   if ((option.stops ?? 0) === 0) out.push("direct");
-  if (option.refundable) out.push("refundable");
+  if (option.refundable && !option.refundPenaltyEur) out.push("refundable, no fee");
+  else if (option.refundable) out.push(`refundable, ${eur(option.refundPenaltyEur ?? 0)} fee`);
   return out;
 }
 

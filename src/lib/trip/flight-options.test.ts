@@ -101,6 +101,24 @@ describe("buildFlightOptions", () => {
     expect(lines).toMatch(/longer/);
   });
 
+  it("never calls a fare refundable without naming the fee", () => {
+    const withFee = { ...base, refundPenaltyEur: 100, changePenaltyEur: 80 };
+    const { options } = buildFlightOptions(withFee, [lowCost()]);
+    expect(options[0]?.gives.join(" ")).toMatch(/refundable, €100 fee/);
+    expect(options[0]?.gives.join(" ")).not.toMatch(/refundable, no fee/);
+  });
+
+  it("credits a genuinely free refund as free", () => {
+    const { options } = buildFlightOptions(base, [lowCost()]);
+    expect(options[0]?.gives.join(" ")).toMatch(/refundable, no fee/);
+  });
+
+  it("names the change fee on an alternative that allows changes", () => {
+    const changeable = lowCost({ changeable: true, changePenaltyEur: 60, refundable: false });
+    const { options } = buildFlightOptions(base, [changeable]);
+    expect(options[1]?.costsLater.join(" ")).toMatch(/changes cost €60/);
+  });
+
   it("records non-refundable and non-changeable fares", () => {
     const { options } = buildFlightOptions(base, [lowCost()]);
     const lines = options[1]?.costsLater.join(" ") ?? "";

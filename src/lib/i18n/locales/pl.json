@@ -199,7 +199,10 @@
         "timeLabel": "Lub godzina",
         "travellersLabel": "Liczba osób",
         "companionsHint": "Osoby podróżujące z Tobą",
-        "done": "Gotowe"
+        "done": "Gotowe",
+        "pickReturn": "Wybierz też dzień powrotu.",
+        "nightsLabel": "albo liczba nocy:",
+        "nightsWord": "nocy"
       }
     },
     "questions": {
@@ -222,8 +225,14 @@
         "timeLabel": "Lub godzina",
         "travellersLabel": "Liczba osób",
         "companionsHint": "Osoby podróżujące z Tobą",
-        "done": "Gotowe"
-      }
+        "done": "Gotowe",
+        "pickReturn": "Wybierz też dzień powrotu.",
+        "nightsLabel": "albo liczba nocy:",
+        "nightsWord": "nocy"
+      },
+      "needsCar": "Chcesz mieć tam samochód?",
+      "returnTime": "O której chcesz wracać?",
+      "airportTransfer": "Zamówić transfer z lotniska?"
     },
     "advice": {
       "tightFlight": "Ten lot ląduje o {land}, a spotkanie jest o {meeting} — mało czasu. Lot o {alt} daje {spare} zapasu za dodatkowe {extra}.",
@@ -310,7 +319,20 @@
     "confirmSent": "Sprawdź skrzynkę odbiorczą — wysłaliśmy link potwierdzający.",
     "genericError": "Coś poszło nie tak",
     "demoHint": "Wolisz najpierw zobaczyć wersję demonstracyjną?",
-    "demoLink": "Otwórz asystenta"
+    "demoLink": "Otwórz asystenta",
+    "accountExists": "Na ten adres jest już założone konto. Zaloguj się albo zresetuj hasło.",
+    "forgotPassword": "Nie pamiętasz hasła?",
+    "resetTitle": "Reset hasła",
+    "resetLead": "Podaj adres e-mail, a wyślemy link do ustawienia nowego hasła.",
+    "resetSend": "Wyślij link",
+    "resetSent": "Jeśli na ten adres jest konto, link już leci. Sprawdź skrzynkę.",
+    "resetNoEmail": "Nie możemy jeszcze wysyłać e-maili, więc link nie został wysłany. Napisz do nas.",
+    "backToSignIn": "Wróć do logowania",
+    "newPasswordTitle": "Ustaw nowe hasło",
+    "newPassword": "Nowe hasło",
+    "newPasswordSave": "Zapisz nowe hasło",
+    "newPasswordSaved": "Zapisane. Jesteś zalogowany.",
+    "newPasswordExpired": "Ten link wygasł. Poproś o nowy."
   },
   "dashboard": {
     "meta": {

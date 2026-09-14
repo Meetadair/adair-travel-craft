@@ -1,11 +1,24 @@
 import { useState } from "react";
-import type { LineMatch } from "@/lib/trip/match";
+import { MATCH_DOTS, matchDots, type LineMatch } from "@/lib/trip/match";
 
-/** Dots plus the real checklist behind the score, expandable on tap. */
-export function MatchNote({ match, label }: { match: LineMatch | null | undefined; label: string }) {
+/**
+ * Five dots, plus the real checklist behind them.
+ *
+ * The scale is fixed so two hotels can be compared at a glance, and the
+ * sentence beside it always states the true numbers — the dots summarise, they
+ * never stand in for the facts.
+ */
+export function MatchNote({
+  match,
+  label,
+}: {
+  match: LineMatch | null | undefined;
+  label: string;
+}) {
   const [open, setOpen] = useState(false);
-  if (!match || match.total === 0) return null;
-  const dots = Array.from({ length: match.total }, (_, i) => i < match.met);
+  const filled = matchDots(match);
+  if (!match || filled === null) return null;
+  const dots = Array.from({ length: MATCH_DOTS }, (_, i) => i < filled);
 
   return (
     <div className="px-5 pb-3">

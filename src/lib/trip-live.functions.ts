@@ -46,9 +46,18 @@ const stopSchema = z.object({
 const overridesSchema = z.object({
   originIata: z.string().trim().length(3).optional(),
   destinationIata: z.string().trim().length(3).optional(),
-  departDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
-  returnDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
-  mustArriveBy: z.string().regex(/^\d{2}:\d{2}$/).optional(),
+  departDate: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
+  returnDate: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
+  mustArriveBy: z
+    .string()
+    .regex(/^\d{2}:\d{2}$/)
+    .optional(),
   passengers: z.number().int().min(1).max(9).optional(),
   childAges: z.array(z.number().int().min(0).max(17)).max(8).optional(),
 });
@@ -64,9 +73,7 @@ const sentenceSchema = z.object({
 
 /** Same date, moved by whole days. */
 function shiftIsoDate(iso: string, days: number): string {
-  return new Date(Date.parse(`${iso}T12:00:00Z`) + days * 86_400_000)
-    .toISOString()
-    .slice(0, 10);
+  return new Date(Date.parse(`${iso}T12:00:00Z`) + days * 86_400_000).toISOString().slice(0, 10);
 }
 
 /** Short, human-readable pointer to the offer we swapped away from or to. */
@@ -77,13 +84,8 @@ function reference(line: Record<string, unknown> | null): string | null {
   return (typeof id === "string" ? id : typeof name === "string" ? name : null) ?? null;
 }
 
-
 /** Analytics sink. Never allowed to break the interaction it measures. */
-async function record(
-  userId: string,
-  name: string,
-  props: Record<string, unknown>,
-): Promise<void> {
+async function record(userId: string, name: string, props: Record<string, unknown>): Promise<void> {
   try {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     await supabaseAdmin.from("events").insert({ name, user_id: userId, props: props as never });
@@ -112,7 +114,7 @@ export const searchLiveTrip = createServerFn({ method: "POST" })
       supabase
         .from("preferences")
         .select(
-          "cabin_class, max_connections, hotel_max_km, seat, airlines, cabin_rule, hotel_chains, hotel_stars, hotel_min_rating, hotel_amenities, hotel_types, car_brands, car_companies, car_class, car_transmission, budget_band, trip_purpose, dealbreakers, extra_answers",
+          "cabin_class, max_connections, hotel_max_km, seat, airlines, cabin_rule, hotel_chains, hotel_stars, hotel_min_rating, hotel_amenities, hotel_types, car_brands, car_companies, car_class, car_transmission, budget_band, trip_purpose, dealbreakers, extra_answers, business_prefs",
         )
         .eq("user_id", userId)
         .maybeSingle(),
@@ -123,7 +125,7 @@ export const searchLiveTrip = createServerFn({ method: "POST" })
 
     const list = (value: unknown): string[] =>
       Array.isArray(value) ? value.filter((v): v is string => typeof v === "string") : [];
-    const searchPrefs: SearchPrefs = {
+    let searchPrefs: SearchPrefs = {
       airlines: list(row?.["airlines"]),
       seat: (row?.["seat"] as string) ?? "any",
       cabinRule: (row?.["cabin_rule"] as string | null) ?? null,
@@ -179,9 +181,29 @@ export const searchLiveTrip = createServerFn({ method: "POST" })
     // Corrections the traveller made on the strip, or answers to what we asked,
     // win over what we read from the sentence.
     const { applyOverrides } = await import("@/lib/trip/understanding");
-    const request: TripRequest = data.overrides
-      ? applyOverrides(base, data.overrides)
-      : base;
+    let request: TripRequest = data.overrides ? applyOverrides(base, data.overrides) : base;
+
+    // A work trip travels differently: the overlay from Preferences → Business
+    // trips takes over for cabin and, further down, hotels and the car. It sits
+    // below explicit overrides — what the traveller just clicked always wins.
+    const { detectTripContext, prefsForContext } = await import("@/lib/prefs/context");
+    const tripContext = detectTripContext(data.sentence, {
+      invoiceToCompany: request.invoiceToCompany,
+      mustArriveBy: request.mustArriveBy ?? null,
+    });
+    const businessOverlay = ((row?.["business_prefs"] as Record<string, unknown> | null) ??
+      {}) as Parameters<typeof prefsForContext>[1];
+    if (tripContext === "business" && businessOverlay) {
+      const cabinOverride = (businessOverlay as { cabinClass?: TripRequest["cabinClass"] })
+        .cabinClass;
+      if (cabinOverride) request = { ...request, cabinClass: cabinOverride };
+      // Hotels and the car rank against the work profile too.
+      searchPrefs = prefsForContext(
+        searchPrefs as unknown as Record<string, unknown>,
+        businessOverlay,
+        tripContext,
+      ) as unknown as SearchPrefs;
+    }
 
     // What we remember about this place, and habits they have confirmed. Both
     // rank below anything they stated; neither can override a dealbreaker.
@@ -269,8 +291,6 @@ export const searchLiveTrip = createServerFn({ method: "POST" })
       }
     }
 
-
-
     const baseTable = await pricing.loadPricing(supabase, plan);
 
     // Early-booking reward: leisure trips booked far ahead pay a smaller Adair
@@ -338,8 +358,7 @@ export const searchLiveTrip = createServerFn({ method: "POST" })
       },
     );
 
-    const expiresAt =
-      search.flight?.expiresAt ?? new Date(Date.now() + 20 * 60_000).toISOString();
+    const expiresAt = search.flight?.expiresAt ?? new Date(Date.now() + 20 * 60_000).toISOString();
 
     const card = await supabase
       .from("trip_cards")
@@ -405,9 +424,9 @@ export const searchLiveTrip = createServerFn({ method: "POST" })
             hotel: rememberedHotel.itemName,
             stays: rememberedHotel.timesChosen,
             city: request.destinationCity,
-            offered: (search.stay?.name ?? "").toLowerCase().includes(
-              rememberedHotel.itemName.toLowerCase(),
-            ),
+            offered: (search.stay?.name ?? "")
+              .toLowerCase()
+              .includes(rememberedHotel.itemName.toLowerCase()),
           }
         : null,
     };
@@ -560,7 +579,8 @@ export const swapCardAlternative = createServerFn({ method: "POST" })
 
     // A swap is the clearest statement of taste there is: remember what they
     // moved *to*, for this city.
-    const chosenName = (chosen as { name?: string; supplier?: string; carrier?: string } | null) ?? null;
+    const chosenName =
+      (chosen as { name?: string; supplier?: string; carrier?: string } | null) ?? null;
     const memoryKind =
       data.kind === "stay" ? "hotel" : data.kind === "car" ? "car_supplier" : "airline";
     const memoryName =

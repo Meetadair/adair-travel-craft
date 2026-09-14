@@ -141,6 +141,21 @@ export function matchesAirline(key: string, carrierText: string): boolean {
   return matchesAny(carrierText, AIRLINE_WORDS[key] ?? brandWords(key));
 }
 
+/** The same, for hotel groups. */
+export function matchesChain(key: string, text: string): boolean {
+  return matchesAny(text, CHAIN_WORDS[key] ?? brandWords(key));
+}
+
+/** The same, for hotel amenities and property types. */
+export function matchesAmenity(key: string, text: string): boolean {
+  return matchesAny(text, AMENITY_WORDS[key] ?? [key]);
+}
+
+/** The same, for car brands. */
+export function matchesCarBrand(key: string, text: string): boolean {
+  return matchesAny(text, CAR_BRAND_WORDS[key] ?? brandWords(key));
+}
+
 /* ------------------------------ hard filters ------------------------------ */
 
 /**

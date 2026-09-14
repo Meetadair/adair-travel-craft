@@ -13,7 +13,20 @@ export function normalizeName(value: string): string {
 }
 
 /** Words that carry no identity of their own. */
-const STOP = new Set(["hotel", "hotels", "the", "a", "an", "de", "la", "le", "du", "del", "of", "and"]);
+const STOP = new Set([
+  "hotel",
+  "hotels",
+  "the",
+  "a",
+  "an",
+  "de",
+  "la",
+  "le",
+  "du",
+  "del",
+  "of",
+  "and",
+]);
 
 function tokens(value: string): string[] {
   return normalizeName(value)
@@ -66,6 +79,30 @@ export type LineMatch = {
   criteria: Criterion[];
 };
 
+/** A fixed scale, so a hotel always reads against the same five dots. */
+export const MATCH_DOTS = 5;
+
+/**
+ * How many of the five dots to fill.
+ *
+ * The scale is fixed but the claim is not inflated: the dots are proportional
+ * to what was actually checked, and the sentence beside them always states the
+ * real numbers. Two criteria met out of two is five dots and "matches 2 of your
+ * 2 criteria" — the reader can see both.
+ *
+ * Null when nothing could be checked. Five dots for a traveller who has stated
+ * no preferences would be a score we have not earned.
+ */
+export function matchDots(match: LineMatch | null | undefined): number | null {
+  if (!match || match.total === 0) return null;
+  const filled = Math.round((match.met / match.total) * MATCH_DOTS);
+  // A partial match never shows as none, and a partial match never shows as
+  // perfect — the reader would take either as a fact.
+  if (match.met > 0 && filled === 0) return 1;
+  if (match.met < match.total && filled === MATCH_DOTS) return MATCH_DOTS - 1;
+  return filled;
+}
+
 export type MatchSummary = {
   flight: LineMatch | null;
   stay: LineMatch | null;
@@ -91,13 +128,12 @@ const flat = (value: string) =>
     .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase();
 
-const has = (text: string, needles: string[]) =>
-  needles.some((n) => flat(text).includes(flat(n)));
+const has = (text: string, needles: string[]) => needles.some((n) => flat(text).includes(flat(n)));
 
-const pretty = (value: string) =>
-  value.replace(/_/g, " ").replace(/^./, (c) => c.toUpperCase());
+const pretty = (value: string) => value.replace(/_/g, " ").replace(/^./, (c) => c.toUpperCase());
 
-const wanted = (list: string[]) => list.filter((v) => v && v !== "any" && v !== "nopref" && v !== "none");
+const wanted = (list: string[]) =>
+  list.filter((v) => v && v !== "any" && v !== "nopref" && v !== "none");
 
 /** Brand ids expand to the brand's name and aliases before matching supplier text. */
 const brandTerms = (list: string[]) => wanted(list).flatMap((id) => brandWords(id));
@@ -173,7 +209,9 @@ function stayCriteria(stay: StayResult, prefs: SearchPrefs): Criterion[] {
     const ok = has(`${stay.name} ${stay.address}`, types);
     out.push({
       ok,
-      label: ok ? `${pretty(types.find((t) => has(stay.name + stay.address, [t])) ?? types[0]!)} property` : `Not clearly a ${types.map(pretty).join(" / ")} property`,
+      label: ok
+        ? `${pretty(types.find((t) => has(stay.name + stay.address, [t])) ?? types[0]!)} property`
+        : `Not clearly a ${types.map(pretty).join(" / ")} property`,
     });
   }
   const amenities = wanted(prefs.hotelAmenities);
@@ -194,16 +232,16 @@ function carCriteria(car: CarResult, prefs: SearchPrefs): Criterion[] {
     const ok = has(car.vehicle, brands);
     out.push({
       ok,
-      label: ok ? `${car.vehicle} — a make you like` : `${car.vehicle} is not one of your preferred makes`,
+      label: ok
+        ? `${car.vehicle} — a make you like`
+        : `${car.vehicle} is not one of your preferred makes`,
     });
   }
   if (prefs.carClass && prefs.carClass !== "any") {
     const ok = has(car.vehicle, [prefs.carClass]);
     out.push({
       ok,
-      label: ok
-        ? `${pretty(prefs.carClass)} class`
-        : `Not clearly ${pretty(prefs.carClass)} class`,
+      label: ok ? `${pretty(prefs.carClass)} class` : `Not clearly ${pretty(prefs.carClass)} class`,
     });
   }
   if (prefs.carTransmission && prefs.carTransmission !== "any") {
@@ -228,10 +266,7 @@ function carCriteria(car: CarResult, prefs: SearchPrefs): Criterion[] {
   return out;
 }
 
-export function matchSummary(
-  search: TripSearchResponse,
-  prefs?: SearchPrefs | null,
-): MatchSummary {
+export function matchSummary(search: TripSearchResponse, prefs?: SearchPrefs | null): MatchSummary {
   if (!prefs) return { flight: null, stay: null, car: null };
   return {
     flight: search.flight ? summarise(flightCriteria(search.flight, prefs)) : null,
@@ -347,7 +382,14 @@ export function budgetStatus(
     ceilingEur: info.ceiling,
     overEur: over,
     culprit,
-    culpritLabel: culprit === "stay" ? "the hotel" : culprit === "flight" ? "the flight" : culprit === "car" ? "the car" : null,
+    culpritLabel:
+      culprit === "stay"
+        ? "the hotel"
+        : culprit === "flight"
+          ? "the flight"
+          : culprit === "car"
+            ? "the car"
+            : null,
     fixTotalEur,
   };
 }

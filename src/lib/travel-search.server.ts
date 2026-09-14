@@ -5,6 +5,9 @@
  * flagged sample data so the concept demo keeps working.
  */
 
+import { buildFlightOptions, type FlightOptions } from "@/lib/trip/flight-options";
+import type { TripRequest } from "@/lib/trip/types";
+
 export type TripOffer = {
   kind: "flight" | "hotel" | "car";
   title: string;
@@ -18,6 +21,12 @@ export type TripOffer = {
   images?: string[];
   /** Optional swap-in options (hotels): shown only on demand. */
   alternatives?: Array<Omit<TripOffer, "alternatives">>;
+  /**
+   * Flights only: two or three options with the trade-off spelled out — the
+   * fare difference, and what each choice costs after booking. Built
+   * server-side, where the bags and fare conditions live.
+   */
+  flightChoice?: FlightOptions;
 };
 
 export type TripSearchInput = {
@@ -49,8 +58,65 @@ function fmtDate(d: string) {
 
 /* ---------------- Duffel: flights ---------------- */
 
+/**
+ * Flights through the richer Duffel module: bags, fare conditions and refund
+ * penalties come back with each offer, so the card can show a choice with the
+ * trade-off spelled out instead of one bare price.
+ */
+async function duffelFlightWithChoice(input: TripSearchInput): Promise<TripOffer | null> {
+  const { hasDuffelKey, searchFlight } = await import("@/lib/trip/duffel.server");
+  if (!hasDuffelKey()) return null;
+
+  const request: TripRequest = {
+    originCity: input.originCity,
+    originIata: input.originIata,
+    destinationCity: input.destinationCity,
+    destinationIata: input.destinationIata,
+    lat: 0,
+    lon: 0,
+    departDate: input.departDate,
+    returnDate: input.returnDate,
+    cabinClass:
+      input.cabinClass === "business" ||
+      input.cabinClass === "first" ||
+      input.cabinClass === "premium_economy"
+        ? input.cabinClass
+        : "economy",
+    passengers: 1,
+    hotelWish: null,
+    hotelNameExact: null,
+    carNameExact: null,
+    invoiceToCompany: false,
+    needsCar: false,
+    stops: [],
+  };
+
+  const found = await searchFlight(request);
+  if (!found) return null;
+
+  const { flight, alternatives } = found;
+  const choice = buildFlightOptions(flight, alternatives);
+
+  const seg = `${input.originIata} → ${flight.destinationIata ?? input.destinationIata}`;
+  const dep = flight.departAt.slice(11, 16);
+  const arr = flight.arriveAt.slice(11, 16);
+
+  return {
+    kind: "flight",
+    title: `${flight.carrier} ${flight.flightNumbers[0] ?? ""} · ${seg}`.trim(),
+    detail: `Departure ${fmtDate(input.departDate)} ${dep} – ${arr} · return ${fmtDate(input.returnDate)} · ${flight.cabin.replace("_", " ")}`,
+    provider: "Duffel",
+    offerReference: flight.offerId,
+    amount: round(flight.amount),
+    currency: flight.currency,
+    live: true,
+    ...(choice.options.length > 1 ? { flightChoice: choice } : {}),
+  };
+}
+
 async function duffelFlight(input: TripSearchInput): Promise<TripOffer | null> {
-  const token = process.env["DUFFEL_ACCESS_TOKEN"];
+  // The rest of the codebase reads DUFFEL_API_KEY; the older name stays as a fallback.
+  const token = process.env["DUFFEL_API_KEY"] ?? process.env["DUFFEL_ACCESS_TOKEN"];
   if (!token) return null;
 
   const cabin =
@@ -115,9 +181,7 @@ async function duffelFlight(input: TripSearchInput): Promise<TripOffer | null> {
 
   const offers = json.data?.offers ?? [];
   if (!offers.length) return null;
-  const best = offers
-    .slice()
-    .sort((a, b) => Number(a.total_amount) - Number(b.total_amount))[0]!;
+  const best = offers.slice().sort((a, b) => Number(a.total_amount) - Number(b.total_amount))[0]!;
 
   const seg = best.slices?.[0]?.segments?.[0];
   const carrier = seg?.marketing_carrier?.name ?? best.owner?.name ?? "Carrier";
@@ -161,10 +225,7 @@ async function amadeusToken(): Promise<string | null> {
   return json.access_token ?? null;
 }
 
-async function amadeusFlight(
-  input: TripSearchInput,
-  token: string,
-): Promise<TripOffer | null> {
+async function amadeusFlight(input: TripSearchInput, token: string): Promise<TripOffer | null> {
   const params = new URLSearchParams({
     originLocationCode: input.originIata,
     destinationLocationCode: input.destinationIata,
@@ -202,7 +263,8 @@ async function amadeusFlight(
   const seg = best.itineraries?.[0]?.segments?.[0];
   return {
     kind: "flight",
-    title: `${seg?.carrierCode ?? ""} ${seg?.number ?? ""} · ${input.originIata} → ${input.destinationIata}`.trim(),
+    title:
+      `${seg?.carrierCode ?? ""} ${seg?.number ?? ""} · ${input.originIata} → ${input.destinationIata}`.trim(),
     detail: `Departure ${fmtDate(input.departDate)} ${seg?.departure?.at?.slice(11, 16) ?? ""} – ${seg?.arrival?.at?.slice(11, 16) ?? ""} · return ${fmtDate(input.returnDate)}`,
     provider: "Amadeus",
     offerReference: `AM-FL-${best.id}`,
@@ -212,10 +274,7 @@ async function amadeusFlight(
   };
 }
 
-async function amadeusHotel(
-  input: TripSearchInput,
-  token: string,
-): Promise<TripOffer | null> {
+async function amadeusHotel(input: TripSearchInput, token: string): Promise<TripOffer | null> {
   const cityRes = await fetch(
     `https://test.api.amadeus.com/v1/reference-data/locations/hotels/by-city?cityCode=${encodeURIComponent(
       input.destinationIata,
@@ -269,8 +328,7 @@ async function amadeusHotel(
   const nights = Math.max(
     1,
     Math.round(
-      (new Date(input.returnDate).getTime() - new Date(input.departDate).getTime()) /
-        86_400_000,
+      (new Date(input.returnDate).getTime() - new Date(input.departDate).getTime()) / 86_400_000,
     ),
   );
 
@@ -305,8 +363,7 @@ function demoOffers(input: TripSearchInput): TripOffer[] {
   const nights = Math.max(
     1,
     Math.round(
-      (new Date(input.returnDate).getTime() - new Date(input.departDate).getTime()) /
-        86_400_000,
+      (new Date(input.returnDate).getTime() - new Date(input.departDate).getTime()) / 86_400_000,
     ),
   );
   const offers: TripOffer[] = [
@@ -386,16 +443,16 @@ export async function searchTrip(input: TripSearchInput): Promise<TripSearchResu
 
   let flight: TripOffer | null = null;
   try {
-    flight = await duffelFlight(input);
+    // The rich path first; the thin one stays as the fallback so a Duffel
+    // hiccup never empties the card.
+    flight = (await duffelFlightWithChoice(input).catch(() => null)) ?? (await duffelFlight(input));
   } catch {
     warnings.push("No live flight offers came back — showing a sample value.");
   }
 
   const token = await amadeusToken();
   if (!token && !flight) {
-    warnings.push(
-      "Live search is not switched on yet — the card contains sample data.",
-    );
+    warnings.push("Live search is not switched on yet — the card contains sample data.");
   }
 
   if (!flight && token) {

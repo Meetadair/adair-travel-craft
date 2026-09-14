@@ -51,11 +51,21 @@ export const askAdair = createServerFn({ method: "POST" })
 
     const history: ChatMessage[] = data.messages.slice(-MAX_HISTORY);
 
+    // Read the name server-side: the browser could claim to be anyone.
+    const profile = await supabase
+      .from("profiles")
+      .select("full_name")
+      .eq("id", userId)
+      .maybeSingle();
+    const fullName = (profile.data as { full_name?: string | null } | null)?.full_name ?? "";
+    const firstName = fullName.trim().split(/\s+/)[0] || null;
+
     const result = await runAgent(
       history,
       {
         today: new Date().toISOString().slice(0, 10),
         locale: data.locale,
+        firstName,
         city: data.city,
         hotel: data.hotel,
       },

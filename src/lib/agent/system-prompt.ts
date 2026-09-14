@@ -9,6 +9,8 @@
 export type PromptContext = {
   today: string;
   locale: string;
+  /** What to call them. First name only — never the full name back at them. */
+  firstName: string | null;
   /** Set when the traveller is mid-trip or has a card open. */
   city: string | null;
   hotel: { name: string; lat: number; lon: number } | null;
@@ -47,6 +49,12 @@ export function systemPrompt(context: PromptContext): string {
     `Today is ${context.today}. Reply in ${context.locale}.`,
   ];
 
+  if (context.firstName) {
+    lines.push(
+      `Their name is ${context.firstName}. Use it in a greeting and sparingly after that —`,
+      "repeating someone's name in every line is what a call centre does.",
+    );
+  }
   if (context.city) {
     lines.push(`The traveller is asking about ${context.city}.`);
   }

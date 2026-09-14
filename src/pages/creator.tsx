@@ -11,6 +11,7 @@ import {
   submitCreatorPlace,
 } from "@/lib/creators.functions";
 import { eur } from "@/lib/trip/client";
+import { AppFooter } from "@/components/app-footer";
 
 const money = (minor: number) => eur(minor / 100);
 
@@ -19,7 +20,10 @@ export function CreatorPage() {
   const fetchDestinations = useServerFn(listGetawayDestinationsForCreators);
   const submitPlace = useServerFn(submitCreatorPlace);
 
-  const dashboard = useQuery({ queryKey: ["creator-dashboard"], queryFn: () => fetchDashboard({}) });
+  const dashboard = useQuery({
+    queryKey: ["creator-dashboard"],
+    queryFn: () => fetchDashboard({}),
+  });
   const destinations = useQuery({
     queryKey: ["creator-destinations"],
     queryFn: () => fetchDestinations({}),
@@ -111,8 +115,8 @@ export function CreatorPage() {
           <>
             {data.creator.status !== "approved" && (
               <p className="hairline-card mt-6 p-4 text-sm">
-                Your account is <span className="font-medium">{data.creator.status}</span>. Your link
-                starts attributing once it is approved.
+                Your account is <span className="font-medium">{data.creator.status}</span>. Your
+                link starts attributing once it is approved.
               </p>
             )}
 
@@ -176,9 +180,7 @@ export function CreatorPage() {
               {data.months.map((month) => (
                 <div key={month.month} className="flex flex-wrap gap-x-6 gap-y-1 p-4 text-sm">
                   <span className="font-medium">{month.month}</span>
-                  <span className="text-muted-foreground">
-                    pending {money(month.pendingMinor)}
-                  </span>
+                  <span className="text-muted-foreground">pending {money(month.pendingMinor)}</span>
                   <span className="text-muted-foreground">
                     confirmed {money(month.confirmedMinor)}
                   </span>
@@ -340,6 +342,7 @@ export function CreatorPage() {
           </>
         )}
       </main>
+      <AppFooter />
     </div>
   );
 }

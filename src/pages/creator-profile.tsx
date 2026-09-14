@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { SiteNav } from "@/components/site-nav";
 import { getCreatorProfile, recordCreatorClick } from "@/lib/creators.functions";
+import { AppFooter } from "@/components/app-footer";
 
 export const CREATOR_STORAGE_KEY = "adair.creator";
 
@@ -83,9 +84,7 @@ export function CreatorProfilePage({ handle }: { handle: string }) {
 
             <h2 className="mt-10 text-sm font-medium">Their picks</h2>
             {data.picks.length === 0 && (
-              <p className="mt-2 text-sm text-muted-foreground">
-                No approved picks yet.
-              </p>
+              <p className="mt-2 text-sm text-muted-foreground">No approved picks yet.</p>
             )}
             <ul className="mt-3 space-y-4">
               {data.picks.map((pick) => (
@@ -137,6 +136,7 @@ export function CreatorProfilePage({ handle }: { handle: string }) {
           </>
         )}
       </main>
+      <AppFooter />
     </div>
   );
 }

@@ -7,6 +7,7 @@ import { TOOLS, distanceAndTimeInput, findPlacesInput, travelMinutes, toolFailur
 const promptContext = {
   today: "2026-09-13",
   locale: "en",
+  firstName: null,
   city: null,
   hotel: null,
 };
@@ -66,6 +67,12 @@ describe("systemPrompt", () => {
 
   it("forbids calling itself an AI", () => {
     expect(systemPrompt(promptContext)).toMatch(/never say AI/i);
+  });
+
+  it("greets by first name when we know it, without overusing it", () => {
+    const named = systemPrompt({ ...promptContext, firstName: "Mark" });
+    expect(named).toContain("Mark");
+    expect(named).toMatch(/sparingly/i);
   });
 
   it("mentions the hotel as the reference point when one is open", () => {

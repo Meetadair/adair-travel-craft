@@ -8,6 +8,7 @@ import { listMyInvoices, type InvoiceTrip } from "@/lib/invoices.functions";
 import { downloadInvoiceFor } from "@/lib/invoice-download";
 import { useLocale } from "@/lib/i18n";
 import { eur } from "@/lib/trip/client";
+import { AppFooter } from "@/components/app-footer";
 
 export function InvoicesPage() {
   const locale = useLocale();
@@ -132,6 +133,7 @@ export function InvoicesPage() {
           ))}
         </div>
       </main>
+      <AppFooter />
     </div>
   );
 }

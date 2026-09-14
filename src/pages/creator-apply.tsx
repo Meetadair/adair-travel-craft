@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { SiteNav } from "@/components/site-nav";
 import { applyAsCreator, getCreatorDashboard } from "@/lib/creators.functions";
+import { AppFooter } from "@/components/app-footer";
 
 const NETWORKS = ["instagram", "tiktok", "youtube", "blog"] as const;
 
@@ -53,7 +54,8 @@ export function CreatorApplyPage() {
         <h1 className="font-display text-3xl font-semibold tracking-tight">Creator programme</h1>
         <p className="mt-3 text-sm text-muted-foreground">
           You earn a share of what we earn, only when someone books. Nobody can pay to be
-          recommended, and you cannot pay to be listed — that is what makes your picks worth reading.
+          recommended, and you cannot pay to be listed — that is what makes your picks worth
+          reading.
         </p>
 
         {already && (
@@ -182,6 +184,7 @@ export function CreatorApplyPage() {
           )}
         </form>
       </main>
+      <AppFooter />
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { SiteNav } from "@/components/site-nav";
 import { getAccount } from "@/lib/account.functions";
 import { LocaleLink, useLocale, useT } from "@/lib/i18n";
+import { AppFooter } from "@/components/app-footer";
 
 export function AuthPage() {
   const navigate = useNavigate();
@@ -45,6 +46,12 @@ export function AuthPage() {
           },
         });
         if (signUpError) throw signUpError;
+        if (data.user && (data.user.identities?.length ?? 0) === 0) {
+          setMode("signin");
+          setPassword("");
+          setError(t.auth.accountExists);
+          return;
+        }
         if (data.session) {
           await continueAfterSignIn();
           return;
@@ -162,6 +169,18 @@ export function AuthPage() {
             />
           </label>
 
+          {mode === "signin" && (
+            <p className="text-sm">
+              <LocaleLink
+                to="/reset-password"
+                locale={locale}
+                className="text-muted-foreground underline decoration-border underline-offset-4 hover:text-foreground"
+              >
+                {t.auth.forgotPassword}
+              </LocaleLink>
+            </p>
+          )}
+
           {error && <p className="text-sm text-primary">{error}</p>}
           {message && <p className="text-sm text-muted-foreground">{message}</p>}
 
@@ -192,6 +211,7 @@ export function AuthPage() {
           </LocaleLink>
         </p>
       </main>
+      <AppFooter />
     </div>
   );
 }

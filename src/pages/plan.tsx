@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Check } from "lucide-react";
 import { SiteNav } from "@/components/site-nav";
 import { getAccount } from "@/lib/account.functions";
+import { AppFooter } from "@/components/app-footer";
 
 const PLANS = [
   {
@@ -75,6 +76,7 @@ export function PlanPage() {
           ))}
         </div>
       </main>
+      <AppFooter />
     </div>
   );
 }

@@ -72,6 +72,9 @@ export type AdminUser = {
   plan: string;
   is_admin: boolean;
   onboarded: boolean;
+  phone: string | null;
+  registered_at: string | null;
+  trips_booked: number;
   preferences_filled: number;
 };
 
@@ -138,7 +141,7 @@ export const getAdminOverview = createServerFn({ method: "GET" })
         .limit(100),
       sb
         .from("profiles")
-        .select("id, full_name, plan, is_admin, onboarded")
+        .select("id, full_name, plan, is_admin, onboarded, traveller_phone, created_at")
         .order("created_at", { ascending: false })
         .limit(200),
       sb
@@ -146,10 +149,7 @@ export const getAdminOverview = createServerFn({ method: "GET" })
         .select("id, message, route, created_at")
         .order("created_at", { ascending: false })
         .limit(50),
-      sb
-        .from("global_stay_rules")
-        .select("id, rule_key, label, hint, enabled")
-        .order("rule_key"),
+      sb.from("global_stay_rules").select("id, rule_key, label, hint, enabled").order("rule_key"),
     ]);
 
     const emails = new Map<string, string | null>();
@@ -160,9 +160,24 @@ export const getAdminOverview = createServerFn({ method: "GET" })
       // Email display is a nicety; the panel still works without it.
     }
 
+    // Booked trips per traveller — the difference between a signup and a
+    // customer. Counted from ids only; nothing heavier is needed here.
+    const bookedByUser = new Map<string, number>();
+    try {
+      const booked = await sb.from("trips").select("user_id").eq("status", "booked").limit(5000);
+      for (const row of booked.data ?? []) {
+        const id = String((row as { user_id: string }).user_id);
+        bookedByUser.set(id, (bookedByUser.get(id) ?? 0) + 1);
+      }
+    } catch {
+      // The panel still stands without the count.
+    }
+
     const prefs = await sb
       .from("preferences")
-      .select("user_id, airlines, hotel_chains, hotel_amenities, car_brands, cuisines, interests, music, budget_band");
+      .select(
+        "user_id, airlines, hotel_chains, hotel_amenities, car_brands, cuisines, interests, music, budget_band",
+      );
     const filled = new Map<string, number>();
     for (const row of prefs.data ?? []) {
       const record = row as Record<string, unknown>;
@@ -198,6 +213,9 @@ export const getAdminOverview = createServerFn({ method: "GET" })
         id: String(profile["id"]),
         email: emails.get(String(profile["id"])) ?? null,
         full_name: (profile["full_name"] as string | null) ?? null,
+        phone: (profile["traveller_phone"] as string | null) ?? null,
+        registered_at: (profile["created_at"] as string | null) ?? null,
+        trips_booked: bookedByUser.get(String(profile["id"])) ?? 0,
         plan: String(profile["plan"] ?? "free"),
         is_admin: Boolean(profile["is_admin"]),
         onboarded: Boolean(profile["onboarded"]),
@@ -253,11 +271,18 @@ export const savePricingRule = createServerFn({ method: "POST" })
       })
       .eq("id", data.id);
     if (error) throw new Error(error.message);
-    await writeAudit(sb, context.userId, "pricing_rule.update", `pricing_rules:${data.id}`, before.data, {
-      markup_bps: data.markupBps,
-      discount_bps: data.discountBps,
-      change_fee_minor: data.changeFeeMinor,
-    });
+    await writeAudit(
+      sb,
+      context.userId,
+      "pricing_rule.update",
+      `pricing_rules:${data.id}`,
+      before.data,
+      {
+        markup_bps: data.markupBps,
+        discount_bps: data.discountBps,
+        change_fee_minor: data.changeFeeMinor,
+      },
+    );
     return { ok: true };
   });
 
@@ -269,7 +294,10 @@ export const setProviderEnabled = createServerFn({ method: "POST" })
   .handler(async ({ context, data }): Promise<{ ok: true }> => {
     await assertAdmin(context.supabase, context.userId);
     const sb = await admin();
-    const { error } = await sb.from("providers").update({ enabled: data.enabled }).eq("id", data.id);
+    const { error } = await sb
+      .from("providers")
+      .update({ enabled: data.enabled })
+      .eq("id", data.id);
     if (error) throw new Error(error.message);
     await writeAudit(sb, context.userId, "provider.toggle", `providers:${data.id}`, null, {
       enabled: data.enabled,
@@ -290,9 +318,16 @@ export const setGlobalStayRuleEnabled = createServerFn({ method: "POST" })
       .update({ enabled: data.enabled })
       .eq("id", data.id);
     if (error) throw new Error(error.message);
-    await writeAudit(sb, context.userId, "global_stay_rule.toggle", `global_stay_rules:${data.id}`, null, {
-      enabled: data.enabled,
-    });
+    await writeAudit(
+      sb,
+      context.userId,
+      "global_stay_rule.toggle",
+      `global_stay_rules:${data.id}`,
+      null,
+      {
+        enabled: data.enabled,
+      },
+    );
     return { ok: true };
   });
 
@@ -390,13 +425,13 @@ export const listWaitlist = createServerFn({ method: "GET" })
       .limit(200);
     if (res.error) throw new Error(res.error.message);
     return ((res.data ?? []) as Array<Record<string, unknown>>).map((row) => ({
-      id: String(row['id']),
-      email: String(row['email']),
-      type: String(row['type']),
-      createdAt: String(row['created_at']),
-      invitedAt: (row['invited_at'] as string | null) ?? null,
-      inviteError: (row['invite_error'] as string | null) ?? null,
-      hasAccount: Boolean(row['user_id']),
+      id: String(row["id"]),
+      email: String(row["email"]),
+      type: String(row["type"]),
+      createdAt: String(row["created_at"]),
+      invitedAt: (row["invited_at"] as string | null) ?? null,
+      inviteError: (row["invite_error"] as string | null) ?? null,
+      hasAccount: Boolean(row["user_id"]),
     }));
   });
 
@@ -409,63 +444,65 @@ export const inviteWaitlist = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) =>
     z.object({ ids: z.array(z.string().uuid()).min(1).max(50) }).parse(input),
   )
-  .handler(async ({ context, data }): Promise<{ invited: number; skipped: number; failed: number }> => {
-    await assertAdmin(context.supabase, context.userId);
-    const sb = await admin();
-    const res = await sb
-      .from("waitlist")
-      .select("id, email, invited_at, user_id")
-      .in("id", data.ids);
-    if (res.error) throw new Error(res.error.message);
+  .handler(
+    async ({ context, data }): Promise<{ invited: number; skipped: number; failed: number }> => {
+      await assertAdmin(context.supabase, context.userId);
+      const sb = await admin();
+      const res = await sb
+        .from("waitlist")
+        .select("id, email, invited_at, user_id")
+        .in("id", data.ids);
+      if (res.error) throw new Error(res.error.message);
 
-    let invited = 0;
-    let skipped = 0;
-    let failed = 0;
+      let invited = 0;
+      let skipped = 0;
+      let failed = 0;
 
-    for (const row of (res.data ?? []) as Array<{
-      id: string;
-      email: string;
-      invited_at: string | null;
-      user_id: string | null;
-    }>) {
-      if (row.invited_at || row.user_id) {
-        skipped += 1;
-        continue;
+      for (const row of (res.data ?? []) as Array<{
+        id: string;
+        email: string;
+        invited_at: string | null;
+        user_id: string | null;
+      }>) {
+        if (row.invited_at || row.user_id) {
+          skipped += 1;
+          continue;
+        }
+        const result = await sb.auth.admin.inviteUserByEmail(row.email);
+        if (result.error) {
+          // Already registered counts as reconciled, not as a failure.
+          const message = result.error.message;
+          const known = /already/i.test(message);
+          await sb
+            .from("waitlist")
+            .update({
+              invited_at: known ? new Date().toISOString() : null,
+              invite_error: known ? null : message,
+            })
+            .eq("id", row.id);
+          if (known) invited += 1;
+          else failed += 1;
+        } else {
+          await sb
+            .from("waitlist")
+            .update({
+              invited_at: new Date().toISOString(),
+              invite_error: null,
+              user_id: result.data.user?.id ?? null,
+            })
+            .eq("id", row.id);
+          invited += 1;
+        }
       }
-      const result = await sb.auth.admin.inviteUserByEmail(row.email);
-      if (result.error) {
-        // Already registered counts as reconciled, not as a failure.
-        const message = result.error.message;
-        const known = /already/i.test(message);
-        await sb
-          .from("waitlist")
-          .update({
-            invited_at: known ? new Date().toISOString() : null,
-            invite_error: known ? null : message,
-          })
-          .eq("id", row.id);
-        if (known) invited += 1;
-        else failed += 1;
-      } else {
-        await sb
-          .from("waitlist")
-          .update({
-            invited_at: new Date().toISOString(),
-            invite_error: null,
-            user_id: result.data.user?.id ?? null,
-          })
-          .eq("id", row.id);
-        invited += 1;
-      }
-    }
 
-    await writeAudit(sb, context.userId, "waitlist.invite", "waitlist", null, {
-      invited,
-      skipped,
-      failed,
-    });
-    return { invited, skipped, failed };
-  });
+      await writeAudit(sb, context.userId, "waitlist.invite", "waitlist", null, {
+        invited,
+        skipped,
+        failed,
+      });
+      return { invited, skipped, failed };
+    },
+  );
 
 /* ------------------------------ help requests ------------------------------ */
 

@@ -13,6 +13,7 @@ import { CREATOR_STORAGE_KEY } from "@/pages/creator-profile";
 import { REFERRAL_STORAGE_KEY } from "@/routes/r.$code";
 import { downloadTripInvoice } from "@/lib/trip-pdf";
 import { useLocale, useT } from "@/lib/i18n";
+import { AppFooter } from "@/components/app-footer";
 
 const ICONS: Record<string, React.ReactNode> = {
   flight: <Plane className="size-4" />,
@@ -307,6 +308,7 @@ export function DashboardPage() {
           </form>
         </section>
       </main>
+      <AppFooter />
     </div>
   );
 }

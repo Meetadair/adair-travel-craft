@@ -12,16 +12,22 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LangRouteImport } from './routes/$lang'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as AssistantRouteImport } from './routes/assistant'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as BusinessRouteImport } from './routes/business'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as CookiesRouteImport } from './routes/cookies'
+import { Route as CooperationRouteImport } from './routes/cooperation'
 import { Route as CreatorsRouteImport } from './routes/creators'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as LangIndexRouteImport } from './routes/$lang.index'
 import { Route as LangAssistantRouteImport } from './routes/$lang.assistant'
 import { Route as LangAuthRouteImport } from './routes/$lang.auth'
 import { Route as LangBusinessRouteImport } from './routes/$lang.business'
+import { Route as LangResetPasswordRouteImport } from './routes/$lang.reset-password'
 import { Route as AuthenticatedCreatorRouteImport } from './routes/_authenticated/creator'
 import { Route as AuthenticatedCreditRouteImport } from './routes/_authenticated/credit'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
@@ -49,6 +55,8 @@ import { Route as ApiPublicTripRemindersRouteImport } from './routes/api/public/
 import { Route as ApiTripParseRouteImport } from './routes/api/trip/parse'
 import { Route as ApiTripPriceContextRouteImport } from './routes/api/trip/price-context'
 import { Route as ApiTripSearchRouteImport } from './routes/api/trip/search'
+import { Route as GetawayRoutesIndexRouteImport } from './routes/getaway.routes.index'
+import { Route as GetawayRoutesSlugRouteImport } from './routes/getaway.routes.$slug'
 import { Route as AuthenticatedTripsTripIdChangeRouteImport } from './routes/_authenticated/trips.$tripId.change'
 import { Route as ApiPublicGetawayImageSplatRouteImport } from './routes/api/public/getaway-image.$'
 import { Route as ApiPublicSupplierOrderUpdatedRouteImport } from './routes/api/public/supplier/order-updated'
@@ -69,6 +77,11 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AssistantRoute = AssistantRouteImport.update({
   id: '/assistant',
   path: '/assistant',
@@ -84,6 +97,21 @@ const BusinessRoute = BusinessRouteImport.update({
   path: '/business',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CookiesRoute = CookiesRouteImport.update({
+  id: '/cookies',
+  path: '/cookies',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CooperationRoute = CooperationRouteImport.update({
+  id: '/cooperation',
+  path: '/cooperation',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CreatorsRoute = CreatorsRouteImport.update({
   id: '/creators',
   path: '/creators',
@@ -92,6 +120,11 @@ const CreatorsRoute = CreatorsRouteImport.update({
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TermsRoute = TermsRouteImport.update({
@@ -117,6 +150,11 @@ const LangAuthRoute = LangAuthRouteImport.update({
 const LangBusinessRoute = LangBusinessRouteImport.update({
   id: '/business',
   path: '/business',
+  getParentRoute: () => LangRoute,
+} as any)
+const LangResetPasswordRoute = LangResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => LangRoute,
 } as any)
 const AuthenticatedCreatorRoute = AuthenticatedCreatorRouteImport.update({
@@ -261,6 +299,16 @@ const ApiTripSearchRoute = ApiTripSearchRouteImport.update({
   path: '/api/trip/search',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GetawayRoutesIndexRoute = GetawayRoutesIndexRouteImport.update({
+  id: '/getaway/routes/',
+  path: '/getaway/routes/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GetawayRoutesSlugRoute = GetawayRoutesSlugRouteImport.update({
+  id: '/getaway/routes/$slug',
+  path: '/getaway/routes/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedTripsTripIdChangeRoute =
   AuthenticatedTripsTripIdChangeRouteImport.update({
     id: '/$tripId/change',
@@ -295,15 +343,21 @@ const ApiPublicCalendarFeedTokenRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$lang': typeof LangRouteWithChildren
+  '/about': typeof AboutRoute
   '/assistant': typeof AssistantRoute
   '/auth': typeof AuthRoute
   '/business': typeof BusinessRoute
+  '/contact': typeof ContactRoute
+  '/cookies': typeof CookiesRoute
+  '/cooperation': typeof CooperationRoute
   '/creators': typeof CreatorsRoute
   '/privacy': typeof PrivacyRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/terms': typeof TermsRoute
   '/$lang/assistant': typeof LangAssistantRoute
   '/$lang/auth': typeof LangAuthRoute
   '/$lang/business': typeof LangBusinessRoute
+  '/$lang/reset-password': typeof LangResetPasswordRoute
   '/creator': typeof AuthenticatedCreatorRoute
   '/credit': typeof AuthenticatedCreditRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -331,7 +385,9 @@ export interface FileRoutesByFullPath {
   '/api/trip/parse': typeof ApiTripParseRoute
   '/api/trip/price-context': typeof ApiTripPriceContextRoute
   '/api/trip/search': typeof ApiTripSearchRoute
+  '/getaway/routes/$slug': typeof GetawayRoutesSlugRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/getaway/routes/': typeof GetawayRoutesIndexRoute
   '/trips/$tripId/change': typeof AuthenticatedTripsTripIdChangeRoute
   '/api/public/getaway-image/$': typeof ApiPublicGetawayImageSplatRoute
   '/api/public/supplier/order-updated': typeof ApiPublicSupplierOrderUpdatedRoute
@@ -340,15 +396,21 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/assistant': typeof AssistantRoute
   '/auth': typeof AuthRoute
   '/business': typeof BusinessRoute
+  '/contact': typeof ContactRoute
+  '/cookies': typeof CookiesRoute
+  '/cooperation': typeof CooperationRoute
   '/creators': typeof CreatorsRoute
   '/privacy': typeof PrivacyRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/terms': typeof TermsRoute
   '/$lang/assistant': typeof LangAssistantRoute
   '/$lang/auth': typeof LangAuthRoute
   '/$lang/business': typeof LangBusinessRoute
+  '/$lang/reset-password': typeof LangResetPasswordRoute
   '/creator': typeof AuthenticatedCreatorRoute
   '/credit': typeof AuthenticatedCreditRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -376,7 +438,9 @@ export interface FileRoutesByTo {
   '/api/trip/parse': typeof ApiTripParseRoute
   '/api/trip/price-context': typeof ApiTripPriceContextRoute
   '/api/trip/search': typeof ApiTripSearchRoute
+  '/getaway/routes/$slug': typeof GetawayRoutesSlugRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/getaway/routes': typeof GetawayRoutesIndexRoute
   '/trips/$tripId/change': typeof AuthenticatedTripsTripIdChangeRoute
   '/api/public/getaway-image/$': typeof ApiPublicGetawayImageSplatRoute
   '/api/public/supplier/order-updated': typeof ApiPublicSupplierOrderUpdatedRoute
@@ -388,15 +452,21 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/$lang': typeof LangRouteWithChildren
+  '/about': typeof AboutRoute
   '/assistant': typeof AssistantRoute
   '/auth': typeof AuthRoute
   '/business': typeof BusinessRoute
+  '/contact': typeof ContactRoute
+  '/cookies': typeof CookiesRoute
+  '/cooperation': typeof CooperationRoute
   '/creators': typeof CreatorsRoute
   '/privacy': typeof PrivacyRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/terms': typeof TermsRoute
   '/$lang/assistant': typeof LangAssistantRoute
   '/$lang/auth': typeof LangAuthRoute
   '/$lang/business': typeof LangBusinessRoute
+  '/$lang/reset-password': typeof LangResetPasswordRoute
   '/_authenticated/creator': typeof AuthenticatedCreatorRoute
   '/_authenticated/credit': typeof AuthenticatedCreditRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
@@ -424,7 +494,9 @@ export interface FileRoutesById {
   '/api/trip/parse': typeof ApiTripParseRoute
   '/api/trip/price-context': typeof ApiTripPriceContextRoute
   '/api/trip/search': typeof ApiTripSearchRoute
+  '/getaway/routes/$slug': typeof GetawayRoutesSlugRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/getaway/routes/': typeof GetawayRoutesIndexRoute
   '/_authenticated/trips/$tripId/change': typeof AuthenticatedTripsTripIdChangeRoute
   '/api/public/getaway-image/$': typeof ApiPublicGetawayImageSplatRoute
   '/api/public/supplier/order-updated': typeof ApiPublicSupplierOrderUpdatedRoute
@@ -436,15 +508,21 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/$lang'
+    | '/about'
     | '/assistant'
     | '/auth'
     | '/business'
+    | '/contact'
+    | '/cookies'
+    | '/cooperation'
     | '/creators'
     | '/privacy'
+    | '/reset-password'
     | '/terms'
     | '/$lang/assistant'
     | '/$lang/auth'
     | '/$lang/business'
+    | '/$lang/reset-password'
     | '/creator'
     | '/credit'
     | '/dashboard'
@@ -472,7 +550,9 @@ export interface FileRouteTypes {
     | '/api/trip/parse'
     | '/api/trip/price-context'
     | '/api/trip/search'
+    | '/getaway/routes/$slug'
     | '/admin/'
+    | '/getaway/routes/'
     | '/trips/$tripId/change'
     | '/api/public/getaway-image/$'
     | '/api/public/supplier/order-updated'
@@ -481,15 +561,21 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/about'
     | '/assistant'
     | '/auth'
     | '/business'
+    | '/contact'
+    | '/cookies'
+    | '/cooperation'
     | '/creators'
     | '/privacy'
+    | '/reset-password'
     | '/terms'
     | '/$lang/assistant'
     | '/$lang/auth'
     | '/$lang/business'
+    | '/$lang/reset-password'
     | '/creator'
     | '/credit'
     | '/dashboard'
@@ -517,7 +603,9 @@ export interface FileRouteTypes {
     | '/api/trip/parse'
     | '/api/trip/price-context'
     | '/api/trip/search'
+    | '/getaway/routes/$slug'
     | '/admin'
+    | '/getaway/routes'
     | '/trips/$tripId/change'
     | '/api/public/getaway-image/$'
     | '/api/public/supplier/order-updated'
@@ -528,15 +616,21 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/$lang'
+    | '/about'
     | '/assistant'
     | '/auth'
     | '/business'
+    | '/contact'
+    | '/cookies'
+    | '/cooperation'
     | '/creators'
     | '/privacy'
+    | '/reset-password'
     | '/terms'
     | '/$lang/assistant'
     | '/$lang/auth'
     | '/$lang/business'
+    | '/$lang/reset-password'
     | '/_authenticated/creator'
     | '/_authenticated/credit'
     | '/_authenticated/dashboard'
@@ -564,7 +658,9 @@ export interface FileRouteTypes {
     | '/api/trip/parse'
     | '/api/trip/price-context'
     | '/api/trip/search'
+    | '/getaway/routes/$slug'
     | '/_authenticated/admin/'
+    | '/getaway/routes/'
     | '/_authenticated/trips/$tripId/change'
     | '/api/public/getaway-image/$'
     | '/api/public/supplier/order-updated'
@@ -576,11 +672,16 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   LangRoute: typeof LangRouteWithChildren
+  AboutRoute: typeof AboutRoute
   AssistantRoute: typeof AssistantRoute
   AuthRoute: typeof AuthRoute
   BusinessRoute: typeof BusinessRoute
+  ContactRoute: typeof ContactRoute
+  CookiesRoute: typeof CookiesRoute
+  CooperationRoute: typeof CooperationRoute
   CreatorsRoute: typeof CreatorsRoute
   PrivacyRoute: typeof PrivacyRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   TermsRoute: typeof TermsRoute
   CHandleRoute: typeof CHandleRoute
   RCodeRoute: typeof RCodeRoute
@@ -590,6 +691,8 @@ export interface RootRouteChildren {
   ApiTripParseRoute: typeof ApiTripParseRoute
   ApiTripPriceContextRoute: typeof ApiTripPriceContextRoute
   ApiTripSearchRoute: typeof ApiTripSearchRoute
+  GetawayRoutesSlugRoute: typeof GetawayRoutesSlugRoute
+  GetawayRoutesIndexRoute: typeof GetawayRoutesIndexRoute
   ApiPublicGetawayImageSplatRoute: typeof ApiPublicGetawayImageSplatRoute
   ApiPublicSupplierOrderUpdatedRoute: typeof ApiPublicSupplierOrderUpdatedRoute
   ApiPublicCalendarCallbackProviderRoute: typeof ApiPublicCalendarCallbackProviderRoute
@@ -619,6 +722,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/assistant': {
       id: '/assistant'
       path: '/assistant'
@@ -640,6 +750,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BusinessRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cookies': {
+      id: '/cookies'
+      path: '/cookies'
+      fullPath: '/cookies'
+      preLoaderRoute: typeof CookiesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cooperation': {
+      id: '/cooperation'
+      path: '/cooperation'
+      fullPath: '/cooperation'
+      preLoaderRoute: typeof CooperationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/creators': {
       id: '/creators'
       path: '/creators'
@@ -652,6 +783,13 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/terms': {
@@ -687,6 +825,13 @@ declare module '@tanstack/react-router' {
       path: '/business'
       fullPath: '/$lang/business'
       preLoaderRoute: typeof LangBusinessRouteImport
+      parentRoute: typeof LangRoute
+    }
+    '/$lang/reset-password': {
+      id: '/$lang/reset-password'
+      path: '/reset-password'
+      fullPath: '/$lang/reset-password'
+      preLoaderRoute: typeof LangResetPasswordRouteImport
       parentRoute: typeof LangRoute
     }
     '/_authenticated/creator': {
@@ -878,6 +1023,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiTripSearchRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/getaway/routes/': {
+      id: '/getaway/routes/'
+      path: '/getaway/routes'
+      fullPath: '/getaway/routes/'
+      preLoaderRoute: typeof GetawayRoutesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/getaway/routes/$slug': {
+      id: '/getaway/routes/$slug'
+      path: '/getaway/routes/$slug'
+      fullPath: '/getaway/routes/$slug'
+      preLoaderRoute: typeof GetawayRoutesSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/trips/$tripId/change': {
       id: '/_authenticated/trips/$tripId/change'
       path: '/$tripId/change'
@@ -978,6 +1137,7 @@ interface LangRouteChildren {
   LangAssistantRoute: typeof LangAssistantRoute
   LangAuthRoute: typeof LangAuthRoute
   LangBusinessRoute: typeof LangBusinessRoute
+  LangResetPasswordRoute: typeof LangResetPasswordRoute
   LangIndexRoute: typeof LangIndexRoute
 }
 
@@ -985,6 +1145,7 @@ const LangRouteChildren: LangRouteChildren = {
   LangAssistantRoute: LangAssistantRoute,
   LangAuthRoute: LangAuthRoute,
   LangBusinessRoute: LangBusinessRoute,
+  LangResetPasswordRoute: LangResetPasswordRoute,
   LangIndexRoute: LangIndexRoute,
 }
 
@@ -994,11 +1155,16 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   LangRoute: LangRouteWithChildren,
+  AboutRoute: AboutRoute,
   AssistantRoute: AssistantRoute,
   AuthRoute: AuthRoute,
   BusinessRoute: BusinessRoute,
+  ContactRoute: ContactRoute,
+  CookiesRoute: CookiesRoute,
+  CooperationRoute: CooperationRoute,
   CreatorsRoute: CreatorsRoute,
   PrivacyRoute: PrivacyRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   TermsRoute: TermsRoute,
   CHandleRoute: CHandleRoute,
   RCodeRoute: RCodeRoute,
@@ -1008,6 +1174,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiTripParseRoute: ApiTripParseRoute,
   ApiTripPriceContextRoute: ApiTripPriceContextRoute,
   ApiTripSearchRoute: ApiTripSearchRoute,
+  GetawayRoutesSlugRoute: GetawayRoutesSlugRoute,
+  GetawayRoutesIndexRoute: GetawayRoutesIndexRoute,
   ApiPublicGetawayImageSplatRoute: ApiPublicGetawayImageSplatRoute,
   ApiPublicSupplierOrderUpdatedRoute: ApiPublicSupplierOrderUpdatedRoute,
   ApiPublicCalendarCallbackProviderRoute:

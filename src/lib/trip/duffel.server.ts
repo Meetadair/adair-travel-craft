@@ -143,8 +143,16 @@ type DuffelOffer = {
   expires_at?: string;
   owner?: { name?: string };
   conditions?: {
-    change_before_departure?: { allowed?: boolean } | null;
-    refund_before_departure?: { allowed?: boolean } | null;
+    change_before_departure?: {
+      allowed?: boolean;
+      penalty_amount?: string | null;
+      penalty_currency?: string | null;
+    } | null;
+    refund_before_departure?: {
+      allowed?: boolean;
+      penalty_amount?: string | null;
+      penalty_currency?: string | null;
+    } | null;
   };
   slices?: Array<{
     origin?: { iata_code?: string };
@@ -176,16 +184,37 @@ function checkedBagsOf(offer: DuffelOffer): number {
     .reduce((total, b) => total + (b.quantity ?? 0), 0);
 }
 
-/** Fare conditions, left null when the airline does not state them. */
+/**
+ * Fare conditions, left null when the airline does not state them. The penalty
+ * matters as much as the permission: "refundable, minus €100" is the truth,
+ * and "refundable" on its own is not.
+ */
 function conditionsOf(offer: DuffelOffer): {
   changeable: boolean | null;
   refundable: boolean | null;
+  changePenaltyEur: number | null;
+  refundPenaltyEur: number | null;
 } {
   const change = offer.conditions?.change_before_departure;
   const refund = offer.conditions?.refund_before_departure;
+
+  const penalty = (
+    condition:
+      { penalty_amount?: string | null; penalty_currency?: string | null } | null | undefined,
+  ): number | null => {
+    const raw = condition?.penalty_amount;
+    const currency = condition?.penalty_currency;
+    if (raw == null || !currency) return null;
+    const value = Number(raw);
+    if (!Number.isFinite(value)) return null;
+    return toEur(value, currency).amountEur;
+  };
+
   return {
     changeable: typeof change?.allowed === "boolean" ? change.allowed : null,
     refundable: typeof refund?.allowed === "boolean" ? refund.allowed : null,
+    changePenaltyEur: penalty(change),
+    refundPenaltyEur: penalty(refund),
   };
 }
 

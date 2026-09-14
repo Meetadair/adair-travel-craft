@@ -18,7 +18,15 @@ export type ClarifyKind =
   | "no_dates"
   | "vague_week"
   | "which_airport"
-  | "hotel_unmatched";
+  | "hotel_unmatched"
+  // Kinds arriving from the richer question set in trip/questions.ts.
+  | "dates"
+  | "destination"
+  | "arrival_time"
+  | "travellers"
+  | "needs_car"
+  | "return_time"
+  | "airport_transfer";
 
 export type Clarification = {
   kind: ClarifyKind;
@@ -66,7 +74,8 @@ const DAY_TERMS =
 const DATE_TERMS =
   /\b\d{1,2}[./-]\d{1,2}\b|\b\d{4}-\d{2}-\d{2}\b|\b\d{1,2}\s*(?:st|nd|rd|th)?\s*(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)|\b(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\w*\s*\d{1,2}\b|stycz|lut(?:y|ego)|marc|kwiet|maj(?:a|u)?\b|czerw|lip(?:ca|iec)|sierp|wrześ|wrzes|paździer|pazdzier|listopad|grud/i;
 
-const PERIOD_TERMS = /\bweekend\b|week-end|wochenende|\b\d+\s*(?:nights?|days?)\b|\bnoc\w*|\bdni\b|\bdzień\b/i;
+const PERIOD_TERMS =
+  /\bweekend\b|week-end|wochenende|\b\d+\s*(?:nights?|days?)\b|\bnoc\w*|\bdni\b|\bdzień\b/i;
 
 const NEXT_WEEK = /\bnext week\b|w przysz[lł]ym tygodniu|przysz[lł]y tydzie/i;
 
