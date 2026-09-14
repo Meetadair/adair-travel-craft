@@ -66,6 +66,11 @@ export const MULTI_AIRPORT: Record<string, { iata: string; label: string }[]> = 
     { iata: "IST", label: "Istanbul Airport" },
     { iata: "SAW", label: "Sabiha Gökçen" },
   ],
+  "San Francisco": [
+    { iata: "SFO", label: "San Francisco International" },
+    { iata: "OAK", label: "Oakland" },
+    { iata: "SJC", label: "San Jose" },
+  ],
 };
 
 const DAY_TERMS =

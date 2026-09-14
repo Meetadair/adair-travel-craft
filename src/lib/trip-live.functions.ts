@@ -3,6 +3,7 @@
  * applied, priced with the plan's rules and stored as a trip card.
  */
 import { createServerFn } from "@tanstack/react-start";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { TripRequest, TripSearchResponse } from "@/lib/trip/types";
@@ -71,6 +72,8 @@ const sentenceSchema = z.object({
   overrides: overridesSchema.optional(),
 });
 
+type SentenceInput = z.infer<typeof sentenceSchema>;
+
 /** Same date, moved by whole days. */
 function shiftIsoDate(iso: string, days: number): string {
   return new Date(Date.parse(`${iso}T12:00:00Z`) + days * 86_400_000).toISOString().slice(0, 10);
@@ -97,340 +100,353 @@ async function record(userId: string, name: string, props: Record<string, unknow
 export const searchLiveTrip = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => sentenceSchema.parse(input))
-  .handler(async ({ data, context }): Promise<LiveTripResult> => {
-    const { supabase, userId } = context;
+  .handler(({ data, context }): Promise<LiveTripResult> =>
+    runLiveSearch(context.supabase, context.userId, data),
+  );
 
-    const [{ parseTripSentence }, { searchTripWithDuffel, hasDuffelKey }, pricing] =
-      await Promise.all([
-        import("@/lib/trip/parse"),
-        import("@/lib/trip/duffel.server"),
-        import("@/lib/pricing.server"),
-      ]);
-
-    if (!hasDuffelKey()) throw new Error("search-not-configured");
-
-    const [profileRes, prefsRes] = await Promise.all([
-      supabase.from("profiles").select("plan, home_airport").eq("id", userId).maybeSingle(),
-      supabase
-        .from("preferences")
-        .select(
-          "cabin_class, max_connections, hotel_max_km, seat, airlines, cabin_rule, hotel_chains, hotel_stars, hotel_min_rating, hotel_amenities, hotel_types, car_brands, car_companies, car_class, car_transmission, budget_band, trip_purpose, dealbreakers, extra_answers, business_prefs",
-        )
-        .eq("user_id", userId)
-        .maybeSingle(),
+/**
+ * The live search itself, callable without a request context.
+ *
+ * The conversational agent runs exactly this function rather than a copy of
+ * it, so preferences, pricing, the stored card and the analytics events stay
+ * identical whether the search came from the form or from the chat.
+ */
+export async function runLiveSearch(
+  supabase: SupabaseClient,
+  userId: string,
+  data: SentenceInput,
+): Promise<LiveTripResult> {
+  const [{ parseTripSentence }, { searchTripWithDuffel, hasDuffelKey }, pricing] =
+    await Promise.all([
+      import("@/lib/trip/parse"),
+      import("@/lib/trip/duffel.server"),
+      import("@/lib/pricing.server"),
     ]);
-    const profile = profileRes.data as { plan: string; home_airport: string } | null;
-    const row = (prefsRes.data ?? null) as Record<string, unknown> | null;
-    const plan = profile?.plan ?? "free";
 
-    const list = (value: unknown): string[] =>
-      Array.isArray(value) ? value.filter((v): v is string => typeof v === "string") : [];
-    let searchPrefs: SearchPrefs = {
-      airlines: list(row?.["airlines"]),
-      seat: (row?.["seat"] as string) ?? "any",
-      cabinRule: (row?.["cabin_rule"] as string | null) ?? null,
-      hotelChains: list(row?.["hotel_chains"]),
-      hotelStars: list(row?.["hotel_stars"]),
-      hotelMinRating: Number(row?.["hotel_min_rating"] ?? 4),
-      hotelAmenities: list(row?.["hotel_amenities"]),
-      hotelTypes: list(row?.["hotel_types"]),
-      carBrands: list(row?.["car_brands"]),
-      carCompanies: list(row?.["car_companies"]),
-      carClass: (row?.["car_class"] as string | null) ?? null,
-      carTransmission: (row?.["car_transmission"] as string) ?? "automatic",
-      cabinClass: (row?.["cabin_class"] as string) ?? "economy",
-      maxConnections: Number(row?.["max_connections"] ?? 1),
-      hotelMaxKm: (row?.["hotel_max_km"] as number | null) ?? null,
-      dealbreakers: list(row?.["dealbreakers"]),
-    };
-    searchPrefs.learned = await loadLearnedFor(context.supabase, userId, searchPrefs);
-    // Repeated "too far" keeps hotels closer than the stated limit.
-    if (searchPrefs.hotelMaxKm && searchPrefs.learned.distanceWeight > 1)
-      searchPrefs.hotelMaxKm = Math.max(
-        1,
-        Math.round(searchPrefs.hotelMaxKm / searchPrefs.learned.distanceWeight),
-      );
+  if (!hasDuffelKey()) throw new Error("search-not-configured");
 
-    const parsed = parseTripSentence(data.sentence, new Date(), profile?.home_airport);
-    // No destination, no trip: the chat asks where they are going instead.
-    if (!parsed) throw new Error("needs-destination");
-    const reordered = data.stops?.length ? data.stops : null;
-    const origin = reordered?.[0];
-    const firstStop = reordered?.[1];
-    const base: TripRequest = {
-      ...parsed,
-      cabinClass: (row?.["cabin_class"] as TripRequest["cabinClass"]) ?? parsed.cabinClass,
-      ...(data.dateShiftDays
-        ? {
-            departDate: shiftIsoDate(parsed.departDate, data.dateShiftDays),
-            returnDate: shiftIsoDate(parsed.returnDate, data.dateShiftDays),
-          }
-        : {}),
-      ...(reordered && origin && firstStop
-        ? {
-            originCity: origin.city,
-            originIata: origin.iata,
-            destinationCity: firstStop.city,
-            destinationIata: firstStop.iata,
-            lat: firstStop.lat,
-            lon: firstStop.lon,
-            stops: reordered,
-          }
-        : {}),
-    };
-    // Corrections the traveller made on the strip, or answers to what we asked,
-    // win over what we read from the sentence.
-    const { applyOverrides } = await import("@/lib/trip/understanding");
-    let request: TripRequest = data.overrides ? applyOverrides(base, data.overrides) : base;
-
-    // A work trip travels differently: the overlay from Preferences → Business
-    // trips takes over for cabin and, further down, hotels and the car. It sits
-    // below explicit overrides — what the traveller just clicked always wins.
-    const { detectTripContext, prefsForContext } = await import("@/lib/prefs/context");
-    const tripContext = detectTripContext(data.sentence, {
-      invoiceToCompany: request.invoiceToCompany,
-      mustArriveBy: request.mustArriveBy ?? null,
-    });
-    const businessOverlay = ((row?.["business_prefs"] as Record<string, unknown> | null) ??
-      {}) as Parameters<typeof prefsForContext>[1];
-    if (tripContext === "business" && businessOverlay) {
-      const cabinOverride = (businessOverlay as { cabinClass?: TripRequest["cabinClass"] })
-        .cabinClass;
-      if (cabinOverride) request = { ...request, cabinClass: cabinOverride };
-      // Hotels and the car rank against the work profile too.
-      searchPrefs = prefsForContext(
-        searchPrefs as unknown as Record<string, unknown>,
-        businessOverlay,
-        tripContext,
-      ) as unknown as SearchPrefs;
-    }
-
-    // What we remember about this place, and habits they have confirmed. Both
-    // rank below anything they stated; neither can override a dealbreaker.
-    const { loadPlaceMemory, loadPatterns } = await import("@/lib/trip/memory.server");
-    const { placeKey, resolvePreferences } = await import("@/lib/trip/memory");
-    const [placeMemory, patterns] = await Promise.all([
-      loadPlaceMemory(supabase, userId),
-      loadPatterns(supabase, userId),
-    ]);
-    const currentPlace = placeKey(request.destinationCity, request.destinationIata);
-    const resolved = resolvePreferences(
-      {
-        airlines: searchPrefs.airlines,
-        hotelChains: searchPrefs.hotelChains,
-        carBrands: searchPrefs.carBrands,
-        carCompanies: searchPrefs.carCompanies,
-        dealbreakers: searchPrefs.dealbreakers,
-      },
-      patterns,
-      placeMemory,
-      currentPlace,
-      searchPrefs.learned,
-    );
-    searchPrefs.airlines = resolved.airlines;
-    searchPrefs.hotelChains = resolved.hotelChains;
-    searchPrefs.carBrands = resolved.carBrands;
-    searchPrefs.remembered = {
-      hotels: resolved.rememberedHotels,
-      carSuppliers: resolved.rememberedCarSuppliers,
-    };
-    const rememberedHotel =
-      placeMemory
-        .filter((row) => row.place === currentPlace && row.itemKind === "hotel")
-        .sort((a, b) => b.timesChosen - a.timesChosen)[0] ?? null;
-
-    const requestRow = await supabase
-      .from("trip_requests")
-      .insert({ user_id: userId, raw_sentence: data.sentence, parsed: request })
-      .select("id")
-      .single();
-    if (requestRow.error) throw new Error(requestRow.error.message);
-    const tripRequestId = (requestRow.data as { id: string }).id;
-
-    // Buffers used when planning backwards from a fixed arrival time; tunable
-    // by an admin without a deploy.
-    const { DEFAULT_PLANNING_RULES } = await import("@/lib/trip/backwards");
-    const rulesRes = await supabase
-      .from("planning_rules")
+  const [profileRes, prefsRes] = await Promise.all([
+    supabase.from("profiles").select("plan, home_airport").eq("id", userId).maybeSingle(),
+    supabase
+      .from("preferences")
       .select(
-        "schengen_clear_min, non_schengen_clear_min, safety_margin_min, business_extra_margin_min, transfer_base_min, transfer_min_per_km",
+        "cabin_class, max_connections, hotel_max_km, seat, airlines, cabin_rule, hotel_chains, hotel_stars, hotel_min_rating, hotel_amenities, hotel_types, car_brands, car_companies, car_class, car_transmission, budget_band, trip_purpose, dealbreakers, extra_answers, business_prefs",
       )
-      .eq("active", true)
-      .limit(1)
-      .maybeSingle();
-    const ruleRow = (rulesRes.data ?? null) as Record<string, unknown> | null;
-    const planningRules = ruleRow
+      .eq("user_id", userId)
+      .maybeSingle(),
+  ]);
+  const profile = profileRes.data as { plan: string; home_airport: string } | null;
+  const row = (prefsRes.data ?? null) as Record<string, unknown> | null;
+  const plan = profile?.plan ?? "free";
+
+  const list = (value: unknown): string[] =>
+    Array.isArray(value) ? value.filter((v): v is string => typeof v === "string") : [];
+  let searchPrefs: SearchPrefs = {
+    airlines: list(row?.["airlines"]),
+    seat: (row?.["seat"] as string) ?? "any",
+    cabinRule: (row?.["cabin_rule"] as string | null) ?? null,
+    hotelChains: list(row?.["hotel_chains"]),
+    hotelStars: list(row?.["hotel_stars"]),
+    hotelMinRating: Number(row?.["hotel_min_rating"] ?? 4),
+    hotelAmenities: list(row?.["hotel_amenities"]),
+    hotelTypes: list(row?.["hotel_types"]),
+    carBrands: list(row?.["car_brands"]),
+    carCompanies: list(row?.["car_companies"]),
+    carClass: (row?.["car_class"] as string | null) ?? null,
+    carTransmission: (row?.["car_transmission"] as string) ?? "automatic",
+    cabinClass: (row?.["cabin_class"] as string) ?? "economy",
+    maxConnections: Number(row?.["max_connections"] ?? 1),
+    hotelMaxKm: (row?.["hotel_max_km"] as number | null) ?? null,
+    dealbreakers: list(row?.["dealbreakers"]),
+  };
+  searchPrefs.learned = await loadLearnedFor(supabase, userId, searchPrefs);
+  // Repeated "too far" keeps hotels closer than the stated limit.
+  if (searchPrefs.hotelMaxKm && searchPrefs.learned.distanceWeight > 1)
+    searchPrefs.hotelMaxKm = Math.max(
+      1,
+      Math.round(searchPrefs.hotelMaxKm / searchPrefs.learned.distanceWeight),
+    );
+
+  const parsed = parseTripSentence(data.sentence, new Date(), profile?.home_airport);
+  // No destination, no trip: the chat asks where they are going instead.
+  if (!parsed) throw new Error("needs-destination");
+  const reordered = data.stops?.length ? data.stops : null;
+  const origin = reordered?.[0];
+  const firstStop = reordered?.[1];
+  const base: TripRequest = {
+    ...parsed,
+    cabinClass: (row?.["cabin_class"] as TripRequest["cabinClass"]) ?? parsed.cabinClass,
+    ...(data.dateShiftDays
       ? {
-          schengenClearMin: Number(ruleRow["schengen_clear_min"]),
-          nonSchengenClearMin: Number(ruleRow["non_schengen_clear_min"]),
-          safetyMarginMin: Number(ruleRow["safety_margin_min"]),
-          businessExtraMarginMin: Number(ruleRow["business_extra_margin_min"]),
-          transferBaseMin: Number(ruleRow["transfer_base_min"]),
-          transferMinPerKm: Number(ruleRow["transfer_min_per_km"]),
+          departDate: shiftIsoDate(parsed.departDate, data.dateShiftDays),
+          returnDate: shiftIsoDate(parsed.returnDate, data.dateShiftDays),
         }
-      : DEFAULT_PLANNING_RULES;
-    const purposes = list(row?.["trip_purpose"]).map((p) => p.toLowerCase());
-    const business = purposes.some((p) => p.includes("business") || p.includes("work"));
+      : {}),
+    ...(reordered && origin && firstStop
+      ? {
+          originCity: origin.city,
+          originIata: origin.iata,
+          destinationCity: firstStop.city,
+          destinationIata: firstStop.iata,
+          lat: firstStop.lat,
+          lon: firstStop.lon,
+          stops: reordered,
+        }
+      : {}),
+  };
+  // Corrections the traveller made on the strip, or answers to what we asked,
+  // win over what we read from the sentence.
+  const { applyOverrides } = await import("@/lib/trip/understanding");
+  let request: TripRequest = data.overrides ? applyOverrides(base, data.overrides) : base;
 
-    const search = await searchTripWithDuffel(request, searchPrefs, {
-      rules: planningRules,
-      business,
-    });
-
-    // Internal demand reporting: which named hotels we cannot source yet.
-    if (search.hotelNotFound && search.hotelRequested) {
-      try {
-        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        await supabaseAdmin.from("hotel_requests_missed").insert({
-          name_requested: search.hotelRequested,
-          destination_iata: request.destinationIata,
-          checkin_date: request.departDate,
-        });
-      } catch (error) {
-        console.error("Could not log missed hotel request", error);
-      }
-    }
-
-    const baseTable = await pricing.loadPricing(supabase, plan);
-
-    // Early-booking reward: leisure trips booked far ahead pay a smaller Adair
-    // fee. Business trips (invoiced) keep the standard fee.
-    const daysAhead = pricing.daysUntilDeparture(request.departDate);
-    const leadTimeBps = business
-      ? 0
-      : pricing.leadTimeDiscountBps(await pricing.loadLeadTimeTiers(supabase, plan), daysAhead);
-    const table = pricing.withLeadTimeDiscount(baseTable, leadTimeBps);
-
-    const priceLine = (net: number | null | undefined, kind: "flight" | "stay" | "car") =>
-      net == null ? null : pricing.fromMinor(pricing.grossMinor(net, table[kind]));
-    const priceLineBase = (net: number | null | undefined, kind: "flight" | "stay" | "car") =>
-      net == null ? 0 : pricing.fromMinor(pricing.grossMinor(net, baseTable[kind]));
-
-    const flight = priceLine(search.flight?.amountEur ?? null, "flight");
-    const stay = priceLine(search.stay?.amountEur ?? null, "stay");
-    const car = priceLine(search.car?.amountEur ?? null, "car");
-    const total = Math.round(((flight ?? 0) + (stay ?? 0) + (car ?? 0)) * 100) / 100;
-    const netTotal = search.totalEur;
-
-    const baseTotal =
-      Math.round(
-        (priceLineBase(search.flight?.amountEur ?? null, "flight") +
-          priceLineBase(search.stay?.amountEur ?? null, "stay") +
-          priceLineBase(search.car?.amountEur ?? null, "car")) *
-          100,
-      ) / 100;
-    const earlyBooking =
-      leadTimeBps > 0 && baseTotal > total
-        ? {
-            daysAhead,
-            discountBps: leadTimeBps,
-            savedEur: Math.round((baseTotal - total) * 100) / 100,
-          }
-        : null;
-
-    const { insuranceQuoteFor } = await import("@/lib/insurance.server");
-    const insurance = await insuranceQuoteFor(
-      supabase,
-      table,
-      request.departDate,
-      request.returnDate,
-      request.passengers,
-    );
-
-    const { matchSummary, budgetStatus } = await import("@/lib/trip/match");
-    const match = matchSummary(search, searchPrefs);
-    const cheapestAlt = (
-      list: { amountEur: number }[] | undefined,
-      kind: "flight" | "stay" | "car",
-    ) => {
-      const nets = (list ?? []).map((a) => a.amountEur).filter((n) => Number.isFinite(n));
-      if (!nets.length) return null;
-      return priceLine(Math.min(...nets), kind);
-    };
-    const budget = budgetStatus(
-      total,
-      (row?.["budget_band"] as string | null) ?? null,
-      { flight, stay, car },
-      {
-        flight: cheapestAlt(search.flightAlternatives, "flight"),
-        stay: cheapestAlt(search.hotelAlternatives, "stay"),
-        car: cheapestAlt(search.carAlternatives, "car"),
-      },
-    );
-
-    const expiresAt = search.flight?.expiresAt ?? new Date(Date.now() + 20 * 60_000).toISOString();
-
-    const card = await supabase
-      .from("trip_cards")
-      .insert({
-        trip_request_id: tripRequestId,
-        user_id: userId,
-        total_minor: pricing.toMinor(total),
-        markup_minor: pricing.toMinor(Math.max(0, total - netTotal)),
-        saved_minor: pricing.toMinor(search.savedEur),
-        saved_minutes: search.savedMinutes,
-        expires_at: expiresAt,
-        items: {
-          search,
-          priced: { flight, stay, car, total },
-          insurance,
-          match,
-          budget,
-          earlyBooking,
-        },
-      })
-      .select("id")
-      .single();
-    if (card.error) throw new Error(card.error.message);
-
-    void record(userId, "search_run", {
-      destination: request.destinationCity,
-      destination_iata: request.destinationIata,
-      total_eur: total,
-      peak: Boolean((search as { peak?: unknown }).peak),
-    });
-    if (earlyBooking) {
-      void record(userId, "early_booking_discount", {
-        days_ahead: earlyBooking.daysAhead,
-        discount_bps: earlyBooking.discountBps,
-        saved_eur: earlyBooking.savedEur,
-        total_eur: total,
-      });
-    }
-    void record(userId, "card_created", { total_eur: total, has_stay: Boolean(search.stay) });
-    for (const kind of ["flight", "stay", "car"] as const) {
-      const line = match[kind];
-      if (!line || line.total === 0) continue;
-      void record(userId, "match_score", {
-        kind,
-        score: Math.round((line.met / line.total) * 100),
-        unmet: line.criteria.filter((c) => !c.ok).map((c) => c.label),
-      });
-    }
-
-    return {
-      cardId: (card.data as { id: string }).id,
-      plan,
-      search,
-      priced: { flight, stay, car, total },
-      insurance,
-      match,
-      budget,
-      earlyBooking,
-      expiresAt,
-      // The UI turns this into one sentence in the traveller's language.
-      memory: rememberedHotel
-        ? {
-            hotel: rememberedHotel.itemName,
-            stays: rememberedHotel.timesChosen,
-            city: request.destinationCity,
-            offered: (search.stay?.name ?? "")
-              .toLowerCase()
-              .includes(rememberedHotel.itemName.toLowerCase()),
-          }
-        : null,
-    };
+  // A work trip travels differently: the overlay from Preferences → Business
+  // trips takes over for cabin and, further down, hotels and the car. It sits
+  // below explicit overrides — what the traveller just clicked always wins.
+  const { detectTripContext, prefsForContext } = await import("@/lib/prefs/context");
+  const tripContext = detectTripContext(data.sentence, {
+    invoiceToCompany: request.invoiceToCompany,
+    mustArriveBy: request.mustArriveBy ?? null,
   });
+  const businessOverlay = ((row?.["business_prefs"] as Record<string, unknown> | null) ??
+    {}) as Parameters<typeof prefsForContext>[1];
+  if (tripContext === "business" && businessOverlay) {
+    const cabinOverride = (businessOverlay as { cabinClass?: TripRequest["cabinClass"] })
+      .cabinClass;
+    if (cabinOverride) request = { ...request, cabinClass: cabinOverride };
+    // Hotels and the car rank against the work profile too.
+    searchPrefs = prefsForContext(
+      searchPrefs as unknown as Record<string, unknown>,
+      businessOverlay,
+      tripContext,
+    ) as unknown as SearchPrefs;
+  }
+
+  // What we remember about this place, and habits they have confirmed. Both
+  // rank below anything they stated; neither can override a dealbreaker.
+  const { loadPlaceMemory, loadPatterns } = await import("@/lib/trip/memory.server");
+  const { placeKey, resolvePreferences } = await import("@/lib/trip/memory");
+  const [placeMemory, patterns] = await Promise.all([
+    loadPlaceMemory(supabase, userId),
+    loadPatterns(supabase, userId),
+  ]);
+  const currentPlace = placeKey(request.destinationCity, request.destinationIata);
+  const resolved = resolvePreferences(
+    {
+      airlines: searchPrefs.airlines,
+      hotelChains: searchPrefs.hotelChains,
+      carBrands: searchPrefs.carBrands,
+      carCompanies: searchPrefs.carCompanies,
+      dealbreakers: searchPrefs.dealbreakers,
+    },
+    patterns,
+    placeMemory,
+    currentPlace,
+    searchPrefs.learned,
+  );
+  searchPrefs.airlines = resolved.airlines;
+  searchPrefs.hotelChains = resolved.hotelChains;
+  searchPrefs.carBrands = resolved.carBrands;
+  searchPrefs.remembered = {
+    hotels: resolved.rememberedHotels,
+    carSuppliers: resolved.rememberedCarSuppliers,
+  };
+  const rememberedHotel =
+    placeMemory
+      .filter((row) => row.place === currentPlace && row.itemKind === "hotel")
+      .sort((a, b) => b.timesChosen - a.timesChosen)[0] ?? null;
+
+  const requestRow = await supabase
+    .from("trip_requests")
+    .insert({ user_id: userId, raw_sentence: data.sentence, parsed: request })
+    .select("id")
+    .single();
+  if (requestRow.error) throw new Error(requestRow.error.message);
+  const tripRequestId = (requestRow.data as { id: string }).id;
+
+  // Buffers used when planning backwards from a fixed arrival time; tunable
+  // by an admin without a deploy.
+  const { DEFAULT_PLANNING_RULES } = await import("@/lib/trip/backwards");
+  const rulesRes = await supabase
+    .from("planning_rules")
+    .select(
+      "schengen_clear_min, non_schengen_clear_min, safety_margin_min, business_extra_margin_min, transfer_base_min, transfer_min_per_km",
+    )
+    .eq("active", true)
+    .limit(1)
+    .maybeSingle();
+  const ruleRow = (rulesRes.data ?? null) as Record<string, unknown> | null;
+  const planningRules = ruleRow
+    ? {
+        schengenClearMin: Number(ruleRow["schengen_clear_min"]),
+        nonSchengenClearMin: Number(ruleRow["non_schengen_clear_min"]),
+        safetyMarginMin: Number(ruleRow["safety_margin_min"]),
+        businessExtraMarginMin: Number(ruleRow["business_extra_margin_min"]),
+        transferBaseMin: Number(ruleRow["transfer_base_min"]),
+        transferMinPerKm: Number(ruleRow["transfer_min_per_km"]),
+      }
+    : DEFAULT_PLANNING_RULES;
+  const purposes = list(row?.["trip_purpose"]).map((p) => p.toLowerCase());
+  const business = purposes.some((p) => p.includes("business") || p.includes("work"));
+
+  const search = await searchTripWithDuffel(request, searchPrefs, {
+    rules: planningRules,
+    business,
+  });
+
+  // Internal demand reporting: which named hotels we cannot source yet.
+  if (search.hotelNotFound && search.hotelRequested) {
+    try {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      await supabaseAdmin.from("hotel_requests_missed").insert({
+        name_requested: search.hotelRequested,
+        destination_iata: request.destinationIata,
+        checkin_date: request.departDate,
+      });
+    } catch (error) {
+      console.error("Could not log missed hotel request", error);
+    }
+  }
+
+  const baseTable = await pricing.loadPricing(supabase, plan);
+
+  // Early-booking reward: leisure trips booked far ahead pay a smaller Adair
+  // fee. Business trips (invoiced) keep the standard fee.
+  const daysAhead = pricing.daysUntilDeparture(request.departDate);
+  const leadTimeBps = business
+    ? 0
+    : pricing.leadTimeDiscountBps(await pricing.loadLeadTimeTiers(supabase, plan), daysAhead);
+  const table = pricing.withLeadTimeDiscount(baseTable, leadTimeBps);
+
+  const priceLine = (net: number | null | undefined, kind: "flight" | "stay" | "car") =>
+    net == null ? null : pricing.fromMinor(pricing.grossMinor(net, table[kind]));
+  const priceLineBase = (net: number | null | undefined, kind: "flight" | "stay" | "car") =>
+    net == null ? 0 : pricing.fromMinor(pricing.grossMinor(net, baseTable[kind]));
+
+  const flight = priceLine(search.flight?.amountEur ?? null, "flight");
+  const stay = priceLine(search.stay?.amountEur ?? null, "stay");
+  const car = priceLine(search.car?.amountEur ?? null, "car");
+  const total = Math.round(((flight ?? 0) + (stay ?? 0) + (car ?? 0)) * 100) / 100;
+  const netTotal = search.totalEur;
+
+  const baseTotal =
+    Math.round(
+      (priceLineBase(search.flight?.amountEur ?? null, "flight") +
+        priceLineBase(search.stay?.amountEur ?? null, "stay") +
+        priceLineBase(search.car?.amountEur ?? null, "car")) *
+        100,
+    ) / 100;
+  const earlyBooking =
+    leadTimeBps > 0 && baseTotal > total
+      ? {
+          daysAhead,
+          discountBps: leadTimeBps,
+          savedEur: Math.round((baseTotal - total) * 100) / 100,
+        }
+      : null;
+
+  const { insuranceQuoteFor } = await import("@/lib/insurance.server");
+  const insurance = await insuranceQuoteFor(
+    supabase,
+    table,
+    request.departDate,
+    request.returnDate,
+    request.passengers,
+  );
+
+  const { matchSummary, budgetStatus } = await import("@/lib/trip/match");
+  const match = matchSummary(search, searchPrefs);
+  const cheapestAlt = (
+    list: { amountEur: number }[] | undefined,
+    kind: "flight" | "stay" | "car",
+  ) => {
+    const nets = (list ?? []).map((a) => a.amountEur).filter((n) => Number.isFinite(n));
+    if (!nets.length) return null;
+    return priceLine(Math.min(...nets), kind);
+  };
+  const budget = budgetStatus(
+    total,
+    (row?.["budget_band"] as string | null) ?? null,
+    { flight, stay, car },
+    {
+      flight: cheapestAlt(search.flightAlternatives, "flight"),
+      stay: cheapestAlt(search.hotelAlternatives, "stay"),
+      car: cheapestAlt(search.carAlternatives, "car"),
+    },
+  );
+
+  const expiresAt = search.flight?.expiresAt ?? new Date(Date.now() + 20 * 60_000).toISOString();
+
+  const card = await supabase
+    .from("trip_cards")
+    .insert({
+      trip_request_id: tripRequestId,
+      user_id: userId,
+      total_minor: pricing.toMinor(total),
+      markup_minor: pricing.toMinor(Math.max(0, total - netTotal)),
+      saved_minor: pricing.toMinor(search.savedEur),
+      saved_minutes: search.savedMinutes,
+      expires_at: expiresAt,
+      items: {
+        search,
+        priced: { flight, stay, car, total },
+        insurance,
+        match,
+        budget,
+        earlyBooking,
+      },
+    })
+    .select("id")
+    .single();
+  if (card.error) throw new Error(card.error.message);
+
+  void record(userId, "search_run", {
+    destination: request.destinationCity,
+    destination_iata: request.destinationIata,
+    total_eur: total,
+    peak: Boolean((search as { peak?: unknown }).peak),
+  });
+  if (earlyBooking) {
+    void record(userId, "early_booking_discount", {
+      days_ahead: earlyBooking.daysAhead,
+      discount_bps: earlyBooking.discountBps,
+      saved_eur: earlyBooking.savedEur,
+      total_eur: total,
+    });
+  }
+  void record(userId, "card_created", { total_eur: total, has_stay: Boolean(search.stay) });
+  for (const kind of ["flight", "stay", "car"] as const) {
+    const line = match[kind];
+    if (!line || line.total === 0) continue;
+    void record(userId, "match_score", {
+      kind,
+      score: Math.round((line.met / line.total) * 100),
+      unmet: line.criteria.filter((c) => !c.ok).map((c) => c.label),
+    });
+  }
+
+  return {
+    cardId: (card.data as { id: string }).id,
+    plan,
+    search,
+    priced: { flight, stay, car, total },
+    insurance,
+    match,
+    budget,
+    earlyBooking,
+    expiresAt,
+    // The UI turns this into one sentence in the traveller's language.
+    memory: rememberedHotel
+      ? {
+          hotel: rememberedHotel.itemName,
+          stays: rememberedHotel.timesChosen,
+          city: request.destinationCity,
+          offered: (search.stay?.name ?? "")
+            .toLowerCase()
+            .includes(rememberedHotel.itemName.toLowerCase()),
+        }
+      : null,
+  };
+}
 
 export const getTripCard = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -490,224 +506,238 @@ export const swapCardAlternative = createServerFn({ method: "POST" })
       })
       .parse(input),
   )
-  .handler(async ({ data, context }) => {
-    const { supabase, userId } = context;
-    const pricing = await import("@/lib/pricing.server");
+  .handler(({ data, context }) => swapCardLine(context.supabase, context.userId, data));
 
-    const [cardRes, profileRes] = await Promise.all([
-      supabase
-        .from("trip_cards")
-        .select("id, items, saved_minor, expires_at, status")
-        .eq("user_id", userId)
-        .eq("id", data.cardId)
-        .maybeSingle(),
-      supabase.from("profiles").select("plan").eq("id", userId).maybeSingle(),
-    ]);
-    if (cardRes.error) throw new Error(cardRes.error.message);
-    if (!cardRes.data) throw new Error("card-not-found");
+/**
+ * Swapping one line of a stored card for an offered alternative, callable
+ * without a request context so the chat agent uses the same path as the UI.
+ */
+export async function swapCardLine(
+  supabase: SupabaseClient,
+  userId: string,
+  data: {
+    cardId: string;
+    kind: "flight" | "stay" | "car";
+    index: number;
+    reason?: string | undefined;
+  },
+) {
+  const pricing = await import("@/lib/pricing.server");
 
-    const row = cardRes.data as unknown as {
-      items: {
-        search: TripSearchResponse;
-        priced: LiveTripResult["priced"];
-        insurance?: InsuranceQuote | null;
-        match?: MatchSummary | null;
-        budget?: BudgetStatus | null;
-        earlyBooking?: LiveTripResult["earlyBooking"];
-      };
-      saved_minor: number;
-      expires_at: string | null;
-    };
-    const search = row.items.search;
-
-    let recommended: Record<string, unknown> | null = null;
-    let chosen: Record<string, unknown> | null = null;
-
-    if (data.kind === "flight") {
-      const pick = search.flightAlternatives?.[data.index];
-      if (!pick) throw new Error("alternative-not-found");
-      const previous = search.flight;
-      recommended = previous ? { ...previous } : null;
-      chosen = { ...pick };
-      search.flight = pick;
-      search.flightAlternatives = [
-        ...(previous ? [previous] : []),
-        ...(search.flightAlternatives ?? []).filter((_, i) => i !== data.index),
-      ].slice(0, 3);
-      delete search.errors.flights;
-    } else if (data.kind === "stay") {
-      const pick = search.hotelAlternatives?.[data.index];
-      if (!pick) throw new Error("alternative-not-found");
-      const previous = search.stay;
-      recommended = previous ? { ...previous } : null;
-      chosen = { ...pick };
-      search.stay = pick;
-      // Keep the rest swappable, with the earlier pick back on the list.
-      search.hotelAlternatives = [
-        ...(previous ? [previous] : []),
-        ...(search.hotelAlternatives ?? []).filter((_, i) => i !== data.index),
-      ].slice(0, 3);
-      search.hotelNotFound = false;
-      delete search.errors.stays;
-    } else {
-      const pick = search.carAlternatives?.[data.index];
-      if (!pick) throw new Error("alternative-not-found");
-      const previous = search.car;
-      recommended = previous ? { ...previous } : null;
-      chosen = { ...pick };
-      search.car = pick;
-      search.carAlternatives = [
-        ...(previous ? [previous] : []),
-        ...(search.carAlternatives ?? []).filter((_, i) => i !== data.index),
-      ].slice(0, 3);
-      search.carNotFound = false;
-      delete search.errors.cars;
-    }
-
-    // Remember that our suggestion was not the one they wanted.
-    const { error: feedbackError } = await supabase.from("choice_feedback").insert({
-      user_id: userId,
-      trip_card_id: data.cardId,
-      item_kind: data.kind,
-      recommended: (recommended ?? {}) as never,
-      chosen: (chosen ?? {}) as never,
-      rejected_reference: reference(recommended),
-      chosen_reference: reference(chosen),
-      ...(data.reason ? { reason: data.reason } : {}),
-    });
-    if (feedbackError) console.error("Could not log choice feedback", feedbackError);
-
-    // A swap is the clearest statement of taste there is: remember what they
-    // moved *to*, for this city.
-    const chosenName =
-      (chosen as { name?: string; supplier?: string; carrier?: string } | null) ?? null;
-    const memoryKind =
-      data.kind === "stay" ? "hotel" : data.kind === "car" ? "car_supplier" : "airline";
-    const memoryName =
-      data.kind === "stay"
-        ? (chosenName?.name ?? "")
-        : data.kind === "car"
-          ? (chosenName?.supplier ?? "")
-          : (chosenName?.carrier ?? "");
-    if (memoryName) {
-      const { rememberChoice } = await import("@/lib/trip/memory.server");
-      await rememberChoice(supabase, userId, {
-        city: search.request.destinationCity,
-        iata: search.request.destinationIata,
-        itemKind: memoryKind,
-        itemName: memoryName,
-        source: "swapped_to",
-      });
-    }
-
-    const plan = (profileRes.data as { plan: string } | null)?.plan ?? "free";
-    const baseTable = await pricing.loadPricing(supabase, plan);
-    // The early-booking reward was earned by the departure date, so it survives
-    // a swap; only the amount it saves is recalculated.
-    const earlyBps = row.items.earlyBooking?.discountBps ?? 0;
-    const table = pricing.withLeadTimeDiscount(baseTable, earlyBps);
-    const priceLine = (net: number | null | undefined, kind: "flight" | "stay" | "car") =>
-      net == null ? null : pricing.fromMinor(pricing.grossMinor(net, table[kind]));
-    const priceLineBase = (net: number | null | undefined, kind: "flight" | "stay" | "car") =>
-      net == null ? 0 : pricing.fromMinor(pricing.grossMinor(net, baseTable[kind]));
-
-    const flight = priceLine(search.flight?.amountEur ?? null, "flight");
-    const stay = priceLine(search.stay?.amountEur ?? null, "stay");
-    const car = priceLine(search.car?.amountEur ?? null, "car");
-    const total = Math.round(((flight ?? 0) + (stay ?? 0) + (car ?? 0)) * 100) / 100;
-    const netTotal =
-      Math.round(
-        ((search.flight?.amountEur ?? 0) +
-          (search.stay?.amountEur ?? 0) +
-          (search.car?.amountEur ?? 0)) *
-          100,
-      ) / 100;
-    search.totalEur = netTotal;
-
-    const priced = { flight, stay, car, total };
-    const insurance = row.items.insurance ?? null;
-
-    const baseTotal =
-      Math.round(
-        (priceLineBase(search.flight?.amountEur ?? null, "flight") +
-          priceLineBase(search.stay?.amountEur ?? null, "stay") +
-          priceLineBase(search.car?.amountEur ?? null, "car")) *
-          100,
-      ) / 100;
-    const earlyBooking =
-      row.items.earlyBooking && baseTotal > total
-        ? { ...row.items.earlyBooking, savedEur: Math.round((baseTotal - total) * 100) / 100 }
-        : null;
-
-    const prefsRes = await supabase
-      .from("preferences")
-      .select(
-        "cabin_class, max_connections, hotel_max_km, seat, airlines, cabin_rule, hotel_chains, hotel_stars, hotel_min_rating, hotel_amenities, hotel_types, car_brands, car_companies, car_class, car_transmission, budget_band, dealbreakers, extra_answers",
-      )
-      .eq("user_id", userId)
-      .maybeSingle();
-    const prefRow = (prefsRes.data ?? null) as Record<string, unknown> | null;
-    const list = (value: unknown): string[] =>
-      Array.isArray(value) ? value.filter((v): v is string => typeof v === "string") : [];
-    const searchPrefs: SearchPrefs = {
-      airlines: list(prefRow?.["airlines"]),
-      seat: (prefRow?.["seat"] as string) ?? "any",
-      cabinRule: (prefRow?.["cabin_rule"] as string | null) ?? null,
-      hotelChains: list(prefRow?.["hotel_chains"]),
-      hotelStars: list(prefRow?.["hotel_stars"]),
-      hotelMinRating: Number(prefRow?.["hotel_min_rating"] ?? 4),
-      hotelAmenities: list(prefRow?.["hotel_amenities"]),
-      hotelTypes: list(prefRow?.["hotel_types"]),
-      carBrands: list(prefRow?.["car_brands"]),
-      carCompanies: list(prefRow?.["car_companies"]),
-      carClass: (prefRow?.["car_class"] as string | null) ?? null,
-      carTransmission: (prefRow?.["car_transmission"] as string) ?? "automatic",
-      cabinClass: (prefRow?.["cabin_class"] as string) ?? "economy",
-      maxConnections: Number(prefRow?.["max_connections"] ?? 1),
-      hotelMaxKm: (prefRow?.["hotel_max_km"] as number | null) ?? null,
-      dealbreakers: list(prefRow?.["dealbreakers"]),
-    };
-    searchPrefs.learned = await loadLearnedFor(context.supabase, userId, searchPrefs);
-    const { matchSummary, budgetStatus } = await import("@/lib/trip/match");
-    const match = matchSummary(search, searchPrefs);
-    const cheapestAlt = (
-      alts: { amountEur: number }[] | undefined,
-      kind: "flight" | "stay" | "car",
-    ) => {
-      const nets = (alts ?? []).map((a) => a.amountEur).filter((n) => Number.isFinite(n));
-      if (!nets.length) return null;
-      return priceLine(Math.min(...nets), kind);
-    };
-    const budget = budgetStatus(
-      total,
-      (prefRow?.["budget_band"] as string | null) ?? null,
-      { flight, stay, car },
-      {
-        flight: cheapestAlt(search.flightAlternatives, "flight"),
-        stay: cheapestAlt(search.hotelAlternatives, "stay"),
-        car: cheapestAlt(search.carAlternatives, "car"),
-      },
-    );
-    const update = await supabase
+  const [cardRes, profileRes] = await Promise.all([
+    supabase
       .from("trip_cards")
-      .update({
-        total_minor: pricing.toMinor(total),
-        markup_minor: pricing.toMinor(Math.max(0, total - netTotal)),
-        items: { search, priced, insurance, match, budget, earlyBooking },
-      })
+      .select("id, items, saved_minor, expires_at, status")
       .eq("user_id", userId)
-      .eq("id", data.cardId);
-    if (update.error) throw new Error(update.error.message);
+      .eq("id", data.cardId)
+      .maybeSingle(),
+    supabase.from("profiles").select("plan").eq("id", userId).maybeSingle(),
+  ]);
+  if (cardRes.error) throw new Error(cardRes.error.message);
+  if (!cardRes.data) throw new Error("card-not-found");
 
-    return {
-      cardId: data.cardId,
-      plan,
-      search,
-      priced,
-      insurance,
-      match,
-      budget,
-      earlyBooking,
-      expiresAt: row.expires_at,
-    } satisfies LiveTripResult;
+  const row = cardRes.data as unknown as {
+    items: {
+      search: TripSearchResponse;
+      priced: LiveTripResult["priced"];
+      insurance?: InsuranceQuote | null;
+      match?: MatchSummary | null;
+      budget?: BudgetStatus | null;
+      earlyBooking?: LiveTripResult["earlyBooking"];
+    };
+    saved_minor: number;
+    expires_at: string | null;
+  };
+  const search = row.items.search;
+
+  let recommended: Record<string, unknown> | null = null;
+  let chosen: Record<string, unknown> | null = null;
+
+  if (data.kind === "flight") {
+    const pick = search.flightAlternatives?.[data.index];
+    if (!pick) throw new Error("alternative-not-found");
+    const previous = search.flight;
+    recommended = previous ? { ...previous } : null;
+    chosen = { ...pick };
+    search.flight = pick;
+    search.flightAlternatives = [
+      ...(previous ? [previous] : []),
+      ...(search.flightAlternatives ?? []).filter((_, i) => i !== data.index),
+    ].slice(0, 3);
+    delete search.errors.flights;
+  } else if (data.kind === "stay") {
+    const pick = search.hotelAlternatives?.[data.index];
+    if (!pick) throw new Error("alternative-not-found");
+    const previous = search.stay;
+    recommended = previous ? { ...previous } : null;
+    chosen = { ...pick };
+    search.stay = pick;
+    // Keep the rest swappable, with the earlier pick back on the list.
+    search.hotelAlternatives = [
+      ...(previous ? [previous] : []),
+      ...(search.hotelAlternatives ?? []).filter((_, i) => i !== data.index),
+    ].slice(0, 3);
+    search.hotelNotFound = false;
+    delete search.errors.stays;
+  } else {
+    const pick = search.carAlternatives?.[data.index];
+    if (!pick) throw new Error("alternative-not-found");
+    const previous = search.car;
+    recommended = previous ? { ...previous } : null;
+    chosen = { ...pick };
+    search.car = pick;
+    search.carAlternatives = [
+      ...(previous ? [previous] : []),
+      ...(search.carAlternatives ?? []).filter((_, i) => i !== data.index),
+    ].slice(0, 3);
+    search.carNotFound = false;
+    delete search.errors.cars;
+  }
+
+  // Remember that our suggestion was not the one they wanted.
+  const { error: feedbackError } = await supabase.from("choice_feedback").insert({
+    user_id: userId,
+    trip_card_id: data.cardId,
+    item_kind: data.kind,
+    recommended: (recommended ?? {}) as never,
+    chosen: (chosen ?? {}) as never,
+    rejected_reference: reference(recommended),
+    chosen_reference: reference(chosen),
+    ...(data.reason ? { reason: data.reason } : {}),
   });
+  if (feedbackError) console.error("Could not log choice feedback", feedbackError);
+
+  // A swap is the clearest statement of taste there is: remember what they
+  // moved *to*, for this city.
+  const chosenName =
+    (chosen as { name?: string; supplier?: string; carrier?: string } | null) ?? null;
+  const memoryKind =
+    data.kind === "stay" ? "hotel" : data.kind === "car" ? "car_supplier" : "airline";
+  const memoryName =
+    data.kind === "stay"
+      ? (chosenName?.name ?? "")
+      : data.kind === "car"
+        ? (chosenName?.supplier ?? "")
+        : (chosenName?.carrier ?? "");
+  if (memoryName) {
+    const { rememberChoice } = await import("@/lib/trip/memory.server");
+    await rememberChoice(supabase, userId, {
+      city: search.request.destinationCity,
+      iata: search.request.destinationIata,
+      itemKind: memoryKind,
+      itemName: memoryName,
+      source: "swapped_to",
+    });
+  }
+
+  const plan = (profileRes.data as { plan: string } | null)?.plan ?? "free";
+  const baseTable = await pricing.loadPricing(supabase, plan);
+  // The early-booking reward was earned by the departure date, so it survives
+  // a swap; only the amount it saves is recalculated.
+  const earlyBps = row.items.earlyBooking?.discountBps ?? 0;
+  const table = pricing.withLeadTimeDiscount(baseTable, earlyBps);
+  const priceLine = (net: number | null | undefined, kind: "flight" | "stay" | "car") =>
+    net == null ? null : pricing.fromMinor(pricing.grossMinor(net, table[kind]));
+  const priceLineBase = (net: number | null | undefined, kind: "flight" | "stay" | "car") =>
+    net == null ? 0 : pricing.fromMinor(pricing.grossMinor(net, baseTable[kind]));
+
+  const flight = priceLine(search.flight?.amountEur ?? null, "flight");
+  const stay = priceLine(search.stay?.amountEur ?? null, "stay");
+  const car = priceLine(search.car?.amountEur ?? null, "car");
+  const total = Math.round(((flight ?? 0) + (stay ?? 0) + (car ?? 0)) * 100) / 100;
+  const netTotal =
+    Math.round(
+      ((search.flight?.amountEur ?? 0) +
+        (search.stay?.amountEur ?? 0) +
+        (search.car?.amountEur ?? 0)) *
+        100,
+    ) / 100;
+  search.totalEur = netTotal;
+
+  const priced = { flight, stay, car, total };
+  const insurance = row.items.insurance ?? null;
+
+  const baseTotal =
+    Math.round(
+      (priceLineBase(search.flight?.amountEur ?? null, "flight") +
+        priceLineBase(search.stay?.amountEur ?? null, "stay") +
+        priceLineBase(search.car?.amountEur ?? null, "car")) *
+        100,
+    ) / 100;
+  const earlyBooking =
+    row.items.earlyBooking && baseTotal > total
+      ? { ...row.items.earlyBooking, savedEur: Math.round((baseTotal - total) * 100) / 100 }
+      : null;
+
+  const prefsRes = await supabase
+    .from("preferences")
+    .select(
+      "cabin_class, max_connections, hotel_max_km, seat, airlines, cabin_rule, hotel_chains, hotel_stars, hotel_min_rating, hotel_amenities, hotel_types, car_brands, car_companies, car_class, car_transmission, budget_band, dealbreakers, extra_answers",
+    )
+    .eq("user_id", userId)
+    .maybeSingle();
+  const prefRow = (prefsRes.data ?? null) as Record<string, unknown> | null;
+  const list = (value: unknown): string[] =>
+    Array.isArray(value) ? value.filter((v): v is string => typeof v === "string") : [];
+  const searchPrefs: SearchPrefs = {
+    airlines: list(prefRow?.["airlines"]),
+    seat: (prefRow?.["seat"] as string) ?? "any",
+    cabinRule: (prefRow?.["cabin_rule"] as string | null) ?? null,
+    hotelChains: list(prefRow?.["hotel_chains"]),
+    hotelStars: list(prefRow?.["hotel_stars"]),
+    hotelMinRating: Number(prefRow?.["hotel_min_rating"] ?? 4),
+    hotelAmenities: list(prefRow?.["hotel_amenities"]),
+    hotelTypes: list(prefRow?.["hotel_types"]),
+    carBrands: list(prefRow?.["car_brands"]),
+    carCompanies: list(prefRow?.["car_companies"]),
+    carClass: (prefRow?.["car_class"] as string | null) ?? null,
+    carTransmission: (prefRow?.["car_transmission"] as string) ?? "automatic",
+    cabinClass: (prefRow?.["cabin_class"] as string) ?? "economy",
+    maxConnections: Number(prefRow?.["max_connections"] ?? 1),
+    hotelMaxKm: (prefRow?.["hotel_max_km"] as number | null) ?? null,
+    dealbreakers: list(prefRow?.["dealbreakers"]),
+  };
+  searchPrefs.learned = await loadLearnedFor(supabase, userId, searchPrefs);
+  const { matchSummary, budgetStatus } = await import("@/lib/trip/match");
+  const match = matchSummary(search, searchPrefs);
+  const cheapestAlt = (
+    alts: { amountEur: number }[] | undefined,
+    kind: "flight" | "stay" | "car",
+  ) => {
+    const nets = (alts ?? []).map((a) => a.amountEur).filter((n) => Number.isFinite(n));
+    if (!nets.length) return null;
+    return priceLine(Math.min(...nets), kind);
+  };
+  const budget = budgetStatus(
+    total,
+    (prefRow?.["budget_band"] as string | null) ?? null,
+    { flight, stay, car },
+    {
+      flight: cheapestAlt(search.flightAlternatives, "flight"),
+      stay: cheapestAlt(search.hotelAlternatives, "stay"),
+      car: cheapestAlt(search.carAlternatives, "car"),
+    },
+  );
+  const update = await supabase
+    .from("trip_cards")
+    .update({
+      total_minor: pricing.toMinor(total),
+      markup_minor: pricing.toMinor(Math.max(0, total - netTotal)),
+      items: { search, priced, insurance, match, budget, earlyBooking },
+    })
+    .eq("user_id", userId)
+    .eq("id", data.cardId);
+  if (update.error) throw new Error(update.error.message);
+
+  return {
+    cardId: data.cardId,
+    plan,
+    search,
+    priced,
+    insurance,
+    match,
+    budget,
+    earlyBooking,
+    expiresAt: row.expires_at,
+  } satisfies LiveTripResult;
+}

@@ -57,7 +57,9 @@ export function isOneWay(sentence: string): boolean {
 }
 
 function cabinOf(text: string): TripRequest["cabinClass"] {
-  if (/business|biznes|klasa biznes/.test(text)) return "business";
+  // Travellers mistype this constantly, and a silent drop to economy on a
+  // long-haul is an expensive misreading.
+  if (/bus+i?ne?s+|biznes|klasa biznes/.test(text)) return "business";
   if (/first class|pierwsza klasa/.test(text)) return "first";
   if (/premium/.test(text)) return "premium_economy";
   return "economy";
