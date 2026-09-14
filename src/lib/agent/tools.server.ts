@@ -11,8 +11,10 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { mapPlacesNear } from "@/lib/places/osm.server";
 import { MAP_ATTRIBUTION, type Place, type PlaceCategory } from "@/lib/places/types";
 import { findCity } from "@/lib/trip/cities";
+import { originClause, resolveLocation, type LocationInputs } from "./location";
 import { loadPatterns, loadPlaceMemory } from "@/lib/trip/memory.server";
 import {
+  currentLocationInput,
   distanceAndTimeInput,
   findPlacesInput,
   getCuratedInput,
@@ -39,6 +41,8 @@ const list = (value: unknown): string[] =>
 export type ToolContext = {
   supabase: SupabaseClient;
   userId: string;
+  /** Where the traveller is, resolved per request and never stored. */
+  location?: LocationInputs;
 };
 
 /* ------------------------------------------------------------ find_places */
@@ -232,6 +236,45 @@ async function travellerContext(input: unknown, ctx: ToolContext): Promise<strin
   });
 }
 
+/* ------------------------------------------------- get_current_location */
+
+function currentLocation(input: unknown, ctx: ToolContext): string {
+  const parsed = currentLocationInput.safeParse(input);
+  if (!parsed.success) return toolFailure("get_current_location", "bad-input");
+
+  const inputs: LocationInputs =
+    ctx.location ?? { device: null, consent: "not_asked", hotel: null, city: null };
+  const resolved = resolveLocation(inputs, parsed.data.precise);
+
+  if (resolved.source === "none") {
+    return JSON.stringify({
+      tool: "get_current_location",
+      ok: false,
+      reason: "no starting point on file — ask where they are setting off from",
+      source: "none",
+      askConsent: resolved.askConsent,
+      consent: resolved.consent,
+      results: [],
+    });
+  }
+
+  return JSON.stringify({
+    tool: "get_current_location",
+    ok: true,
+    source: resolved.source,
+    label: resolved.label,
+    lat: resolved.lat,
+    lon: resolved.lon,
+    consent: resolved.consent,
+    askConsent: resolved.askConsent,
+    say: originClause(resolved),
+    note:
+      resolved.source === "device"
+        ? "Exact position, used for this answer only and not kept."
+        : "Not their exact position. Name the starting point you used in the answer.",
+  });
+}
+
 /* ------------------------------------------------------------- dispatcher */
 
 export async function runTool(name: ToolName, input: unknown, ctx: ToolContext): Promise<string> {
@@ -245,6 +288,8 @@ export async function runTool(name: ToolName, input: unknown, ctx: ToolContext):
         return distanceAndTime(input);
       case "get_traveller_context":
         return await travellerContext(input, ctx);
+      case "get_current_location":
+        return currentLocation(input, ctx);
       default:
         return toolFailure(name, "unknown tool");
     }
