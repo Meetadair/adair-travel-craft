@@ -1,7 +1,7 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { ageQuestion, familyFromSentence } from "@/lib/trip/family";
 import { applyAnswer, assumptionNote, clarify, type Clarification } from "@/lib/trip/clarify";
 import { AirportAnswer, DateAnswer } from "@/components/trip/answer-controls";
@@ -129,11 +129,19 @@ export function AssistantPage() {
   const [cardDates, setCardDates] = useState<DateRange | null>(null);
   /** Adair reading its replies aloud. Off until somebody asks for it. */
   const speech = useSpeech(locale, t.assistant.speechHello);
-  // Speaking happens here rather than at each call site, so a reply added
-  // anywhere in the page cannot be silently left unspoken.
+  /**
+   * Whether the traveller's last message was spoken rather than typed.
+   *
+   * This is the rule that makes it feel like a conversation: speak to Adair
+   * and it speaks back, whatever the toggle says. Type to it and it answers
+   * in text, unless you asked to be read to. Speaking every reply to someone
+   * who was typing is "it just starts talking".
+   */
+  const askedByVoice = useRef(false);
   useEffect(() => {
     const latest = [...turns].reverse().find((t) => t.role === "adair");
-    if (latest) speech.say(latest.text);
+    if (!latest) return;
+    if (askedByVoice.current || speech.enabled) speech.say(latest.text, askedByVoice.current);
   }, [turns, speech]);
   /**
    * Cabin and who is flying, re-openable on the card. Airlines put this behind
@@ -548,7 +556,10 @@ export function AssistantPage() {
         >
           <textarea
             value={input}
-            onChange={(e) => setInput(e.target.value)}
+            onChange={(e) => {
+              askedByVoice.current = false;
+              setInput(e.target.value);
+            }}
             onKeyDown={(e) => {
               // Enter sends, as in any chat. Shift+Enter still breaks the line,
               // and we never send mid-composition (IME for CJK input).
@@ -564,7 +575,16 @@ export function AssistantPage() {
           {/* Listening and speaking are one idea, so they share one pill:
               two identical round buttons, one hairline, no competing shapes. */}
           <div className="flex shrink-0 items-center gap-0.5 rounded-full border border-border bg-background p-0.5">
-            <VoiceInput locale={locale} onTranscript={setInput} />
+            <VoiceInput
+              locale={locale}
+              onTranscript={setInput}
+              onSubmit={(sentence) => {
+                // Spoken in, spoken out.
+                askedByVoice.current = true;
+                setInput("");
+                handleSentence(sentence);
+              }}
+            />
             <SpeechToggle
               enabled={speech.enabled}
               supported={speech.supported}

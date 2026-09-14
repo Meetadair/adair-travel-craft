@@ -41,13 +41,26 @@ function speechCtor(): SpeechCtor | null {
 }
 
 type Props = {
-  /** Called with the transcript so far; never submits anything. */
+  /** Called with the transcript so far, as it grows. */
   onTranscript: (text: string) => void;
+  /**
+   * Called once with the finished sentence — when the traveller presses stop,
+   * or after they have clearly finished talking. This is what makes it a
+   * conversation: you speak, and something happens, without a button.
+   */
+  onSubmit?: ((text: string) => void) | undefined;
   /** Language hint: Polish page → pl-PL, otherwise English. */
   locale: string;
 };
 
-export function VoiceInput({ onTranscript, locale }: Props) {
+/**
+ * How long a silence has to be, after real words, before we take the sentence
+ * as finished. Long enough for a breath and a "…erm", short enough that the
+ * traveller is not left wondering whether anything heard them.
+ */
+const SILENCE_MS = 2200;
+
+export function VoiceInput({ onTranscript, onSubmit, locale }: Props) {
   const [supported, setSupported] = useState(false);
   const [recording, setRecording] = useState(false);
   const [seconds, setSeconds] = useState(0);
@@ -63,6 +76,25 @@ export function VoiceInput({ onTranscript, locale }: Props) {
   const elapsed = useRef(0);
   /** Settled text including the run currently in progress. */
   const runSettled = useRef("");
+  /** The full sentence as last shown, so stop can hand it over. */
+  const lastShown = useRef("");
+  const silenceTimer = useRef<number | null>(null);
+
+  const clearSilence = () => {
+    if (silenceTimer.current !== null) {
+      window.clearTimeout(silenceTimer.current);
+      silenceTimer.current = null;
+    }
+  };
+
+  /** Hand the sentence over and switch off, once. */
+  const finish = () => {
+    clearSilence();
+    wanted.current = false;
+    recognition.current?.stop();
+    const sentence = lastShown.current.trim();
+    if (sentence && onSubmit) onSubmit(sentence);
+  };
 
   // Support is a browser fact, so only check after hydration.
   useEffect(() => {
@@ -89,6 +121,7 @@ export function VoiceInput({ onTranscript, locale }: Props) {
 
   useEffect(
     () => () => {
+      clearSilence();
       wanted.current = false;
       recognition.current?.stop();
     },
@@ -120,8 +153,16 @@ export function VoiceInput({ onTranscript, locale }: Props) {
       }
       // The settled text of *previous* runs, plus this run's own.
       const wholeSettled = foldSettled(settled.current, results);
-      onTranscript(composeTranscript(baseText.current, wholeSettled, interimPart(results)));
+      const shown = composeTranscript(baseText.current, wholeSettled, interimPart(results));
+      lastShown.current = shown;
+      onTranscript(shown);
       runSettled.current = wholeSettled;
+      // Words arrived, so the traveller is still talking. A pause after real
+      // words — not before any — is what ends the sentence.
+      clearSilence();
+      if (wholeSettled.trim() && onSubmit) {
+        silenceTimer.current = window.setTimeout(finish, SILENCE_MS);
+      }
     };
 
     rec.onerror = (event) => {
@@ -157,6 +198,8 @@ export function VoiceInput({ onTranscript, locale }: Props) {
     baseText.current = currentText.trim();
     settled.current = "";
     runSettled.current = "";
+    lastShown.current = "";
+    clearSilence();
     lastError.current = null;
     elapsed.current = 0;
     wanted.current = true;
@@ -192,8 +235,7 @@ export function VoiceInput({ onTranscript, locale }: Props) {
         disabled={denied}
         onClick={(e) => {
           if (recording) {
-            wanted.current = false;
-            recognition.current?.stop();
+            finish();
             return;
           }
           const field = e.currentTarget

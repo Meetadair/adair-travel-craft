@@ -95,9 +95,9 @@ export function useSpeech(locale: string, confirmation: string) {
 
   /** Say this, replacing anything currently being said. */
   const say = useCallback(
-    (text: string) => {
+    (text: string, force = false) => {
       const engine = synth();
-      if (!engine || !enabled) return;
+      if (!engine || (!enabled && !force)) return;
       const words = speakableReply(text, locale);
       if (!words) return;
       // Never say the same reply twice: React re-renders, the assistant does
