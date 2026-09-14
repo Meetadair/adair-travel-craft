@@ -1645,6 +1645,7 @@ export type Database = {
           hotel_stars: Json
           hotel_types: Json
           interests: Json
+          location_consent: string
           max_connections: number
           music: Json
           seat: string
@@ -1682,6 +1683,7 @@ export type Database = {
           hotel_stars?: Json
           hotel_types?: Json
           interests?: Json
+          location_consent?: string
           max_connections?: number
           music?: Json
           seat?: string
@@ -1719,6 +1721,7 @@ export type Database = {
           hotel_stars?: Json
           hotel_types?: Json
           interests?: Json
+          location_consent?: string
           max_connections?: number
           music?: Json
           seat?: string
