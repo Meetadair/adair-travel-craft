@@ -12,7 +12,8 @@
     "format": "prettier --write .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "playwright test"
+    "test:e2e": "bash scripts/dev-up.sh && playwright test",
+    "dev:up": "bash scripts/dev-up.sh"
   },
   "overrides": {
     "rolldown": "1.2.1"

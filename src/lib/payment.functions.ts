@@ -6,6 +6,11 @@
  */
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import {
+  bookableTotalMinor,
+  type PricedLines,
+  type SearchLines,
+} from "@/lib/trip/bookable-total";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { PaymentMethodKind, SettlementModel } from "@/lib/payments/types";
 
@@ -22,7 +27,12 @@ export type SavedCard = {
 export type PaymentSession = {
   clientKey: string | null;
   /** Set when the payment step cannot run, e.g. the provider key is missing. */
-  unavailable: "supplier-not-configured" | "card-payments-not-enabled" | null;
+  unavailable:
+    | "supplier-not-configured"
+    | "card-payments-not-enabled"
+    /** Nothing on this card can be bought, so there is nothing to charge for. */
+    | "nothing-bookable"
+    | null;
   testMode: boolean;
   currency: string;
   /** Duffel offer the 3-D Secure session must be created against. */
@@ -57,8 +67,11 @@ export const getPaymentSession = createServerFn({ method: "POST" })
       .eq("id", data.cardId)
       .maybeSingle();
     if (cardRes.error) throw new Error(cardRes.error.message);
-    const items = (cardRes.data as { items?: { search?: { flight?: { offerId?: string } } } } | null)
-      ?.items;
+    const items = (
+      cardRes.data as {
+        items?: { search?: SearchLines; priced?: PricedLines };
+      } | null
+    )?.items;
     const offerId = items?.search?.flight?.offerId ?? null;
 
     const savedRes = await supabase
@@ -79,9 +92,36 @@ export const getPaymentSession = createServerFn({ method: "POST" })
 
     const row = cardRes.data as { currency?: string; total_minor?: number } | null;
     const currency = row?.currency ?? "EUR";
-    const amountMinor = row?.total_minor ?? 0;
+    // Only what a supplier will actually sell us. Opening the intent for the
+    // card's whole total authorised the traveller's card for lines the booking
+    // step would immediately record as "requested, supplier-not-enabled" and
+    // never buy — charge for three things, deliver one.
+    //
+    // There is no fallback to the card's stored total on purpose. Falling back
+    // is how the bug returns: a card whose every line turns out unsellable
+    // would quietly be charged in full again. Nothing sellable means nothing
+    // to pay for, and the checkout says so instead of taking money.
+    const amountMinor = bookableTotalMinor(items?.priced ?? {}, items?.search ?? {});
 
     const chosen = await paymentProvider(supabase);
+    if (amountMinor <= 0) {
+      return {
+        clientKey: null,
+        unavailable: "nothing-bookable",
+        testMode: false,
+        currency,
+        offerId,
+        savedCards,
+        provider: "none",
+        providerLabel: "No payment provider",
+        settlementModel: "supplier-of-record",
+        methods: [],
+        intentRef: null,
+        amountMinor: 0,
+        publishableKey: null,
+        clientSecret: null,
+      };
+    }
     if (chosen.status !== "ok") {
       return {
         clientKey: null,

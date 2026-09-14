@@ -4,6 +4,7 @@
  */
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { chargeableTotalEur } from "@/lib/trip/booked-total";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { TripSearchResponse, TripStop } from "@/lib/trip/types";
 import { CITIES } from "@/lib/trip/cities";
@@ -638,9 +639,11 @@ export const bookTripCard = createServerFn({ method: "POST" })
 
     if (!lines.length) throw new Error("nothing-selected");
 
-    const confirmedTotal =
-      Math.round(lines.reduce((sum, l) => sum + (l.status === "failed" ? 0 : l.amountEur), 0) * 100) /
-      100;
+    // Only what somebody actually sold us. A "requested" line — a hotel whose
+    // supplier product is not enabled, a car no provider sells through an API —
+    // was carrying its full price into this total, so the traveller was told
+    // they owed money for a room that was never booked and never would be.
+    const confirmedTotal = chargeableTotalEur(lines);
     const status: BookingResult["status"] = lines.every((l) => l.status === "failed")
       ? "failed"
       : failed
