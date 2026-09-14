@@ -16,6 +16,8 @@ export type BookingMembership = {
   last4: string;
   tier: string | null;
   hasNumber: boolean;
+  /** Whose card this is. Null means the account holder. */
+  travellerId: string | null;
 };
 
 export async function loadMemberships(userId: string): Promise<BookingMembership[]> {
@@ -25,7 +27,7 @@ export async function loadMemberships(userId: string): Promise<BookingMembership
     const res = await supabaseAdmin
       .from("loyalty_memberships")
       .select(
-        "id, category, programme_code, programme_label, airline_iata, member_number_encrypted, member_number_last4, tier",
+        "id, category, programme_code, programme_label, airline_iata, member_number_encrypted, member_number_last4, tier, traveller_id",
       )
       .eq("user_id", userId);
     if (res.error) throw new Error(res.error.message);
@@ -39,6 +41,7 @@ export async function loadMemberships(userId: string): Promise<BookingMembership
       member_number_encrypted: string | null;
       member_number_last4: string | null;
       tier: string | null;
+      traveller_id: string | null;
     }>;
 
     const out: BookingMembership[] = [];
@@ -56,6 +59,7 @@ export async function loadMemberships(userId: string): Promise<BookingMembership
           last4: row.member_number_last4 ?? "",
           tier: row.tier,
           hasNumber: Boolean(row.member_number_encrypted),
+          travellerId: row.traveller_id,
         });
       } catch (error) {
         console.error("loyalty decrypt failed", row.id, error);

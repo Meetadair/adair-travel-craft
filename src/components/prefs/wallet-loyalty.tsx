@@ -13,6 +13,7 @@ import {
   saveMembership,
   type Membership,
 } from "@/lib/loyalty.functions";
+import { listCompanions } from "@/lib/companions.functions";
 import {
   CATEGORY_LABEL,
   COMMON_TIERS,
@@ -31,9 +32,17 @@ type Draft = {
   customLabel: string;
   memberNumber: string;
   tier: string;
+  /** Who holds this card — a travel_companions id, or null for the account holder. */
+  travellerId: string | null;
 };
 
-const emptyDraft: Draft = { programmeCode: "", customLabel: "", memberNumber: "", tier: "" };
+const emptyDraft: Draft = {
+  programmeCode: "",
+  customLabel: "",
+  memberNumber: "",
+  tier: "",
+  travellerId: null,
+};
 
 /** Each category keeps its own draft, so opening one never clears another. */
 type Drafts = Partial<Record<LoyaltyCategory, Draft>>;
@@ -43,9 +52,23 @@ export function WalletLoyalty() {
   const save = useServerFn(saveMembership);
   const remove = useServerFn(deleteMembership);
   const reveal = useServerFn(revealMembership);
+  const fetchCompanions = useServerFn(listCompanions);
   const queryClient = useQueryClient();
 
   const list = useQuery({ queryKey: ["loyalty"], queryFn: () => fetchList() });
+  // Only people other than the account holder can be picked — "You" always
+  // covers the lead traveller and doesn't need a row of its own here.
+  const companions = useQuery({
+    queryKey: ["companions"],
+    queryFn: () => fetchCompanions({}),
+    retry: false,
+  });
+  const companionList = (companions.data ?? []).filter((c) => !c.isSelf);
+  const travellerLabel = (id: string | null): string | null => {
+    if (!id) return null;
+    const match = companionList.find((c) => c.id === id);
+    return match ? `${match.givenName} ${match.familyName}`.trim() : null;
+  };
   const [open, setOpen] = useState<Record<string, boolean>>({});
   const [drafts, setDrafts] = useState<Drafts>({});
   const [justSaved, setJustSaved] = useState<LoyaltyCategory | null>(null);
@@ -71,6 +94,7 @@ export function WalletLoyalty() {
           airlineIata: option?.iata ?? null,
           memberNumber: draft.memberNumber,
           tier: draft.tier.trim() || null,
+          travellerId: draft.travellerId,
         },
       });
       return category;
@@ -128,7 +152,10 @@ export function WalletLoyalty() {
               className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border px-4 py-3"
             >
               <div className="min-w-0">
-                <p className="truncate text-sm font-medium">{m.programmeLabel}</p>
+                <p className="truncate text-sm font-medium">
+                  {m.programmeLabel}
+                  {travellerLabel(m.travellerId) ? ` · ${travellerLabel(m.travellerId)}` : ""}
+                </p>
                 <p className="text-xs text-muted-foreground">
                   {m.hasNumber ? (revealed[m.id] ?? maskNumber(m.last4)) : "No member number"}
                   {m.tier ? ` · ${m.tier}` : ""}
@@ -224,6 +251,24 @@ export function WalletLoyalty() {
                   className={inputClass}
                 />
               </label>
+
+              {companionList.length > 0 && (
+                <label className="block">
+                  <span className="text-xs font-medium text-muted-foreground">Whose card?</span>
+                  <select
+                    value={draftFor(category).travellerId ?? ""}
+                    onChange={(e) => patchDraft(category, { travellerId: e.target.value || null })}
+                    className={inputClass}
+                  >
+                    <option value="">You</option>
+                    {companionList.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.givenName} {c.familyName}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              )}
 
               {addMutation.isError && (
                 <p className="text-sm text-primary">{(addMutation.error as Error).message}</p>

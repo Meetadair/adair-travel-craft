@@ -18,6 +18,8 @@ export type Membership = {
   tier: string | null;
   /** False when the traveller kept the programme but hasn't given the number. */
   hasNumber: boolean;
+  /** Whose card this is. Null means the account holder. */
+  travellerId: string | null;
 };
 
 type Row = {
@@ -28,6 +30,7 @@ type Row = {
   airline_iata: string | null;
   member_number_last4: string | null;
   tier: string | null;
+  traveller_id: string | null;
 };
 
 const toMembership = (row: Row): Membership => ({
@@ -41,6 +44,7 @@ const toMembership = (row: Row): Membership => ({
   last4: row.member_number_last4 ?? "",
   tier: row.tier,
   hasNumber: Boolean(row.member_number_last4),
+  travellerId: row.traveller_id,
 });
 
 const upsertSchema = z.object({
@@ -58,6 +62,8 @@ const upsertSchema = z.object({
   // credited when the number reaches the supplier at booking.
   memberNumber: z.string().trim().max(40),
   tier: z.string().trim().max(40).nullable().optional(),
+  /** A travel_companions id — whose card this is. Omitted or null: the account holder. */
+  travellerId: z.string().uuid().nullable().optional(),
 });
 
 export const listMemberships = createServerFn({ method: "GET" })
@@ -65,7 +71,9 @@ export const listMemberships = createServerFn({ method: "GET" })
   .handler(async ({ context }): Promise<Membership[]> => {
     const res = await context.supabase
       .from("loyalty_memberships")
-      .select("id, category, programme_code, programme_label, airline_iata, member_number_last4, tier")
+      .select(
+        "id, category, programme_code, programme_label, airline_iata, member_number_last4, tier, traveller_id",
+      )
       .eq("user_id", context.userId)
       .order("created_at", { ascending: true });
     if (res.error) throw new Error(res.error.message);
@@ -79,6 +87,21 @@ export const saveMembership = createServerFn({ method: "POST" })
     const { encryptSecret } = await import("@/lib/loyalty/crypto.server");
     const number = data.memberNumber.replace(/\s+/g, "");
     const hasNumber = number.length >= 4;
+
+    // A card can only be assigned to someone actually in this traveller's
+    // wallet — never trust an id the client happens to send.
+    let travellerId: string | null = null;
+    if (data.travellerId) {
+      const owned = await context.supabase
+        .from("travel_companions")
+        .select("id")
+        .eq("id", data.travellerId)
+        .eq("user_id", context.userId)
+        .maybeSingle();
+      if (!owned.data) throw new Error("traveller-not-found");
+      travellerId = data.travellerId;
+    }
+
     const row = {
       user_id: context.userId,
       category: data.category,
@@ -88,6 +111,7 @@ export const saveMembership = createServerFn({ method: "POST" })
       member_number_encrypted: hasNumber ? await encryptSecret(number) : null,
       member_number_last4: hasNumber ? number.slice(-4) : null,
       tier: data.tier?.trim() ? data.tier.trim() : null,
+      traveller_id: travellerId,
     };
 
     const query = data.id
@@ -99,7 +123,9 @@ export const saveMembership = createServerFn({ method: "POST" })
       : context.supabase.from("loyalty_memberships").insert(row);
 
     const res = await query
-      .select("id, category, programme_code, programme_label, airline_iata, member_number_last4, tier")
+      .select(
+        "id, category, programme_code, programme_label, airline_iata, member_number_last4, tier, traveller_id",
+      )
       .single();
     if (res.error) throw new Error(res.error.message);
     return toMembership(res.data as Row);
@@ -131,8 +157,7 @@ export const revealMembership = createServerFn({ method: "POST" })
       .maybeSingle();
     if (res.error) throw new Error(res.error.message);
     if (!res.data) throw new Error("not-found");
-    const stored = (res.data as { member_number_encrypted: string | null })
-      .member_number_encrypted;
+    const stored = (res.data as { member_number_encrypted: string | null }).member_number_encrypted;
     if (!stored) return { memberNumber: "" };
     const { decryptSecret } = await import("@/lib/loyalty/crypto.server");
     return {

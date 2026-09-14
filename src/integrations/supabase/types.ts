@@ -1385,6 +1385,7 @@ export type Database = {
           programme_code: string;
           programme_label: string;
           tier: string | null;
+          traveller_id: string | null;
           updated_at: string;
           user_id: string;
         };
@@ -1398,6 +1399,7 @@ export type Database = {
           programme_code: string;
           programme_label: string;
           tier?: string | null;
+          traveller_id?: string | null;
           updated_at?: string;
           user_id: string;
         };
@@ -1411,10 +1413,19 @@ export type Database = {
           programme_code?: string;
           programme_label?: string;
           tier?: string | null;
+          traveller_id?: string | null;
           updated_at?: string;
           user_id?: string;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "loyalty_memberships_traveller_id_fkey";
+            columns: ["traveller_id"];
+            isOneToOne: false;
+            referencedRelation: "travel_companions";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       notification_log: {
         Row: {

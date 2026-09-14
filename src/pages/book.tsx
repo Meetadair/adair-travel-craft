@@ -107,6 +107,8 @@ export function BookPage({ cardId }: { cardId: string }) {
       passportCountry: string;
       passportExpiry: string;
       remember: boolean;
+      /** The saved traveller this form was pre-filled from, if any. */
+      travellerId: string | null;
     }>
   >([]);
   const [extras, setExtras] = useState<AncillarySelection[]>([]);
@@ -148,6 +150,7 @@ export function BookPage({ cardId }: { cardId: string }) {
             title: c.title as "mr" | "ms" | "mrs",
             passport: passportOf(c),
             remember: c.remember,
+            travellerId: c.travellerId,
           })),
           ancillaries: include.flight ? extras : [],
           payment: authorised,
@@ -285,6 +288,7 @@ export function BookPage({ cardId }: { cardId: string }) {
           passportCountry: suggestion?.passportCountry ?? "",
           passportExpiry: suggestion?.passportExpiry ?? "",
           remember: !suggestion,
+          travellerId: suggestion?.id ?? null,
         });
       }
       return next;

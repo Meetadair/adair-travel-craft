@@ -201,6 +201,8 @@ export async function createFlightOrder(input: {
     gender: "m" | "f";
     title: "mr" | "ms" | "mrs";
     passport?: PassportDetails | null | undefined;
+    /** The travel_companions row this person was pre-filled from, if any. */
+    travellerId?: string | null;
   }>;
   idempotencyKey: string;
   /**
@@ -211,8 +213,15 @@ export async function createFlightOrder(input: {
   cardPayment?: { threeDSecureSessionId: string } | null;
   /** Bags and seats the customer chose, as supplier service ids. */
   services?: AncillarySelection[];
-  /** Frequent-flyer accounts the supplier accepts on the order. */
-  loyaltyAccounts?: Array<{ airlineIataCode: string; accountNumber: string }>;
+  /**
+   * Frequent-flyer accounts the supplier accepts on the order, grouped by
+   * whose they are — the map key is a travel_companions id, or null for the
+   * lead traveller (passenger 0). A companion with no matching key gets none.
+   */
+  loyaltyAccountsByTraveller?: Map<
+    string | null,
+    Array<{ airlineIataCode: string; accountNumber: string }>
+  >;
 }): Promise<OrderResult> {
   const json = await call<{
     data?: {
@@ -245,10 +254,13 @@ export async function createFlightOrder(input: {
             : { type: "balance", amount: input.amount.toFixed(2), currency: input.currency },
         ],
         passengers: input.passengerIds.map((id, index) => {
-          const person =
-            index === 0
-              ? input.traveller
-              : ((input.companions ?? [])[index - 1] ?? input.traveller);
+          const companion = index === 0 ? null : ((input.companions ?? [])[index - 1] ?? null);
+          const person = companion ?? input.traveller;
+          // Passenger 0 is always the account holder (travellerId null); a
+          // companion carries their own id only when the form was pre-filled
+          // from their saved traveller profile.
+          const travellerId = index === 0 ? null : (companion?.travellerId ?? null);
+          const accounts = input.loyaltyAccountsByTraveller?.get(travellerId) ?? [];
           return {
             id,
             given_name: person.givenName,
@@ -259,9 +271,9 @@ export async function createFlightOrder(input: {
             email: input.traveller.email,
             phone_number: input.traveller.phone,
             ...identityDocuments(person.passport),
-            ...(index === 0 && input.loyaltyAccounts?.length
+            ...(accounts.length
               ? {
-                  loyalty_programme_accounts: input.loyaltyAccounts.map((a) => ({
+                  loyalty_programme_accounts: accounts.map((a) => ({
                     airline_iata_code: a.airlineIataCode,
                     account_number: a.accountNumber,
                   })),

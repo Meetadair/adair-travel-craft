@@ -9,16 +9,8 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { TripSearchResponse, TripStop } from "@/lib/trip/types";
 import { CITIES } from "@/lib/trip/cities";
 import { paymentKey, shouldStopBeforeSupplier } from "@/lib/trip/idempotency";
-import {
-  tripCalendarEvents,
-  type CalendarEvent,
-  type ItemCalendarPayload,
-} from "@/lib/calendar";
-import {
-  INSURANCE_NOTE,
-  INSURANCE_TITLE,
-  type InsuranceQuote,
-} from "@/lib/trip/insurance";
+import { tripCalendarEvents, type CalendarEvent, type ItemCalendarPayload } from "@/lib/calendar";
+import { INSURANCE_NOTE, INSURANCE_TITLE, type InsuranceQuote } from "@/lib/trip/insurance";
 
 /**
  * All three parts or none. Duffel refuses an identity document that is just a
@@ -52,7 +44,10 @@ const bookSchema = z.object({
     car: z.boolean(),
     insurance: z.boolean().optional(),
     /** Optional airport transfers, by leg. */
-    rides: z.array(z.enum(["arrival", "departure"])).max(2).optional(),
+    rides: z
+      .array(z.enum(["arrival", "departure"]))
+      .max(2)
+      .optional(),
   }),
   companyId: z.string().uuid().nullable(),
   traveller: travellerSchema,
@@ -68,13 +63,21 @@ const bookSchema = z.object({
         passport: passportSchema,
         /** Save this person to "people I travel with" for next time. */
         remember: z.boolean().optional(),
+        /**
+         * The travel_companions row this form was pre-filled from, if any —
+         * so this person's own loyalty cards (not the lead traveller's) are
+         * sent to the airline for them.
+         */
+        travellerId: z.string().uuid().nullable().optional(),
       }),
     )
     .max(8)
     .optional(),
   /** Airline extras the customer chose: supplier service ids and quantities. */
   ancillaries: z
-    .array(z.object({ id: z.string().trim().min(3).max(120), quantity: z.number().int().min(1).max(9) }))
+    .array(
+      z.object({ id: z.string().trim().min(3).max(120), quantity: z.number().int().min(1).max(9) }),
+    )
     .max(12)
     .optional(),
   /**
@@ -85,7 +88,11 @@ const bookSchema = z.object({
       providerCardId: z.string().trim().min(3).max(120),
       threeDSecureSessionId: z.string().trim().max(120),
       brand: z.string().trim().max(40).nullable(),
-      last4: z.string().trim().regex(/^\d{4}$/).nullable(),
+      last4: z
+        .string()
+        .trim()
+        .regex(/^\d{4}$/)
+        .nullable(),
       method: z.enum(["card", "saved-card"]),
     })
     .nullable()
@@ -135,14 +142,11 @@ export type BookingResult = {
   } | null;
 };
 
-
 type CardItems = {
   search: TripSearchResponse;
   priced: { flight: number | null; stay: number | null; car: number | null; total: number };
   insurance?: InsuranceQuote | null;
 };
-
-
 
 /** Analytics sink; never allowed to break a booking. */
 async function recordEvent(
@@ -249,20 +253,30 @@ export const bookTripCard = createServerFn({ method: "POST" })
 
     // Programmes earn across partners, not only on the airline that owns them:
     // a LOT ticket credits Miles & More. The mapping lives in the database.
-    const flightCarrierCode =
-      search.flight?.flightNumbers[0]?.match(/^[A-Z0-9]{2}/)?.[0] ?? null;
+    const flightCarrierCode = search.flight?.flightNumbers[0]?.match(/^[A-Z0-9]{2}/)?.[0] ?? null;
     const flightMemberships = usable.filter(
       (m) =>
         m.category === "airline" &&
         (earnsOn(earningRules, "airline", m.programmeCode, flightCarrierCode) ||
           (m.airlineIata !== null && m.airlineIata === flightCarrierCode)),
     );
-    const flightAccounts = flightMemberships
-      .filter((m) => m.airlineIata ?? flightCarrierCode)
-      .map((m) => ({
+    // Each passenger gets their own cards, not just the lead traveller's — a
+    // membership tagged with a companion's travel_companions id is grouped
+    // under that id; an untagged one (travellerId null) belongs to whoever
+    // is passenger 0.
+    const flightAccountsByTraveller = new Map<
+      string | null,
+      Array<{ airlineIataCode: string; accountNumber: string }>
+    >();
+    for (const m of flightMemberships.filter((m) => m.airlineIata ?? flightCarrierCode)) {
+      const key = m.travellerId ?? null;
+      const list = flightAccountsByTraveller.get(key) ?? [];
+      list.push({
         airlineIataCode: (flightCarrierCode ?? m.airlineIata) as string,
         accountNumber: m.memberNumber,
-      }));
+      });
+      flightAccountsByTraveller.set(key, list);
+    }
     for (const m of usable.filter(
       (m) => m.category === "airline" && !flightMemberships.includes(m),
     )) {
@@ -333,11 +347,14 @@ export const bookTripCard = createServerFn({ method: "POST" })
           currency: offer.currency,
           passengerIds: offer.passengerIds,
           traveller: data.traveller,
-          companions: data.companions ?? [],
+          companions: (data.companions ?? []).map((c) => ({
+            ...c,
+            travellerId: c.travellerId ?? null,
+          })),
           services,
           idempotencyKey: `${card.id}-flight`,
           cardPayment,
-          loyaltyAccounts: flightAccounts,
+          loyaltyAccountsByTraveller: flightAccountsByTraveller,
         });
         for (const m of flightMemberships) {
           loyaltyApplied.push({
@@ -384,7 +401,6 @@ export const bookTripCard = createServerFn({ method: "POST" })
             payload: { serviceId: extra.id, quantity: extra.quantity },
           });
         }
-
       } catch (error) {
         failed = true;
         const message = error instanceof Error ? error.message : "unknown";
@@ -406,7 +422,6 @@ export const bookTripCard = createServerFn({ method: "POST" })
         });
       }
     }
-
 
     // Stays go through Duffel Stays: quote the rate, then book it. Until the
     // product is enabled on the account the supplier answers 401/403 and the
@@ -435,9 +450,7 @@ export const bookTripCard = createServerFn({ method: "POST" })
       if (!stay.rateId) {
         pushRequested();
       } else {
-        const { bookStay, freeCancellationUntil } = await import(
-          "@/lib/trip/duffel-stays.server"
-        );
+        const { bookStay, freeCancellationUntil } = await import("@/lib/trip/duffel-stays.server");
         const outcome = await bookStay({
           rateId: stay.rateId,
           expectedAmount: stay.amount,
@@ -578,9 +591,6 @@ export const bookTripCard = createServerFn({ method: "POST" })
       });
     }
 
-
-
-
     // Airport transfers. Booked through the enabled ride provider when one is
     // connected; otherwise stored as a requested line with no price, so the
     // itinerary carries the pickup details without inventing a fare.
@@ -697,7 +707,6 @@ export const bookTripCard = createServerFn({ method: "POST" })
           status: "failed",
         },
       };
-
     }
 
     const tripRow = await supabase
@@ -766,7 +775,6 @@ export const bookTripCard = createServerFn({ method: "POST" })
         r.id,
       ]),
     );
-
 
     await supabase
       .from("trip_cards")
@@ -984,7 +992,7 @@ export const bookTripCard = createServerFn({ method: "POST" })
     try {
       const { loadChannel, notifyTraveller } = await import("@/lib/notifications/send.server");
       const channel = await loadChannel(supabase, userId);
-      const email = context.claims?.['email'];
+      const email = context.claims?.["email"];
       await notifyTraveller(supabase, {
         userId,
         kind: "booking_confirmation",
@@ -1048,8 +1056,6 @@ export const bookTripCard = createServerFn({ method: "POST" })
         status: "test_settled",
       },
     };
-
-
   });
 
 /** Stored stop list, falling back to origin + destination from the city map. */
@@ -1096,8 +1102,6 @@ export type MyTrip = {
   tips: Array<{ key: string; label: string; text: string }>;
   /** The sentence this trip was composed from, for "Book again". */
   sentence: string | null;
-
-
 };
 
 export const listMyTrips = createServerFn({ method: "GET" })
@@ -1137,7 +1141,8 @@ export const listMyTrips = createServerFn({ method: "GET" })
         .in("id", cardIds);
       for (const row of (cardsRes.data ?? []) as Array<{
         id: string;
-        trip_requests: { raw_sentence: string | null } | Array<{ raw_sentence: string | null }> | null;
+        trip_requests:
+          { raw_sentence: string | null } | Array<{ raw_sentence: string | null }> | null;
       }>) {
         const req = Array.isArray(row.trip_requests) ? row.trip_requests[0] : row.trip_requests;
         if (req?.raw_sentence) sentenceByCard.set(row.id, req.raw_sentence);
@@ -1169,7 +1174,6 @@ export const listMyTrips = createServerFn({ method: "GET" })
       offer_reference: string | null;
       payload: ItemCalendarPayload | null;
     }>;
-
 
     // Destination notes, shown once a trip is booked. Nothing is generated:
     // a destination with no editorial tips simply has none.
@@ -1213,7 +1217,6 @@ export const listMyTrips = createServerFn({ method: "GET" })
           amountEur: Number(i.amount),
           reference: i.offer_reference,
           payload: (i.payload ?? null) as ItemCalendarPayload | null,
-
         })),
       tips:
         trip.status === "cancelled" || !trip.city
@@ -1265,11 +1268,7 @@ export const cancelTripItem = createServerFn({ method: "POST" })
       }
     }
 
-    await supabase
-      .from("trip_items")
-      .update({ status })
-      .eq("id", item.id)
-      .eq("user_id", userId);
+    await supabase.from("trip_items").update({ status }).eq("id", item.id).eq("user_id", userId);
 
     // Remove this line's events from any connected calendar.
     const { removeItemFromCalendars } = await import("@/lib/calendar/sync.server");
