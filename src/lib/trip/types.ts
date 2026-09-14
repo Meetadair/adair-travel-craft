@@ -18,6 +18,12 @@ export type TripRequest = {
   lon: number;
   departDate: string; // YYYY-MM-DD
   returnDate: string; // YYYY-MM-DD
+  /**
+   * True only when the traveller said so in as many words. Round trips stay
+   * the default, so `returnDate` is always populated; on a one-way it is the
+   * outbound date and nothing downstream reads it as a real return.
+   */
+  oneWay?: boolean;
   cabinClass: "economy" | "premium_economy" | "business" | "first";
   /** Everyone travelling, including children and lap infants. */
   passengers: number;

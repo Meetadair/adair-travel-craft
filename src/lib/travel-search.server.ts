@@ -40,6 +40,8 @@ export type TripSearchInput = {
   cabinClass?: string;
   needsCar?: boolean;
   notes?: string;
+  /** Flight only, one direction. Set from the sentence, never guessed. */
+  oneWay?: boolean;
 };
 
 export type TripSearchResult = {
@@ -90,6 +92,7 @@ async function duffelFlightWithChoice(input: TripSearchInput): Promise<TripOffer
     invoiceToCompany: false,
     needsCar: false,
     stops: [],
+    ...(input.oneWay ? { oneWay: true as const } : {}),
   };
 
   const found = await searchFlight(request);
@@ -137,18 +140,26 @@ async function duffelFlight(input: TripSearchInput): Promise<TripOffer | null> {
     },
     body: JSON.stringify({
       data: {
-        slices: [
-          {
-            origin: input.originIata,
-            destination: input.destinationIata,
-            departure_date: input.departDate,
-          },
-          {
-            origin: input.destinationIata,
-            destination: input.originIata,
-            departure_date: input.returnDate,
-          },
-        ],
+        slices: input.oneWay
+          ? [
+              {
+                origin: input.originIata,
+                destination: input.destinationIata,
+                departure_date: input.departDate,
+              },
+            ]
+          : [
+              {
+                origin: input.originIata,
+                destination: input.destinationIata,
+                departure_date: input.departDate,
+              },
+              {
+                origin: input.destinationIata,
+                destination: input.originIata,
+                departure_date: input.returnDate,
+              },
+            ],
         passengers: [{ type: "adult" }],
         cabin_class: cabin,
       },
@@ -540,6 +551,20 @@ export async function searchTrip(input: TripSearchInput): Promise<TripSearchResu
   if (!flight && token) {
     flight = await amadeusFlight(input, token);
     if (!flight) warnings.push("No flights available from the API for these dates.");
+  }
+
+  // A one-way is a flight and nothing else: with no return date there is no
+  // span to book a hotel or a car against, and inventing one would be a lie.
+  if (input.oneWay) {
+    const demoFlight = demoOffers(input).find((o) => o.kind === "flight")!;
+    const only = flight ?? demoFlight;
+    return {
+      offers: [only],
+      total: round(only.amount),
+      currency: only.currency,
+      source: only.live ? "live" : "demo",
+      warnings,
+    };
   }
 
   // Duffel Stays first, because that is where the booking will actually go.

@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { parseTripSentence } from "./trip/parse";
+import { isOneWay, parseTripSentence } from "./trip/parse";
 
 const askSchema = z.object({
   message: z.string().min(3).max(1000),
@@ -36,6 +36,7 @@ const parsedSchema = z.object({
   returnDate: z.string().min(8),
   cabinClass: z.string().optional(),
   needsCar: z.boolean().optional(),
+  oneWay: z.boolean().optional(),
   notes: z.string().optional(),
   reply: z.string().optional(),
 });
@@ -59,6 +60,7 @@ function fallbackParse(message: string): ParsedRequest | null {
     returnDate: request.returnDate,
     ...(request.cabinClass ? { cabinClass: request.cabinClass } : {}),
     needsCar: /auto|samoch|car/i.test(message),
+    ...(request.oneWay ? { oneWay: true } : {}),
     notes: message,
   };
 }
@@ -128,10 +130,13 @@ async function understand(message: string, locale = "en"): Promise<ParsedRequest
   const rules = fallbackParse(message);
   if (!rules) return null;
 
+  // One-way is decided by the sentence, not by the model: whichever parser
+  // won, the flag is recomputed here so Claude cannot invent a one-way trip.
+  const oneWay = isOneWay(message);
   const claude = await understandWithClaude(message, locale, today);
-  if (claude) return claude;
+  if (claude) return { ...claude, ...(oneWay ? { oneWay: true } : { oneWay: false }) };
 
-  return rules;
+  return { ...rules, ...(oneWay ? { oneWay: true } : { oneWay: false }) };
 }
 
 /** Public: composes a trip from live provider offers (or flagged samples). */
@@ -151,18 +156,22 @@ export const composeTrip = createServerFn({ method: "POST" })
       returnDate: parsed.returnDate,
       ...(parsed.cabinClass ? { cabinClass: parsed.cabinClass } : {}),
       ...(parsed.needsCar === undefined ? {} : { needsCar: parsed.needsCar }),
+      ...(parsed.oneWay ? { oneWay: true } : {}),
       ...(parsed.notes ? { notes: parsed.notes } : {}),
     });
 
     return {
       reply:
         parsed.reply ??
-        `${parsed.destinationCity}: ${parsed.departDate} – ${parsed.returnDate}. Your composed trip is below.`,
+        (parsed.oneWay
+          ? `${parsed.destinationCity}: ${parsed.departDate}, one way. Your composed trip is below.`
+          : `${parsed.destinationCity}: ${parsed.departDate} – ${parsed.returnDate}. Your composed trip is below.`),
       request: {
         originCity: parsed.originCity,
         destinationCity: parsed.destinationCity,
         departDate: parsed.departDate,
         returnDate: parsed.returnDate,
+        ...(parsed.oneWay ? { oneWay: true } : {}),
       },
       ...result,
     };

@@ -226,18 +226,26 @@ export async function searchFlight(
     "/air/offer_requests?return_offers=true",
     {
       data: {
-        slices: [
-          {
-            origin: req.originIata,
-            destination: req.destinationIata,
-            departure_date: req.departDate,
-          },
-          {
-            origin: req.destinationIata,
-            destination: req.originIata,
-            departure_date: req.returnDate,
-          },
-        ],
+        slices: req.oneWay
+          ? [
+              {
+                origin: req.originIata,
+                destination: req.destinationIata,
+                departure_date: req.departDate,
+              },
+            ]
+          : [
+              {
+                origin: req.originIata,
+                destination: req.destinationIata,
+                departure_date: req.departDate,
+              },
+              {
+                origin: req.destinationIata,
+                destination: req.originIata,
+                departure_date: req.returnDate,
+              },
+            ],
         // Age drives the fare: children get a child fare, babies a lap-infant
         // fare, so the airline prices the family rather than a row of adults.
         passengers: flightPassengers(req),

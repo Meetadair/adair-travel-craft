@@ -39,6 +39,23 @@ function addDays(date: Date, days: number): Date {
   return d;
 }
 
+/**
+ * A one-way is never inferred from a missing return date - travellers leave
+ * that out constantly and mean a round trip. It has to be said outright.
+ */
+export function isOneWay(sentence: string): boolean {
+  const text = sentence.toLowerCase();
+  return (
+    /\bone[\s-]?way\b/.test(text) ||
+    /\bno return\b/.test(text) ||
+    // No trailing \b: JS word boundaries only know ASCII, and \u0119 is not a
+    // word character, so \b would never match after "stron\u0119".
+    /\bw jedn[\u0105a] stron[\u0119e]/.test(text) ||
+    /\bbez powrotu\b/.test(text) ||
+    /\btylko tam\b/.test(text)
+  );
+}
+
 function cabinOf(text: string): TripRequest["cabinClass"] {
   if (/business|biznes|klasa biznes/.test(text)) return "business";
   if (/first class|pierwsza klasa/.test(text)) return "first";
@@ -394,6 +411,8 @@ export function parseTripSentence(
   }
   const mustDepartBy = mustDepartOf(sentence, today, iso(back));
 
+  const oneWay = isOneWay(sentence);
+
   const family = familyFromSentence(sentence);
 
   const stopEntries = destinations.length ? destinations : [destination];
@@ -410,7 +429,10 @@ export function parseTripSentence(
     lat: destination.lat,
     lon: destination.lon,
     departDate: iso(depart),
-    returnDate: iso(back),
+    // A one-way keeps a return date so the 100-odd places that read it keep
+    // working; it is the outbound date, and only the flight search cares.
+    returnDate: oneWay ? iso(depart) : iso(back),
+    ...(oneWay ? { oneWay: true as const } : {}),
     cabinClass: cabinOf(text),
     passengers: Math.max(passengersOf(text), family.children + family.infants + 1),
     childAges: family.ages.filter((age) => age >= 2),
