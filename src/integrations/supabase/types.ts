@@ -1618,7 +1618,6 @@ export type Database = {
       }
       preferences: {
         Row: {
-          business_prefs: Json
           accessibility_note: string | null
           airlines: Json
           avoid_note: string | null
@@ -1657,7 +1656,6 @@ export type Database = {
           user_id: string
         }
         Insert: {
-          business_prefs?: Json
           accessibility_note?: string | null
           airlines?: Json
           avoid_note?: string | null
@@ -1696,7 +1694,6 @@ export type Database = {
           user_id: string
         }
         Update: {
-          business_prefs?: Json
           accessibility_note?: string | null
           airlines?: Json
           avoid_note?: string | null
