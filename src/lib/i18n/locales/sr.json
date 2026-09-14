@@ -248,6 +248,16 @@
       "saveCompanyAction": "Sačuvajte kompaniju",
       "dismiss": "Ne sada"
     },
+    "location": {
+      "ask": "Da bih rekao koliko je to daleko od mesta gde stojite, potrebna mi je vaša lokacija — dozvoljavate?",
+      "privacy": "Koristimo je samo za ovaj odgovor i ne čuvamo je.",
+      "allow": "Dozvoli",
+      "deny": "Ne sada",
+      "blocked": "Pregledač blokira lokaciju za ovaj sajt. Otvorite katanac u adresnoj liniji, postavite Lokaciju na Dozvoli i pitajte ponovo.",
+      "unavailable": "Uređaj nije vratio poziciju. Meriću od vašeg hotela.",
+      "fromHotel": "Mereno od vašeg hotela.",
+      "fromCity": "Mereno od centra grada."
+    },
     "memory": {
       "sameAgain": "Prošli put ste u {city} odseli u hotelu {hotel} — želite li isto ponovo?",
       "sameAgainYes": "Isto ponovo",
