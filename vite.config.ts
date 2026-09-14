@@ -13,7 +13,18 @@ export default defineConfig(({ mode }) => {
   Object.assign(process.env, loadEnv(mode, process.cwd(), ""));
 
   return {
-    server: { port: 8080, host: true },
+    server: {
+      port: 8080,
+      // Fail loudly rather than moving to 8081.
+      //
+      // Vite's default is to take the next free port when 8080 is busy and
+      // print that URL instead. A stale server from an earlier run therefore
+      // sends the new one to 8081 in a line nobody reads, and localhost:8080
+      // silently shows nothing — which looks exactly like the app being
+      // broken. "Port 8080 is already in use" is a message somebody can act on.
+      strictPort: true,
+      host: true,
+    },
     // One copy of each, or hooks break across the router/start boundary.
     resolve: {
       dedupe: ["react", "react-dom", "@tanstack/react-router", "@tanstack/react-start"],
