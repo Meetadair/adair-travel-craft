@@ -7,6 +7,7 @@ import { applyAnswer, assumptionNote, clarify, type Clarification } from "@/lib/
 import { AirportAnswer, DateAnswer } from "@/components/trip/answer-controls";
 import { isCompleteRange, rangeSentence, type DateRange } from "@/lib/trip/answers";
 import { CabinParty, type Cabin } from "@/components/trip/cabin-party";
+import { SpeechToggle, useSpeech } from "@/components/voice-output";
 import {
   EMPTY_PARTY,
   describeParty,
@@ -126,6 +127,14 @@ export function AssistantPage() {
    * at all, which is the one moment it is worth the most.
    */
   const [cardDates, setCardDates] = useState<DateRange | null>(null);
+  /** Adair reading its replies aloud. Off until somebody asks for it. */
+  const speech = useSpeech(locale);
+  // Speaking happens here rather than at each call site, so a reply added
+  // anywhere in the page cannot be silently left unspoken.
+  useEffect(() => {
+    const latest = [...turns].reverse().find((t) => t.role === "adair");
+    if (latest) speech.say(latest.text);
+  }, [turns, speech]);
   /**
    * Cabin and who is flying, re-openable on the card. Airlines put this behind
    * one control for a reason: the cabin a family can afford depends on how
@@ -553,6 +562,13 @@ export function AssistantPage() {
             className="min-h-[56px] w-full resize-none bg-transparent px-2 py-2 text-sm outline-none"
           />
           <VoiceInput locale={locale} onTranscript={setInput} />
+          <SpeechToggle
+            enabled={speech.enabled}
+            supported={speech.supported}
+            onToggle={speech.toggle}
+            labelOn={t.assistant.speechOn}
+            labelOff={t.assistant.speechOff}
+          />
           <button
             type="submit"
             disabled={search.isPending}

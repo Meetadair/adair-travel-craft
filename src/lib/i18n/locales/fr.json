@@ -361,7 +361,9 @@
       "detailsFailed": "Ces informations n'ont pas été acceptées. Veuillez les vérifier."
     },
     "bookIdle": "Réserver",
-    "bookBusy": "Offre en cours de blocage…"
+    "bookBusy": "Offre en cours de blocage…",
+    "speechOn": "Adair lit les réponses à voix haute",
+    "speechOff": "Lire les réponses à voix haute"
   },
   "auth": {
     "meta": {
@@ -419,7 +421,9 @@
     "saveBusy": "Enregistrement…",
     "saved": "Enregistré.",
     "bookIdle": "Réserver",
-    "bookBusy": "Offre en cours de blocage…"
+    "bookBusy": "Offre en cours de blocage…",
+    "speechOn": "Adair lit les réponses à voix haute",
+    "speechOff": "Lire les réponses à voix haute"
   },
   "investors": {
     "meta": {

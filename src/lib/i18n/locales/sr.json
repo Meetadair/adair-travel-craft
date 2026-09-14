@@ -361,7 +361,9 @@
       "detailsFailed": "Podaci nisu prihvaćeni. Molimo proverite ih."
     },
     "bookIdle": "Rezerviši",
-    "bookBusy": "Držimo ponudu…"
+    "bookBusy": "Držimo ponudu…",
+    "speechOn": "Adair čita odgovore naglas",
+    "speechOff": "Čitaj odgovore naglas"
   },
   "auth": {
     "meta": {
@@ -419,7 +421,9 @@
     "saveBusy": "Čuvanje…",
     "saved": "Sačuvano.",
     "bookIdle": "Rezerviši",
-    "bookBusy": "Držimo ponudu…"
+    "bookBusy": "Držimo ponudu…",
+    "speechOn": "Adair čita odgovore naglas",
+    "speechOff": "Čitaj odgovore naglas"
   },
   "investors": {
     "meta": {

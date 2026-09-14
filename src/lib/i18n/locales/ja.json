@@ -361,7 +361,9 @@
       "detailsFailed": "入力情報を受け付けられませんでした。内容をご確認ください。"
     },
     "bookIdle": "予約する",
-    "bookBusy": "オファーを確保中…"
+    "bookBusy": "オファーを確保中…",
+    "speechOn": "Adair が返答を読み上げます",
+    "speechOff": "返答を読み上げる"
   },
   "auth": {
     "meta": {
@@ -419,7 +421,9 @@
     "saveBusy": "保存中…",
     "saved": "保存しました。",
     "bookIdle": "予約する",
-    "bookBusy": "オファーを確保中…"
+    "bookBusy": "オファーを確保中…",
+    "speechOn": "Adair が返答を読み上げます",
+    "speechOff": "返答を読み上げる"
   },
   "investors": {
     "meta": {

@@ -361,7 +361,9 @@
       "detailsFailed": "Uppgifterna godkändes inte. Kontrollera och försök igen."
     },
     "bookIdle": "Boka",
-    "bookBusy": "Håller erbjudandet…"
+    "bookBusy": "Håller erbjudandet…",
+    "speechOn": "Adair läser upp svaren",
+    "speechOff": "Läs upp svaren"
   },
   "auth": {
     "meta": {
@@ -419,7 +421,9 @@
     "saveBusy": "Sparar…",
     "saved": "Sparat.",
     "bookIdle": "Boka",
-    "bookBusy": "Håller erbjudandet…"
+    "bookBusy": "Håller erbjudandet…",
+    "speechOn": "Adair läser upp svaren",
+    "speechOff": "Läs upp svaren"
   },
   "investors": {
     "meta": {

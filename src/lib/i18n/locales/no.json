@@ -361,7 +361,9 @@
       "detailsFailed": "Opplysningene ble ikke godkjent. Vennligst sjekk dem."
     },
     "bookIdle": "Bestill",
-    "bookBusy": "Holder tilbudet…"
+    "bookBusy": "Holder tilbudet…",
+    "speechOn": "Adair leser svarene høyt",
+    "speechOff": "Les svarene høyt"
   },
   "auth": {
     "meta": {
@@ -419,7 +421,9 @@
     "saveBusy": "Lagrer…",
     "saved": "Lagret.",
     "bookIdle": "Bestill",
-    "bookBusy": "Holder tilbudet…"
+    "bookBusy": "Holder tilbudet…",
+    "speechOn": "Adair leser svarene høyt",
+    "speechOff": "Les svarene høyt"
   },
   "investors": {
     "meta": {

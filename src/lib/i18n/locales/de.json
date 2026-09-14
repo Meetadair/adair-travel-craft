@@ -361,7 +361,9 @@
       "detailsFailed": "Diese Angaben wurden nicht akzeptiert. Bitte überprüfen."
     },
     "bookIdle": "Jetzt buchen",
-    "bookBusy": "Angebot wird gehalten…"
+    "bookBusy": "Angebot wird gehalten…",
+    "speechOn": "Adair liest Antworten vor",
+    "speechOff": "Antworten vorlesen"
   },
   "auth": {
     "meta": {
@@ -419,7 +421,9 @@
     "saveBusy": "Wird gespeichert…",
     "saved": "Gespeichert.",
     "bookIdle": "Jetzt buchen",
-    "bookBusy": "Angebot wird gehalten…"
+    "bookBusy": "Angebot wird gehalten…",
+    "speechOn": "Adair liest Antworten vor",
+    "speechOff": "Antworten vorlesen"
   },
   "investors": {
     "meta": {

@@ -361,7 +361,9 @@
       "detailsFailed": "乘机人信息未通过核验，请检查后重试。"
     },
     "bookIdle": "立即预订",
-    "bookBusy": "正在锁定报价…"
+    "bookBusy": "正在锁定报价…",
+    "speechOn": "Adair 朗读回复",
+    "speechOff": "朗读回复"
   },
   "auth": {
     "meta": {
@@ -419,7 +421,9 @@
     "saveBusy": "正在保存…",
     "saved": "已保存。",
     "bookIdle": "立即预订",
-    "bookBusy": "正在锁定报价…"
+    "bookBusy": "正在锁定报价…",
+    "speechOn": "Adair 朗读回复",
+    "speechOff": "朗读回复"
   },
   "investors": {
     "meta": {

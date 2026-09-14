@@ -361,7 +361,9 @@
       "detailsFailed": "Tietoja ei hyväksytty. Tarkista ne."
     },
     "bookIdle": "Varaa",
-    "bookBusy": "Varataan tarjousta…"
+    "bookBusy": "Varataan tarjousta…",
+    "speechOn": "Adair lukee vastaukset ääneen",
+    "speechOff": "Lue vastaukset ääneen"
   },
   "auth": {
     "meta": {
@@ -419,7 +421,9 @@
     "saveBusy": "Tallennetaan…",
     "saved": "Tallennettu.",
     "bookIdle": "Varaa",
-    "bookBusy": "Varataan tarjousta…"
+    "bookBusy": "Varataan tarjousta…",
+    "speechOn": "Adair lukee vastaukset ääneen",
+    "speechOff": "Lue vastaukset ääneen"
   },
   "investors": {
     "meta": {

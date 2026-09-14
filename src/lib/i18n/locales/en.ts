@@ -149,6 +149,8 @@ export const en = {
     showAlternatives: "Show alternatives",
     backToRecommendation: "Back to Adair's recommendation",
     total: "Total, one booking",
+    speechOn: "Adair reads replies aloud",
+    speechOff: "Read replies aloud",
     bookIdle: "Book this trip",
     bookBusy: "Holding your offer…",
     saveIdle: "Save for later",

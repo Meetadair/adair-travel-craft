@@ -361,7 +361,9 @@
       "detailsFailed": "No se han aceptado esos datos. Por favor, revísalos."
     },
     "bookIdle": "Reservar",
-    "bookBusy": "Reservando la oferta…"
+    "bookBusy": "Reservando la oferta…",
+    "speechOn": "Adair lee las respuestas en voz alta",
+    "speechOff": "Leer las respuestas en voz alta"
   },
   "auth": {
     "meta": {
@@ -419,7 +421,9 @@
     "saveBusy": "Guardando…",
     "saved": "Guardado.",
     "bookIdle": "Reservar",
-    "bookBusy": "Reservando la oferta…"
+    "bookBusy": "Reservando la oferta…",
+    "speechOn": "Adair lee las respuestas en voz alta",
+    "speechOff": "Leer las respuestas en voz alta"
   },
   "investors": {
     "meta": {

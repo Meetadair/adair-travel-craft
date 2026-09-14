@@ -364,7 +364,9 @@
       "detailsFailed": "Dane nie zostały zaakceptowane. Sprawdź ich poprawność."
     },
     "bookIdle": "Rezerwuj",
-    "bookBusy": "Rezerwuję ofertę…"
+    "bookBusy": "Rezerwuję ofertę…",
+    "speechOn": "Adair czyta odpowiedzi na głos",
+    "speechOff": "Czytaj odpowiedzi na głos"
   },
   "auth": {
     "meta": {
@@ -435,7 +437,9 @@
     "saveBusy": "Zapisywanie…",
     "saved": "Zapisano.",
     "bookIdle": "Rezerwuj",
-    "bookBusy": "Rezerwuję ofertę…"
+    "bookBusy": "Rezerwuję ofertę…",
+    "speechOn": "Adair czyta odpowiedzi na głos",
+    "speechOff": "Czytaj odpowiedzi na głos"
   },
   "investors": {
     "meta": {
