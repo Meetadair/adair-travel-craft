@@ -17,12 +17,13 @@ const toolContext = {
 };
 
 describe("tool definitions", () => {
-  it("exposes the four tools the assistant needs", () => {
+  it("exposes the tools the assistant needs", () => {
     expect(TOOLS.map((t) => t.name)).toEqual([
       "find_places",
       "get_curated",
       "distance_and_time",
       "get_traveller_context",
+      "get_current_location",
     ]);
   });
 
