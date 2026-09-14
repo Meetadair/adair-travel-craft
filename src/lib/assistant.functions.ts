@@ -10,6 +10,7 @@ import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { runAgent, type AgentResult, type ChatMessage } from "@/lib/agent/loop.server";
+import { asConsent, type LocationConsent } from "@/lib/agent/location";
 
 /** Enough history for context, short enough to stay cheap. */
 const MAX_HISTORY = 20;
@@ -34,10 +35,27 @@ const inputSchema = z.object({
     })
     .nullable()
     .default(null),
+  /**
+   * Coordinates the browser handed over for this one question. They are used
+   * to answer and then dropped — nothing about position is written down.
+   */
+  device: z
+    .object({ lat: z.number().min(-90).max(90), lon: z.number().min(-180).max(180) })
+    .nullable()
+    .default(null),
+  cityCentre: z
+    .object({ lat: z.number().min(-90).max(90), lon: z.number().min(-180).max(180) })
+    .nullable()
+    .default(null),
 });
 
 export type AskAdairInput = z.infer<typeof inputSchema>;
-export type AskAdairResult = AgentResult & { configured: boolean };
+export type AskAdairResult = AgentResult & {
+  configured: boolean;
+  /** True when the answer would be better with exact position and we may ask. */
+  askLocation: boolean;
+  locationConsent: LocationConsent;
+};
 
 export const askAdair = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -45,8 +63,24 @@ export const askAdair = createServerFn({ method: "POST" })
   .handler(async ({ data, context }): Promise<AskAdairResult> => {
     const { supabase, userId } = context;
 
+    const consentRes = await supabase
+      .from("preferences")
+      .select("location_consent")
+      .eq("user_id", userId)
+      .maybeSingle();
+    const consent = asConsent(
+      (consentRes.data as Record<string, unknown> | null)?.["location_consent"],
+    );
+
     if (!process.env["ANTHROPIC_API_KEY"]) {
-      return { reply: "", toolsUsed: [], truncated: false, configured: false };
+      return {
+        reply: "",
+        toolsUsed: [],
+        truncated: false,
+        configured: false,
+        askLocation: false,
+        locationConsent: consent,
+      };
     }
 
     const history: ChatMessage[] = data.messages.slice(-MAX_HISTORY);
@@ -69,8 +103,24 @@ export const askAdair = createServerFn({ method: "POST" })
         city: data.city,
         hotel: data.hotel,
       },
-      { supabase, userId },
+      {
+        supabase,
+        userId,
+        location: {
+          device: consent === "granted" ? data.device : null,
+          consent,
+          hotel: data.hotel,
+          city: data.cityCentre && data.city
+            ? { name: data.city, lat: data.cityCentre.lat, lon: data.cityCentre.lon }
+            : null,
+        },
+      },
     );
 
-    return { ...result, configured: true };
+    // Precision is only worth asking about once, and only when the traveller
+    // actually asked something that needs it.
+    const askLocation =
+      consent === "not_asked" && !data.device && result.toolsUsed.includes("get_current_location");
+
+    return { ...result, configured: true, askLocation, locationConsent: consent };
   });

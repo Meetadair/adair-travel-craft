@@ -248,6 +248,16 @@
       "saveCompanyAction": "保存公司信息",
       "dismiss": "暂不处理"
     },
+    "location": {
+      "ask": "要告诉你那里距你现在的位置有多远，我需要你的位置信息——允许吗？",
+      "privacy": "仅用于这次回答，不会保存。",
+      "allow": "允许",
+      "deny": "暂不",
+      "blocked": "浏览器已阻止本站获取位置。请点击地址栏的锁形图标，把位置设为「允许」，然后再问一次。",
+      "unavailable": "设备没有返回位置。我改从你的酒店测算。",
+      "fromHotel": "从你的酒店测算。",
+      "fromCity": "从市中心测算。"
+    },
     "memory": {
       "sameAgain": "你上次在 {city} 入住了 {hotel} — 这次照旧吗？",
       "sameAgainYes": "照旧预订",

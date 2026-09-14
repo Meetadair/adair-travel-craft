@@ -248,6 +248,16 @@
       "saveCompanyAction": "Tallenna yritys",
       "dismiss": "Ei nyt"
     },
+    "location": {
+      "ask": "Jotta voin kertoa, kuinka kauas se on nykyisestä paikastasi, tarvitsen sijaintisi — sallitko?",
+      "privacy": "Käytämme sitä vain tähän vastaukseen emmekä säilytä sitä.",
+      "allow": "Salli",
+      "deny": "Ei nyt",
+      "blocked": "Selain estää sijainnin tällä sivustolla. Avaa lukko osoitepalkissa, aseta Sijainti tilaan Salli ja kysy uudelleen.",
+      "unavailable": "Laitteesi ei antanut sijaintia. Mittaan hotellistasi.",
+      "fromHotel": "Mitattu hotellistasi.",
+      "fromCity": "Mitattu keskustasta."
+    },
     "memory": {
       "sameAgain": "Yövyit kohteessa {hotel} viimeksi kaupungissa {city} — varataanko sama uudelleen?",
       "sameAgainYes": "Sama uudelleen",

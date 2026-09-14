@@ -248,6 +248,16 @@
       "saveCompanyAction": "Lagre bedriften",
       "dismiss": "Ikke nå"
     },
+    "location": {
+      "ask": "For å si hvor langt det er fra der du står, trenger jeg posisjonen din — tillater du det?",
+      "privacy": "Vi bruker den bare til dette svaret og lagrer den ikke.",
+      "allow": "Tillat",
+      "deny": "Ikke nå",
+      "blocked": "Nettleseren blokkerer posisjon for dette nettstedet. Åpne låsen i adressefeltet, sett Posisjon til Tillat, og spør igjen.",
+      "unavailable": "Enheten ga ingen posisjon. Jeg måler fra hotellet ditt i stedet.",
+      "fromHotel": "Målt fra hotellet ditt.",
+      "fromCity": "Målt fra sentrum."
+    },
     "memory": {
       "sameAgain": "Du bodde på {hotel} forrige gang i {city} — det samme igjen?",
       "sameAgainYes": "Det samme igjen",

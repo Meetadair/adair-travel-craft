@@ -257,6 +257,16 @@
       "saveCompanyAction": "Zapisz firmę",
       "dismiss": "Nie teraz"
     },
+    "location": {
+      "ask": "Żeby powiedzieć, jak daleko to jest od miejsca, w którym stoisz, potrzebuję Twojej lokalizacji — pozwolisz?",
+      "privacy": "Używamy jej tylko do tej odpowiedzi i nie zapisujemy.",
+      "allow": "Pozwól",
+      "deny": "Nie teraz",
+      "blocked": "Przeglądarka blokuje lokalizację dla tej strony. Otwórz kłódkę w pasku adresu, ustaw Lokalizację na Zezwól i zapytaj ponownie.",
+      "unavailable": "Urządzenie nie podało pozycji. Zmierzę od Twojego hotelu.",
+      "fromHotel": "Zmierzone od Twojego hotelu.",
+      "fromCity": "Zmierzone od centrum miasta."
+    },
     "memory": {
       "sameAgain": "Ostatnio w {city} Twój wybór to {hotel} — powtórzyć?",
       "sameAgainYes": "Tak jak ostatnio",

@@ -307,3 +307,12 @@ Hard rules: live facts (hours, prices, addresses, availability) only from tools,
 Cost and speed: streaming, at most five tool calls per turn, cached map lookups, tight system prompt, token usage per conversation logged to `/admin/analytics`. Without the key: structured trip requests only, stated plainly, never a faked answer.
 
 Tests to write: a restaurant question answers without a flight search; a five-minute-walk taxi request proposes walking first; opening hours never stated without a tool result; no booking without confirmation.
+
+## Location awareness (done)
+- Three levels, least intrusive first: trip city → trip hotel → device location.
+- `src/lib/agent/location.ts` — `resolveLocation`, `originClause`, consent type; hotel is the default origin for distance questions.
+- `get_current_location` tool (`tools.ts` / `tools.server.ts`) always reports its source (device / hotel / city / none), so the answer names the starting point.
+- Permission asked only in the chat, only when exact position is the point of the question (`precise: true`), with the reason and "we don't keep it". Never on load or sign-up.
+- Consent stored as `preferences.location_consent` (granted / denied / not_asked) via `src/lib/location.functions.ts`; a refusal is never re-asked. No coordinates are ever stored — device coords travel with one request and are discarded.
+- `src/hooks/use-device-location.ts` detects browser-level blocking (PWA) and the UI explains how to re-enable; `src/components/trip/location-prompt.tsx` is the one-tap prompt.
+- Copy under `assistant.location` in all 14 languages. Tests in `src/lib/agent/location.test.ts` (387 total pass).
