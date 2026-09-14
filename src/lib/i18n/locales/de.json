@@ -125,7 +125,7 @@
       "teams": "Adair for Teams — eine Richtlinie, eine Rechnung.",
       "teamsLink": "Auf die Liste setzen"
     },
-    "footer": "Adair Kft. · Budapest"
+    "footer": "Adair"
   },
   "assistant": {
     "meta": {
@@ -691,6 +691,6 @@
       "success": "Vielen Dank — wir melden uns innerhalb eines Werktags bei Ihnen.",
       "error": "Das hat nicht geklappt. Bitte versuchen Sie es erneut."
     },
-    "footer": "Adair Kft. · Budapest"
+    "footer": "Adair"
   }
 }

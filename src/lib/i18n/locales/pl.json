@@ -125,7 +125,7 @@
       "teams": "Adair for Teams — jedna polityka, jedna faktura.",
       "teamsLink": "Dołącz do listy"
     },
-    "footer": "Adair Kft. · Budapest"
+    "footer": "Adair"
   },
   "assistant": {
     "meta": {
@@ -713,6 +713,6 @@
       "success": "Dziękujemy — odezwiemy się w ciągu jednego dnia roboczego.",
       "error": "Coś poszło nie tak. Spróbuj ponownie."
     },
-    "footer": "Adair Kft. · Budapest"
+    "footer": "Adair"
   }
 }

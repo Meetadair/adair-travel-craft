@@ -100,7 +100,10 @@ export function AppFooter() {
         </div>
 
         <p className="mt-8 text-xs text-muted-foreground">
-          © {new Date().getFullYear()} Adair Kft. · Budapest
+          {/* The operating entity and its registered address stay on About and
+              Contact, both linked above: a package organiser has to be
+              identifiable, but not necessarily from the copyright line. */}
+          © {new Date().getFullYear()} Adair
         </p>
       </div>
     </footer>

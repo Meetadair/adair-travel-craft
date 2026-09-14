@@ -125,7 +125,7 @@
       "teams": "Adair 团队版 — 统一标准，一张发票。",
       "teamsLink": "加入候补名单"
     },
-    "footer": "Adair Kft. · Budapest"
+    "footer": "Adair"
   },
   "assistant": {
     "meta": {
@@ -691,6 +691,6 @@
       "success": "感谢联系 — 我们将在一个工作日内回复你。",
       "error": "提交未成功，请重试。"
     },
-    "footer": "Adair Kft. · Budapest"
+    "footer": "Adair"
   }
 }

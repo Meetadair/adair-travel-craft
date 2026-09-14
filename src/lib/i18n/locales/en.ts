@@ -120,7 +120,7 @@ export const en = {
       teams: "Adair for Teams — one policy, one invoice.",
       teamsLink: "Join the list",
     },
-    footer: "Adair Kft. · Budapest",
+    footer: "Adair",
   },
 
   assistant: {
@@ -702,7 +702,7 @@ export const en = {
       success: "Thank you — we'll get back to you within one business day.",
       error: "That didn't go through. Please try again.",
     },
-    footer: "Adair Kft. · Budapest",
+    footer: "Adair",
   },
 } as const;
 

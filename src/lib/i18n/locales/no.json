@@ -125,7 +125,7 @@
       "teams": "Adair for Teams — én policy, én faktura.",
       "teamsLink": "Bli med på listen"
     },
-    "footer": "Adair Kft. · Budapest"
+    "footer": "Adair"
   },
   "assistant": {
     "meta": {
@@ -691,6 +691,6 @@
       "success": "Takk — vi tar kontakt innen én virkedag.",
       "error": "Det gikk dessverre ikke gjennom. Prøv igjen."
     },
-    "footer": "Adair Kft. · Budapest"
+    "footer": "Adair"
   }
 }
