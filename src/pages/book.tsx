@@ -20,13 +20,7 @@ import { getPaymentSession } from "@/lib/payment.functions";
 import { PaymentStep, type AuthorisedPayment } from "@/components/payment-step";
 import { eur } from "@/lib/trip/client";
 import { isSchengen } from "@/lib/trip/backwards";
-import {
-  bedLines,
-  categoryOn,
-  childSeatsFor,
-  partyOf,
-  CATEGORY_LABEL,
-} from "@/lib/trip/family";
+import { bedLines, categoryOn, childSeatsFor, partyOf, CATEGORY_LABEL } from "@/lib/trip/family";
 
 const inputClass =
   "mt-1 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary";
@@ -64,7 +58,6 @@ function methodLabel(payment: BookingResult["payment"]): string {
   return payment.last4 ? `${brand} ···· ${payment.last4}` : brand;
 }
 
-
 export function BookPage({ cardId }: { cardId: string }) {
   const navigate = useNavigate();
   const fetchCard = useServerFn(getTripCard);
@@ -98,6 +91,9 @@ export function BookPage({ cardId }: { cardId: string }) {
     bornOn: "",
     gender: "m",
     title: "mr",
+    passportNumber: "",
+    passportCountry: "",
+    passportExpiry: "",
   });
   /** One entry per extra seat; passenger 1 is the lead traveller above. */
   const [companions, setCompanions] = useState<
@@ -108,6 +104,8 @@ export function BookPage({ cardId }: { cardId: string }) {
       gender: string;
       title: string;
       passportNumber: string;
+      passportCountry: string;
+      passportExpiry: string;
       remember: boolean;
     }>
   >([]);
@@ -133,9 +131,14 @@ export function BookPage({ cardId }: { cardId: string }) {
           include: { ...include, rides },
           companyId: companyId || null,
           traveller: {
-            ...traveller,
+            givenName: traveller.givenName,
+            familyName: traveller.familyName,
+            email: traveller.email,
+            phone: traveller.phone,
+            bornOn: traveller.bornOn,
             gender: traveller.gender as "m" | "f",
             title: traveller.title as "mr" | "ms" | "mrs",
+            passport: passportOf(traveller),
           },
           companions: companions.map((c) => ({
             givenName: c.givenName,
@@ -143,7 +146,7 @@ export function BookPage({ cardId }: { cardId: string }) {
             bornOn: c.bornOn,
             gender: c.gender as "m" | "f",
             title: c.title as "mr" | "ms" | "mrs",
-            passportNumber: c.passportNumber.trim() || null,
+            passport: passportOf(c),
             remember: c.remember,
           })),
           ancillaries: include.flight ? extras : [],
@@ -153,10 +156,23 @@ export function BookPage({ cardId }: { cardId: string }) {
     onSuccess: (data) => setResult(data),
   });
 
-  const updateCompanion = (
-    index: number,
-    patch: Partial<(typeof companions)[number]>,
-  ) =>
+  /**
+   * All three parts or nothing: Duffel rejects a document that is only a number,
+   * so a half-filled passport is worse than none - it fails at the airline.
+   */
+  function passportOf(person: {
+    passportNumber: string;
+    passportCountry: string;
+    passportExpiry: string;
+  }): { number: string; countryCode: string; expiresOn: string } | null {
+    const number = person.passportNumber.trim();
+    const countryCode = person.passportCountry.trim().toUpperCase();
+    const expiresOn = person.passportExpiry.trim();
+    if (!number || countryCode.length !== 2 || !/^\d{4}-\d{2}-\d{2}$/.test(expiresOn)) return null;
+    return { number, countryCode, expiresOn };
+  }
+
+  const updateCompanion = (index: number, patch: Partial<(typeof companions)[number]>) =>
     setCompanions((current) => current.map((c, i) => (i === index ? { ...c, ...patch } : c)));
 
   /** Passports are only asked for on routes that leave the Schengen area. */
@@ -169,11 +185,15 @@ export function BookPage({ cardId }: { cardId: string }) {
     /.+@.+\..+/.test(traveller.email) &&
     traveller.phone.trim().length >= 6 &&
     /^\d{4}-\d{2}-\d{2}$/.test(traveller.bornOn) &&
+    // On a route that needs a passport, an incomplete one is not "optional
+    // extra detail": the airline refuses the order, after we have taken payment.
+    (!passportNeeded || passportOf(traveller) !== null) &&
     companions.every(
       (c) =>
         c.givenName.trim().length > 0 &&
         c.familyName.trim().length > 0 &&
-        /^\d{4}-\d{2}-\d{2}$/.test(c.bornOn),
+        /^\d{4}-\d{2}-\d{2}$/.test(c.bornOn) &&
+        (!passportNeeded || passportOf(c) !== null),
     );
 
   // Booked (fully or partly): show the confirmation, then move on to My trips.
@@ -182,8 +202,6 @@ export function BookPage({ cardId }: { cardId: string }) {
     const timer = window.setTimeout(() => navigate({ to: "/trips" }), 3500);
     return () => window.clearTimeout(timer);
   }, [result, navigate]);
-
-
 
   const search = card.data?.search;
   /** Ages count as of the day they fly home: a birthday mid-trip changes the fare. */
@@ -235,6 +253,8 @@ export function BookPage({ cardId }: { cardId: string }) {
           gender: "f",
           title: "ms",
           passportNumber: "",
+          passportCountry: "",
+          passportExpiry: "",
           remember: !suggestion,
         });
       }
@@ -315,9 +335,7 @@ export function BookPage({ cardId }: { cardId: string }) {
                     <input
                       type="checkbox"
                       checked={include.insurance}
-                      onChange={() =>
-                        setInclude((s) => ({ ...s, insurance: !s.insurance }))
-                      }
+                      onChange={() => setInclude((s) => ({ ...s, insurance: !s.insurance }))}
                       className="accent-primary"
                       aria-label="Add travel insurance"
                     />
@@ -325,9 +343,7 @@ export function BookPage({ cardId }: { cardId: string }) {
                       <ShieldCheck className="size-4" />
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-sm font-medium">
-                        {INSURANCE_TITLE}
-                      </span>
+                      <span className="block truncate text-sm font-medium">{INSURANCE_TITLE}</span>
                       <span className="block text-xs text-muted-foreground">
                         Insurance · {insurance.nights} night
                         {insurance.nights === 1 ? "" : "s"} · {insurance.passengers} traveller
@@ -398,6 +414,52 @@ export function BookPage({ cardId }: { cardId: string }) {
                     onChange={(e) => setTraveller({ ...traveller, bornOn: e.target.value })}
                   />
                 </label>
+                {passportNeeded && (
+                  <>
+                    <label className="block">
+                      <span className="text-xs font-medium text-muted-foreground">
+                        Passport number
+                      </span>
+                      <input
+                        className={inputClass}
+                        value={traveller.passportNumber}
+                        onChange={(e) =>
+                          setTraveller({ ...traveller, passportNumber: e.target.value })
+                        }
+                      />
+                    </label>
+                    <label className="block">
+                      <span className="text-xs font-medium text-muted-foreground">
+                        Issuing country
+                      </span>
+                      <input
+                        className={inputClass}
+                        placeholder="PL"
+                        maxLength={2}
+                        value={traveller.passportCountry}
+                        onChange={(e) =>
+                          setTraveller({
+                            ...traveller,
+                            passportCountry: e.target.value.toUpperCase(),
+                          })
+                        }
+                      />
+                    </label>
+                    <label className="block">
+                      <span className="text-xs font-medium text-muted-foreground">
+                        Passport expires
+                      </span>
+                      <input
+                        type="date"
+                        className={inputClass}
+                        value={traveller.passportExpiry}
+                        onChange={(e) =>
+                          setTraveller({ ...traveller, passportExpiry: e.target.value })
+                        }
+                      />
+                    </label>
+                  </>
+                )}
                 <label className="block">
                   <span className="text-xs font-medium text-muted-foreground">Title</span>
                   <select
@@ -417,7 +479,6 @@ export function BookPage({ cardId }: { cardId: string }) {
                   </select>
                 </label>
               </div>
-
 
               {companions.map((person, index) => (
                 <div key={index} className="space-y-3 border-t border-border pt-4">
@@ -470,18 +531,49 @@ export function BookPage({ cardId }: { cardId: string }) {
                       </select>
                     </label>
                     {passportNeeded && (
-                      <label className="block sm:col-span-2">
-                        <span className="text-xs font-medium text-muted-foreground">
-                          Passport number
-                        </span>
-                        <input
-                          className={inputClass}
-                          value={person.passportNumber}
-                          onChange={(e) =>
-                            updateCompanion(index, { passportNumber: e.target.value })
-                          }
-                        />
-                      </label>
+                      <>
+                        <label className="block sm:col-span-2">
+                          <span className="text-xs font-medium text-muted-foreground">
+                            Passport number
+                          </span>
+                          <input
+                            className={inputClass}
+                            value={person.passportNumber}
+                            onChange={(e) =>
+                              updateCompanion(index, { passportNumber: e.target.value })
+                            }
+                          />
+                        </label>
+                        <label className="block">
+                          <span className="text-xs font-medium text-muted-foreground">
+                            Issuing country
+                          </span>
+                          <input
+                            className={inputClass}
+                            placeholder="PL"
+                            maxLength={2}
+                            value={person.passportCountry}
+                            onChange={(e) =>
+                              updateCompanion(index, {
+                                passportCountry: e.target.value.toUpperCase(),
+                              })
+                            }
+                          />
+                        </label>
+                        <label className="block">
+                          <span className="text-xs font-medium text-muted-foreground">
+                            Passport expires
+                          </span>
+                          <input
+                            type="date"
+                            className={inputClass}
+                            value={person.passportExpiry}
+                            onChange={(e) =>
+                              updateCompanion(index, { passportExpiry: e.target.value })
+                            }
+                          />
+                        </label>
+                      </>
                     )}
                   </div>
                   <label className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -497,14 +589,18 @@ export function BookPage({ cardId }: { cardId: string }) {
 
               {(familyLines.length > 0 || seats.length > 0) && (
                 <div className="space-y-2 border-t border-border pt-4">
-                  <p className="text-xs font-medium text-muted-foreground">Travelling with children</p>
+                  <p className="text-xs font-medium text-muted-foreground">
+                    Travelling with children
+                  </p>
                   {search?.familyNote ? (
                     <p className="text-xs leading-relaxed text-foreground">{search.familyNote}</p>
                   ) : null}
                   {familyLines.map((line) => (
                     <p key={line.kind} className="text-xs leading-relaxed text-muted-foreground">
                       {line.label} —{" "}
-                      {line.priceEur == null ? line.note : `${eur(line.priceEur)} ${line.note.toLowerCase()}`}
+                      {line.priceEur == null
+                        ? line.note
+                        : `${eur(line.priceEur)} ${line.note.toLowerCase()}`}
                     </p>
                   ))}
                   {seats.map((seat) => (
@@ -577,7 +673,9 @@ export function BookPage({ cardId }: { cardId: string }) {
                     session={payment.data}
                     amountEur={selectedTotal}
                     disabled={mutation.isPending || card.data?.expired === true}
-                    payingLabel={mutation.isPending ? "Payment approved — booking your trip…" : null}
+                    payingLabel={
+                      mutation.isPending ? "Payment approved — booking your trip…" : null
+                    }
                     onAuthorised={(authorised) => mutation.mutate(authorised)}
                   />
                 )}
@@ -641,7 +739,9 @@ export function BookPage({ cardId }: { cardId: string }) {
               <div className="mt-5 space-y-1 border-t border-border pt-4 text-sm">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Charged</span>
-                  <span className="font-semibold">{eur(result.payment?.amountEur ?? result.totalEur)}</span>
+                  <span className="font-semibold">
+                    {eur(result.payment?.amountEur ?? result.totalEur)}
+                  </span>
                 </div>
                 {(result.credit?.appliedEur ?? 0) > 0 && (
                   <div className="flex justify-between">
@@ -695,8 +795,6 @@ export function BookPage({ cardId }: { cardId: string }) {
               </div>
             )}
 
-
-
             {result.calendar.length > 0 && (
               <AddToCalendar
                 events={result.calendar}
@@ -727,7 +825,6 @@ export function BookPage({ cardId }: { cardId: string }) {
             )}
           </div>
         )}
-
       </main>
     </div>
   );

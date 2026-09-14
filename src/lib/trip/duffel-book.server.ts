@@ -186,6 +186,33 @@ export async function getOfferAncillaries(
   return { options, seatMapPublished };
 }
 
+/**
+ * An identity document as the airline needs it. A bare number is useless:
+ * Duffel wants the issuing country and the expiry alongside it, and airlines
+ * on routes leaving the travel area refuse the order without all three.
+ */
+export type PassportDetails = {
+  number: string;
+  /** ISO 3166-1 alpha-2, e.g. "PL". */
+  countryCode: string;
+  /** "YYYY-MM-DD". */
+  expiresOn: string;
+};
+
+function identityDocuments(passport: PassportDetails | null | undefined) {
+  if (!passport?.number?.trim()) return {};
+  return {
+    identity_documents: [
+      {
+        type: "passport",
+        unique_identifier: passport.number.trim(),
+        issuing_country_code: passport.countryCode.trim().toUpperCase(),
+        expires_on: passport.expiresOn,
+      },
+    ],
+  };
+}
+
 export type OrderResult = {
   id: string;
   bookingReference: string | null;
@@ -207,6 +234,7 @@ export async function createFlightOrder(input: {
     bornOn: string;
     gender: "m" | "f";
     title: "mr" | "ms" | "mrs";
+    passport?: PassportDetails | null | undefined;
   };
   /**
    * Everyone else on the booking, in seat order. Each gets their own name and
@@ -219,7 +247,7 @@ export async function createFlightOrder(input: {
     bornOn: string;
     gender: "m" | "f";
     title: "mr" | "ms" | "mrs";
-    passportNumber?: string | null | undefined;
+    passport?: PassportDetails | null | undefined;
   }>;
   idempotencyKey: string;
   /**
@@ -275,6 +303,7 @@ export async function createFlightOrder(input: {
           title: person.title,
           email: input.traveller.email,
           phone_number: input.traveller.phone,
+          ...identityDocuments(person.passport),
           ...(index === 0 && input.loyaltyAccounts?.length
             ? {
                 loyalty_programme_accounts: input.loyaltyAccounts.map((a) => ({

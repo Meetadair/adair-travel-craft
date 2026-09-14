@@ -19,6 +19,19 @@ import {
   type InsuranceQuote,
 } from "@/lib/trip/insurance";
 
+/**
+ * All three parts or none. Duffel refuses an identity document that is just a
+ * number, and airlines on routes leaving the travel area refuse the order.
+ */
+const passportSchema = z
+  .object({
+    number: z.string().trim().min(4).max(40),
+    countryCode: z.string().trim().length(2),
+    expiresOn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  })
+  .nullable()
+  .optional();
+
 const travellerSchema = z.object({
   givenName: z.string().trim().min(1).max(60),
   familyName: z.string().trim().min(1).max(60),
@@ -27,6 +40,7 @@ const travellerSchema = z.object({
   bornOn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   gender: z.enum(["m", "f"]),
   title: z.enum(["mr", "ms", "mrs"]),
+  passport: passportSchema,
 });
 
 const bookSchema = z.object({
@@ -50,7 +64,7 @@ const bookSchema = z.object({
         bornOn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
         gender: z.enum(["m", "f"]),
         title: z.enum(["mr", "ms", "mrs"]),
-        passportNumber: z.string().trim().max(40).nullable().optional(),
+        passport: passportSchema,
         /** Save this person to "people I travel with" for next time. */
         remember: z.boolean().optional(),
       }),
@@ -795,7 +809,7 @@ export const bookTripCard = createServerFn({ method: "POST" })
         const { encryptSecret } = await import("@/lib/loyalty/crypto.server");
         const rows = [];
         for (const c of remembered) {
-          const passport = c.passportNumber?.trim() || null;
+          const passport = c.passport?.number?.trim() || null;
           rows.push({
             user_id: userId,
             label: `${c.givenName} ${c.familyName}`.trim(),
