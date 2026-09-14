@@ -1,7 +1,7 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Plane, BedDouble, CarFront, Check, AlertTriangle, ShieldCheck } from "lucide-react";
 import { INSURANCE_DETAIL, INSURANCE_TITLE } from "@/lib/trip/insurance";
 import { SiteNav } from "@/components/site-nav";
@@ -237,30 +237,59 @@ export function BookPage({ cardId }: { cardId: string }) {
     ? ancillariesTotalEur(flightExtras.data.options, extras)
     : 0;
   const saved = useQuery({ queryKey: ["companions"], queryFn: () => fetchCompanions({}) });
+  const selfTraveller = saved.data?.find((t) => t.isSelf) ?? null;
+  const companionSuggestions = useMemo(
+    () => saved.data?.filter((t) => !t.isSelf) ?? [],
+    [saved.data],
+  );
 
-  // Match the number of forms to the seats booked, pre-filling saved people.
+  // The account holder's own saved profile fills the lead traveller once,
+  // the moment it arrives — the whole point of saving it in Settings is to
+  // never retype it here. A traveller who starts typing before it loads is
+  // left alone rather than overwritten out from under them.
+  const selfApplied = useRef(false);
+  useEffect(() => {
+    if (selfApplied.current || !selfTraveller) return;
+    selfApplied.current = true;
+    setTraveller((current) => ({
+      givenName: current.givenName || selfTraveller.givenName,
+      familyName: current.familyName || selfTraveller.familyName,
+      email: current.email || selfTraveller.email || "",
+      phone: current.phone || selfTraveller.phone || "",
+      bornOn: current.bornOn || selfTraveller.bornOn || "",
+      gender: current.gender !== "m" ? current.gender : (selfTraveller.gender ?? "m"),
+      title: current.title !== "mr" ? current.title : (selfTraveller.title ?? "mr"),
+      passportNumber: current.passportNumber || selfTraveller.passportNumber || "",
+      passportCountry: current.passportCountry || selfTraveller.passportCountry || "",
+      passportExpiry: current.passportExpiry || selfTraveller.passportExpiry || "",
+    }));
+  }, [selfTraveller]);
+
+  // Match the number of forms to the seats booked, pre-filling saved people —
+  // full details, not just the name, so a returning family member's passport
+  // does not need retyping either.
   useEffect(() => {
     setCompanions((current) => {
       const wanted = paxCount - 1;
       if (current.length === wanted) return current;
       const next = current.slice(0, wanted);
       while (next.length < wanted) {
-        const suggestion = saved.data?.[next.length];
+        const suggestion = companionSuggestions[next.length];
         next.push({
           givenName: suggestion?.givenName ?? "",
           familyName: suggestion?.familyName ?? "",
           bornOn: suggestion?.bornOn ?? "",
-          gender: "f",
-          title: "ms",
-          passportNumber: "",
-          passportCountry: "",
-          passportExpiry: "",
+          gender: suggestion?.gender ?? "f",
+          title: suggestion?.title ?? "ms",
+          passportNumber: suggestion?.passportNumber ?? "",
+          passportCountry: suggestion?.passportCountry ?? "",
+          passportExpiry: suggestion?.passportExpiry ?? "",
           remember: !suggestion,
         });
       }
       return next;
     });
-  }, [paxCount, saved.data]);
+  }, [paxCount, companionSuggestions]);
   const priced = card.data?.priced;
   const insurance = card.data?.insurance ?? null;
   const selectedTotal =

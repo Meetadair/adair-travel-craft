@@ -32,6 +32,7 @@ import { MyData } from "@/components/prefs/my-data";
 import { Noticed } from "@/components/prefs/noticed";
 import { Knows } from "@/components/prefs/knows";
 import { PaymentCards } from "@/components/prefs/payment-cards";
+import { TravellerProfiles } from "@/components/prefs/traveller-profiles";
 import { WalletLoyalty } from "@/components/prefs/wallet-loyalty";
 import { NotificationChannel } from "@/components/prefs/notification-channel";
 import { AppFooter } from "@/components/app-footer";
@@ -213,6 +214,8 @@ export function PreferencesPage() {
                   </section>
                 </div>
               ))}
+
+            <TravellerProfiles />
 
             <BusinessTrips />
 
