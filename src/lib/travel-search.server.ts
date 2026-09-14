@@ -1,12 +1,13 @@
 /**
  * Server-only travel provider access.
- * Flights: Duffel (preferred) or Amadeus. Hotels: Amadeus. Cars: Amadeus
+ * Flights: Duffel (preferred) or Amadeus. Hotels: Duffel Stays, then Amadeus.
+ * Cars: Amadeus
  * transfer/car estimate. When credentials are missing we fall back to clearly
  * flagged sample data so the concept demo keeps working.
  */
 
 import { buildFlightOptions, type FlightOptions } from "@/lib/trip/flight-options";
-import type { TripRequest } from "@/lib/trip/types";
+import type { StayResult, TripRequest } from "@/lib/trip/types";
 
 export type TripOffer = {
   kind: "flight" | "hotel" | "car";
@@ -202,6 +203,87 @@ async function duffelFlight(input: TripSearchInput): Promise<TripOffer | null> {
 }
 
 /* ---------------- Amadeus ---------------- */
+
+/**
+ * Hotels from Duffel Stays — the supplier we actually book through.
+ *
+ * Returns null instead of throwing whenever the product is switched off on the
+ * account, the destination has no centre coordinates, or the search comes back
+ * empty, so the card falls through to Amadeus and then to flagged sample data
+ * exactly as it did before. Nothing here can empty the trip card.
+ */
+async function duffelStay(input: TripSearchInput): Promise<TripOffer | null> {
+  const token = process.env["DUFFEL_API_KEY"] ?? process.env["DUFFEL_ACCESS_TOKEN"];
+  if (!token) return null;
+
+  // Stays are searched by coordinates, not by airport code: take the city
+  // centre, because a hotel by the runway is not what anyone asked for.
+  const { CITIES } = await import("@/lib/trip/cities");
+  const iata = input.destinationIata.trim().toUpperCase();
+  const named = input.destinationCity.trim().toLowerCase();
+  const city =
+    CITIES.find((c) => c.iata === iata) ??
+    CITIES.find((c) => c.city.toLowerCase() === named || c.aliases.includes(named));
+  if (!city) return null;
+
+  const request: TripRequest = {
+    originCity: input.originCity,
+    originIata: input.originIata,
+    destinationCity: input.destinationCity,
+    destinationIata: input.destinationIata,
+    lat: city.lat,
+    lon: city.lon,
+    departDate: input.departDate,
+    returnDate: input.returnDate,
+    cabinClass: "economy",
+    passengers: 1,
+    hotelWish: input.notes?.trim() || null,
+    hotelNameExact: null,
+    carNameExact: null,
+    needsCar: Boolean(input.needsCar),
+    invoiceToCompany: false,
+    stops: [
+      { city: city.city, iata: city.iata, lat: city.lat, lon: city.lon },
+    ],
+  };
+
+  const nights = Math.max(
+    1,
+    Math.round((Date.parse(input.returnDate) - Date.parse(input.departDate)) / 86_400_000),
+  );
+
+  const toOffer = (stay: StayResult): Omit<TripOffer, "alternatives"> => ({
+    kind: "hotel",
+    title: stay.name,
+    detail: `${nights} ${nights === 1 ? "night" : "nights"} \u00b7 check-in ${fmtDate(
+      input.departDate,
+    )} \u00b7 ${stay.address || input.destinationCity}`,
+    provider: "Duffel",
+    offerReference: stay.rateId ?? `DF-ST-${stay.name}`,
+    amount: round(stay.amount),
+    currency: stay.currency,
+    live: true,
+    ...(stay.photoUrl ? { images: [stay.photoUrl] } : {}),
+  });
+
+  try {
+    const { searchStay } = await import("@/lib/trip/duffel.server");
+    const outcome = await searchStay(request);
+    if (!outcome.stay) return null;
+
+    const alternatives = outcome.alternatives.slice(0, 3).map(toOffer);
+    return { ...toOffer(outcome.stay), ...(alternatives.length ? { alternatives } : {}) };
+  } catch (error) {
+    const { isProductDisabled } = await import("@/lib/trip/duffel-stays.server");
+    if (isProductDisabled(error)) {
+      // Not a failure: this account cannot sell stays yet. Said once, quietly.
+      console.info("Duffel Stays is not enabled on this account - hotel falls back to sample.");
+      return null;
+    }
+    console.error("Duffel stays search failed", error);
+    return null;
+  }
+}
 
 async function amadeusToken(): Promise<string | null> {
   const id = process.env["AMADEUS_CLIENT_ID"];
@@ -460,8 +542,10 @@ export async function searchTrip(input: TripSearchInput): Promise<TripSearchResu
     if (!flight) warnings.push("No flights available from the API for these dates.");
   }
 
-  let hotel: TripOffer | null = null;
-  if (token) {
+  // Duffel Stays first, because that is where the booking will actually go.
+  // Amadeus stays as the fallback; the sample hotel below is the last resort.
+  let hotel: TripOffer | null = await duffelStay(input).catch(() => null);
+  if (!hotel && token) {
     hotel = await amadeusHotel(input, token);
     if (!hotel) warnings.push("No hotel offers available from the API for these dates.");
   }
