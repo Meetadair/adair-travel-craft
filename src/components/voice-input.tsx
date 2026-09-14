@@ -60,11 +60,24 @@ type Props = {
  */
 const SILENCE_MS = 2200;
 
+/**
+ * A silence-triggered submit is a guess about what the traveller meant to
+ * do, not a tap on a button — and a misheard city is exactly the failure a
+ * blind auto-send risks. So it does not fire straight away: the sentence
+ * sits here, visible, for a beat long enough to catch and cancel, before it
+ * actually goes. Pressing Stop is a deliberate action instead and skips
+ * this grace period.
+ */
+const CONFIRM_MS = 1500;
+
 export function VoiceInput({ onTranscript, onSubmit, locale }: Props) {
   const [supported, setSupported] = useState(false);
   const [recording, setRecording] = useState(false);
   const [seconds, setSeconds] = useState(0);
   const [denied, setDenied] = useState(false);
+  /** Sentence about to auto-submit, still cancellable. */
+  const [pending, setPending] = useState<string | null>(null);
+  const confirmTimer = useRef<number | null>(null);
   const recognition = useRef<SpeechRecognitionLike | null>(null);
   const baseText = useRef("");
   /** Everything the engine has finalised, across every restart. */
@@ -87,13 +100,47 @@ export function VoiceInput({ onTranscript, onSubmit, locale }: Props) {
     }
   };
 
-  /** Hand the sentence over and switch off, once. */
+  const clearConfirm = () => {
+    if (confirmTimer.current !== null) {
+      window.clearTimeout(confirmTimer.current);
+      confirmTimer.current = null;
+    }
+  };
+
+  /** Traveller pressed Stop — a deliberate action, sent immediately. */
   const finish = () => {
     clearSilence();
+    clearConfirm();
+    setPending(null);
     wanted.current = false;
     recognition.current?.stop();
     const sentence = lastShown.current.trim();
     if (sentence && onSubmit) onSubmit(sentence);
+  };
+
+  /**
+   * The engine decided the traveller has stopped talking — a guess, not a
+   * command. Stop listening and show what it heard for CONFIRM_MS before
+   * actually sending, so a misheard word can be caught instead of booked.
+   */
+  const beginAutoSubmit = () => {
+    clearSilence();
+    wanted.current = false;
+    recognition.current?.stop();
+    const sentence = lastShown.current.trim();
+    if (!sentence || !onSubmit) return;
+    setPending(sentence);
+    confirmTimer.current = window.setTimeout(() => {
+      confirmTimer.current = null;
+      setPending(null);
+      onSubmit(sentence);
+    }, CONFIRM_MS);
+  };
+
+  /** Traveller caught a mistake in time — the text stays in the field, unsent. */
+  const cancelPending = () => {
+    clearConfirm();
+    setPending(null);
   };
 
   // Support is a browser fact, so only check after hydration.
@@ -122,6 +169,7 @@ export function VoiceInput({ onTranscript, onSubmit, locale }: Props) {
   useEffect(
     () => () => {
       clearSilence();
+      clearConfirm();
       wanted.current = false;
       recognition.current?.stop();
     },
@@ -161,7 +209,7 @@ export function VoiceInput({ onTranscript, onSubmit, locale }: Props) {
       // words — not before any — is what ends the sentence.
       clearSilence();
       if (wholeSettled.trim() && onSubmit) {
-        silenceTimer.current = window.setTimeout(finish, SILENCE_MS);
+        silenceTimer.current = window.setTimeout(beginAutoSubmit, SILENCE_MS);
       }
     };
 
@@ -200,6 +248,8 @@ export function VoiceInput({ onTranscript, onSubmit, locale }: Props) {
     runSettled.current = "";
     lastShown.current = "";
     clearSilence();
+    clearConfirm();
+    setPending(null);
     lastError.current = null;
     elapsed.current = 0;
     wanted.current = true;
@@ -251,11 +301,23 @@ export function VoiceInput({ onTranscript, onSubmit, locale }: Props) {
       >
         {recording ? <Square className="size-3.5" /> : <Mic className="size-4" />}
       </button>
-      {recording && (
+      {recording && !pending && (
         <span className="flex items-center gap-1.5 px-1.5 font-mono text-[11px] tabular-nums text-muted-foreground">
           <span className="size-1.5 rounded-full bg-primary motion-safe:animate-pulse" />
           {String(Math.floor(seconds / 60)).padStart(2, "0")}:
           {String(seconds % 60).padStart(2, "0")}
+        </span>
+      )}
+      {pending && (
+        <span className="flex min-w-0 items-center gap-1.5 px-1.5 text-[11px] text-muted-foreground">
+          <span className="min-w-0 truncate">Sending "{pending}"</span>
+          <button
+            type="button"
+            onClick={cancelPending}
+            className="shrink-0 font-medium text-primary underline decoration-border underline-offset-2"
+          >
+            Cancel
+          </button>
         </span>
       )}
     </>
