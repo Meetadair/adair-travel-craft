@@ -12,7 +12,6 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { htmlLang, isLocale } from "@/lib/i18n";
-import { reportLovableError } from "../lib/lovable-error-reporting";
 import { CookieNotice } from "@/components/cookie-notice";
 
 function NotFoundComponent() {
@@ -41,7 +40,6 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
   const router = useRouter();
   useEffect(() => {
-    reportLovableError(error, { boundary: "tanstack_root_error_component" });
     // Also record it in our own error log, so /admin shows recent failures.
     void import("@/lib/events.functions")
       .then(({ logAppError }) =>

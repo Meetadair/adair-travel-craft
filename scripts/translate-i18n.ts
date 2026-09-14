@@ -21,8 +21,8 @@ const LOCALES: Record<string, string> = {
   pl: "Polish",
 };
 
-const apiKey = process.env["LOVABLE_API_KEY"];
-if (!apiKey) throw new Error("LOVABLE_API_KEY missing");
+const apiKey = process.env["ANTHROPIC_API_KEY"];
+if (!apiKey) throw new Error("ANTHROPIC_API_KEY missing");
 
 function shapeOf(value: unknown): unknown {
   if (Array.isArray(value)) return value.map(shapeOf);
@@ -41,15 +41,17 @@ function sameShape(a: unknown, b: unknown, path = ""): string[] {
 }
 
 async function translate(code: string, language: string) {
-  const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+  const res = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
-    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+    headers: {
+      "x-api-key": apiKey,
+      "anthropic-version": "2023-06-01",
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify({
-      model: "google/gemini-3.8-flash",
-      messages: [
-        {
-          role: "system",
-          content:
+      model: "claude-sonnet-4-5",
+      max_tokens: 8192,
+      system:
             `You localize marketing and product UI copy for a premium AI travel assistant called Adair. ` +
             `Translate every string value of the given JSON into ${language}. ` +
             `Rules: keep the JSON structure, keys, array order and array length EXACTLY the same. ` +
@@ -58,15 +60,12 @@ async function translate(code: string, language: string) {
             `airport/IATA codes, booking references, dates, numbers and prices. ` +
             `Keep the tone calm, warm and premium — not corporate, not shouty. Keep copy roughly as short as the English. ` +
             `Preserve punctuation marks such as the middot separator and the arrow. Return ONLY the JSON object.`,
-        },
-        { role: "user", content: JSON.stringify(en) },
-      ],
-      response_format: { type: "json_object" },
+      messages: [{ role: "user", content: JSON.stringify(en) }],
     }),
   });
-  if (!res.ok) throw new Error(`${code}: gateway ${res.status} ${await res.text()}`);
-  const json = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> };
-  const parsed = JSON.parse(json.choices?.[0]?.message?.content ?? "{}");
+  if (!res.ok) throw new Error(`${code}: anthropic ${res.status} ${await res.text()}`);
+  const json = (await res.json()) as { content?: Array<{ text?: string }> };
+  const parsed = JSON.parse(json.content?.[0]?.text ?? "{}");
   const problems = sameShape(en, parsed);
   if (problems.length) throw new Error(`${code}: ${problems.join(", ")}`);
   await writeFile(

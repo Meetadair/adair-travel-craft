@@ -131,39 +131,7 @@ async function understand(message: string, locale = "en"): Promise<ParsedRequest
   const claude = await understandWithClaude(message, locale, today);
   if (claude) return claude;
 
-  const apiKey = process.env["LOVABLE_API_KEY"];
-  if (!apiKey) return rules;
-
-  const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: "google/gemini-3.8-flash",
-      messages: [
-        { role: "system", content: systemPrompt(today, locale) },
-        { role: "user", content: message },
-      ],
-      response_format: { type: "json_object" },
-    }),
-  });
-
-  if (!res.ok) {
-    console.error(`AI gateway failed [${res.status}]: ${await res.text()}`);
-    return rules;
-  }
-  const json = (await res.json()) as {
-    choices?: Array<{ message?: { content?: string } }>;
-  };
-  try {
-    const raw = JSON.parse(json.choices?.[0]?.message?.content ?? "{}");
-    return parsedSchema.parse(raw);
-  } catch (error) {
-    console.error("AI parse failed", error);
-    return rules;
-  }
+  return rules;
 }
 
 /** Public: composes a trip from live provider offers (or flagged samples). */

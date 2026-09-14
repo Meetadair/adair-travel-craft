@@ -2,7 +2,7 @@
  * Getaway pictures, server side.
  *
  * Two sources only, in this order:
- *   1. Our own photo, uploaded by the team and stored in Lovable Cloud storage.
+ *   1. Our own photo, uploaded by the team and stored in Supabase storage.
  *   2. Unsplash, looked up by destination name, with the attribution their
  *      licence requires stored alongside the URL.
  *
