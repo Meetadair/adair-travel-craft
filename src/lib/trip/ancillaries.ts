@@ -32,6 +32,116 @@ export type AncillaryOption = {
 /** Chosen extras, as sent back when booking. */
 export type AncillarySelection = { id: string; quantity: number };
 
+/**
+ * Raw shapes from Duffel's `/air/seat_maps`, kept minimal on purpose — only
+ * the fields the grid below actually reads.
+ */
+export type RawSeatMapElement = {
+  type?: string;
+  designator?: string;
+  disclosures?: string[];
+  available_services?: Array<{ id: string; total_amount: string; total_currency: string }>;
+};
+export type RawSeatMapSection = { elements?: RawSeatMapElement[] };
+export type RawSeatMapRow = { sections?: RawSeatMapSection[] };
+export type RawSeatMapCabin = { rows?: RawSeatMapRow[] };
+
+/** One square in the cross-section grid. */
+export type SeatCell =
+  | { kind: "seat"; id: string; column: string; priceEur: number; extraLegroom: boolean }
+  | { kind: "taken"; column: string | null }
+  | { kind: "blank" };
+
+/** One row of the plane, sections in supplier order so aisles render as gaps. */
+export type SeatMapRow = { label: string; sections: SeatCell[][] };
+
+/**
+ * Turns Duffel's cabin/row/section tree into a real cross-section grid, and
+ * the flat pricing options the rest of the checkout already understands.
+ * A row with no sellable or occupied seat (all galley, lavatory, exit signage)
+ * is dropped rather than shown as a mysteriously empty line.
+ */
+export function buildSeatMap(
+  cabins: RawSeatMapCabin[],
+  rule: MarkupRule,
+): { options: AncillaryOption[]; rows: SeatMapRow[] } {
+  const options: AncillaryOption[] = [];
+  const rows: SeatMapRow[] = [];
+
+  for (const cabin of cabins) {
+    for (const row of cabin.rows ?? []) {
+      const sections = row.sections ?? [];
+      const seatsBySection = sections.map((section) =>
+        (section.elements ?? []).filter((element) => element.type === "seat"),
+      );
+
+      let label: string | null = null;
+      for (const seats of seatsBySection) {
+        const withDesignator = seats.find((s) => s.designator);
+        const digits = withDesignator?.designator?.match(/\d+/)?.[0];
+        if (digits) {
+          label = digits;
+          break;
+        }
+      }
+      if (!label) continue;
+
+      const cellSections: SeatCell[][] = sections.map((section, sectionIndex) => {
+        const seats = seatsBySection[sectionIndex] ?? [];
+        return (section.elements ?? []).map((element): SeatCell => {
+          if (element.type !== "seat") return { kind: "blank" };
+
+          const designator = element.designator ?? null;
+          const column = designator ? designator.replace(/^\d+/, "") : null;
+          const indexInSection = seats.indexOf(element);
+
+          const service = element.available_services?.[0];
+          const netEur = service ? Number(service.total_amount) : NaN;
+          if (!service || !Number.isFinite(netEur)) return { kind: "taken", column };
+
+          const disclosures = (element.disclosures ?? []).join(" ").toLowerCase();
+          const extraLegroom =
+            disclosures.includes("legroom") || disclosures.includes("extra space");
+
+          let position: "window" | "aisle" | "middle";
+          const lastIndex = seats.length - 1;
+          if (sections.length === 1) {
+            position =
+              indexInSection === 0 ? "window" : indexInSection === lastIndex ? "aisle" : "middle";
+          } else if (sectionIndex === 0) {
+            position =
+              indexInSection === 0 ? "window" : indexInSection === lastIndex ? "aisle" : "middle";
+          } else if (sectionIndex === sections.length - 1) {
+            position =
+              indexInSection === lastIndex ? "window" : indexInSection === 0 ? "aisle" : "middle";
+          } else {
+            position = indexInSection === 0 || indexInSection === lastIndex ? "aisle" : "middle";
+          }
+
+          const priceEur = customerPriceEur(netEur, rule);
+          options.push({
+            id: service.id,
+            kind: "seat",
+            label: seatLabel(designator),
+            detail: null,
+            netEur,
+            priceEur,
+            currency: service.total_currency,
+            maxQuantity: 1,
+            seat: { position, extraLegroom },
+          });
+
+          return { kind: "seat", id: service.id, column: column ?? "", priceEur, extraLegroom };
+        });
+      });
+
+      rows.push({ label, sections: cellSections });
+    }
+  }
+
+  return { options, rows };
+}
+
 export const ANCILLARY_NONE_NOTE =
   "This fare includes a cabin bag only; checked bags can't be added.";
 

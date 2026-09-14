@@ -5,10 +5,12 @@ import {
   ancillariesTotalEur,
   ancillaryLines,
   bagLabel,
+  buildSeatMap,
   customerPriceEur,
   preselectAncillaries,
   seatDetail,
   type AncillaryOption,
+  type RawSeatMapCabin,
 } from "./ancillaries";
 
 const rule = { markupBps: 4000, discountBps: 0 };
@@ -134,5 +136,100 @@ describe("ancillaryLines", () => {
 
   it("describes a seat without traits plainly", () => {
     expect(seatDetail(seat("12B", 5, "middle"))).toBe("middle");
+  });
+});
+
+describe("buildSeatMap", () => {
+  const seatEl = (designator: string, netEur: number | null, disclosures: string[] = []) => ({
+    type: "seat",
+    designator,
+    disclosures,
+    available_services:
+      netEur === null
+        ? []
+        : [{ id: `svc-${designator}`, total_amount: String(netEur), total_currency: "EUR" }],
+  });
+
+  it("groups a single-aisle 3-3 row into two sections with the aisle as the gap", () => {
+    const cabins: RawSeatMapCabin[] = [
+      {
+        rows: [
+          {
+            sections: [
+              { elements: [seatEl("12A", 10), seatEl("12B", 8), seatEl("12C", 12)] },
+              { elements: [seatEl("12D", 12), seatEl("12E", 8), seatEl("12F", 10)] },
+            ],
+          },
+        ],
+      },
+    ];
+
+    const { rows, options } = buildSeatMap(cabins, rule);
+    expect(rows).toHaveLength(1);
+    expect(rows[0]?.label).toBe("12");
+    expect(rows[0]?.sections).toHaveLength(2);
+    expect(rows[0]?.sections[0]?.map((c) => (c.kind === "seat" ? c.column : c.kind))).toEqual([
+      "A",
+      "B",
+      "C",
+    ]);
+
+    // Left block: A is by the window, C is by the aisle (touches the gap).
+    expect(options.find((o) => o.id === "svc-12A")?.seat?.position).toBe("window");
+    expect(options.find((o) => o.id === "svc-12C")?.seat?.position).toBe("aisle");
+    expect(options.find((o) => o.id === "svc-12B")?.seat?.position).toBe("middle");
+    // Right block is the mirror image: D is by the aisle, F is by the window.
+    expect(options.find((o) => o.id === "svc-12D")?.seat?.position).toBe("aisle");
+    expect(options.find((o) => o.id === "svc-12F")?.seat?.position).toBe("window");
+  });
+
+  it("marks a seat with no available_services as taken, still keeping its place in the grid", () => {
+    const cabins: RawSeatMapCabin[] = [
+      {
+        rows: [
+          { sections: [{ elements: [seatEl("1A", 20), seatEl("1B", null), seatEl("1C", 20)] }] },
+        ],
+      },
+    ];
+    const { rows, options } = buildSeatMap(cabins, rule);
+    expect(rows[0]?.sections[0]?.[1]).toEqual({ kind: "taken", column: "B" });
+    expect(options.some((o) => o.id.includes("1B"))).toBe(false);
+  });
+
+  it("renders galley and lavatory elements as blank spacers, not seats", () => {
+    const cabins: RawSeatMapCabin[] = [
+      {
+        rows: [
+          {
+            sections: [{ elements: [seatEl("1A", 20), { type: "lavatory" }, seatEl("1C", 20)] }],
+          },
+        ],
+      },
+    ];
+    const { rows } = buildSeatMap(cabins, rule);
+    expect(rows[0]?.sections[0]?.[1]).toEqual({ kind: "blank" });
+  });
+
+  it("drops a row with no seat at all, so nothing renders as a mystery empty line", () => {
+    const cabins: RawSeatMapCabin[] = [
+      { rows: [{ sections: [{ elements: [{ type: "galley" }, { type: "lavatory" }] }] }] },
+    ];
+    expect(buildSeatMap(cabins, rule).rows).toHaveLength(0);
+  });
+
+  it("flags extra-legroom seats from their disclosures", () => {
+    const cabins: RawSeatMapCabin[] = [
+      { rows: [{ sections: [{ elements: [seatEl("14A", 25, ["Extra legroom seat"])] }] }] },
+    ];
+    const { options } = buildSeatMap(cabins, rule);
+    expect(options[0]?.seat?.extraLegroom).toBe(true);
+  });
+
+  it("prices seats with the extras markup, same as any other ancillary", () => {
+    const cabins: RawSeatMapCabin[] = [
+      { rows: [{ sections: [{ elements: [seatEl("1A", 30)] }] }] },
+    ];
+    const { options } = buildSeatMap(cabins, rule);
+    expect(options[0]?.priceEur).toBe(customerPriceEur(30, rule));
   });
 });

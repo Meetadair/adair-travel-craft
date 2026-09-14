@@ -12,6 +12,7 @@ import {
   preselectAncillaries,
   type AncillaryOption,
   type AncillarySelection,
+  type SeatMapRow,
 } from "@/lib/trip/ancillaries";
 
 export type FlightAncillaries = {
@@ -20,6 +21,9 @@ export type FlightAncillaries = {
   /** Plain sentence to show when the fare carries no bags or no seats. */
   bagNote: string | null;
   seatNote: string | null;
+  /** The real cross-section grid, one entry per flight segment. Empty when
+   *  the airline publishes no seat map — seatNote explains that case. */
+  seatMaps: SeatMapRow[][];
 };
 
 export const getFlightAncillaries = createServerFn({ method: "POST" })
@@ -31,6 +35,7 @@ export const getFlightAncillaries = createServerFn({ method: "POST" })
       preselected: [],
       bagNote: ANCILLARY_NONE_NOTE,
       seatNote: ANCILLARY_NO_SEATS_NOTE,
+      seatMaps: [],
     };
 
     const res = await context.supabase
@@ -53,9 +58,11 @@ export const getFlightAncillaries = createServerFn({ method: "POST" })
     const table = await loadPricing(context.supabase as never, "free");
 
     let options: AncillaryOption[] = [];
+    let seatMaps: SeatMapRow[][] = [];
     try {
       const result = await getOfferAncillaries(offerId, table.extras);
       options = result.options;
+      seatMaps = result.seatMaps;
     } catch (error) {
       console.error("ancillaries lookup failed", error);
       return empty;
@@ -98,5 +105,6 @@ export const getFlightAncillaries = createServerFn({ method: "POST" })
       preselected,
       bagNote: options.some((o) => o.kind === "bag") ? null : ANCILLARY_NONE_NOTE,
       seatNote: options.some((o) => o.kind === "seat") ? null : ANCILLARY_NO_SEATS_NOTE,
+      seatMaps,
     };
   });

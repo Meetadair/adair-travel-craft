@@ -4,10 +4,12 @@
  */
 import {
   bagLabel,
+  buildSeatMap,
   customerPriceEur,
-  seatLabel,
   type AncillaryOption,
   type AncillarySelection,
+  type RawSeatMapCabin,
+  type SeatMapRow,
 } from "./ancillaries";
 
 const BASE = "https://api.duffel.com";
@@ -68,7 +70,6 @@ export async function getOffer(offerId: string): Promise<OfferSnapshot> {
   };
 }
 
-
 /**
  * The airline's own extras for this fare: checked bags from the offer's
  * available services, seats from the seat map when one is published. Returns
@@ -77,7 +78,7 @@ export async function getOffer(offerId: string): Promise<OfferSnapshot> {
 export async function getOfferAncillaries(
   offerId: string,
   rule: { markupBps: number; discountBps: number },
-): Promise<{ options: AncillaryOption[]; seatMapPublished: boolean }> {
+): Promise<{ options: AncillaryOption[]; seatMapPublished: boolean; seatMaps: SeatMapRow[][] }> {
   const options: AncillaryOption[] = [];
 
   const offer = await call<{
@@ -113,77 +114,29 @@ export async function getOfferAncillaries(
   }
 
   let seatMapPublished = false;
+  const seatMaps: SeatMapRow[][] = [];
   try {
-    const maps = await call<{
-      data?: Array<{
-        cabins?: Array<{
-          rows?: Array<{
-            sections?: Array<{
-              elements?: Array<{
-                type?: string;
-                designator?: string;
-                disclosures?: string[];
-                available_services?: Array<{
-                  id: string;
-                  total_amount: string;
-                  total_currency: string;
-                }>;
-              }>;
-            }>;
-          }>;
-        }>;
-      }>;
-    }>(`/air/seat_maps?offer_id=${encodeURIComponent(offerId)}`, { method: "GET" });
+    const maps = await call<{ data?: Array<{ cabins?: RawSeatMapCabin[] }> }>(
+      `/air/seat_maps?offer_id=${encodeURIComponent(offerId)}`,
+      { method: "GET" },
+    );
 
-    const seen = new Set<string>();
+    // One entry per flight segment (outbound, return, each leg of a
+    // connection) — kept separate so the grid never mixes two aircraft's
+    // seats into one confusing cross-section.
     for (const map of maps.data ?? []) {
-      for (const cabin of map.cabins ?? []) {
-        for (const row of cabin.rows ?? []) {
-          for (const section of row.sections ?? []) {
-            const elements = section.elements ?? [];
-            const seats = elements.filter((e) => e.type === "seat");
-            seats.forEach((element, indexInSection) => {
-              seatMapPublished = true;
-              const service = element.available_services?.[0];
-              if (!service) return;
-              const netEur = Number(service.total_amount);
-              if (!Number.isFinite(netEur)) return;
-              const disclosures = (element.disclosures ?? []).join(" ").toLowerCase();
-              const position =
-                indexInSection === 0
-                  ? "window"
-                  : indexInSection === seats.length - 1
-                    ? "aisle"
-                    : "middle";
-              const id = service.id;
-              if (seen.has(id)) return;
-              seen.add(id);
-              options.push({
-                id,
-                kind: "seat",
-                label: seatLabel(element.designator ?? null),
-                detail: null,
-                netEur,
-                priceEur: customerPriceEur(netEur, rule),
-                currency: service.total_currency,
-                maxQuantity: 1,
-                seat: {
-                  position,
-                  extraLegroom:
-                    disclosures.includes("legroom") || disclosures.includes("extra space"),
-                },
-              });
-            });
-          }
-        }
-      }
+      const built = buildSeatMap(map.cabins ?? [], rule);
+      if (built.rows.length === 0) continue;
+      seatMapPublished = true;
+      options.push(...built.options);
+      seatMaps.push(built.rows);
     }
   } catch (error) {
     // Many fares publish no seat map at all; that is not a booking failure.
     console.error("seat map unavailable", error);
   }
 
-  return { options, seatMapPublished };
+  return { options, seatMapPublished, seatMaps };
 }
 
 /**
@@ -293,25 +246,27 @@ export async function createFlightOrder(input: {
         ],
         passengers: input.passengerIds.map((id, index) => {
           const person =
-            index === 0 ? input.traveller : (input.companions ?? [])[index - 1] ?? input.traveller;
+            index === 0
+              ? input.traveller
+              : ((input.companions ?? [])[index - 1] ?? input.traveller);
           return {
-          id,
-          given_name: person.givenName,
-          family_name: person.familyName,
-          born_on: person.bornOn,
-          gender: person.gender,
-          title: person.title,
-          email: input.traveller.email,
-          phone_number: input.traveller.phone,
-          ...identityDocuments(person.passport),
-          ...(index === 0 && input.loyaltyAccounts?.length
-            ? {
-                loyalty_programme_accounts: input.loyaltyAccounts.map((a) => ({
-                  airline_iata_code: a.airlineIataCode,
-                  account_number: a.accountNumber,
-                })),
-              }
-            : {}),
+            id,
+            given_name: person.givenName,
+            family_name: person.familyName,
+            born_on: person.bornOn,
+            gender: person.gender,
+            title: person.title,
+            email: input.traveller.email,
+            phone_number: input.traveller.phone,
+            ...identityDocuments(person.passport),
+            ...(index === 0 && input.loyaltyAccounts?.length
+              ? {
+                  loyalty_programme_accounts: input.loyaltyAccounts.map((a) => ({
+                    airline_iata_code: a.airlineIataCode,
+                    account_number: a.accountNumber,
+                  })),
+                }
+              : {}),
           };
         }),
       },
