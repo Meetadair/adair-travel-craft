@@ -363,7 +363,8 @@
     "bookIdle": "予約する",
     "bookBusy": "オファーを確保中…",
     "speechOn": "Adair が返答を読み上げます",
-    "speechOff": "返答を読み上げる"
+    "speechOff": "返答を読み上げる",
+    "speechHello": "これからは返答を読み上げます。"
   },
   "auth": {
     "meta": {
@@ -423,7 +424,8 @@
     "bookIdle": "予約する",
     "bookBusy": "オファーを確保中…",
     "speechOn": "Adair が返答を読み上げます",
-    "speechOff": "返答を読み上げる"
+    "speechOff": "返答を読み上げる",
+    "speechHello": "これからは返答を読み上げます。"
   },
   "investors": {
     "meta": {

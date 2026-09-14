@@ -363,7 +363,8 @@
     "bookIdle": "Prenota",
     "bookBusy": "Blocco l'offerta…",
     "speechOn": "Adair legge le risposte ad alta voce",
-    "speechOff": "Leggi le risposte ad alta voce"
+    "speechOff": "Leggi le risposte ad alta voce",
+    "speechHello": "D'ora in poi leggerò le mie risposte ad alta voce."
   },
   "auth": {
     "meta": {
@@ -423,7 +424,8 @@
     "bookIdle": "Prenota",
     "bookBusy": "Blocco l'offerta…",
     "speechOn": "Adair legge le risposte ad alta voce",
-    "speechOff": "Leggi le risposte ad alta voce"
+    "speechOff": "Leggi le risposte ad alta voce",
+    "speechHello": "D'ora in poi leggerò le mie risposte ad alta voce."
   },
   "investors": {
     "meta": {

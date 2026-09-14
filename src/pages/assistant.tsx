@@ -128,7 +128,7 @@ export function AssistantPage() {
    */
   const [cardDates, setCardDates] = useState<DateRange | null>(null);
   /** Adair reading its replies aloud. Off until somebody asks for it. */
-  const speech = useSpeech(locale);
+  const speech = useSpeech(locale, t.assistant.speechHello);
   // Speaking happens here rather than at each call site, so a reply added
   // anywhere in the page cannot be silently left unspoken.
   useEffect(() => {
@@ -561,14 +561,18 @@ export function AssistantPage() {
             placeholder={t.assistant.placeholder}
             className="min-h-[56px] w-full resize-none bg-transparent px-2 py-2 text-sm outline-none"
           />
-          <VoiceInput locale={locale} onTranscript={setInput} />
-          <SpeechToggle
-            enabled={speech.enabled}
-            supported={speech.supported}
-            onToggle={speech.toggle}
-            labelOn={t.assistant.speechOn}
-            labelOff={t.assistant.speechOff}
-          />
+          {/* Listening and speaking are one idea, so they share one pill:
+              two identical round buttons, one hairline, no competing shapes. */}
+          <div className="flex shrink-0 items-center gap-0.5 rounded-full border border-border bg-background p-0.5">
+            <VoiceInput locale={locale} onTranscript={setInput} />
+            <SpeechToggle
+              enabled={speech.enabled}
+              supported={speech.supported}
+              onToggle={speech.toggle}
+              labelOn={t.assistant.speechOn}
+              labelOff={t.assistant.speechOff}
+            />
+          </div>
           <button
             type="submit"
             disabled={search.isPending}

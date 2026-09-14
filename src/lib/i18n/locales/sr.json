@@ -363,7 +363,8 @@
     "bookIdle": "Rezerviši",
     "bookBusy": "Držimo ponudu…",
     "speechOn": "Adair čita odgovore naglas",
-    "speechOff": "Čitaj odgovore naglas"
+    "speechOff": "Čitaj odgovore naglas",
+    "speechHello": "Od sada ću čitati odgovore naglas."
   },
   "auth": {
     "meta": {
@@ -423,7 +424,8 @@
     "bookIdle": "Rezerviši",
     "bookBusy": "Držimo ponudu…",
     "speechOn": "Adair čita odgovore naglas",
-    "speechOff": "Čitaj odgovore naglas"
+    "speechOff": "Čitaj odgovore naglas",
+    "speechHello": "Od sada ću čitati odgovore naglas."
   },
   "investors": {
     "meta": {

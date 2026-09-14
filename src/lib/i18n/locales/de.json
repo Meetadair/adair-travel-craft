@@ -363,7 +363,8 @@
     "bookIdle": "Jetzt buchen",
     "bookBusy": "Angebot wird gehalten…",
     "speechOn": "Adair liest Antworten vor",
-    "speechOff": "Antworten vorlesen"
+    "speechOff": "Antworten vorlesen",
+    "speechHello": "Ab jetzt lese ich meine Antworten vor."
   },
   "auth": {
     "meta": {
@@ -423,7 +424,8 @@
     "bookIdle": "Jetzt buchen",
     "bookBusy": "Angebot wird gehalten…",
     "speechOn": "Adair liest Antworten vor",
-    "speechOff": "Antworten vorlesen"
+    "speechOff": "Antworten vorlesen",
+    "speechHello": "Ab jetzt lese ich meine Antworten vor."
   },
   "investors": {
     "meta": {

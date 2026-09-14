@@ -171,11 +171,23 @@ export function VoiceInput({ onTranscript, locale }: Props) {
 
   if (!supported) return null;
 
+  // One round button, sized to sit inside the voice pill beside the speaker.
+  // The timer lives inline rather than stacked beneath, so the row never
+  // changes height when recording starts.
+  const shape =
+    "inline-flex size-9 items-center justify-center rounded-full transition-colors disabled:opacity-40";
+  const label = denied
+    ? "No microphone access — please type instead."
+    : recording
+      ? "Stop recording"
+      : "Dictate your trip";
+
   return (
-    <div className="flex shrink-0 flex-col items-end gap-1">
+    <>
       <button
         type="button"
-        aria-label={recording ? "Stop recording" : "Dictate your trip"}
+        aria-label={label}
+        title={label}
         aria-pressed={recording}
         disabled={denied}
         onClick={(e) => {
@@ -189,26 +201,21 @@ export function VoiceInput({ onTranscript, locale }: Props) {
             ?.querySelector("textarea") as HTMLTextAreaElement | null;
           start(field?.value ?? "");
         }}
-        className={`inline-flex size-11 items-center justify-center rounded-xl border transition-colors ${
+        className={`${shape} ${
           recording
-            ? "border-primary bg-primary text-primary-foreground"
-            : "border-border text-foreground hover:border-primary disabled:opacity-50"
+            ? "bg-primary text-primary-foreground"
+            : "text-muted-foreground hover:bg-secondary hover:text-foreground"
         }`}
       >
-        {recording ? <Square className="size-4" /> : <Mic className="size-4" />}
+        {recording ? <Square className="size-3.5" /> : <Mic className="size-4" />}
       </button>
       {recording && (
-        <span className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+        <span className="flex items-center gap-1.5 px-1.5 font-mono text-[11px] tabular-nums text-muted-foreground">
           <span className="size-1.5 rounded-full bg-primary motion-safe:animate-pulse" />
           {String(Math.floor(seconds / 60)).padStart(2, "0")}:
           {String(seconds % 60).padStart(2, "0")}
         </span>
       )}
-      {denied && (
-        <span className="max-w-[9rem] text-right text-[11px] leading-snug text-muted-foreground">
-          No microphone access — please type instead.
-        </span>
-      )}
-    </div>
+    </>
   );
 }

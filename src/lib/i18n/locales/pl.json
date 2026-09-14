@@ -366,7 +366,8 @@
     "bookIdle": "Rezerwuj",
     "bookBusy": "Rezerwuję ofertę…",
     "speechOn": "Adair czyta odpowiedzi na głos",
-    "speechOff": "Czytaj odpowiedzi na głos"
+    "speechOff": "Czytaj odpowiedzi na głos",
+    "speechHello": "Od teraz będę czytać odpowiedzi na głos."
   },
   "auth": {
     "meta": {
@@ -439,7 +440,8 @@
     "bookIdle": "Rezerwuj",
     "bookBusy": "Rezerwuję ofertę…",
     "speechOn": "Adair czyta odpowiedzi na głos",
-    "speechOff": "Czytaj odpowiedzi na głos"
+    "speechOff": "Czytaj odpowiedzi na głos",
+    "speechHello": "Od teraz będę czytać odpowiedzi na głos."
   },
   "investors": {
     "meta": {

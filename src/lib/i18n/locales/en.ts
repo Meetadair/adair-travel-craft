@@ -150,6 +150,7 @@ export const en = {
     backToRecommendation: "Back to Adair's recommendation",
     total: "Total, one booking",
     speechOn: "Adair reads replies aloud",
+    speechHello: "I'll read my replies aloud from now on.",
     speechOff: "Read replies aloud",
     bookIdle: "Book this trip",
     bookBusy: "Holding your offer…",

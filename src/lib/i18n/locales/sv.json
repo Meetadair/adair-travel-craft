@@ -363,7 +363,8 @@
     "bookIdle": "Boka",
     "bookBusy": "Håller erbjudandet…",
     "speechOn": "Adair läser upp svaren",
-    "speechOff": "Läs upp svaren"
+    "speechOff": "Läs upp svaren",
+    "speechHello": "Från och med nu läser jag upp mina svar."
   },
   "auth": {
     "meta": {
@@ -423,7 +424,8 @@
     "bookIdle": "Boka",
     "bookBusy": "Håller erbjudandet…",
     "speechOn": "Adair läser upp svaren",
-    "speechOff": "Läs upp svaren"
+    "speechOff": "Läs upp svaren",
+    "speechHello": "Från och med nu läser jag upp mina svar."
   },
   "investors": {
     "meta": {

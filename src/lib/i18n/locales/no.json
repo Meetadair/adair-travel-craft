@@ -363,7 +363,8 @@
     "bookIdle": "Bestill",
     "bookBusy": "Holder tilbudet…",
     "speechOn": "Adair leser svarene høyt",
-    "speechOff": "Les svarene høyt"
+    "speechOff": "Les svarene høyt",
+    "speechHello": "Fra nå av leser jeg svarene mine høyt."
   },
   "auth": {
     "meta": {
@@ -423,7 +424,8 @@
     "bookIdle": "Bestill",
     "bookBusy": "Holder tilbudet…",
     "speechOn": "Adair leser svarene høyt",
-    "speechOff": "Les svarene høyt"
+    "speechOff": "Les svarene høyt",
+    "speechHello": "Fra nå av leser jeg svarene mine høyt."
   },
   "investors": {
     "meta": {

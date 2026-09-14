@@ -363,7 +363,8 @@
     "bookIdle": "Varaa",
     "bookBusy": "Varataan tarjousta…",
     "speechOn": "Adair lukee vastaukset ääneen",
-    "speechOff": "Lue vastaukset ääneen"
+    "speechOff": "Lue vastaukset ääneen",
+    "speechHello": "Luen vastaukseni tästä lähtien ääneen."
   },
   "auth": {
     "meta": {
@@ -423,7 +424,8 @@
     "bookIdle": "Varaa",
     "bookBusy": "Varataan tarjousta…",
     "speechOn": "Adair lukee vastaukset ääneen",
-    "speechOff": "Lue vastaukset ääneen"
+    "speechOff": "Lue vastaukset ääneen",
+    "speechHello": "Luen vastaukseni tästä lähtien ääneen."
   },
   "investors": {
     "meta": {

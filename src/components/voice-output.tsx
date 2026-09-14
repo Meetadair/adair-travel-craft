@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Volume2, VolumeX } from "lucide-react";
+import { Volume2 } from "lucide-react";
 
 import { speakableReply } from "@/lib/voice/speech";
 
@@ -38,13 +38,37 @@ export function pickVoice(voices: SpeechSynthesisVoice[], locale: string): Speec
   return matching.find((v) => v.localService) ?? matching[0] ?? null;
 }
 
-export function useSpeech(locale: string) {
+/**
+ * Speak now, from inside a click.
+ *
+ * Safari refuses speech that does not begin inside a user gesture, and it
+ * refuses silently — no error, no sound. Speaking the first words from the
+ * toggle's own click handler unlocks the synthesiser for the replies that
+ * follow, which arrive from the network and have no gesture to ride on. The
+ * confirmation doubles as proof that the voice works at all.
+ */
+function speakNow(text: string, locale: string) {
+  const engine = synth();
+  if (!engine) return;
+  engine.cancel();
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = locale.startsWith("pl") ? "pl-PL" : "en-US";
+  const voice = pickVoice(engine.getVoices(), locale);
+  if (voice) utterance.voice = voice;
+  utterance.rate = 1.05;
+  engine.speak(utterance);
+}
+
+export function useSpeech(locale: string, confirmation: string) {
   const [enabled, setEnabled] = useState(false);
   const [supported, setSupported] = useState(false);
   const spokenAlready = useRef<string | null>(null);
 
   useEffect(() => {
     setSupported(synth() !== null);
+    // Chrome and Safari return an empty voice list until voiceschanged fires;
+    // touching getVoices once is what makes them load it.
+    synth()?.getVoices();
     try {
       setEnabled(window.localStorage.getItem(KEY) === "on");
     } catch {
@@ -53,17 +77,21 @@ export function useSpeech(locale: string) {
   }, []);
 
   const toggle = useCallback(() => {
-    setEnabled((was) => {
-      const next = !was;
-      try {
-        window.localStorage.setItem(KEY, next ? "on" : "off");
-      } catch {
-        /* nothing to remember it in; the session still works */
-      }
-      if (!next) synth()?.cancel();
-      return next;
-    });
-  }, []);
+    // Decide synchronously, inside the click, so Safari sees a gesture.
+    const next = !enabled;
+    try {
+      window.localStorage.setItem(KEY, next ? "on" : "off");
+    } catch {
+      /* nothing to remember it in; the session still works */
+    }
+    if (next) {
+      spokenAlready.current = null;
+      speakNow(confirmation, locale);
+    } else {
+      synth()?.cancel();
+    }
+    setEnabled(next);
+  }, [enabled, confirmation, locale]);
 
   /** Say this, replacing anything currently being said. */
   const say = useCallback(
@@ -109,6 +137,8 @@ export function SpeechToggle({
   labelOff: string;
 }) {
   if (!supported) return null;
+  // A crossed-out speaker reads as "broken", not "off". Off is the plain
+  // speaker in the quiet colour; on is the filled one.
   return (
     <button
       type="button"
@@ -118,11 +148,11 @@ export function SpeechToggle({
       aria-label={enabled ? labelOn : labelOff}
       className={
         enabled
-          ? "inline-flex size-9 items-center justify-center rounded-xl border border-primary bg-primary/5 text-primary transition-colors"
-          : "inline-flex size-9 items-center justify-center rounded-xl border border-border text-muted-foreground transition-colors hover:text-foreground"
+          ? "inline-flex size-9 items-center justify-center rounded-full bg-primary text-primary-foreground transition-colors"
+          : "inline-flex size-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
       }
     >
-      {enabled ? <Volume2 className="size-4" /> : <VolumeX className="size-4" />}
+      <Volume2 className="size-4" />
     </button>
   );
 }
