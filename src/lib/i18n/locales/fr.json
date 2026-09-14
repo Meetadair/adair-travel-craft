@@ -248,6 +248,16 @@
       "saveCompanyAction": "Enregistrer l'entreprise",
       "dismiss": "Pas maintenant"
     },
+    "location": {
+      "ask": "Pour vous dire à quelle distance c'est de là où vous êtes, j'ai besoin de votre position — vous autorisez ?",
+      "privacy": "Nous l'utilisons uniquement pour cette réponse et ne la conservons pas.",
+      "allow": "Autoriser",
+      "deny": "Pas maintenant",
+      "blocked": "Votre navigateur bloque la localisation pour ce site. Ouvrez le cadenas dans la barre d'adresse, réglez Position sur Autoriser, puis redemandez.",
+      "unavailable": "Votre appareil n'a pas renvoyé de position. Je mesure depuis votre hôtel.",
+      "fromHotel": "Mesuré depuis votre hôtel.",
+      "fromCity": "Mesuré depuis le centre-ville."
+    },
     "memory": {
       "sameAgain": "Vous avez séjourné à {hotel} la dernière fois à {city} — même choix ?",
       "sameAgainYes": "Même choix",

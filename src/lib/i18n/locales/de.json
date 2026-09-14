@@ -248,6 +248,16 @@
       "saveCompanyAction": "Unternehmen speichern",
       "dismiss": "Nicht jetzt"
     },
+    "location": {
+      "ask": "Um zu sagen, wie weit das von Ihrem Standort entfernt ist, brauche ich Ihre Position — erlauben?",
+      "privacy": "Wir nutzen sie nur für diese Antwort und speichern sie nicht.",
+      "allow": "Erlauben",
+      "deny": "Nicht jetzt",
+      "blocked": "Ihr Browser blockiert den Standort für diese Seite. Öffnen Sie das Schloss in der Adressleiste, setzen Sie Standort auf Zulassen und fragen Sie erneut.",
+      "unavailable": "Ihr Gerät hat keine Position geliefert. Ich messe stattdessen ab Ihrem Hotel.",
+      "fromHotel": "Ab Ihrem Hotel gemessen.",
+      "fromCity": "Ab dem Stadtzentrum gemessen."
+    },
     "memory": {
       "sameAgain": "Sie waren zuletzt im {hotel} in {city} — wieder dort buchen?",
       "sameAgainYes": "Wie beim letzten Mal",

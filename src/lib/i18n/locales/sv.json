@@ -248,6 +248,16 @@
       "saveCompanyAction": "Spara företaget",
       "dismiss": "Inte nu"
     },
+    "location": {
+      "ask": "För att säga hur långt det är från där du står behöver jag din plats — tillåter du det?",
+      "privacy": "Vi använder den bara för det här svaret och sparar den inte.",
+      "allow": "Tillåt",
+      "deny": "Inte nu",
+      "blocked": "Din webbläsare blockerar plats för den här sidan. Öppna låset i adressfältet, sätt Plats till Tillåt och fråga igen.",
+      "unavailable": "Din enhet gav ingen position. Jag mäter från ditt hotell i stället.",
+      "fromHotel": "Mätt från ditt hotell.",
+      "fromCity": "Mätt från stadens centrum."
+    },
     "memory": {
       "sameAgain": "Du bodde på {hotel} senast i {city} — samma igen?",
       "sameAgainYes": "Samma igen",
