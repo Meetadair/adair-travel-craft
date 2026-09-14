@@ -201,7 +201,16 @@
         "companionsHint": "Personnes voyageant avec vous",
         "done": "Terminé",
         "roundTrip": "Aller-retour",
-        "flexible": "± 3 jours"
+        "flexible": "± 3 jours",
+        "searchDates": "Rechercher ces dates",
+        "airportOther": "Ou chercher un autre aéroport",
+        "changeDates": "Modifier les dates",
+        "flexSaveLead": "Économisez",
+        "flexSaveTail": "en partant le",
+        "flexSaveApply": "Choisir ces dates",
+        "pickReturn": "Choisissez aussi le jour du retour.",
+        "nightsLabel": "ou nuits :",
+        "nightsWord": "nuits"
       }
     },
     "questions": {
@@ -226,7 +235,16 @@
         "companionsHint": "Personnes voyageant avec vous",
         "done": "Terminé",
         "roundTrip": "Aller-retour",
-        "flexible": "± 3 jours"
+        "flexible": "± 3 jours",
+        "searchDates": "Rechercher ces dates",
+        "airportOther": "Ou chercher un autre aéroport",
+        "changeDates": "Modifier les dates",
+        "flexSaveLead": "Économisez",
+        "flexSaveTail": "en partant le",
+        "flexSaveApply": "Choisir ces dates",
+        "pickReturn": "Choisissez aussi le jour du retour.",
+        "nightsLabel": "ou nuits :",
+        "nightsWord": "nuits"
       }
     },
     "advice": {

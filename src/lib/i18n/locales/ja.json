@@ -201,7 +201,16 @@
         "companionsHint": "同行者",
         "done": "完了",
         "roundTrip": "往復",
-        "flexible": "±3日"
+        "flexible": "±3日",
+        "searchDates": "この日程で検索",
+        "airportOther": "または別の空港を検索",
+        "changeDates": "日程を変更",
+        "flexSaveLead": "節約",
+        "flexSaveTail": "出発日",
+        "flexSaveApply": "この日程にする",
+        "pickReturn": "帰りの日も選んでください。",
+        "nightsLabel": "または泊数:",
+        "nightsWord": "泊"
       }
     },
     "questions": {
@@ -226,7 +235,16 @@
         "companionsHint": "同行者",
         "done": "完了",
         "roundTrip": "往復",
-        "flexible": "±3日"
+        "flexible": "±3日",
+        "searchDates": "この日程で検索",
+        "airportOther": "または別の空港を検索",
+        "changeDates": "日程を変更",
+        "flexSaveLead": "節約",
+        "flexSaveTail": "出発日",
+        "flexSaveApply": "この日程にする",
+        "pickReturn": "帰りの日も選んでください。",
+        "nightsLabel": "または泊数:",
+        "nightsWord": "泊"
       }
     },
     "advice": {

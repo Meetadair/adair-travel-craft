@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 
-import { addDaysIso, nightsBetween, today, type DateRange } from "@/lib/trip/answers";
+import { isCompleteRange, nightsBetween, today, type DateRange } from "@/lib/trip/answers";
 
 /**
  * Picking the days of a trip.
@@ -23,6 +23,7 @@ type Copy = {
   flexible: string;
   pickReturn: string;
   nightsWord: string;
+  searchDates: string;
 };
 
 const DAY_MS = 86_400_000;
@@ -74,12 +75,14 @@ export function TripDates({
   locale = "en",
   monthsAhead = 12,
   onChange,
+  onConfirm,
 }: {
   value: DateRange | null;
   copy: Copy;
   locale?: string;
   monthsAhead?: number;
   onChange: (range: DateRange) => void;
+  onConfirm?: (() => void) | undefined;
 }) {
   const from = today();
   const oneWay = Boolean(value?.oneWay);
@@ -134,11 +137,10 @@ export function TripDates({
       onChange({ departDate: from, ...(next ? { oneWay: true } : {}) });
       return;
     }
-    onChange(
-      next
-        ? { departDate: depart, oneWay: true }
-        : { departDate: depart, returnDate: addDaysIso(depart, 2) },
-    );
+    // Switching back to a return trip clears the return instead of inventing
+    // one: a made-up date used to complete the range and submit the search
+    // behind the traveller's back.
+    onChange(next ? { departDate: depart, oneWay: true } : { departDate: depart });
   }
 
   const depart = value?.departDate;
@@ -290,6 +292,16 @@ export function TripDates({
         )}
         {oneWay && <div className="text-muted-foreground">{copy.oneWay}</div>}
         {value?.flexDays ? <div className="text-muted-foreground">{copy.flexible}</div> : null}
+        {onConfirm && (
+          <button
+            type="button"
+            disabled={!value || !isCompleteRange(value)}
+            onClick={onConfirm}
+            className="ml-auto rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-40"
+          >
+            {copy.searchDates}
+          </button>
+        )}
       </div>
     </div>
   );

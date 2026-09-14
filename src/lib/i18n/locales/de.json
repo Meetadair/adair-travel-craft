@@ -201,7 +201,16 @@
         "companionsHint": "Mitreisende Personen",
         "done": "Fertig",
         "roundTrip": "Hin und zurück",
-        "flexible": "± 3 Tage"
+        "flexible": "± 3 Tage",
+        "searchDates": "Diese Daten suchen",
+        "airportOther": "Oder anderen Flughafen suchen",
+        "changeDates": "Daten ändern",
+        "flexSaveLead": "Spare",
+        "flexSaveTail": "bei Abflug am",
+        "flexSaveApply": "Diese Daten nehmen",
+        "pickReturn": "Wähle auch den Rückreisetag.",
+        "nightsLabel": "oder Nächte:",
+        "nightsWord": "Nächte"
       }
     },
     "questions": {
@@ -226,7 +235,16 @@
         "companionsHint": "Mitreisende Personen",
         "done": "Fertig",
         "roundTrip": "Hin und zurück",
-        "flexible": "± 3 Tage"
+        "flexible": "± 3 Tage",
+        "searchDates": "Diese Daten suchen",
+        "airportOther": "Oder anderen Flughafen suchen",
+        "changeDates": "Daten ändern",
+        "flexSaveLead": "Spare",
+        "flexSaveTail": "bei Abflug am",
+        "flexSaveApply": "Diese Daten nehmen",
+        "pickReturn": "Wähle auch den Rückreisetag.",
+        "nightsLabel": "oder Nächte:",
+        "nightsWord": "Nächte"
       }
     },
     "advice": {

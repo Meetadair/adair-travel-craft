@@ -201,7 +201,16 @@
         "companionsHint": "同行人员",
         "done": "完成",
         "roundTrip": "往返",
-        "flexible": "±3天"
+        "flexible": "±3天",
+        "searchDates": "搜索这些日期",
+        "airportOther": "或搜索其他机场",
+        "changeDates": "更改日期",
+        "flexSaveLead": "节省",
+        "flexSaveTail": "如果出发于",
+        "flexSaveApply": "使用此日期",
+        "pickReturn": "也请选择返程日期。",
+        "nightsLabel": "或住几晚：",
+        "nightsWord": "晚"
       }
     },
     "questions": {
@@ -226,7 +235,16 @@
         "companionsHint": "同行人员",
         "done": "完成",
         "roundTrip": "往返",
-        "flexible": "±3天"
+        "flexible": "±3天",
+        "searchDates": "搜索这些日期",
+        "airportOther": "或搜索其他机场",
+        "changeDates": "更改日期",
+        "flexSaveLead": "节省",
+        "flexSaveTail": "如果出发于",
+        "flexSaveApply": "使用此日期",
+        "pickReturn": "也请选择返程日期。",
+        "nightsLabel": "或住几晚：",
+        "nightsWord": "晚"
       }
     },
     "advice": {

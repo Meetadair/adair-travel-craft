@@ -201,7 +201,16 @@
         "companionsHint": "Люди, з якими ви подорожуєте",
         "done": "Готово",
         "roundTrip": "Туди й назад",
-        "flexible": "± 3 дні"
+        "flexible": "± 3 дні",
+        "searchDates": "Шукати на ці дати",
+        "airportOther": "Або знайдіть інший аеропорт",
+        "changeDates": "Змінити дати",
+        "flexSaveLead": "Заощадьте",
+        "flexSaveTail": "вилетівши",
+        "flexSaveApply": "Обрати ці дати",
+        "pickReturn": "Оберіть також день повернення.",
+        "nightsLabel": "або ночей:",
+        "nightsWord": "ночей"
       }
     },
     "questions": {
@@ -226,7 +235,16 @@
         "companionsHint": "Люди, з якими ви подорожуєте",
         "done": "Готово",
         "roundTrip": "Туди й назад",
-        "flexible": "± 3 дні"
+        "flexible": "± 3 дні",
+        "searchDates": "Шукати на ці дати",
+        "airportOther": "Або знайдіть інший аеропорт",
+        "changeDates": "Змінити дати",
+        "flexSaveLead": "Заощадьте",
+        "flexSaveTail": "вилетівши",
+        "flexSaveApply": "Обрати ці дати",
+        "pickReturn": "Оберіть також день повернення.",
+        "nightsLabel": "або ночей:",
+        "nightsWord": "ночей"
       }
     },
     "advice": {

@@ -201,7 +201,16 @@
         "companionsHint": "Kanssamatkustajat",
         "done": "Valmis",
         "roundTrip": "Meno-paluu",
-        "flexible": "± 3 päivää"
+        "flexible": "± 3 päivää",
+        "searchDates": "Hae näille päiville",
+        "airportOther": "Tai etsi toinen lentoasema",
+        "changeDates": "Vaihda päivät",
+        "flexSaveLead": "Säästä",
+        "flexSaveTail": "lähtemällä",
+        "flexSaveApply": "Käytä näitä",
+        "pickReturn": "Valitse myös paluupäivä.",
+        "nightsLabel": "tai öitä:",
+        "nightsWord": "yötä"
       }
     },
     "questions": {
@@ -226,7 +235,16 @@
         "companionsHint": "Kanssamatkustajat",
         "done": "Valmis",
         "roundTrip": "Meno-paluu",
-        "flexible": "± 3 päivää"
+        "flexible": "± 3 päivää",
+        "searchDates": "Hae näille päiville",
+        "airportOther": "Tai etsi toinen lentoasema",
+        "changeDates": "Vaihda päivät",
+        "flexSaveLead": "Säästä",
+        "flexSaveTail": "lähtemällä",
+        "flexSaveApply": "Käytä näitä",
+        "pickReturn": "Valitse myös paluupäivä.",
+        "nightsLabel": "tai öitä:",
+        "nightsWord": "yötä"
       }
     },
     "advice": {

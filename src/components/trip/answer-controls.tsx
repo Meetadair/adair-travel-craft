@@ -27,8 +27,14 @@ export type AnswerControlsCopy = {
   pickReturn: string;
   nightsLabel: string;
   nightsWord: string;
+  searchDates: string;
+  changeDates: string;
+  flexSaveLead: string;
+  flexSaveTail: string;
+  flexSaveApply: string;
   airportSearch: string;
   airportEmpty: string;
+  airportOther: string;
   timeLabel: string;
   travellersLabel: string;
   companionsHint: string;
@@ -60,10 +66,12 @@ export function DateAnswer({
   value,
   copy,
   onChange,
+  onConfirm,
 }: {
   value: DateRange | null;
   copy: AnswerControlsCopy;
   onChange: (range: DateRange) => void;
+  onConfirm?: (() => void) | undefined;
 }) {
   const from = today();
   const bounds = monthRange(from);
@@ -92,7 +100,7 @@ export function DateAnswer({
         })}
       </div>
 
-      <TripDates value={value} copy={copy} onChange={onChange} />
+      <TripDates value={value} copy={copy} onChange={onChange} onConfirm={onConfirm} />
 
       {value?.departDate && !value.returnDate && !value.oneWay && (
         <div className="mt-2 flex flex-wrap items-center gap-2">
@@ -187,7 +195,12 @@ export function AirportAnswer({
   onChange: (iata: string) => void;
 }) {
   const [query, setQuery] = useState("");
-  const matches = searchAirports(query);
+  const typed = query.trim().length > 0;
+  // An empty box used to list the world's airports alphabetically underneath
+  // chips that already answered the question. Amsterdam is not a useful reply
+  // to "which New York airport?" — the list appears once someone actually asks
+  // for it.
+  const matches = typed ? searchAirports(query) : [];
 
   return (
     <div className="w-full">
@@ -208,10 +221,11 @@ export function AirportAnswer({
       <input
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        placeholder={copy.airportSearch}
+        placeholder={suggestions.length > 0 ? copy.airportOther : copy.airportSearch}
         aria-label={copy.airportSearch}
         className={`${suggestions.length > 0 ? "mt-3" : ""} w-full rounded-lg border border-border bg-background px-3 py-2 text-xs outline-none`}
       />
+      {typed && (
       <ul className="mt-1 max-h-44 overflow-auto rounded-lg border border-border">
         {matches.length === 0 && (
           <li className="px-3 py-2 text-xs text-muted-foreground">{copy.airportEmpty}</li>
@@ -230,6 +244,7 @@ export function AirportAnswer({
           </li>
         ))}
       </ul>
+      )}
     </div>
   );
 }

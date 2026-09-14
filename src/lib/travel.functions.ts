@@ -3,9 +3,18 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { isOneWay, parseTripSentence } from "./trip/parse";
 
+const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
+
 const askSchema = z.object({
   message: z.string().min(3).max(1000),
   locale: z.string().max(8).optional(),
+  // Dates chosen on the card, which beat whatever the sentence said. Appending
+  // a second range to the sentence does not work — the parser keeps the first
+  // one it finds — so an explicit choice travels on its own.
+  departDate: isoDate.optional(),
+  returnDate: isoDate.optional(),
+  oneWay: z.boolean().optional(),
+  flexDays: z.number().int().min(0).max(14).optional(),
 });
 
 /** Language the assistant answers in, keyed by UI locale. */
@@ -147,31 +156,40 @@ export const composeTrip = createServerFn({ method: "POST" })
     // The chat asks "Where are you going?" instead of searching.
     if (!parsed) return { needsDestination: true as const };
     const { searchTrip } = await import("./travel-search.server");
+    const departDate = data.departDate ?? parsed.departDate;
+    const returnDate = data.returnDate ?? parsed.returnDate;
+    const oneWay = data.oneWay ?? parsed.oneWay;
     const result = await searchTrip({
       originCity: parsed.originCity,
       originIata: parsed.originIata.toUpperCase(),
       destinationCity: parsed.destinationCity,
       destinationIata: parsed.destinationIata.toUpperCase(),
-      departDate: parsed.departDate,
-      returnDate: parsed.returnDate,
+      departDate,
+      returnDate,
       ...(parsed.cabinClass ? { cabinClass: parsed.cabinClass } : {}),
       ...(parsed.needsCar === undefined ? {} : { needsCar: parsed.needsCar }),
-      ...(parsed.oneWay ? { oneWay: true } : {}),
+      ...(oneWay ? { oneWay: true } : {}),
       ...(parsed.notes ? { notes: parsed.notes } : {}),
+      ...(data.flexDays ? { flexDays: data.flexDays } : {}),
     });
 
+    // The reply and the card must both quote the dates we actually searched,
+    // not the ones the sentence happened to contain before the traveller
+    // changed them on the card.
+    const overridden = Boolean(data.departDate || data.returnDate || data.oneWay !== undefined);
     return {
       reply:
-        parsed.reply ??
-        (parsed.oneWay
-          ? `${parsed.destinationCity}: ${parsed.departDate}, one way. Your composed trip is below.`
-          : `${parsed.destinationCity}: ${parsed.departDate} – ${parsed.returnDate}. Your composed trip is below.`),
+        (overridden ? null : parsed.reply) ??
+        (oneWay
+          ? `${parsed.destinationCity}: ${departDate}, one way. Your composed trip is below.`
+          : `${parsed.destinationCity}: ${departDate} – ${returnDate}. Your composed trip is below.`),
       request: {
         originCity: parsed.originCity,
         destinationCity: parsed.destinationCity,
-        departDate: parsed.departDate,
-        returnDate: parsed.returnDate,
-        ...(parsed.oneWay ? { oneWay: true } : {}),
+        departDate,
+        returnDate,
+        ...(oneWay ? { oneWay: true } : {}),
+        ...(data.flexDays ? { flexDays: data.flexDays } : {}),
       },
       ...result,
     };

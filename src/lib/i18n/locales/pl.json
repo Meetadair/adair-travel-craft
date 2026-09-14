@@ -204,7 +204,13 @@
         "nightsLabel": "albo liczba nocy:",
         "nightsWord": "nocy",
         "roundTrip": "W obie strony",
-        "flexible": "± 3 dni"
+        "flexible": "± 3 dni",
+        "searchDates": "Szukaj w tych terminach",
+        "airportOther": "Albo poszukaj innego lotniska",
+        "changeDates": "Zmień daty",
+        "flexSaveLead": "Oszczędzisz",
+        "flexSaveTail": "wylatując",
+        "flexSaveApply": "Użyj tych dat"
       }
     },
     "questions": {
@@ -232,7 +238,13 @@
         "nightsLabel": "albo liczba nocy:",
         "nightsWord": "nocy",
         "roundTrip": "W obie strony",
-        "flexible": "± 3 dni"
+        "flexible": "± 3 dni",
+        "searchDates": "Szukaj w tych terminach",
+        "airportOther": "Albo poszukaj innego lotniska",
+        "changeDates": "Zmień daty",
+        "flexSaveLead": "Oszczędzisz",
+        "flexSaveTail": "wylatując",
+        "flexSaveApply": "Użyj tych dat"
       },
       "needsCar": "Chcesz mieć tam samochód?",
       "returnTime": "O której chcesz wracać?",

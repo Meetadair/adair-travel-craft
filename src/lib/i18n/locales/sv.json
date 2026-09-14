@@ -201,7 +201,16 @@
         "companionsHint": "Personer du reser med",
         "done": "Klar",
         "roundTrip": "Tur och retur",
-        "flexible": "± 3 dagar"
+        "flexible": "± 3 dagar",
+        "searchDates": "Sök dessa datum",
+        "airportOther": "Eller sök en annan flygplats",
+        "changeDates": "Ändra datum",
+        "flexSaveLead": "Spara",
+        "flexSaveTail": "genom att resa",
+        "flexSaveApply": "Välj dessa",
+        "pickReturn": "Välj även hemresedagen.",
+        "nightsLabel": "eller nätter:",
+        "nightsWord": "nätter"
       }
     },
     "questions": {
@@ -226,7 +235,16 @@
         "companionsHint": "Personer du reser med",
         "done": "Klar",
         "roundTrip": "Tur och retur",
-        "flexible": "± 3 dagar"
+        "flexible": "± 3 dagar",
+        "searchDates": "Sök dessa datum",
+        "airportOther": "Eller sök en annan flygplats",
+        "changeDates": "Ändra datum",
+        "flexSaveLead": "Spara",
+        "flexSaveTail": "genom att resa",
+        "flexSaveApply": "Välj dessa",
+        "pickReturn": "Välj även hemresedagen.",
+        "nightsLabel": "eller nätter:",
+        "nightsWord": "nätter"
       }
     },
     "advice": {

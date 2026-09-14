@@ -9,6 +9,8 @@
 import { buildFlightOptions, type FlightOptions } from "@/lib/trip/flight-options";
 import type { StayResult, TripRequest } from "@/lib/trip/types";
 
+import { bestSaving, flexWindows, type FlexSaving } from "@/lib/trip/flex";
+
 export type TripOffer = {
   kind: "flight" | "hotel" | "car";
   title: string;
@@ -42,6 +44,8 @@ export type TripSearchInput = {
   notes?: string;
   /** Flight only, one direction. Set from the sentence, never guessed. */
   oneWay?: boolean;
+  /** Days either side the traveller said they could move. 0 or absent = fixed. */
+  flexDays?: number;
 };
 
 export type TripSearchResult = {
@@ -50,9 +54,56 @@ export type TripSearchResult = {
   currency: string;
   source: "live" | "partial" | "demo";
   warnings: string[];
+  /** Present only when the traveller said they were flexible and it paid off. */
+  flexSaving?: FlexSaving;
 };
 
 const round = (n: number) => Math.round(n * 100) / 100;
+
+/**
+ * Prices the same flight on the nearby days the traveller said they could move
+ * to. Flight only: the hotel follows the flight, and re-pricing the whole trip
+ * six times to answer "is it cheaper on Tuesday" is not worth the wait.
+ *
+ * Every call is allowed to fail on its own. A flexible search that breaks the
+ * ordinary one would be a poor trade for a hint.
+ */
+async function flexibleSaving(
+  input: TripSearchInput,
+  baseFlight: TripOffer,
+): Promise<FlexSaving | null> {
+  const today = new Date().toISOString().slice(0, 10);
+  const windows = flexWindows(
+    input.departDate,
+    input.oneWay ? undefined : input.returnDate,
+    input.flexDays ?? 0,
+    today,
+  ).slice(0, 4); // four extra calls is the most a traveller will wait for
+
+  if (windows.length === 0) return null;
+
+  const priced = await Promise.all(
+    windows.map(async (window) => {
+      try {
+        const offer = await duffelFlight({
+          ...input,
+          departDate: window.departDate,
+          returnDate: window.returnDate ?? window.departDate,
+        });
+        if (!offer || !offer.live) return null;
+        return { window, amount: offer.amount, currency: offer.currency };
+      } catch {
+        return null;
+      }
+    }),
+  );
+
+  return bestSaving(
+    baseFlight.amount,
+    baseFlight.currency,
+    priced.filter((p): p is NonNullable<typeof p> => p !== null),
+  );
+}
 
 function fmtDate(d: string) {
   const [y, m, day] = d.split("-");
@@ -558,12 +609,14 @@ export async function searchTrip(input: TripSearchInput): Promise<TripSearchResu
   if (input.oneWay) {
     const demoFlight = demoOffers(input).find((o) => o.kind === "flight")!;
     const only = flight ?? demoFlight;
+    const flexOneWay = only.live ? await flexibleSaving(input, only).catch(() => null) : null;
     return {
       offers: [only],
       total: round(only.amount),
       currency: only.currency,
       source: only.live ? "live" : "demo",
       warnings,
+      ...(flexOneWay ? { flexSaving: flexOneWay } : {}),
     };
   }
 
@@ -590,11 +643,15 @@ export async function searchTrip(input: TripSearchInput): Promise<TripSearchResu
 
   const liveCount = offers.filter((o) => o.live).length;
   const currency = offers[0]?.currency ?? "EUR";
+  // Only worth asking when the flight we are comparing against is a real one.
+  const flexSaving =
+    flight && flight.live ? await flexibleSaving(input, flight).catch(() => null) : null;
   return {
     offers,
     total: round(offers.reduce((sum, o) => sum + o.amount, 0)),
     currency,
     source: liveCount === offers.length ? "live" : liveCount > 0 ? "partial" : "demo",
     warnings,
+    ...(flexSaving ? { flexSaving } : {}),
   };
 }

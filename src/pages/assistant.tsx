@@ -6,6 +6,15 @@ import { ageQuestion, familyFromSentence } from "@/lib/trip/family";
 import { applyAnswer, assumptionNote, clarify, type Clarification } from "@/lib/trip/clarify";
 import { AirportAnswer, DateAnswer } from "@/components/trip/answer-controls";
 import { isCompleteRange, rangeSentence, type DateRange } from "@/lib/trip/answers";
+
+/** A search with the dates settled on the card rather than read from the text. */
+type SearchArgs = {
+  message: string;
+  departDate?: string;
+  returnDate?: string;
+  oneWay?: boolean;
+  flexDays?: number;
+};
 import { ASSISTANT_PREFILL_KEY } from "@/lib/trips/prefill";
 import { parseTripSentence } from "@/lib/trip/parse";
 import { offerMatch } from "@/lib/trip/offer-match";
@@ -97,6 +106,13 @@ export function AssistantPage() {
   const [assumption, setAssumption] = useState<string | null>(null);
   /** A plain answer — a greeting, a question about Adair — instead of a search. */
   const [reply, setReply] = useState<string | null>(null);
+  /**
+   * The dates being re-picked on the result card. The picker used to exist only
+   * while Adair was asking "which dates?", so a traveller who had already named
+   * their dates could never reach it — and never saw the flexible-dates option
+   * at all, which is the one moment it is worth the most.
+   */
+  const [cardDates, setCardDates] = useState<DateRange | null>(null);
 
   // Airport choices are remembered locally, so the same question is not asked
   // twice for a city they have already answered for.
@@ -210,7 +226,7 @@ export function AssistantPage() {
     runSearch(sentence);
   };
 
-  const runSearch = (sentence: string) => {
+  const runSearch = (sentence: string, override?: Omit<SearchArgs, "message">) => {
     setAsked(sentence);
     setSaved(null);
     setHotelRef(null);
@@ -223,7 +239,7 @@ export function AssistantPage() {
         ? assumptionNote(sentence, parsed.destinationCity, parsed.destinationIata ?? "")
         : null,
     );
-    search.mutate(sentence);
+    search.mutate(override ? { message: sentence, ...override } : sentence);
   };
 
   const money = (amount: number, currency: string) =>
@@ -321,7 +337,10 @@ export function AssistantPage() {
   });
 
   const search = useMutation({
-    mutationFn: (message: string) => compose({ data: { message, locale } }),
+    mutationFn: (args: string | SearchArgs) =>
+      typeof args === "string"
+        ? compose({ data: { message: args, locale } })
+        : compose({ data: { ...args, locale } }),
     onSuccess: (result) => {
       if ("needsDestination" in result) {
         say("adair", t.assistant.intent.needsDestination);
@@ -523,14 +542,15 @@ export function AssistantPage() {
                 <DateAnswer
                   value={dateDraft}
                   copy={t.assistant.strip.controls}
-                  onChange={(range) => {
-                    setDateDraft(range);
-                    // Both ends or nothing: a one-way answer would send the
-                    // search off with a return date we made up.
-                    if (isCompleteRange(range)) {
-                      setDateDraft(null);
-                      answerQuestion(rangeSentence(range));
-                    }
+                  onChange={setDateDraft}
+                  // The calendar stays up until the traveller says they are
+                  // done. Submitting the moment a range happened to be complete
+                  // took the calendar away mid-thought, with no way back to it.
+                  onConfirm={() => {
+                    if (!dateDraft || !isCompleteRange(dateDraft)) return;
+                    const sentence = rangeSentence(dateDraft);
+                    setDateDraft(null);
+                    answerQuestion(sentence);
                   }}
                 />
               </div>
@@ -601,13 +621,90 @@ export function AssistantPage() {
                   </p>
                   <p className="mt-0.5 text-xs text-muted-foreground">
                     {assumption ? `${assumption} · ` : ""}
-                    {result.request.departDate} – {result.request.returnDate} ·{" "}
+                    {result.request.oneWay
+                      ? `${result.request.departDate} · ${t.assistant.strip.controls.oneWay}`
+                      : `${result.request.departDate} – ${result.request.returnDate}`}{" "}
+                    ·{" "}
                     {result.source === "live"
                       ? t.assistant.sourceLive
                       : result.source === "partial"
                         ? t.assistant.sourcePartial
                         : t.assistant.sourceDemo}
+                    {" · "}
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setCardDates((open) =>
+                          open
+                            ? null
+                            : {
+                                departDate: result.request.departDate,
+                                ...(result.request.oneWay
+                                  ? { oneWay: true }
+                                  : { returnDate: result.request.returnDate }),
+                                ...(result.request.flexDays
+                                  ? { flexDays: result.request.flexDays }
+                                  : {}),
+                              },
+                        )
+                      }
+                      className="font-medium text-primary underline underline-offset-4"
+                    >
+                      {t.assistant.strip.controls.changeDates}
+                    </button>
                   </p>
+
+                  {/* Cheaper a day or two either side. Only ever shown when the
+                      traveller said they could move, and only with a real
+                      saving behind it. */}
+                  {result.flexSaving && !cardDates && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        runSearch(asked ?? "", {
+                          departDate: result.flexSaving!.departDate,
+                          ...(result.flexSaving!.returnDate
+                            ? { returnDate: result.flexSaving!.returnDate }
+                            : { oneWay: true }),
+                        })
+                      }
+                      className="mt-2 flex w-full items-center justify-between gap-3 rounded-lg border border-primary/40 bg-primary/5 px-3 py-2 text-left text-xs"
+                    >
+                      <span>
+                        {t.assistant.strip.controls.flexSaveLead}{" "}
+                        <span className="font-semibold">
+                          {result.flexSaving.saveAmount} {result.flexSaving.currency}
+                        </span>{" "}
+                        {t.assistant.strip.controls.flexSaveTail}{" "}
+                        <span className="font-semibold">{result.flexSaving.departDate}</span>
+                      </span>
+                      <span className="shrink-0 font-medium text-primary">
+                        {t.assistant.strip.controls.flexSaveApply}
+                      </span>
+                    </button>
+                  )}
+
+                  {cardDates && (
+                    <div className="mt-3">
+                      <DateAnswer
+                        value={cardDates}
+                        copy={t.assistant.strip.controls}
+                        onChange={setCardDates}
+                        onConfirm={() => {
+                          if (!isCompleteRange(cardDates)) return;
+                          const next = cardDates;
+                          setCardDates(null);
+                          runSearch(asked ?? "", {
+                            departDate: next.departDate,
+                            ...(next.oneWay
+                              ? { oneWay: true }
+                              : { returnDate: next.returnDate ?? next.departDate, oneWay: false }),
+                            ...(next.flexDays ? { flexDays: next.flexDays } : {}),
+                          });
+                        }}
+                      />
+                    </div>
+                  )}
                 </div>
                 <div className="divide-y divide-border">
                   {offers.map((o) => (

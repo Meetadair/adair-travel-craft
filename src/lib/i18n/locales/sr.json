@@ -201,7 +201,16 @@
         "companionsHint": "Osobe sa kojima putujete",
         "done": "Završeno",
         "roundTrip": "Povratna",
-        "flexible": "± 3 dana"
+        "flexible": "± 3 dana",
+        "searchDates": "Pretraži ove datume",
+        "airportOther": "Ili potraži drugi aerodrom",
+        "changeDates": "Promeni datume",
+        "flexSaveLead": "Uštedi",
+        "flexSaveTail": "polaskom",
+        "flexSaveApply": "Koristi ove datume",
+        "pickReturn": "Izaberi i dan povratka.",
+        "nightsLabel": "ili noći:",
+        "nightsWord": "noći"
       }
     },
     "questions": {
@@ -226,7 +235,16 @@
         "companionsHint": "Osobe sa kojima putujete",
         "done": "Završeno",
         "roundTrip": "Povratna",
-        "flexible": "± 3 dana"
+        "flexible": "± 3 dana",
+        "searchDates": "Pretraži ove datume",
+        "airportOther": "Ili potraži drugi aerodrom",
+        "changeDates": "Promeni datume",
+        "flexSaveLead": "Uštedi",
+        "flexSaveTail": "polaskom",
+        "flexSaveApply": "Koristi ove datume",
+        "pickReturn": "Izaberi i dan povratka.",
+        "nightsLabel": "ili noći:",
+        "nightsWord": "noći"
       }
     },
     "advice": {
