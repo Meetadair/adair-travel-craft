@@ -60,6 +60,8 @@ const overridesSchema = z.object({
     .optional(),
   passengers: z.number().int().min(1).max(9).optional(),
   childAges: z.array(z.number().int().min(0).max(17)).max(8).optional(),
+  cabinClass: z.enum(["economy", "premium_economy", "business", "first"]).optional(),
+  oneWay: z.boolean().optional(),
 });
 
 const sentenceSchema = z.object({

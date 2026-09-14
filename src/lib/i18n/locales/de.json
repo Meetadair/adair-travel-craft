@@ -152,7 +152,7 @@
     "showAlternatives": "Alternativen anzeigen",
     "backToRecommendation": "Zurück zur Empfehlung von Adair",
     "total": "Gesamt, eine Buchung",
-    "saveIdle": "Reise speichern",
+    "saveIdle": "Für später speichern",
     "saveBusy": "Wird gespeichert…",
     "savedAs": "Gespeichert als",
     "openDashboard": "Dashboard öffnen",
@@ -359,7 +359,9 @@
       "finishSecure": "Auf gesicherter Seite abschließen",
       "companyFailed": "Unternehmen konnte nicht gespeichert werden. Bitte erneut versuchen.",
       "detailsFailed": "Diese Angaben wurden nicht akzeptiert. Bitte überprüfen."
-    }
+    },
+    "bookIdle": "Jetzt buchen",
+    "bookBusy": "Angebot wird gehalten…"
   },
   "auth": {
     "meta": {
@@ -413,9 +415,11 @@
       "budget": "Budget pro Reise",
       "currency": "Währung"
     },
-    "saveIdle": "Präferenzen speichern",
+    "saveIdle": "Für später speichern",
     "saveBusy": "Wird gespeichert…",
-    "saved": "Gespeichert."
+    "saved": "Gespeichert.",
+    "bookIdle": "Jetzt buchen",
+    "bookBusy": "Angebot wird gehalten…"
   },
   "investors": {
     "meta": {

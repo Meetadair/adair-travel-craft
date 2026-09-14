@@ -152,7 +152,7 @@
     "showAlternatives": "他の候補を表示",
     "backToRecommendation": "Adairのおすすめに戻る",
     "total": "合計（一括予約）",
-    "saveIdle": "旅程を保存",
+    "saveIdle": "後で見る",
     "saveBusy": "保存中…",
     "savedAs": "保存名：",
     "openDashboard": "ダッシュボードを開く",
@@ -359,7 +359,9 @@
       "finishSecure": "専用ページで手続きを完了する",
       "companyFailed": "会社情報を保存できませんでした。もう一度お試しください。",
       "detailsFailed": "入力情報を受け付けられませんでした。内容をご確認ください。"
-    }
+    },
+    "bookIdle": "予約する",
+    "bookBusy": "オファーを確保中…"
   },
   "auth": {
     "meta": {
@@ -413,9 +415,11 @@
       "budget": "1回あたりの出張予算",
       "currency": "通貨"
     },
-    "saveIdle": "設定を保存",
+    "saveIdle": "後で見る",
     "saveBusy": "保存中…",
-    "saved": "保存しました。"
+    "saved": "保存しました。",
+    "bookIdle": "予約する",
+    "bookBusy": "オファーを確保中…"
   },
   "investors": {
     "meta": {

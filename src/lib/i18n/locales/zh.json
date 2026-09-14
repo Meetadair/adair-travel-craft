@@ -152,7 +152,7 @@
     "showAlternatives": "查看备选方案",
     "backToRecommendation": "返回 Adair 推荐方案",
     "total": "总计，单笔预订",
-    "saveIdle": "保存行程",
+    "saveIdle": "稍后再看",
     "saveBusy": "正在保存…",
     "savedAs": "已保存为",
     "openDashboard": "打开控制台",
@@ -359,7 +359,9 @@
       "finishSecure": "在安全页面完成预订",
       "companyFailed": "无法保存该公司信息，请重试。",
       "detailsFailed": "乘机人信息未通过核验，请检查后重试。"
-    }
+    },
+    "bookIdle": "立即预订",
+    "bookBusy": "正在锁定报价…"
   },
   "auth": {
     "meta": {
@@ -413,9 +415,11 @@
       "budget": "单次行程预算",
       "currency": "币种"
     },
-    "saveIdle": "保存偏好",
+    "saveIdle": "稍后再看",
     "saveBusy": "正在保存…",
-    "saved": "已保存。"
+    "saved": "已保存。",
+    "bookIdle": "立即预订",
+    "bookBusy": "正在锁定报价…"
   },
   "investors": {
     "meta": {

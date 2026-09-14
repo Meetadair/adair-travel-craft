@@ -152,7 +152,7 @@
     "showAlternatives": "Näytä vaihtoehdot",
     "backToRecommendation": "Takaisin Adairin suositukseen",
     "total": "Yhteensä, yksi varaus",
-    "saveIdle": "Tallenna matka",
+    "saveIdle": "Tallenna myöhemmäksi",
     "saveBusy": "Tallennetaan…",
     "savedAs": "Tallennettu nimellä",
     "openDashboard": "Avaa hallintapaneeli",
@@ -359,7 +359,9 @@
       "finishSecure": "Viimeistele suojatulla sivulla",
       "companyFailed": "Yrityksen tallentaminen ei onnistunut. Yritä uudelleen.",
       "detailsFailed": "Tietoja ei hyväksytty. Tarkista ne."
-    }
+    },
+    "bookIdle": "Varaa",
+    "bookBusy": "Varataan tarjousta…"
   },
   "auth": {
     "meta": {
@@ -413,9 +415,11 @@
       "budget": "Budjetti per matka",
       "currency": "Valuutta"
     },
-    "saveIdle": "Tallenna valinnat",
+    "saveIdle": "Tallenna myöhemmäksi",
     "saveBusy": "Tallennetaan…",
-    "saved": "Tallennettu."
+    "saved": "Tallennettu.",
+    "bookIdle": "Varaa",
+    "bookBusy": "Varataan tarjousta…"
   },
   "investors": {
     "meta": {

@@ -152,7 +152,7 @@
     "showAlternatives": "Visa alternativ",
     "backToRecommendation": "Tillbaka till Adairs rekommendation",
     "total": "Totalt, en bokning",
-    "saveIdle": "Spara resa",
+    "saveIdle": "Spara till senare",
     "saveBusy": "Sparar…",
     "savedAs": "Sparad som",
     "openDashboard": "Öppna översikten",
@@ -359,7 +359,9 @@
       "finishSecure": "Slutför på den säkra sidan",
       "companyFailed": "Vi kunde inte spara företaget. Försök igen.",
       "detailsFailed": "Uppgifterna godkändes inte. Kontrollera och försök igen."
-    }
+    },
+    "bookIdle": "Boka",
+    "bookBusy": "Håller erbjudandet…"
   },
   "auth": {
     "meta": {
@@ -413,9 +415,11 @@
       "budget": "Budget per resa",
       "currency": "Valuta"
     },
-    "saveIdle": "Spara preferenser",
+    "saveIdle": "Spara till senare",
     "saveBusy": "Sparar…",
-    "saved": "Sparat."
+    "saved": "Sparat.",
+    "bookIdle": "Boka",
+    "bookBusy": "Håller erbjudandet…"
   },
   "investors": {
     "meta": {

@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { safeReply } from "@/lib/trip/reply-guard";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { isOneWay, parseTripSentence } from "./trip/parse";
 
@@ -93,6 +94,7 @@ function systemPrompt(today: string, locale: string) {
     `(IATA code of the destination city), departDate (YYYY-MM-DD), returnDate (YYYY-MM-DD), ` +
     `cabinClass (economy|premium_economy|business), needsCar (boolean), notes, ` +
     `reply (one short sentence summarizing the understood request, written in ${REPLY_LANGUAGE[locale] ?? "English"}). ` +
+    `Nothing has been booked or reserved at this point — the reply must never say or imply that it has. ` +
     `If the origin city is not given, use Warsaw (WAW). ` +
     `The text may be dictated speech: it can contain filler words ("erm", "you know"), ` +
     `repetitions and self-corrections ("Milan — no, sorry, Rome"). Ignore filler, and when the ` +
@@ -192,11 +194,15 @@ export const composeTrip = createServerFn({ method: "POST" })
     // changed them on the card.
     const overridden = Boolean(data.departDate || data.returnDate || data.oneWay !== undefined);
     return {
-      reply:
-        (overridden ? null : parsed.reply) ??
+      // The model has claimed "I've booked your trip" above a card with a Book
+      // button still on it. safeReply drops any sentence that says a booking
+      // happened and uses ours, which can only say what is true.
+      reply: safeReply(
+        overridden ? null : parsed.reply,
         (oneWay
           ? `${parsed.destinationCity}: ${departDate}, one way. Your composed trip is below.`
           : `${parsed.destinationCity}: ${departDate} – ${returnDate}. Your composed trip is below.`),
+      ),
       request: {
         originCity: parsed.originCity,
         destinationCity: parsed.destinationCity,

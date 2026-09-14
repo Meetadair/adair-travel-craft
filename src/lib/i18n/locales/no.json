@@ -152,7 +152,7 @@
     "showAlternatives": "Vis alternativer",
     "backToRecommendation": "Tilbake til Adairs anbefaling",
     "total": "Totalt, én bestilling",
-    "saveIdle": "Lagre reise",
+    "saveIdle": "Lagre til senere",
     "saveBusy": "Lagrer…",
     "savedAs": "Lagret som",
     "openDashboard": "Åpne dashbord",
@@ -359,7 +359,9 @@
       "finishSecure": "Fullfør på den sikre siden",
       "companyFailed": "Vi klarte ikke å lagre selskapet. Prøv igjen.",
       "detailsFailed": "Opplysningene ble ikke godkjent. Vennligst sjekk dem."
-    }
+    },
+    "bookIdle": "Bestill",
+    "bookBusy": "Holder tilbudet…"
   },
   "auth": {
     "meta": {
@@ -413,9 +415,11 @@
       "budget": "Budsjett per reise",
       "currency": "Valuta"
     },
-    "saveIdle": "Lagre preferanser",
+    "saveIdle": "Lagre til senere",
     "saveBusy": "Lagrer…",
-    "saved": "Lagret."
+    "saved": "Lagret.",
+    "bookIdle": "Bestill",
+    "bookBusy": "Holder tilbudet…"
   },
   "investors": {
     "meta": {

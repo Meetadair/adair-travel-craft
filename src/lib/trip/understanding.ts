@@ -133,6 +133,9 @@ export type TripOverrides = {
   mustArriveBy?: string | undefined;
   passengers?: number | undefined;
   childAges?: number[] | undefined;
+  cabinClass?: string | undefined;
+  /** Explicitly false collapses a one-way back into a return trip. */
+  oneWay?: boolean | undefined;
 };
 
 /** The request as the traveller corrected it. */
@@ -143,6 +146,10 @@ export function applyOverrides(request: TripRequest, overrides: TripOverrides): 
   if (overrides.mustArriveBy) next.mustArriveBy = overrides.mustArriveBy;
   if (overrides.passengers) next.passengers = overrides.passengers;
   if (overrides.childAges?.length) next.childAges = overrides.childAges;
+  if (overrides.cabinClass) next.cabinClass = overrides.cabinClass as TripRequest["cabinClass"];
+  // Tested against undefined, not truthiness: turning a one-way back into a
+  // return trip means sending false, and `if (false)` would drop it silently.
+  if (overrides.oneWay !== undefined) next.oneWay = overrides.oneWay;
   if (overrides.originIata) next.originIata = overrides.originIata.toUpperCase();
   if (overrides.destinationIata) {
     const iata = overrides.destinationIata.toUpperCase();

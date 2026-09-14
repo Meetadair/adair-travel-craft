@@ -152,7 +152,7 @@
     "showAlternatives": "Afficher les alternatives",
     "backToRecommendation": "Retour à la recommandation Adair",
     "total": "Total, une seule réservation",
-    "saveIdle": "Enregistrer le voyage",
+    "saveIdle": "Garder pour plus tard",
     "saveBusy": "Enregistrement…",
     "savedAs": "Enregistré sous",
     "openDashboard": "Ouvrir le tableau de bord",
@@ -359,7 +359,9 @@
       "finishSecure": "Finaliser sur la page sécurisée",
       "companyFailed": "Impossible d'enregistrer cette entreprise. Veuillez réessayer.",
       "detailsFailed": "Ces informations n'ont pas été acceptées. Veuillez les vérifier."
-    }
+    },
+    "bookIdle": "Réserver",
+    "bookBusy": "Offre en cours de blocage…"
   },
   "auth": {
     "meta": {
@@ -413,9 +415,11 @@
       "budget": "Budget par voyage",
       "currency": "Devise"
     },
-    "saveIdle": "Enregistrer les préférences",
+    "saveIdle": "Garder pour plus tard",
     "saveBusy": "Enregistrement…",
-    "saved": "Enregistré."
+    "saved": "Enregistré.",
+    "bookIdle": "Réserver",
+    "bookBusy": "Offre en cours de blocage…"
   },
   "investors": {
     "meta": {

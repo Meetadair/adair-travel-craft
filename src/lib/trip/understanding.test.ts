@@ -64,3 +64,43 @@ describe("strip edits", () => {
     expect(next.returnDate).toBe("2026-10-10");
   });
 });
+
+describe("overrides the traveller set on the card", () => {
+  const base = {
+    originCity: "Warsaw",
+    originIata: "WAW",
+    destinationCity: "Lisbon",
+    destinationIata: "LIS",
+    departDate: "2026-10-20",
+    returnDate: "2026-10-24",
+    cabinClass: "economy",
+    passengers: 1,
+    lat: 38.72,
+    lon: -9.14,
+    hotelWish: null,
+    hotelNameExact: null,
+    carNameExact: null,
+    invoiceToCompany: false,
+    needsCar: false,
+    stops: [],
+  } as unknown as Parameters<typeof applyOverrides>[0];
+
+  it("carries the cabin the traveller picked", () => {
+    expect(applyOverrides(base, { cabinClass: "business" }).cabinClass).toBe("business");
+  });
+
+  it("can turn a return trip into a one-way", () => {
+    expect(applyOverrides(base, { oneWay: true }).oneWay).toBe(true);
+  });
+
+  it("can turn a one-way back into a return trip", () => {
+    // The bug this guards: `if (overrides.oneWay)` drops an explicit false, so
+    // a traveller who changed their mind stayed on a one-way for ever.
+    const oneWay = applyOverrides(base, { oneWay: true });
+    expect(applyOverrides(oneWay, { oneWay: false }).oneWay).toBe(false);
+  });
+
+  it("leaves the cabin alone when nothing was said about it", () => {
+    expect(applyOverrides(base, { departDate: "2026-11-01" }).cabinClass).toBe("economy");
+  });
+});

@@ -10,7 +10,9 @@ import { CabinParty, type Cabin } from "@/components/trip/cabin-party";
 import {
   EMPTY_PARTY,
   describeParty,
+  headCount,
   isBookableParty,
+  stayGuestAges,
   type PartyCounts,
 } from "@/lib/trip/party-counts";
 
@@ -43,6 +45,7 @@ import { LoyaltyReminder } from "@/components/prefs/loyalty-reminder";
 import { getPromptSuggestions } from "@/lib/suggestions.functions";
 import { getAccount } from "@/lib/account.functions";
 import { composeTrip, saveTrip } from "@/lib/travel.functions";
+import { searchLiveTrip } from "@/lib/trip-live.functions";
 import { askAdair } from "@/lib/assistant.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { localeHref, useLocale, useT } from "@/lib/i18n";
@@ -69,6 +72,7 @@ export function AssistantPage() {
   const t = useT();
   const compose = useServerFn(composeTrip);
   const persist = useServerFn(saveTrip);
+  const live = useServerFn(searchLiveTrip);
   const converse = useServerFn(askAdair);
   const [input, setInput] = useState("");
 
@@ -431,6 +435,51 @@ export function AssistantPage() {
     onSuccess: (res) => setSaved(res.documentNumber),
   });
 
+  /**
+   * Booking.
+   *
+   * composeTrip is a preview: it prices a trip but stores nothing, so there is
+   * nothing for the booking page to open. The live search is the path that
+   * writes a trip card and holds the supplier's offer, so booking runs that —
+   * with the dates, cabin and party the traveller settled on here, so the card
+   * they book is the card they were looking at.
+   *
+   * Signing in is required to book, as it is everywhere: an offer has to be
+   * held against somebody. The sentence is stashed so they come back to it
+   * rather than to an empty box.
+   */
+  const startBooking = useMutation({
+    mutationFn: async () => {
+      const sentence = asked?.trim();
+      if (!sentence || !raw) throw new Error("No trip to book");
+      const { data } = await supabase.auth.getUser();
+      if (!data.user) {
+        try {
+          window.localStorage.setItem(ASSISTANT_PREFILL_KEY, sentence);
+        } catch {
+          /* private browsing — they will retype it */
+        }
+        navigate({ href: localeHref(locale, "/auth") });
+        throw new Error("Sign in to book");
+      }
+      return live({
+        data: {
+          sentence,
+          overrides: {
+            departDate: raw.request.departDate,
+            ...(raw.request.oneWay
+              ? { oneWay: true }
+              : { returnDate: raw.request.returnDate, oneWay: false }),
+            cabinClass: cabin,
+            passengers: headCount(party),
+            ...(stayGuestAges(party).length ? { childAges: stayGuestAges(party) } : {}),
+          },
+        },
+      });
+    },
+    onSuccess: (res) => navigate({ to: "/book/$cardId", params: { cardId: res.cardId } }),
+  });
+
   const result = raw;
 
   return (
@@ -670,6 +719,33 @@ export function AssistantPage() {
                       {t.assistant.strip.controls.changeDates}
                     </button>
                     {" · "}
+                    {/* Trip type, at the top level where every airline site
+                        puts it. It used to live inside the calendar, two
+                        clicks deep, so a traveller looking for "one way"
+                        simply could not find it. */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (result.request.oneWay) {
+                          // Back to a return trip needs a return day, and we do
+                          // not invent one: open the calendar and let them pick.
+                          setCardDates({ departDate: result.request.departDate });
+                          return;
+                        }
+                        runSearch(asked ?? "", {
+                          departDate: result.request.departDate,
+                          oneWay: true,
+                          cabinClass: cabin,
+                          party,
+                        });
+                      }}
+                      className="font-medium text-primary underline underline-offset-4"
+                    >
+                      {result.request.oneWay
+                        ? t.assistant.strip.controls.roundTrip
+                        : t.assistant.strip.controls.oneWay}
+                    </button>
+                    {" · "}
                     <button
                       type="button"
                       onClick={() => setPartyOpen((open) => !open)}
@@ -873,14 +949,23 @@ export function AssistantPage() {
                       {money(total, result.currency)}
                     </p>
                   </div>
-                  <button
-                    onClick={() => store.mutate()}
-                    disabled={store.isPending}
-                    className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-60"
-                  >
-                    {store.isPending ? t.assistant.saveBusy : t.assistant.saveIdle}
-                    <ChevronRight className="size-4" />
-                  </button>
+                  <div className="flex items-center gap-4">
+                    <button
+                      onClick={() => store.mutate()}
+                      disabled={store.isPending}
+                      className="text-sm text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground disabled:opacity-60"
+                    >
+                      {store.isPending ? t.assistant.saveBusy : t.assistant.saveIdle}
+                    </button>
+                    <button
+                      onClick={() => startBooking.mutate()}
+                      disabled={startBooking.isPending}
+                      className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-60"
+                    >
+                      {startBooking.isPending ? t.assistant.bookBusy : t.assistant.bookIdle}
+                      <ChevronRight className="size-4" />
+                    </button>
+                  </div>
                 </div>
               </div>
 

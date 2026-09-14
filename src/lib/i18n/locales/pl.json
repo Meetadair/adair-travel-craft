@@ -152,7 +152,7 @@
     "showAlternatives": "Pokaż alternatywy",
     "backToRecommendation": "Wróć do rekomendacji Adair",
     "total": "Łącznie, jedna rezerwacja",
-    "saveIdle": "Zapisz podróż",
+    "saveIdle": "Zapisz na później",
     "saveBusy": "Zapisywanie…",
     "savedAs": "Zapisano jako",
     "openDashboard": "Otwórz panel",
@@ -362,7 +362,9 @@
       "finishSecure": "Dokończ na bezpiecznej stronie",
       "companyFailed": "Nie udało się zapisać danych firmy. Spróbuj ponownie.",
       "detailsFailed": "Dane nie zostały zaakceptowane. Sprawdź ich poprawność."
-    }
+    },
+    "bookIdle": "Rezerwuj",
+    "bookBusy": "Rezerwuję ofertę…"
   },
   "auth": {
     "meta": {
@@ -429,9 +431,11 @@
       "budget": "Budżet na podróż",
       "currency": "Waluta"
     },
-    "saveIdle": "Zapisz preferencje",
+    "saveIdle": "Zapisz na później",
     "saveBusy": "Zapisywanie…",
-    "saved": "Zapisano."
+    "saved": "Zapisano.",
+    "bookIdle": "Rezerwuj",
+    "bookBusy": "Rezerwuję ofertę…"
   },
   "investors": {
     "meta": {

@@ -152,7 +152,7 @@
     "showAlternatives": "Prikaži alternative",
     "backToRecommendation": "Nazad na preporuku Adair-a",
     "total": "Ukupno, jedna rezervacija",
-    "saveIdle": "Sačuvaj putovanje",
+    "saveIdle": "Sačuvaj za kasnije",
     "saveBusy": "Čuvanje…",
     "savedAs": "Sačuvano kao",
     "openDashboard": "Otvori kontrolnu tablu",
@@ -359,7 +359,9 @@
       "finishSecure": "Završi na bezbednoj stranici",
       "companyFailed": "Nismo uspeli da sačuvamo tu kompaniju. Pokušajte ponovo.",
       "detailsFailed": "Podaci nisu prihvaćeni. Molimo proverite ih."
-    }
+    },
+    "bookIdle": "Rezerviši",
+    "bookBusy": "Držimo ponudu…"
   },
   "auth": {
     "meta": {
@@ -413,9 +415,11 @@
       "budget": "Budžet po putovanju",
       "currency": "Valuta"
     },
-    "saveIdle": "Sačuvaj preferencije",
+    "saveIdle": "Sačuvaj za kasnije",
     "saveBusy": "Čuvanje…",
-    "saved": "Sačuvano."
+    "saved": "Sačuvano.",
+    "bookIdle": "Rezerviši",
+    "bookBusy": "Držimo ponudu…"
   },
   "investors": {
     "meta": {
