@@ -11,7 +11,11 @@ import { z } from "zod";
 import { PLACE_CATEGORIES } from "@/lib/places/types";
 
 export type ToolName =
-  "find_places" | "get_curated" | "distance_and_time" | "get_traveller_context";
+  | "find_places"
+  | "get_curated"
+  | "distance_and_time"
+  | "get_traveller_context"
+  | "get_current_location";
 
 /** A tool definition in the shape the Anthropic messages API expects. */
 export type ToolSpec = {
@@ -60,16 +64,23 @@ export const travellerContextInput = z.object({
   city: z.string().max(60).nullable().default(null),
 });
 
+export const currentLocationInput = z.object({
+  /** True only when exact position is the point of the question. */
+  precise: z.boolean().default(false),
+});
+
 export type FindPlacesInput = z.infer<typeof findPlacesInput>;
 export type GetCuratedInput = z.infer<typeof getCuratedInput>;
 export type DistanceAndTimeInput = z.infer<typeof distanceAndTimeInput>;
 export type TravellerContextInput = z.infer<typeof travellerContextInput>;
+export type CurrentLocationInput = z.infer<typeof currentLocationInput>;
 
 export const TOOL_INPUT_SCHEMAS = {
   find_places: findPlacesInput,
   get_curated: getCuratedInput,
   distance_and_time: distanceAndTimeInput,
   get_traveller_context: travellerContextInput,
+  get_current_location: currentLocationInput,
 } as const;
 
 /* ------------------------------------------------------------ definitions */
@@ -170,6 +181,27 @@ export const TOOLS: ToolSpec[] = [
         city: {
           type: ["string", "null"],
           description: "Limit place memory to one city, or null for the general profile only.",
+        },
+      },
+      required: [],
+    },
+  },
+  {
+    name: "get_current_location",
+    description:
+      "Where the traveller is right now, as a starting point for anything about distance or what is " +
+      "nearby. Returns device coordinates when they have allowed it, otherwise their hotel, otherwise " +
+      "the city centre — and always says which one, in `source`. Say which starting point you used: " +
+      "'about 12 minutes on foot from your hotel'. Never imply you know their exact position when " +
+      "source is not 'device'. Set precise to true only when the question cannot be answered without " +
+      "exact position ('what is near me right now'); that is the only case where permission is asked.",
+    input_schema: {
+      type: "object",
+      properties: {
+        precise: {
+          type: "boolean",
+          default: false,
+          description: "True when only exact position can answer the question.",
         },
       },
       required: [],
