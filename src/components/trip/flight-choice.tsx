@@ -13,6 +13,7 @@ import { useState } from "react";
 import { Check, ChevronDown, ChevronUp } from "lucide-react";
 
 import type { FlightOptions } from "@/lib/trip/flight-options";
+import { flexibilityOf } from "@/lib/trip/fare-flexibility";
 
 const eur = (value: number): string => `€${Math.abs(Math.round(value)).toLocaleString("en-GB")}`;
 
@@ -82,6 +83,29 @@ export function FlightChoice({
                     </>
                   )}
                 </span>
+                {/* Whether the fare can be moved, and what that costs. The
+                    airline states it on every offer and it is frequently the
+                    deciding fact — on a real Warsaw–London search the cheaper
+                    fare was also the one you could change for a third of the
+                    fee. An airline that states nothing gets nothing said. */}
+                {(() => {
+                  const flex = flexibilityOf(option.flight);
+                  if (!flex.label) return null;
+                  return (
+                    <span
+                      className={
+                        flex.tone === "free"
+                          ? "mt-1 inline-block rounded-md bg-secondary px-1.5 py-0.5 text-[11px] text-foreground"
+                          : flex.tone === "penalty"
+                            ? "mt-1 inline-block rounded-md border border-border px-1.5 py-0.5 text-[11px] text-muted-foreground"
+                            : "mt-1 inline-block text-[11px] text-muted-foreground"
+                      }
+                      title={flex.detail ?? undefined}
+                    >
+                      {flex.label}
+                    </span>
+                  );
+                })()}
               </span>
 
               <span className="shrink-0 text-right">

@@ -5,6 +5,13 @@
  */
 import { useEffect, useRef, useState } from "react";
 import { Mic, Square } from "lucide-react";
+import {
+  composeTranscript,
+  foldSettled,
+  interimPart,
+  shouldRestart,
+  type SpeechResult,
+} from "@/lib/voice/transcript";
 
 const MAX_SECONDS = 60;
 
@@ -47,6 +54,15 @@ export function VoiceInput({ onTranscript, locale }: Props) {
   const [denied, setDenied] = useState(false);
   const recognition = useRef<SpeechRecognitionLike | null>(null);
   const baseText = useRef("");
+  /** Everything the engine has finalised, across every restart. */
+  const settled = useRef("");
+  /** Whether the traveller still wants to dictate, as opposed to the engine
+      having ended on its own. onend cannot tell the difference by itself. */
+  const wanted = useRef(false);
+  const lastError = useRef<string | null>(null);
+  const elapsed = useRef(0);
+  /** Settled text including the run currently in progress. */
+  const runSettled = useRef("");
 
   // Support is a browser fact, so only check after hydration.
   useEffect(() => {
@@ -55,44 +71,100 @@ export function VoiceInput({ onTranscript, locale }: Props) {
 
   useEffect(() => {
     if (!recording) return;
-    const id = window.setInterval(() => setSeconds((s) => s + 1), 1000);
+    const id = window.setInterval(() => {
+      elapsed.current += 1;
+      setSeconds(elapsed.current);
+    }, 1000);
     return () => window.clearInterval(id);
   }, [recording]);
 
   useEffect(() => {
-    if (recording && seconds >= MAX_SECONDS) recognition.current?.stop();
+    // At the cap, stopping must also clear the intent — otherwise onend would
+    // dutifully start another run and the microphone would never switch off.
+    if (recording && seconds >= MAX_SECONDS) {
+      wanted.current = false;
+      recognition.current?.stop();
+    }
   }, [recording, seconds]);
 
-  useEffect(() => () => recognition.current?.stop(), []);
+  useEffect(
+    () => () => {
+      wanted.current = false;
+      recognition.current?.stop();
+    },
+    [],
+  );
 
-  const start = (currentText: string) => {
+  /**
+   * One run of the speech engine.
+   *
+   * The engine ends itself at every natural pause and empties its results
+   * list, which is why dictation used to die after three or four words. Each
+   * run folds what it finalised into `settled` and, unless the traveller has
+   * pressed stop, another run is started straight away.
+   */
+  const runEngine = () => {
     const Ctor = speechCtor();
-    if (!Ctor) return;
+    if (!Ctor) return false;
     const rec = new Ctor();
     rec.lang = locale.startsWith("pl") ? "pl-PL" : "en-US";
     rec.continuous = true;
     rec.interimResults = true;
-    baseText.current = currentText.trim();
+
     rec.onresult = (event) => {
-      let heard = "";
+      const results: SpeechResult[] = [];
       for (let i = 0; i < event.results.length; i += 1) {
-        heard += `${event.results[i]?.[0]?.transcript ?? ""} `;
+        const item = event.results[i];
+        if (!item) continue;
+        results.push({ transcript: item[0]?.transcript ?? "", isFinal: item.isFinal });
       }
-      const prefix = baseText.current ? `${baseText.current} ` : "";
-      onTranscript(`${prefix}${heard.trim()}`);
+      // The settled text of *previous* runs, plus this run's own.
+      const wholeSettled = foldSettled(settled.current, results);
+      onTranscript(composeTranscript(baseText.current, wholeSettled, interimPart(results)));
+      runSettled.current = wholeSettled;
     };
+
     rec.onerror = (event) => {
-      if (event.error === "not-allowed" || event.error === "service-not-allowed") setDenied(true);
+      lastError.current = event.error;
+      if (event.error === "not-allowed" || event.error === "service-not-allowed") {
+        setDenied(true);
+        wanted.current = false;
+      }
+    };
+
+    rec.onend = () => {
+      // Whatever this run finalised is now permanent; its results list is gone.
+      settled.current = runSettled.current;
+      if (shouldRestart(wanted.current, elapsed.current, MAX_SECONDS, lastError.current)) {
+        lastError.current = null;
+        if (runEngine()) return;
+      }
+      wanted.current = false;
       setRecording(false);
     };
-    rec.onend = () => setRecording(false);
+
     recognition.current = rec;
+    try {
+      rec.start();
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  const start = (currentText: string) => {
+    if (!speechCtor()) return;
+    baseText.current = currentText.trim();
+    settled.current = "";
+    runSettled.current = "";
+    lastError.current = null;
+    elapsed.current = 0;
+    wanted.current = true;
     setSeconds(0);
     setRecording(true);
     // Permission is requested here, on first use — never on page load.
-    try {
-      rec.start();
-    } catch {
+    if (!runEngine()) {
+      wanted.current = false;
       setRecording(false);
     }
   };
@@ -108,6 +180,7 @@ export function VoiceInput({ onTranscript, locale }: Props) {
         disabled={denied}
         onClick={(e) => {
           if (recording) {
+            wanted.current = false;
             recognition.current?.stop();
             return;
           }
