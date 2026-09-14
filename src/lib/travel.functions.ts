@@ -15,6 +15,18 @@ const askSchema = z.object({
   returnDate: isoDate.optional(),
   oneWay: z.boolean().optional(),
   flexDays: z.number().int().min(0).max(14).optional(),
+  cabinClass: z.enum(["economy", "premium_economy", "business", "first"]).optional(),
+  // Who is flying, in the five bands airlines price by. Counts only — the real
+  // dates of birth are collected at booking, where the airline requires them.
+  party: z
+    .object({
+      adults: z.number().int().min(1).max(9),
+      teenagers: z.number().int().min(0).max(9),
+      children: z.number().int().min(0).max(9),
+      infantsWithSeat: z.number().int().min(0).max(9),
+      infantsOnLap: z.number().int().min(0).max(9),
+    })
+    .optional(),
 });
 
 /** Language the assistant answers in, keyed by UI locale. */
@@ -159,6 +171,7 @@ export const composeTrip = createServerFn({ method: "POST" })
     const departDate = data.departDate ?? parsed.departDate;
     const returnDate = data.returnDate ?? parsed.returnDate;
     const oneWay = data.oneWay ?? parsed.oneWay;
+    const cabinClass = data.cabinClass ?? parsed.cabinClass;
     const result = await searchTrip({
       originCity: parsed.originCity,
       originIata: parsed.originIata.toUpperCase(),
@@ -166,7 +179,8 @@ export const composeTrip = createServerFn({ method: "POST" })
       destinationIata: parsed.destinationIata.toUpperCase(),
       departDate,
       returnDate,
-      ...(parsed.cabinClass ? { cabinClass: parsed.cabinClass } : {}),
+      ...(cabinClass ? { cabinClass } : {}),
+      ...(data.party ? { party: data.party } : {}),
       ...(parsed.needsCar === undefined ? {} : { needsCar: parsed.needsCar }),
       ...(oneWay ? { oneWay: true } : {}),
       ...(parsed.notes ? { notes: parsed.notes } : {}),

@@ -6,6 +6,13 @@ import { ageQuestion, familyFromSentence } from "@/lib/trip/family";
 import { applyAnswer, assumptionNote, clarify, type Clarification } from "@/lib/trip/clarify";
 import { AirportAnswer, DateAnswer } from "@/components/trip/answer-controls";
 import { isCompleteRange, rangeSentence, type DateRange } from "@/lib/trip/answers";
+import { CabinParty, type Cabin } from "@/components/trip/cabin-party";
+import {
+  EMPTY_PARTY,
+  describeParty,
+  isBookableParty,
+  type PartyCounts,
+} from "@/lib/trip/party-counts";
 
 /** A search with the dates settled on the card rather than read from the text. */
 type SearchArgs = {
@@ -14,6 +21,8 @@ type SearchArgs = {
   returnDate?: string;
   oneWay?: boolean;
   flexDays?: number;
+  cabinClass?: string;
+  party?: PartyCounts;
 };
 import { ASSISTANT_PREFILL_KEY } from "@/lib/trips/prefill";
 import { parseTripSentence } from "@/lib/trip/parse";
@@ -113,6 +122,14 @@ export function AssistantPage() {
    * at all, which is the one moment it is worth the most.
    */
   const [cardDates, setCardDates] = useState<DateRange | null>(null);
+  /**
+   * Cabin and who is flying, re-openable on the card. Airlines put this behind
+   * one control for a reason: the cabin a family can afford depends on how
+   * many of them there are, so the two are decided together or not at all.
+   */
+  const [partyOpen, setPartyOpen] = useState(false);
+  const [cabin, setCabin] = useState<Cabin>("economy");
+  const [party, setParty] = useState<PartyCounts>(EMPTY_PARTY);
 
   // Airport choices are remembered locally, so the same question is not asked
   // twice for a city they have already answered for.
@@ -652,7 +669,35 @@ export function AssistantPage() {
                     >
                       {t.assistant.strip.controls.changeDates}
                     </button>
+                    {" · "}
+                    <button
+                      type="button"
+                      onClick={() => setPartyOpen((open) => !open)}
+                      className="font-medium text-primary underline underline-offset-4"
+                    >
+                      {describeParty(party)} ·{" "}
+                      {t.assistant.strip.controls[
+                        cabin === "premium_economy" ? "premiumEconomy" : cabin
+                      ]}
+                    </button>
                   </p>
+
+                  {partyOpen && (
+                    <div className="mt-3">
+                      <CabinParty
+                        cabin={cabin}
+                        party={party}
+                        copy={t.assistant.strip.controls}
+                        onCabin={setCabin}
+                        onParty={setParty}
+                        onDone={() => {
+                          if (!isBookableParty(party)) return;
+                          setPartyOpen(false);
+                          runSearch(asked ?? "", { cabinClass: cabin, party });
+                        }}
+                      />
+                    </div>
+                  )}
 
                   {/* Cheaper a day or two either side. Only ever shown when the
                       traveller said they could move, and only with a real
@@ -700,6 +745,8 @@ export function AssistantPage() {
                               ? { oneWay: true }
                               : { returnDate: next.returnDate ?? next.departDate, oneWay: false }),
                             ...(next.flexDays ? { flexDays: next.flexDays } : {}),
+                            cabinClass: cabin,
+                            party,
                           });
                         }}
                       />

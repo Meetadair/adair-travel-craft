@@ -10,6 +10,10 @@ import { buildFlightOptions, type FlightOptions } from "@/lib/trip/flight-option
 import type { StayResult, TripRequest } from "@/lib/trip/types";
 
 import { bestSaving, flexWindows, type FlexSaving } from "@/lib/trip/flex";
+import { duffelPassengers, headCount, type PartyCounts } from "@/lib/trip/party-counts";
+
+/** Everyone on the booking, lap infants included — a room counts people. */
+const headOf = (party: PartyCounts) => headCount(party);
 
 export type TripOffer = {
   kind: "flight" | "hotel" | "car";
@@ -46,6 +50,8 @@ export type TripSearchInput = {
   oneWay?: boolean;
   /** Days either side the traveller said they could move. 0 or absent = fixed. */
   flexDays?: number;
+  /** Who is flying, when the traveller has said. Absent means one adult. */
+  party?: PartyCounts;
 };
 
 export type TripSearchResult = {
@@ -136,7 +142,7 @@ async function duffelFlightWithChoice(input: TripSearchInput): Promise<TripOffer
       input.cabinClass === "premium_economy"
         ? input.cabinClass
         : "economy",
-    passengers: 1,
+    passengers: input.party ? headOf(input.party) : 1,
     hotelWish: null,
     hotelNameExact: null,
     carNameExact: null,
@@ -211,7 +217,8 @@ async function duffelFlight(input: TripSearchInput): Promise<TripOffer | null> {
                 departure_date: input.returnDate,
               },
             ],
-        passengers: [{ type: "adult" }],
+        // One entry per person, not a head count: the fare depends on who.
+        passengers: input.party ? duffelPassengers(input.party) : [{ type: "adult" }],
         cabin_class: cabin,
       },
     }),
@@ -298,7 +305,7 @@ async function duffelStay(input: TripSearchInput): Promise<TripOffer | null> {
     departDate: input.departDate,
     returnDate: input.returnDate,
     cabinClass: "economy",
-    passengers: 1,
+    passengers: input.party ? headOf(input.party) : 1,
     hotelWish: input.notes?.trim() || null,
     hotelNameExact: null,
     carNameExact: null,
