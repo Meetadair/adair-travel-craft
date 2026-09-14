@@ -12,6 +12,13 @@ async function card(page: Page, sentence: string) {
   for (let i = 0; i < 6; i += 1) {
     await page.waitForTimeout(6000);
     if (await changeDates.isVisible().catch(() => false)) return;
+    const soloChip = page.getByRole("button", { name: "1", exact: true }).first();
+    if (await soloChip.isVisible().catch(() => false)) {
+      await soloChip.click();
+      const done = page.getByRole("button", { name: /^done$/i }).first();
+      if (await done.isVisible().catch(() => false)) await done.click();
+      continue;
+    }
     const noCar = page.getByRole("button", { name: /^no car$/i }).first();
     if (await noCar.isVisible().catch(() => false)) await noCar.click();
   }

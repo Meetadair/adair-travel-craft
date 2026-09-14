@@ -7,6 +7,7 @@ import {
   passengersLabel,
   roomsFor,
   scaleFor,
+  travellersStated,
   vehiclesFor,
 } from "@/lib/trip/passengers";
 
@@ -87,5 +88,32 @@ describe("scaling", () => {
   it("labels the party", () => {
     expect(passengersLabel(1)).toBe("1 traveller");
     expect(passengersLabel(3)).toBe("3 travellers");
+  });
+});
+
+describe("travellersStated", () => {
+  it("is true for an explicit count, a digit or a written number", () => {
+    expect(travellersStated("Vienna for 3 people")).toBe(true);
+    expect(travellersStated("Vienna for two")).toBe(true);
+    expect(travellersStated("Vienna, we dwoje")).toBe(true);
+  });
+
+  it("is true for solo wording", () => {
+    expect(travellersStated("Vienna, solo")).toBe(true);
+    expect(travellersStated("Wiedeń, sam")).toBe(true);
+  });
+
+  it("is true for one named companion", () => {
+    expect(travellersStated("Vienna with my wife")).toBe(true);
+    expect(travellersStated("Wiedeń z żoną")).toBe(true);
+  });
+
+  it("is false for a vague group with no number — this is exactly what the question resolves", () => {
+    expect(travellersStated("Vienna with my family")).toBe(false);
+    expect(travellersStated("Wiedeń z rodziną")).toBe(false);
+  });
+
+  it("is false when the sentence says nothing about who's coming", () => {
+    expect(travellersStated("Vienna next week")).toBe(false);
   });
 });

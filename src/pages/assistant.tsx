@@ -4,7 +4,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState, useEffect, useMemo, useRef } from "react";
 import { ageQuestion, familyFromSentence } from "@/lib/trip/family";
 import { applyAnswer, assumptionNote, clarify, type Clarification } from "@/lib/trip/clarify";
-import { AirportAnswer, DateAnswer } from "@/components/trip/answer-controls";
+import { AirportAnswer, DateAnswer, TravellersAnswer } from "@/components/trip/answer-controls";
 import { isCompleteRange, rangeSentence, type DateRange } from "@/lib/trip/answers";
 import { CabinParty, type Cabin } from "@/components/trip/cabin-party";
 import { SpeechToggle, useSpeech } from "@/components/voice-output";
@@ -45,6 +45,7 @@ import { CalendarTripHints } from "@/components/calendar-trip-hints";
 import { LoyaltyReminder } from "@/components/prefs/loyalty-reminder";
 import { getPromptSuggestions } from "@/lib/suggestions.functions";
 import { getAccount } from "@/lib/account.functions";
+import { listCompanions } from "@/lib/companions.functions";
 import { composeTrip, saveTrip } from "@/lib/travel.functions";
 import { searchLiveTrip } from "@/lib/trip-live.functions";
 import { askAdair } from "@/lib/assistant.functions";
@@ -230,6 +231,7 @@ export function AssistantPage() {
           known: knownProfile,
           copy: {
             destination: t.assistant.questions.destination,
+            travellers: t.assistant.questions.travellers,
             dates: t.assistant.questions.dates,
             arrivalTime: t.assistant.questions.arrivalTime,
             whichAirport: t.assistant.questions.whichAirport,
@@ -255,6 +257,10 @@ export function AssistantPage() {
     if (ask) {
       setQuestion(ask);
       setAnswer("");
+      if (ask.kind === "travellers") {
+        setTravellersCount(1);
+        setSelectedCompanions([]);
+      }
       setAsked(sentence);
       search.reset();
       say("adair", ask.question);
@@ -292,6 +298,22 @@ export function AssistantPage() {
     retry: false,
     staleTime: 5 * 60 * 1000,
   });
+
+  // Who to offer as chips on the "flying solo, or with others?" question —
+  // signed out or nobody saved yet, and the count-only control still works.
+  const loadCompanions = useServerFn(listCompanions);
+  const companions = useQuery({
+    queryKey: ["companions-for-questions"],
+    queryFn: () => loadCompanions(),
+    retry: false,
+    staleTime: 5 * 60 * 1000,
+  });
+  const savedCompanions = useMemo(
+    () => (companions.data ?? []).filter((t) => !t.isSelf),
+    [companions.data],
+  );
+  const [travellersCount, setTravellersCount] = useState(1);
+  const [selectedCompanions, setSelectedCompanions] = useState<string[]>([]);
   const basePrefs = (account.data?.preferences ?? null) as SearchPrefs | null;
   const searchPrefs = useMemo(() => {
     if (!basePrefs) return null;
@@ -682,28 +704,59 @@ export function AssistantPage() {
               </div>
             )}
 
+            {question.kind === "travellers" && (
+              <div className="mt-3 space-y-3">
+                <TravellersAnswer
+                  value={travellersCount}
+                  companions={savedCompanions.map((c) => ({ id: c.id, label: c.givenName }))}
+                  selected={selectedCompanions}
+                  copy={t.assistant.strip.controls}
+                  onChange={setTravellersCount}
+                  onToggleCompanion={(id) => {
+                    setSelectedCompanions((current) => {
+                      const next = current.includes(id)
+                        ? current.filter((c) => c !== id)
+                        : [...current, id];
+                      // Picking a person is picking a seat: the count follows
+                      // the chips rather than needing to be set twice.
+                      setTravellersCount((count) => Math.max(count, next.length + 1));
+                      return next;
+                    });
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => answerQuestion(`for ${travellersCount} people`)}
+                  className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+                >
+                  {t.assistant.questions.done}
+                </button>
+              </div>
+            )}
+
             {/* The typed answer is for questions that have no better control.
                 Under the calendar it was a second, meaningless way to answer
                 the same question — an empty box and a Continue button sitting
                 right below "Search these dates". */}
             {question.kind !== "dates" &&
               question.kind !== "no_dates" &&
-              question.kind !== "vague_week" && (
-            <div className="mt-3 flex flex-wrap items-center gap-2">
-              <input
-                value={answer}
-                onChange={(e) => setAnswer(e.target.value)}
-                placeholder={question.placeholder}
-                className="rounded-xl border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
-              />
-              <button
-                type="submit"
-                className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
-              >
-                Continue
-              </button>
-            </div>
-            )}
+              question.kind !== "vague_week" &&
+              question.kind !== "travellers" && (
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <input
+                    value={answer}
+                    onChange={(e) => setAnswer(e.target.value)}
+                    placeholder={question.placeholder}
+                    className="rounded-xl border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
+                  />
+                  <button
+                    type="submit"
+                    className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+                  >
+                    Continue
+                  </button>
+                </div>
+              )}
           </form>
         )}
 
@@ -800,9 +853,11 @@ export function AssistantPage() {
                       className="font-medium text-primary underline underline-offset-4"
                     >
                       {describeParty(party)} ·{" "}
-                      {t.assistant.strip.controls[
-                        cabin === "premium_economy" ? "premiumEconomy" : cabin
-                      ]}
+                      {
+                        t.assistant.strip.controls[
+                          cabin === "premium_economy" ? "premiumEconomy" : cabin
+                        ]
+                      }
                     </button>
                   </p>
 

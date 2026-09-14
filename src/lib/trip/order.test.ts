@@ -40,9 +40,11 @@ describe("question order", () => {
     expect(questions.map((q) => q.kind)).toEqual(["destination"]);
   });
 
-  it("asks dates before the arrival time once the city is known", () => {
+  it("asks who's travelling first, then dates before the arrival time", () => {
     const questions = chatQuestions("Milan for a client meeting", request("Milan"));
-    expect(questions[0]?.kind).toBe("dates");
+    const kinds = questions.map((q) => q.kind);
+    expect(kinds[0]).toBe("travellers");
+    expect(kinds.indexOf("dates")).toBeLessThan(kinds.indexOf("arrival_time"));
   });
 });
 

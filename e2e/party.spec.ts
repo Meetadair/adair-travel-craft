@@ -13,6 +13,13 @@ async function answerUntilCard(page: Page, sentence: string) {
   for (let step = 0; step < 6; step += 1) {
     await page.waitForTimeout(6000);
     if (await changeDates.isVisible().catch(() => false)) return;
+    const soloChip = page.getByRole("button", { name: "1", exact: true }).first();
+    if (await soloChip.isVisible().catch(() => false)) {
+      await soloChip.click();
+      const done = page.getByRole("button", { name: /^done$/i }).first();
+      if (await done.isVisible().catch(() => false)) await done.click();
+      continue;
+    }
     for (const label of [/^no car$/i, /^no preference$/i, /^no transfer$/i, /^any time$/i]) {
       const option = page.getByRole("button", { name: label }).first();
       if (await option.isVisible().catch(() => false)) {

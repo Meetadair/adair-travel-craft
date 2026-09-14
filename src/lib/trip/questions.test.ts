@@ -31,8 +31,40 @@ describe("chat questions", () => {
   it("asks for dates when the sentence has none", () => {
     const sentence = "I need to get to Vienna";
     const questions = chatQuestions(sentence, req(sentence));
-    expect(questions[0]?.kind).toBe("dates");
-    expect(questions[0]?.control).toBe("calendar");
+    const dates = questions.find((q) => q.kind === "dates");
+    expect(dates).toBeTruthy();
+    expect(dates?.control).toBe("calendar");
+  });
+
+  it("asks who's travelling before it asks the dates, on a bare sentence", () => {
+    const sentence = "I need to get to Vienna";
+    const questions = chatQuestions(sentence, req(sentence));
+    expect(questions[0]?.kind).toBe("travellers");
+    expect(questions[0]?.control).toBe("travellers");
+    expect(questions[0]?.essential).toBe(true);
+    expect(questions.some((q) => q.kind === "dates")).toBe(true);
+  });
+
+  it("does not ask who's travelling once the sentence already says", () => {
+    const solo = "I need to get to Vienna, solo";
+    expect(chatQuestions(solo, req(solo)).some((q) => q.kind === "travellers")).toBe(false);
+
+    const counted = "I need to get to Vienna for 3 people";
+    expect(chatQuestions(counted, req(counted)).some((q) => q.kind === "travellers")).toBe(false);
+
+    const named = "I need to get to Vienna with my wife";
+    expect(chatQuestions(named, req(named)).some((q) => q.kind === "travellers")).toBe(false);
+  });
+
+  it("still asks who's travelling for a vague 'with my family', which is not a real count", () => {
+    const sentence = "I need to get to Vienna with my family";
+    expect(chatQuestions(sentence, req(sentence)).some((q) => q.kind === "travellers")).toBe(true);
+  });
+
+  it("does not ask who's travelling twice in one conversation", () => {
+    const sentence = "I need to get to Vienna";
+    const questions = chatQuestions(sentence, req(sentence), { answered: ["travellers"] });
+    expect(questions.some((q) => q.kind === "travellers")).toBe(false);
   });
 
   it("stays within the budget, essentials first", () => {

@@ -184,6 +184,14 @@ export function applyAnswer(sentence: string, kind: ClarifyKind, answer: string)
   if (kind === "child_ages") return `${sentence} (children aged ${clean})`;
   if (kind === "which_airport") return `${sentence} from ${clean}`;
   if (kind === "hotel_unmatched") return `${sentence} — ${clean}`;
+  if (kind === "travellers") {
+    // The control sends either a bare count ("3") or an already-worded
+    // answer ("for 3 people"); either way passengersFromSentence only reads
+    // a digit next to a people word, so normalise to that shape here rather
+    // than trust each caller to word it correctly.
+    const count = /\d+/.exec(clean)?.[0];
+    return count ? `${sentence} for ${count} people` : `${sentence} ${clean}`;
+  }
   return `${sentence} ${clean}`;
 }
 

@@ -17,6 +17,15 @@ async function openDates(page: Page) {
   await page.getByPlaceholder(/e\.g\./i).first().fill("Manhattan");
   await page.getByRole("button", { name: /compose trip/i }).first().click();
   await page.waitForTimeout(6000);
+  // A bare destination settles nothing about who's coming, so that question
+  // comes first now — answer "1" and move on to the dates these tests exist
+  // to check.
+  const soloChip = page.getByRole("button", { name: "1", exact: true }).first();
+  if (await soloChip.isVisible().catch(() => false)) {
+    await soloChip.click();
+    await page.getByRole("button", { name: /^done$/i }).first().click();
+    await page.waitForTimeout(1500);
+  }
   await expect(calendar(page)).toBeVisible();
 }
 

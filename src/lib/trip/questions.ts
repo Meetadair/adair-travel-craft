@@ -6,6 +6,7 @@
 import { MULTI_AIRPORT, hasNoDates, isVagueWeek, mentionsAirport } from "./clarify";
 import { calendarDates } from "./parse";
 import { ageQuestion, familyFromSentence } from "./family";
+import { travellersStated } from "./passengers";
 import type { TripRequest } from "./types";
 
 export type ChatQuestionKind =
@@ -33,6 +34,7 @@ export type ChatQuestion = {
 
 export type QuestionCopy = {
   destination: string;
+  travellers: string;
   dates: string;
   arrivalTime: string;
   whichAirport: string;
@@ -43,6 +45,7 @@ export type QuestionCopy = {
 
 export const QUESTION_COPY: QuestionCopy = {
   destination: "Where are you going?",
+  travellers: "Flying solo, or with others?",
   dates: "Which dates?",
   arrivalTime: "What time do you need to be there?",
   whichAirport: "{city} has more than one airport. Which one?",
@@ -148,6 +151,20 @@ export function chatQuestions(
   const ages = ageQuestion(familyFromSentence(sentence));
   if (ages && !answered.includes("child_ages")) {
     out.push({ kind: "child_ages", question: ages, control: "ages", options: [], essential: true });
+  }
+
+  // Who's coming shapes everything else — fares, rooms, whether the hotel
+  // needs a second bed. Skipped only once the sentence has actually settled
+  // it (a number, "solo", one named companion); "with my family" on its own
+  // is exactly the vague case this question exists to resolve.
+  if (!travellersStated(sentence) && !answered.includes("travellers")) {
+    out.push({
+      kind: "travellers",
+      question: copy.travellers,
+      control: "travellers",
+      options: [],
+      essential: true,
+    });
   }
 
   // Three ways the dates are not settled: none in the sentence, a vague week,
@@ -261,10 +278,10 @@ export function chatQuestions(
   // Destination, then dates, then the arrival time, then anything else.
   const rank: Record<ChatQuestionKind, number> = {
     destination: 0,
-    dates: 1,
-    arrival_time: 2,
-    child_ages: 3,
-    travellers: 4,
+    travellers: 1,
+    dates: 2,
+    arrival_time: 3,
+    child_ages: 4,
     which_airport: 5,
     needs_car: 6,
     return_time: 7,

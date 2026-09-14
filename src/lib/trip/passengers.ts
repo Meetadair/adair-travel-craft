@@ -45,14 +45,19 @@ const MANY_COMPANIONS = word(
  * Passenger count read from a free-text sentence. Defaults to 1: we never
  * guess upwards from a vague phrase, because an extra seat costs real money.
  */
+function digitMatch(text: string): RegExpExecArray | null {
+  return (
+    /(\d+)\s*(?:passengers?|people|persons?|adults?|travellers?|travelers?|pax|os[oó]b\w*|osoby|pasa[zż]er\w*|doros[lł]\w*)/.exec(
+      text,
+    ) ?? /(?:for|dla|na)\s+(\d+)\b/.exec(text)
+  );
+}
+
 export function passengersFromSentence(sentence: string): number {
   const text = ` ${sentence.toLowerCase().replace(/\s+/g, " ")} `;
 
   // A digit next to a people word is the most reliable signal.
-  const digit =
-    /(\d+)\s*(?:passengers?|people|persons?|adults?|travellers?|travelers?|pax|os[oó]b\w*|osoby|pasa[zż]er\w*|doros[lł]\w*)/.exec(
-      text,
-    ) ?? /(?:for|dla|na)\s+(\d+)\b/.exec(text);
+  const digit = digitMatch(text);
   if (digit?.[1]) return clamp(Number(digit[1]));
 
   // "for two", "dla dwóch osób", "we trójkę", "the two of us".
@@ -63,6 +68,20 @@ export function passengersFromSentence(sentence: string): number {
   if (MANY_COMPANIONS.test(text)) return 2; // Ask rather than assume a number.
   if (ONE_COMPANION.test(text)) return 2;
   return 1;
+}
+
+/**
+ * True only when the sentence settles who's travelling on its own — a
+ * number, "solo", or one named companion. "With my family" is deliberately
+ * NOT one of these: passengersFromSentence guesses 2 for it, but that guess
+ * is exactly what the travellers question exists to replace with an answer.
+ */
+export function travellersStated(sentence: string): boolean {
+  const text = ` ${sentence.toLowerCase().replace(/\s+/g, " ")} `;
+  if (digitMatch(text)) return true;
+  if (WORD_NUMBERS.some(([pattern]) => pattern.test(text))) return true;
+  if (ONE_COMPANION.test(text)) return true;
+  return false;
 }
 
 function clamp(value: number): number {

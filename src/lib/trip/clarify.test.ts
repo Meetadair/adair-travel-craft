@@ -1,11 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  applyAnswer,
-  assumptionNote,
-  clarify,
-  hasNoDates,
-  isVagueWeek,
-} from "@/lib/trip/clarify";
+import { applyAnswer, assumptionNote, clarify, hasNoDates, isVagueWeek } from "@/lib/trip/clarify";
 
 describe("ambiguity detection", () => {
   it("spots a sentence with no timing at all", () => {
@@ -53,7 +47,9 @@ describe("ambiguity detection", () => {
   });
 
   it("never asks a second question for the same sentence", () => {
-    expect(clarify("London, flight and hotel", { destinationCity: "London", alreadyAsked: true })).toBeNull();
+    expect(
+      clarify("London, flight and hotel", { destinationCity: "London", alreadyAsked: true }),
+    ).toBeNull();
     expect(
       clarify("Paris", {
         destinationCity: "Paris",
@@ -71,6 +67,14 @@ describe("answers and assumptions", () => {
     );
     expect(applyAnswer("Paris", "no_dates", "This weekend")).toBe("Paris This weekend");
     expect(applyAnswer("Paris", "no_dates", "  ")).toBe("Paris");
+  });
+
+  it("normalises a travellers answer to a shape the parser can re-read, whatever the control sent", () => {
+    // The chip control sends a bare count; the stepper sends already-worded text.
+    expect(applyAnswer("Vienna", "travellers", "3")).toBe("Vienna for 3 people");
+    expect(applyAnswer("Vienna", "travellers", "for 3 people")).toBe("Vienna for 3 people");
+    // No digit at all: fall back to appending as-is rather than losing the answer.
+    expect(applyAnswer("Vienna", "travellers", "just me")).toBe("Vienna just me");
   });
 
   it("states the assumption when it searched without an answer", () => {

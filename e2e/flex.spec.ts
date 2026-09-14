@@ -19,6 +19,13 @@ async function answerUntilCard(page: Page, sentence: string) {
   for (let step = 0; step < 6; step += 1) {
     await page.waitForTimeout(6000);
     if (await changeDates.isVisible().catch(() => false)) return;
+    const soloChip = page.getByRole("button", { name: "1", exact: true }).first();
+    if (await soloChip.isVisible().catch(() => false)) {
+      await soloChip.click();
+      const done = page.getByRole("button", { name: /^done$/i }).first();
+      if (await done.isVisible().catch(() => false)) await done.click();
+      continue;
+    }
     // Take the plainest answer to whatever is on screen.
     for (const label of [/^no car$/i, /^no preference$/i, /^no transfer$/i, /^any time$/i]) {
       const option = page.getByRole("button", { name: label }).first();
@@ -30,7 +37,7 @@ async function answerUntilCard(page: Page, sentence: string) {
   }
 }
 
-const flexChip = (page: Page) => page.getByRole("button", { name: /3 days/i }).first();
+const flexChip = (page: Page) => page.getByRole("checkbox", { name: /3 days/i }).first();
 
 test("the flex option is reachable while Adair is asking for dates", async ({ page }) => {
   await page.goto("/assistant", { waitUntil: "networkidle" });
@@ -39,7 +46,15 @@ test("the flex option is reachable while Adair is asking for dates", async ({ pa
   await page.waitForTimeout(2500);
   await page.getByPlaceholder(/e\.g\./i).first().fill("Lisbon next week");
   await page.getByRole("button", { name: /compose trip/i }).first().click();
-  await page.waitForTimeout(8000);
+  await page.waitForTimeout(6000);
+  // "Lisbon next week" settles nothing about who's coming, so that question
+  // comes first now — answer it before the dates question this test checks.
+  const soloChip = page.getByRole("button", { name: "1", exact: true }).first();
+  if (await soloChip.isVisible().catch(() => false)) {
+    await soloChip.click();
+    await page.getByRole("button", { name: /^done$/i }).first().click();
+    await page.waitForTimeout(2000);
+  }
   await expect(flexChip(page)).toBeVisible();
 });
 
