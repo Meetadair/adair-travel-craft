@@ -200,7 +200,8 @@
         "travellersLabel": "Kuinka monta henkilöä",
         "companionsHint": "Kanssamatkustajat",
         "done": "Valmis",
-        "roundTrip": "Meno-paluu"
+        "roundTrip": "Meno-paluu",
+        "flexible": "± 3 päivää"
       }
     },
     "questions": {
@@ -224,7 +225,8 @@
         "travellersLabel": "Kuinka monta henkilöä",
         "companionsHint": "Kanssamatkustajat",
         "done": "Valmis",
-        "roundTrip": "Meno-paluu"
+        "roundTrip": "Meno-paluu",
+        "flexible": "± 3 päivää"
       }
     },
     "advice": {

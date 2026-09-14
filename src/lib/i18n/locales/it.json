@@ -200,7 +200,8 @@
         "travellersLabel": "Quante persone",
         "companionsHint": "Persone che viaggiano con te",
         "done": "Fatto",
-        "roundTrip": "Andata e ritorno"
+        "roundTrip": "Andata e ritorno",
+        "flexible": "± 3 giorni"
       }
     },
     "questions": {
@@ -224,7 +225,8 @@
         "travellersLabel": "Quante persone",
         "companionsHint": "Persone che viaggiano con te",
         "done": "Fatto",
-        "roundTrip": "Andata e ritorno"
+        "roundTrip": "Andata e ritorno",
+        "flexible": "± 3 giorni"
       }
     },
     "advice": {

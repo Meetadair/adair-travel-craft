@@ -200,7 +200,8 @@
         "travellersLabel": "Anzahl der Reisenden",
         "companionsHint": "Mitreisende Personen",
         "done": "Fertig",
-        "roundTrip": "Hin und zurück"
+        "roundTrip": "Hin und zurück",
+        "flexible": "± 3 Tage"
       }
     },
     "questions": {
@@ -224,7 +225,8 @@
         "travellersLabel": "Anzahl der Reisenden",
         "companionsHint": "Mitreisende Personen",
         "done": "Fertig",
-        "roundTrip": "Hin und zurück"
+        "roundTrip": "Hin und zurück",
+        "flexible": "± 3 Tage"
       }
     },
     "advice": {

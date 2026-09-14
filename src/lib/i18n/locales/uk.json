@@ -200,7 +200,8 @@
         "travellersLabel": "Кількість людей",
         "companionsHint": "Люди, з якими ви подорожуєте",
         "done": "Готово",
-        "roundTrip": "Туди й назад"
+        "roundTrip": "Туди й назад",
+        "flexible": "± 3 дні"
       }
     },
     "questions": {
@@ -224,7 +225,8 @@
         "travellersLabel": "Кількість людей",
         "companionsHint": "Люди, з якими ви подорожуєте",
         "done": "Готово",
-        "roundTrip": "Туди й назад"
+        "roundTrip": "Туди й назад",
+        "flexible": "± 3 дні"
       }
     },
     "advice": {

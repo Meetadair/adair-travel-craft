@@ -200,7 +200,8 @@
         "travellersLabel": "ご利用人数",
         "companionsHint": "同行者",
         "done": "完了",
-        "roundTrip": "往復"
+        "roundTrip": "往復",
+        "flexible": "±3日"
       }
     },
     "questions": {
@@ -224,7 +225,8 @@
         "travellersLabel": "ご利用人数",
         "companionsHint": "同行者",
         "done": "完了",
-        "roundTrip": "往復"
+        "roundTrip": "往復",
+        "flexible": "±3日"
       }
     },
     "advice": {

@@ -56,6 +56,20 @@ export function isOneWay(sentence: string): boolean {
   );
 }
 
+/**
+ * "+/- 3 days", "± 3 days", "plus minus 3 days" - how far the traveller will
+ * move. Capped at a fortnight: beyond that they are choosing a month, not
+ * flexing a date.
+ */
+export function flexDaysOf(sentence: string): number | null {
+  const match = /(?:\u00b1|\+\s*\/\s*-|\+-|plus\s*minus)\s*(\d{1,2})\s*(?:day|dni|dzien|dzień)/i.exec(
+    sentence,
+  );
+  if (!match) return null;
+  const days = Number(match[1]);
+  return days >= 1 && days <= 14 ? days : null;
+}
+
 function cabinOf(text: string): TripRequest["cabinClass"] {
   // Travellers mistype this constantly, and a silent drop to economy on a
   // long-haul is an expensive misreading.
@@ -414,6 +428,7 @@ export function parseTripSentence(
   const mustDepartBy = mustDepartOf(sentence, today, iso(back));
 
   const oneWay = isOneWay(sentence);
+  const flexDays = flexDaysOf(sentence);
 
   const family = familyFromSentence(sentence);
 
@@ -435,6 +450,7 @@ export function parseTripSentence(
     // working; it is the outbound date, and only the flight search cares.
     returnDate: oneWay ? iso(depart) : iso(back),
     ...(oneWay ? { oneWay: true as const } : {}),
+    ...(flexDays ? { flexDays } : {}),
     cabinClass: cabinOf(text),
     passengers: Math.max(passengersOf(text), family.children + family.infants + 1),
     childAges: family.ages.filter((age) => age >= 2),

@@ -23,6 +23,7 @@ export type AnswerControlsCopy = {
   returnDay: string;
   oneWay: string;
   roundTrip: string;
+  flexible: string;
   pickReturn: string;
   nightsLabel: string;
   nightsWord: string;

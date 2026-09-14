@@ -200,7 +200,8 @@
         "travellersLabel": "Hur många personer",
         "companionsHint": "Personer du reser med",
         "done": "Klar",
-        "roundTrip": "Tur och retur"
+        "roundTrip": "Tur och retur",
+        "flexible": "± 3 dagar"
       }
     },
     "questions": {
@@ -224,7 +225,8 @@
         "travellersLabel": "Hur många personer",
         "companionsHint": "Personer du reser med",
         "done": "Klar",
-        "roundTrip": "Tur och retur"
+        "roundTrip": "Tur och retur",
+        "flexible": "± 3 dagar"
       }
     },
     "advice": {

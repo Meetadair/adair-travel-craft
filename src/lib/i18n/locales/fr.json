@@ -200,7 +200,8 @@
         "travellersLabel": "Nombre de personnes",
         "companionsHint": "Personnes voyageant avec vous",
         "done": "Terminé",
-        "roundTrip": "Aller-retour"
+        "roundTrip": "Aller-retour",
+        "flexible": "± 3 jours"
       }
     },
     "questions": {
@@ -224,7 +225,8 @@
         "travellersLabel": "Nombre de personnes",
         "companionsHint": "Personnes voyageant avec vous",
         "done": "Terminé",
-        "roundTrip": "Aller-retour"
+        "roundTrip": "Aller-retour",
+        "flexible": "± 3 jours"
       }
     },
     "advice": {

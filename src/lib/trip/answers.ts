@@ -15,6 +15,8 @@ export type DateRange = {
    * on a calendar is an unfinished answer, not a decision to fly one way.
    */
   oneWay?: boolean | undefined;
+  /** Days either side the traveller is willing to move, when they said so. */
+  flexDays?: number | undefined;
 };
 
 export type DateShortcutId = "tomorrow" | "this_weekend" | "next_weekend";
@@ -105,13 +107,14 @@ export function nightsBetween(depart: string, back: string): number {
 }
 
 export function rangeSentence(range: DateRange): string {
-  // "one way" is spelled out so the parser reads the choice back out of the
+  // Both choices are spelled out so the parser reads them back out of the
   // sentence, exactly as it would from something the traveller typed.
-  if (range.oneWay) return `on ${range.departDate}, one way`;
+  const flex = range.flexDays ? `, +/- ${range.flexDays} days` : "";
+  if (range.oneWay) return `on ${range.departDate}, one way${flex}`;
   if (!range.returnDate || range.returnDate === range.departDate) {
-    return `on ${range.departDate}`;
+    return `on ${range.departDate}${flex}`;
   }
-  return `from ${range.departDate} to ${range.returnDate}`;
+  return `from ${range.departDate} to ${range.returnDate}${flex}`;
 }
 
 /** An arrival time, folded back into the sentence the same way. */

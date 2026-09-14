@@ -200,7 +200,8 @@
         "travellersLabel": "出行人数",
         "companionsHint": "同行人员",
         "done": "完成",
-        "roundTrip": "往返"
+        "roundTrip": "往返",
+        "flexible": "±3天"
       }
     },
     "questions": {
@@ -224,7 +225,8 @@
         "travellersLabel": "出行人数",
         "companionsHint": "同行人员",
         "done": "完成",
-        "roundTrip": "往返"
+        "roundTrip": "往返",
+        "flexible": "±3天"
       }
     },
     "advice": {

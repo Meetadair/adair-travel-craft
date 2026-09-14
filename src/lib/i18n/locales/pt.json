@@ -200,7 +200,8 @@
         "travellersLabel": "Quantas pessoas",
         "companionsHint": "Pessoas que viajam consigo",
         "done": "Concluído",
-        "roundTrip": "Ida e volta"
+        "roundTrip": "Ida e volta",
+        "flexible": "± 3 dias"
       }
     },
     "questions": {
@@ -224,7 +225,8 @@
         "travellersLabel": "Quantas pessoas",
         "companionsHint": "Pessoas que viajam consigo",
         "done": "Concluído",
-        "roundTrip": "Ida e volta"
+        "roundTrip": "Ida e volta",
+        "flexible": "± 3 dias"
       }
     },
     "advice": {

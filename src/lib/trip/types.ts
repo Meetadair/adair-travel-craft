@@ -24,6 +24,12 @@ export type TripRequest = {
    * outbound date and nothing downstream reads it as a real return.
    */
   oneWay?: boolean;
+  /**
+   * How many days either side of the stated dates the traveller will move, when
+   * they said so. Never assumed: shifting someone's trip uninvited is worse
+   * than showing them a dearer fare.
+   */
+  flexDays?: number;
   cabinClass: "economy" | "premium_economy" | "business" | "first";
   /** Everyone travelling, including children and lap infants. */
   passengers: number;

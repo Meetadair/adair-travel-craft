@@ -20,6 +20,7 @@ type Copy = {
   returnDay: string;
   oneWay: string;
   roundTrip: string;
+  flexible: string;
   pickReturn: string;
   nightsWord: string;
 };
@@ -159,6 +160,29 @@ export function TripDates({
         </button>
       </div>
 
+      {/* Flexibility is a promise the traveller makes, never an assumption we
+          make for them: moving someone's trip uninvited is worse than showing
+          them a dearer fare. */}
+      <button
+        type="button"
+        aria-pressed={value?.flexDays === 3}
+        onClick={() =>
+          onChange({
+            departDate: depart ?? from,
+            ...(value?.returnDate && !oneWay ? { returnDate: value.returnDate } : {}),
+            ...(oneWay ? { oneWay: true } : {}),
+            ...(value?.flexDays === 3 ? {} : { flexDays: 3 }),
+          })
+        }
+        className={
+          value?.flexDays === 3
+            ? "mb-3 rounded-lg border border-primary bg-primary/5 px-3 py-1.5 text-xs text-foreground"
+            : "mb-3 rounded-lg border border-border bg-background px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
+        }
+      >
+        {copy.flexible}
+      </button>
+
       <div className="flex flex-col gap-5 sm:flex-row sm:gap-6">
         {shown.map((m, index) => (
           <div
@@ -265,6 +289,7 @@ export function TripDates({
           </div>
         )}
         {oneWay && <div className="text-muted-foreground">{copy.oneWay}</div>}
+        {value?.flexDays ? <div className="text-muted-foreground">{copy.flexible}</div> : null}
       </div>
     </div>
   );

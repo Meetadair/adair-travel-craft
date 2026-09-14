@@ -200,7 +200,8 @@
         "travellersLabel": "Koliko osoba",
         "companionsHint": "Osobe sa kojima putujete",
         "done": "Završeno",
-        "roundTrip": "Povratna"
+        "roundTrip": "Povratna",
+        "flexible": "± 3 dana"
       }
     },
     "questions": {
@@ -224,7 +225,8 @@
         "travellersLabel": "Koliko osoba",
         "companionsHint": "Osobe sa kojima putujete",
         "done": "Završeno",
-        "roundTrip": "Povratna"
+        "roundTrip": "Povratna",
+        "flexible": "± 3 dana"
       }
     },
     "advice": {
