@@ -259,6 +259,19 @@ export const en = {
       dismiss: "Not now",
     },
 
+    // Asked only at the moment a question needs exact position.
+    location: {
+      ask: "To tell you how far that is from where you're standing, I need your location — allow?",
+      privacy: "We use it for this answer only and don't keep it.",
+      allow: "Allow",
+      deny: "Not now",
+      blocked:
+        "Your browser is blocking location for this site. Open the padlock in the address bar, set Location to Allow, then ask again.",
+      unavailable: "Your device didn't return a position. I'll measure from your hotel instead.",
+      fromHotel: "Measured from your hotel.",
+      fromCity: "Measured from the city centre.",
+    },
+
     // What Adair remembers by itself, and how it says it.
     memory: {
       sameAgain: "You stayed at {hotel} last time in {city} — same again?",
