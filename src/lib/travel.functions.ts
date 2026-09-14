@@ -251,7 +251,10 @@ export const saveTrip = createServerFn({ method: "POST" })
         origin: data.origin,
         start_date: data.startDate,
         end_date: data.endDate,
-        status: "confirmed",
+        // Saved, not booked. Writing "confirmed" here told My trips that a
+        // shortlisted itinerary was a live reservation — which is how somebody
+        // reaches an airport holding a trip nobody ever bought.
+        status: "saved",
         total_amount: total,
         currency: data.currency,
         document_number: documentNumber,

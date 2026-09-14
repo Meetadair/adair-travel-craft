@@ -5,6 +5,7 @@
  */
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { isBooked, isLive } from "@/lib/trip/trip-status";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { changeSentence, type ChangeMethod, type ChangeTrip } from "@/lib/trip/change";
 
@@ -38,8 +39,7 @@ type ItemRow = {
   payload: Record<string, unknown> | null;
 };
 
-const activeItems = (rows: ItemRow[]) =>
-  rows.filter((r) => r.status !== "cancelled" && r.status !== "failed");
+const activeItems = (rows: ItemRow[]) => rows.filter((r) => isLive(r.status));
 
 export const startTripChange = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -66,6 +66,9 @@ export const startTripChange = createServerFn({ method: "POST" })
       document_number: string | null;
     };
     if (trip.status === "cancelled") throw new Error("trip-cancelled");
+    // A saved itinerary has no supplier order behind it, so there is nothing to
+    // change and nothing to cancel. Offering either would be a lie.
+    if (!isBooked(trip.status)) throw new Error("trip-not-booked");
 
     const itemsRes = await supabase
       .from("trip_items")
