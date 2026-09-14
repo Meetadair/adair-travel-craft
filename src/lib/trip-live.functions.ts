@@ -10,7 +10,6 @@ import type { TripRequest, TripSearchResponse } from "@/lib/trip/types";
 import type { BudgetStatus, MatchSummary } from "@/lib/trip/match";
 import type { InsuranceQuote } from "@/lib/trip/insurance";
 import type { SearchPrefs } from "@/lib/trip/rank";
-import { loadLearned as loadLearnedFor } from "@/lib/trip/learned.server";
 
 export type LiveTripResult = {
   cardId: string;
@@ -159,7 +158,11 @@ export async function runLiveSearch(
     hotelMaxKm: (row?.["hotel_max_km"] as number | null) ?? null,
     dealbreakers: list(row?.["dealbreakers"]),
   };
-  searchPrefs.learned = await loadLearnedFor(supabase, userId, searchPrefs);
+  // Imported here, not at the top: these functions are exported so the agent
+  // can call them, which puts this module in the client's import graph.
+  // A static server-only import would then be shipped to the browser.
+  const { loadLearned } = await import("@/lib/trip/learned.server");
+  searchPrefs.learned = await loadLearned(supabase, userId, searchPrefs);
   // Repeated "too far" keeps hotels closer than the stated limit.
   if (searchPrefs.hotelMaxKm && searchPrefs.learned.distanceWeight > 1)
     searchPrefs.hotelMaxKm = Math.max(
@@ -697,7 +700,11 @@ export async function swapCardLine(
     hotelMaxKm: (prefRow?.["hotel_max_km"] as number | null) ?? null,
     dealbreakers: list(prefRow?.["dealbreakers"]),
   };
-  searchPrefs.learned = await loadLearnedFor(supabase, userId, searchPrefs);
+  // Imported here, not at the top: these functions are exported so the agent
+  // can call them, which puts this module in the client's import graph.
+  // A static server-only import would then be shipped to the browser.
+  const { loadLearned } = await import("@/lib/trip/learned.server");
+  searchPrefs.learned = await loadLearned(supabase, userId, searchPrefs);
   const { matchSummary, budgetStatus } = await import("@/lib/trip/match");
   const match = matchSummary(search, searchPrefs);
   const cheapestAlt = (
