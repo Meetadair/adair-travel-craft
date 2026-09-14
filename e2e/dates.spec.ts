@@ -57,7 +57,7 @@ test("the flex chip does not close the calendar", async ({ page }) => {
   await openDates(page);
   await page.getByRole("button", { name: "22", exact: true }).first().click();
   await page.waitForTimeout(600);
-  await page.getByRole("button", { name: /3 days/i }).first().click();
+  await page.getByRole("checkbox", { name: /3 days/i }).first().click();
   await page.waitForTimeout(1500);
   await expect(calendar(page)).toBeVisible();
 });
