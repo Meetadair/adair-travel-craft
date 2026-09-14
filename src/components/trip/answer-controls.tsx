@@ -143,21 +143,21 @@ export function DateAnswer({
         </div>
       )}
 
+      {value && (
       <p
         className={
-          value && !isCompleteRange(value)
+          !isCompleteRange(value)
             ? "mt-2 text-[11px] text-primary"
             : "mt-2 text-[11px] text-muted-foreground"
         }
       >
-        {!value
-          ? copy.outbound
-          : value.oneWay
+        {value.oneWay
             ? `${copy.outbound} ${value.departDate} · ${copy.oneWay}`
             : isCompleteRange(value)
               ? `${copy.outbound} ${value.departDate} · ${copy.returnDay} ${value.returnDate} · ${nightsBetween(value.departDate, value.returnDate ?? value.departDate)} ${copy.nightsWord}`
               : copy.pickReturn}
       </p>
+      )}
     </div>
   );
 }

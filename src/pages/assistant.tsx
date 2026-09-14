@@ -662,6 +662,13 @@ export function AssistantPage() {
               </div>
             )}
 
+            {/* The typed answer is for questions that have no better control.
+                Under the calendar it was a second, meaningless way to answer
+                the same question — an empty box and a Continue button sitting
+                right below "Search these dates". */}
+            {question.kind !== "dates" &&
+              question.kind !== "no_dates" &&
+              question.kind !== "vague_week" && (
             <div className="mt-3 flex flex-wrap items-center gap-2">
               <input
                 value={answer}
@@ -676,6 +683,7 @@ export function AssistantPage() {
                 Continue
               </button>
             </div>
+            )}
           </form>
         )}
 
