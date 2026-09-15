@@ -1,8 +1,26 @@
 /**
  * OpenTable restaurant adapter.
  *
- * To connect: replace the bodies of search/quote/book/cancel with calls to
- * OpenTable's partner API using `key`. Nothing outside this file changes.
+ * Checked docs.opentable.com and the API-partners programme
+ * (opentable.com/restaurant-solutions/api-partners) directly: there is no
+ * third-party "search availability and create a reservation for someone
+ * else" API here, credentials or not.
+ *
+ * - Authorization, Directory and Sync are the only documented API
+ *   families, all partner-gated (application, ~3-4 week review, signed
+ *   agreement — no self-serve key). Directory returns restaurant listings,
+ *   but a reservation is a link back into OpenTable's own booking page, not
+ *   a bookable object this adapter could complete. Sync is restaurant-side
+ *   (pushes reservation/guest data into a POS/CRM) — the wrong direction.
+ * - OpenTable's consumer terms separately disallow "robots, scrapers, and
+ *   automated assistants" absent explicit authorisation, which a genuine
+ *   book-on-behalf-of-the-traveller flow would need OpenTable to grant on
+ *   top of the partner agreement.
+ *
+ * So this stays an honest stub — not a missing key away from working, the
+ * way Uber or TheFork are. If OpenTable ever publishes a real third-party
+ * booking API, wire it the same way uber.ts was; nothing outside this file
+ * needs to change.
  */
 import {
   unavailable,
@@ -26,7 +44,6 @@ export const openTableRestaurants: RestaurantAdapter = {
 
   async search(_criteria: RestaurantCriteria): Promise<AdapterResult<RestaurantOffer[]>> {
     if (!key()) return unavailable("missing-key");
-    // TODO: availability search by city/coordinates, date, time and party size.
     return unavailable("not-connected");
   },
 
