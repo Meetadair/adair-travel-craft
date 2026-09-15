@@ -688,7 +688,12 @@ export const bookTripCard = createServerFn({ method: "POST" })
           });
           continue;
         }
-        const order = await provider.data.book(plan, quote.quoteRef);
+        const order = await provider.data.book(plan, quote.quoteRef, {
+          givenName: data.traveller.givenName,
+          familyName: data.traveller.familyName,
+          email: data.traveller.email,
+          phone: data.traveller.phone,
+        });
         const gross = pricing.fromMinor(pricing.grossMinor(quote.netEur, table.ride));
         lines.push({
           kind: "ride",

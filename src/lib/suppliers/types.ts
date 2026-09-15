@@ -24,7 +24,7 @@ export type Unavailable = { status: "unavailable"; reason: UnavailableReason };
 export type Ok<T> = { status: "ok"; data: T };
 export type AdapterResult<T> = Ok<T> | Unavailable;
 
-export const ok = <T,>(data: T): Ok<T> => ({ status: "ok", data });
+export const ok = <T>(data: T): Ok<T> => ({ status: "ok", data });
 export const unavailable = (reason: UnavailableReason): Unavailable => ({
   status: "unavailable",
   reason,
@@ -44,6 +44,18 @@ export type RidePlan = {
   /** Local "YYYY-MM-DDTHH:mm". */
   pickupAt: string;
   passengers: number;
+  /** Null when the endpoint's coordinates aren't known — a provider that
+   *  needs them (rather than a free-text address) degrades honestly. */
+  pickupCoords: { lat: number; lon: number } | null;
+  dropoffCoords: { lat: number; lon: number } | null;
+};
+
+/** Who the ride is for, so a real booking can actually reach them. */
+export type RideGuest = {
+  givenName: string;
+  familyName: string;
+  email: string;
+  phone: string;
 };
 
 export type RideQuote = {
@@ -72,7 +84,7 @@ export interface RideAdapter {
   isConfigured(): boolean;
   search(plan: RidePlan): Promise<AdapterResult<RideQuote[]>>;
   quote(plan: RidePlan, quoteRef: string): Promise<AdapterResult<RideQuote>>;
-  book(plan: RidePlan, quoteRef: string): Promise<AdapterResult<RideOrder>>;
+  book(plan: RidePlan, quoteRef: string, guest: RideGuest): Promise<AdapterResult<RideOrder>>;
   cancel(reference: string): Promise<AdapterResult<{ cancelled: boolean }>>;
 }
 

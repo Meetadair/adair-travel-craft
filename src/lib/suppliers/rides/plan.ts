@@ -4,6 +4,7 @@
  */
 import type { TripSearchResponse } from "@/lib/trip/types";
 import type { RidePlan } from "@/lib/suppliers/types";
+import { AIRPORT_COORDS } from "@/lib/trip/airport-geo";
 
 const shift = (iso: string, minutes: number) =>
   new Date(Date.parse(iso) + minutes * 60_000).toISOString().slice(0, 16);
@@ -17,6 +18,11 @@ export function ridePlansFor(search: TripSearchResponse): RidePlan[] {
   const passengers = Math.max(1, request.passengers);
   const hotel = stay ? `${stay.name}, ${stay.address}` : `${request.destinationCity} centre`;
   const airport = airportLabel(request.destinationIata, request.destinationCity);
+  const airportCoords = AIRPORT_COORDS[request.destinationIata] ?? null;
+  const hotelCoords =
+    stay && typeof stay.lat === "number" && typeof stay.lon === "number"
+      ? { lat: stay.lat, lon: stay.lon }
+      : null;
   const plans: RidePlan[] = [];
 
   plans.push({
@@ -27,6 +33,8 @@ export function ridePlansFor(search: TripSearchResponse): RidePlan[] {
     // Enough time to clear the terminal after the scheduled arrival.
     pickupAt: shift(flight.arriveAt, 45),
     passengers,
+    pickupCoords: airportCoords,
+    dropoffCoords: hotelCoords,
   });
 
   const departure = flight.returnDepartAt
@@ -39,6 +47,8 @@ export function ridePlansFor(search: TripSearchResponse): RidePlan[] {
     dropoffAddress: airport,
     pickupAt: departure,
     passengers,
+    pickupCoords: hotelCoords,
+    dropoffCoords: airportCoords,
   });
 
   return plans;
