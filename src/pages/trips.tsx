@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { AddReservation } from "@/components/add-reservation";
 import { TripPlaces } from "@/components/trip-places";
+import { TripEventsSection } from "@/components/trip-events";
 import { TripMapSection } from "@/components/trip/trip-map-section";
 import { SiteNav } from "@/components/site-nav";
 import { AppFooter } from "@/components/app-footer";
@@ -235,6 +236,7 @@ export function TripsPage() {
 
                 {trip.status === "booked" && <TripMapSection tripId={trip.id} />}
                 {trip.status === "booked" && <TripPlaces tripId={trip.id} />}
+                {trip.status === "booked" && <TripEventsSection tripId={trip.id} />}
 
                 {trip.status === "booked" && (
                   <AddReservation

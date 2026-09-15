@@ -117,6 +117,7 @@ const SECRET_NAMES = [
   "UBER_CLIENT_SECRET",
   "UBER_ORG_UUID",
   "BOLT_API_KEY",
+  "TICKETMASTER_API_KEY",
 ];
 
 export const getAdminOverview = createServerFn({ method: "GET" })
