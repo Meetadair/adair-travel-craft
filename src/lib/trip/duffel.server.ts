@@ -729,6 +729,8 @@ export async function searchCar(req: TripRequest, prefs?: SearchPrefs): Promise<
         currency,
         ...toEur(amount, currency),
         transmission: raw.transmission ?? raw.vehicle?.transmission ?? "automatic",
+        // Sample/test inventory has no real rate to book against.
+        rateId: sample ? null : (raw.id ?? null),
       },
     };
   };

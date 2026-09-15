@@ -426,7 +426,7 @@ export const bookTripCard = createServerFn({ method: "POST" })
     // Stays go through Duffel Stays: quote the rate, then book it. Until the
     // product is enabled on the account the supplier answers 401/403 and the
     // stay stays a requested line, exactly as before — nothing is charged.
-    // Cars are not bookable on this supplier account yet and stay requested.
+    // Cars follow the same quote-then-book shape below, through Duffel Cars.
     if (data.include.stay && search.stay) {
       const stay = search.stay;
       const stayPayload: ItemCalendarPayload = {
@@ -512,21 +512,76 @@ export const bookTripCard = createServerFn({ method: "POST" })
       }
     }
     if (data.include.car && search.car) {
-      lines.push({
-        kind: "car",
-        title: `${search.car.vehicle} · ${search.car.supplier}`,
-        status: "requested",
-        amountEur: priced.car ?? 0,
-        reference: null,
-        note: "supplier-not-enabled",
-        payload: {
-          pickup: request.departDate,
-          dropoff: request.returnDate,
-          location: request.destinationCity,
-          loyaltyProgramme: carMembership?.programmeLabel ?? null,
-          loyaltyMemberMasked: carMembership ? mask(carMembership.last4) : null,
-        },
-      });
+      const car = search.car;
+      const carPayload: ItemCalendarPayload = {
+        pickup: request.departDate,
+        dropoff: request.returnDate,
+        location: request.destinationCity,
+        loyaltyProgramme: carMembership?.programmeLabel ?? null,
+        loyaltyMemberMasked: carMembership ? mask(carMembership.last4) : null,
+      };
+      const pushRequestedCar = () =>
+        lines.push({
+          kind: "car",
+          title: `${car.vehicle} · ${car.supplier}`,
+          status: "requested",
+          amountEur: priced.car ?? 0,
+          reference: null,
+          note: "supplier-not-enabled",
+          payload: carPayload,
+        });
+
+      if (!car.rateId) {
+        pushRequestedCar();
+      } else {
+        const { bookCar } = await import("@/lib/trip/duffel-cars.server");
+        const outcome = await bookCar({
+          rateId: car.rateId,
+          expectedAmount: car.amount,
+          driver: {
+            givenName: data.traveller.givenName,
+            familyName: data.traveller.familyName,
+            bornOn: data.traveller.bornOn,
+            email: data.traveller.email,
+            phone: data.traveller.phone,
+          },
+          idempotencyKey: `${card.id}-car`,
+          cardPayment,
+        });
+
+        if (outcome.status === "not-enabled") {
+          pushRequestedCar();
+        } else if (outcome.status === "failed") {
+          // A live product that could not book: the line fails, the trip is
+          // partial, and the car amount never reaches the total.
+          failed = true;
+          reason = reason ?? `car-${outcome.reason}`;
+          lines.push({
+            kind: "car",
+            title: `${car.vehicle} · ${car.supplier}`,
+            status: "failed",
+            amountEur: 0,
+            reference: null,
+            note: outcome.reason,
+            payload: carPayload,
+          });
+        } else {
+          const ratio = outcome.repriced ? outcome.repriced.to / outcome.repriced.from : 1;
+          const carNet = Math.round(car.amountEur * ratio * 100) / 100;
+          const carGross = priced.car ?? pricing.fromMinor(pricing.grossMinor(carNet, table.car));
+          lines.push({
+            kind: "car",
+            title: `${car.vehicle} · ${car.supplier}`,
+            status: "confirmed",
+            amountEur: carGross,
+            reference: outcome.booking.bookingReference,
+            note: null,
+            supplierOrderId: outcome.booking.id,
+            netEur: carNet,
+            payload: carPayload,
+          });
+        }
+      }
     }
 
     if (!flightMemberships.length && lines.some((l) => l.kind === "flight")) {

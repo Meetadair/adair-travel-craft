@@ -123,6 +123,8 @@ export type CarResult = {
   transmission: string;
   /** True when this car is the exact supplier/model the traveller named. */
   exact?: boolean;
+  /** The Duffel rate id, needed to quote and book this rate. Null in sample data. */
+  rateId: string | null;
 };
 
 export type TripSearchResponse = {
