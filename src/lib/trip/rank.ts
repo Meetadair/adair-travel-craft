@@ -3,6 +3,7 @@
  * on most of these, so we use them to sort results rather than drop them.
  */
 import { brandWords } from "@/lib/brands/catalogue";
+import { houseBonus } from "@/lib/trip/house-standard";
 import type { TravelPrefs } from "@/lib/prefs/questions";
 import type { Learned } from "@/lib/trip/learning";
 import type { TripOccasion, TripParty, TripPurpose } from "@/lib/trip/types";
@@ -327,6 +328,8 @@ export function stayScore(
   amount: number,
   prefs?: SearchPrefs,
   style?: TripStyle,
+  /** What the supplier publishes about the property, lower-cased. */
+  amenities?: string[],
 ): number {
   // A celebration is the one case where price should push less hard: someone
   // marking an anniversary is not shopping for the cheapest bed in the city.
@@ -338,7 +341,14 @@ export function stayScore(
       style.occasion === "honeymoon");
   const priceWeight = (prefs?.learned?.priceWeight ?? 1) * (celebrating ? 0.6 : 1);
 
-  let score = (rating ?? 0) * 2 - (amount / 500) * priceWeight + styleScore(name, rating, style);
+  // The house standard rides above every preference: what we are willing to put
+  // our name on, for a traveller who has not used Adair before and will judge us
+  // by the first hotel we show them.
+  let score =
+    (rating ?? 0) * 2 -
+    (amount / 500) * priceWeight +
+    styleScore(name, rating, style) +
+    houseBonus(name, amenities);
   if (!prefs) return score;
   if (avoided(name, "hotel", prefs)) score -= 5;
   if (prefs.hotelChains.length && anySelected(name, prefs.hotelChains, CHAIN_WORDS)) score += 6;

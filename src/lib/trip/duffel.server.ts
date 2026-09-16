@@ -658,8 +658,8 @@ export async function searchStay(
     .slice()
     .sort(
       (a, b) =>
-        stayScore(b.rawName, b.result.rating, b.result.amount, prefs, style) -
-        stayScore(a.rawName, a.result.rating, a.result.amount, prefs, style),
+        stayScore(b.rawName, b.result.rating, b.result.amount, prefs, style, b.result.amenities) -
+        stayScore(a.rawName, a.result.rating, a.result.amount, prefs, style, a.result.amenities),
     )[0]!;
 
   // Keep the next best few so the traveller can swap without a new search.
@@ -668,8 +668,8 @@ export async function searchStay(
     .slice()
     .sort(
       (a, b) =>
-        stayScore(b.rawName, b.result.rating, b.result.amount, prefs, style) -
-        stayScore(a.rawName, a.result.rating, a.result.amount, prefs, style),
+        stayScore(b.rawName, b.result.rating, b.result.amount, prefs, style, b.result.amenities) -
+        stayScore(a.rawName, a.result.rating, a.result.amount, prefs, style, a.result.amenities),
     )
     .slice(0, 3)
     .map((m) => m.result);
