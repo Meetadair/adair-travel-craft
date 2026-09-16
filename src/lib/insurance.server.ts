@@ -3,7 +3,7 @@
  * so it can be changed without a deploy, like `pricing_rules`.
  */
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { InsuranceQuote } from "@/lib/trip/insurance";
+import { INSURANCE_AVAILABLE, type InsuranceQuote } from "@/lib/trip/insurance";
 import { fromMinor, grossMinor, type PricingTable } from "@/lib/pricing.server";
 
 export type InsuranceRate = {
@@ -73,7 +73,8 @@ export async function insuranceQuoteFor(
   departDate: string,
   returnDate: string,
   passengers: number,
-): Promise<InsuranceQuote> {
+): Promise<InsuranceQuote | null> {
+  if (!INSURANCE_AVAILABLE) return null;
   const rate = await loadInsuranceRate(supabase);
   return quoteInsurance(rate, tripNights(departDate, returnDate), passengers, table);
 }

@@ -10,7 +10,12 @@ import type { TripSearchResponse, TripStop } from "@/lib/trip/types";
 import { CITIES } from "@/lib/trip/cities";
 import { paymentKey, shouldStopBeforeSupplier } from "@/lib/trip/idempotency";
 import { tripCalendarEvents, type CalendarEvent, type ItemCalendarPayload } from "@/lib/calendar";
-import { INSURANCE_NOTE, INSURANCE_TITLE, type InsuranceQuote } from "@/lib/trip/insurance";
+import {
+  INSURANCE_AVAILABLE,
+  INSURANCE_NOTE,
+  INSURANCE_TITLE,
+  type InsuranceQuote,
+} from "@/lib/trip/insurance";
 
 /**
  * All three parts or none. Duffel refuses an identity document that is just a
@@ -633,7 +638,9 @@ export const bookTripCard = createServerFn({ method: "POST" })
 
     // In-app insurance offer: priced from our own rate table, no external order.
     const insurance = card.items.insurance ?? null;
-    const insuranceOptedIn = Boolean(data.include.insurance && insurance);
+    // A trip card saved before insurance was withdrawn can still carry a quote;
+    // it must not turn into a paid line on the strength of a stale card.
+    const insuranceOptedIn = INSURANCE_AVAILABLE && Boolean(data.include.insurance && insurance);
     if (insuranceOptedIn && insurance) {
       lines.push({
         kind: "insurance",
