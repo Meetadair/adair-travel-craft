@@ -238,6 +238,10 @@ export const QUESTIONS: QuestionDef[] = [
       {
         field: "carBrands",
         noneValue: "none",
+        // European makes are what the big rental desks stock in Europe, but a
+        // fleet in the US is Ford and Chevrolet, and the electric cars turning
+        // up across European fleets now are BYD, MG and Polestar. A list that
+        // stops at Peugeot tells those travellers we do not rent what they drive.
         options: opts(
           ["bmw", "BMW"],
           ["mercedes", "Mercedes"],
@@ -249,6 +253,14 @@ export const QUESTIONS: QuestionDef[] = [
           ["skoda", "Škoda"],
           ["renault", "Renault"],
           ["peugeot", "Peugeot"],
+          ["ford", "Ford"],
+          ["chevrolet", "Chevrolet"],
+          ["jeep", "Jeep"],
+          ["cadillac", "Cadillac"],
+          ["byd", "BYD"],
+          ["mg", "MG"],
+          ["polestar", "Polestar"],
+          ["nio", "NIO"],
           NONE,
         ),
       },

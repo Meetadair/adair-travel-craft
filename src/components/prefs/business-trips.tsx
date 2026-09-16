@@ -32,6 +32,33 @@ const HOTEL_STYLES = [
   ["apartment", "Apartment"],
 ] as const;
 
+/** The same list the main questionnaire offers, so both sides speak one language. */
+const AMENITIES = [
+  ["gym", "Gym"],
+  ["breakfast", "Breakfast included"],
+  ["pool", "Pool"],
+  ["spa", "Spa"],
+  ["sauna", "Sauna"],
+  ["bathtub", "Bathtub"],
+  ["beachfront", "Beachfront"],
+  ["view", "Great view"],
+  ["balcony", "Balcony"],
+  ["allinclusive", "All-inclusive"],
+  ["large", "Large hotel"],
+  ["boutique", "Boutique"],
+  ["pets", "Pet friendly"],
+  ["adults", "Adults only"],
+  ["doublebed", "Double bed"],
+] as const;
+
+const RATINGS = [
+  ["", "Same as my usual"],
+  ["4.5", "Exceptional"],
+  ["4", "Very good"],
+  ["3.5", "Good"],
+  ["3", "Pleasant"],
+] as const;
+
 const CAR_CLASSES = [
   ["", "Same as my usual"],
   ["compact", "Compact"],
@@ -51,6 +78,8 @@ export function BusinessTrips() {
   const [hotelStyle, setHotelStyle] = useState("");
   const [maxKm, setMaxKm] = useState("");
   const [carClass, setCarClass] = useState("");
+  const [amenities, setAmenities] = useState<string[]>([]);
+  const [rating, setRating] = useState("");
   const [loaded, setLoaded] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -61,6 +90,8 @@ export function BusinessTrips() {
     setHotelStyle(overlay.hotelTypes?.[0] ?? "");
     setMaxKm(overlay.hotelMaxKm ? String(overlay.hotelMaxKm) : "");
     setCarClass(overlay.carClass ?? "");
+    setAmenities(overlay.hotelAmenities ?? []);
+    setRating(overlay.hotelMinRating ? String(overlay.hotelMinRating) : "");
     setLoaded(true);
   }, [account.data, loaded]);
 
@@ -80,6 +111,9 @@ export function BusinessTrips() {
       if (maxKm && Number.isFinite(km) && km >= 1)
         overlay.hotelMaxKm = Math.min(50, Math.round(km));
       if (carClass) overlay.carClass = carClass;
+      if (amenities.length) overlay.hotelAmenities = amenities;
+      const min = Number(rating);
+      if (rating && Number.isFinite(min)) overlay.hotelMinRating = min;
       return save({ data: { overlay } });
     },
     onSuccess: () => {
@@ -93,9 +127,9 @@ export function BusinessTrips() {
       <div>
         <h2 className="font-display text-lg font-semibold">Business trips</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          When a trip is for work — a meeting in the sentence, or the invoice going to a company —
-          these take over. Anything left on &quot;same as my usual&quot; simply uses your normal
-          preferences.
+          When a trip is for work — you said so when Adair asked, the invoice goes to a company,
+          or the sentence reads like a meeting — these take over. Anything left on &quot;same as my
+          usual&quot; simply uses your normal preferences.
         </p>
       </div>
 
@@ -118,6 +152,46 @@ export function BusinessTrips() {
           className={field}
         >
           {HOTEL_STYLES.map(([value, name]) => (
+            <option key={value} value={value}>
+              {name}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      <div>
+        <span className={label}>What matters inside the hotel on a work trip</span>
+        <p className="mt-1 text-xs text-muted-foreground">
+          A gym on a Tuesday in Frankfurt and a pool in Crete are not the same holiday. Pick
+          nothing and your usual answers apply.
+        </p>
+        <div className="mt-2 flex flex-wrap gap-2">
+          {AMENITIES.map(([value, name]) => {
+            const on = amenities.includes(value);
+            return (
+              <button
+                key={value}
+                type="button"
+                onClick={() =>
+                  setAmenities((prev) =>
+                    prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value],
+                  )
+                }
+                className={`rounded-full border px-3 py-1.5 text-xs font-medium ${
+                  on ? "border-primary bg-primary/5" : "border-border text-muted-foreground"
+                }`}
+              >
+                {name}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <label className="block">
+        <span className={label}>Lowest hotel rating on a work trip</span>
+        <select value={rating} onChange={(e) => setRating(e.target.value)} className={field}>
+          {RATINGS.map(([value, name]) => (
             <option key={value} value={value}>
               {name}
             </option>
