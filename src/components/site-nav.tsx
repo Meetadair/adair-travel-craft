@@ -4,6 +4,8 @@ import { Globe, Check } from "lucide-react";
 import logoMark from "@/assets/logo-adair.png";
 import { supabase } from "@/integrations/supabase/client";
 import { ThemeNavToggle } from "@/components/theme-toggle";
+import { useCurrency } from "@/lib/currency";
+import { Coins } from "lucide-react";
 import {
   LocaleLink,
   localeHref,
@@ -58,6 +60,52 @@ function LanguageMenu() {
                   {localeNames[l]}
                   {l === locale && <Check className="size-3.5 text-primary" />}
                 </a>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+    </div>
+  );
+}
+
+function CurrencyMenu() {
+  const { code, setCode, currencies } = useCurrency();
+  const t = useT();
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setOpen((v) => !v)}
+        aria-label={t.nav.currency}
+        className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground sm:text-sm"
+      >
+        <Coins className="size-4" />
+        <span className="uppercase">{code}</span>
+      </button>
+      {open && (
+        <>
+          <button
+            aria-hidden
+            tabIndex={-1}
+            onClick={() => setOpen(false)}
+            className="fixed inset-0 z-40 cursor-default"
+          />
+          <ul className="absolute right-0 z-50 mt-2 max-h-80 w-36 overflow-y-auto rounded-xl border border-border bg-card py-2 shadow-sm">
+            {currencies.map((c) => (
+              <li key={c}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCode(c);
+                    setOpen(false);
+                  }}
+                  className="flex w-full items-center justify-between px-4 py-2 text-left text-sm text-foreground hover:bg-secondary"
+                >
+                  {c}
+                  {c === code && <Check className="size-3.5 text-primary" />}
+                </button>
               </li>
             ))}
           </ul>
@@ -205,6 +253,7 @@ export function SiteNav() {
             </>
           )}
           <ThemeNavToggle />
+          <CurrencyMenu />
           <LanguageMenu />
           {signedIn ? (
             <AccountMenu viewer={viewer} />

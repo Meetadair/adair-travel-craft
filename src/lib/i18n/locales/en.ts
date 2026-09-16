@@ -12,6 +12,7 @@ export const en = {
     account: "My account",
     signIn: "Sign in",
     language: "Language",
+    currency: "Currency",
   },
 
   home: {

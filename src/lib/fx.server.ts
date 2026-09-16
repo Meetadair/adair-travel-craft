@@ -66,8 +66,20 @@ function ensureFresh(): void {
 // first traveller to pay the cold-cache cost.
 void refresh();
 
-/** Units of `currency` per 1 EUR's worth, or null when we have never heard of it. */
+/** EUR value of one unit of `currency`, or null when we have never heard of it. */
 export function fxRate(currency: string): number | null {
   ensureFresh();
   return rates[currency.toUpperCase()] ?? null;
 }
+
+/** The whole table, EUR value per unit — for a display-currency picker that
+ *  converts client-side rather than round-tripping for every price shown. */
+export function allFxRates(): Record<string, number> {
+  ensureFresh();
+  return { ...rates };
+}
+
+/** Currencies this app is willing to let someone pick as their display currency. */
+export const DISPLAY_CURRENCIES = [
+  "EUR", "USD", "GBP", "PLN", "CHF", "SEK", "NOK", "DKK", "CZK", "JPY",
+] as const;

@@ -29,6 +29,8 @@ export type Account = {
   homeAirport: string;
   plan: string;
   onboarded: boolean;
+  /** Display currency the traveller picked; prices convert to this on screen. */
+  currency: string;
   preferences: Preferences;
   /** Overrides for work trips. Empty object means business uses the base. */
   businessPrefs: BusinessPrefsPayload;
@@ -174,7 +176,7 @@ export const getAccount = createServerFn({ method: "GET" })
     const [profileRes, prefsRes, companiesRes] = await Promise.all([
       supabase
         .from("profiles")
-        .select("full_name, home_airport, plan, onboarded")
+        .select("full_name, home_airport, plan, onboarded, currency")
         .eq("id", userId)
         .maybeSingle(),
       supabase.from("preferences").select(PREF_COLUMNS).eq("user_id", userId).maybeSingle(),
@@ -190,6 +192,7 @@ export const getAccount = createServerFn({ method: "GET" })
       home_airport: string;
       plan: string;
       onboarded: boolean;
+      currency: string | null;
     } | null;
 
     return {
@@ -198,6 +201,7 @@ export const getAccount = createServerFn({ method: "GET" })
       homeAirport: profile?.home_airport ?? "WAW",
       plan: profile?.plan ?? "free",
       onboarded: profile?.onboarded ?? false,
+      currency: profile?.currency ?? "EUR",
       preferences: rowToPrefs((prefsRes.data as PrefRow | null) ?? null),
       businessPrefs:
         ((prefsRes.data as PrefRow | null)?.["business_prefs"] as BusinessPrefsPayload) ?? {},
@@ -386,6 +390,22 @@ export const setDefaultCompany = createServerFn({ method: "POST" })
       .update({ is_default: true })
       .eq("user_id", userId)
       .eq("id", data.id);
+    if (res.error) throw new Error(res.error.message);
+    return { ok: true };
+  });
+
+/** Everyone's own currency: what they see prices in, not what gets charged. */
+export const setPreferredCurrency = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ currency: z.string().trim().length(3) }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const res = await supabase
+      .from("profiles")
+      .update({ currency: data.currency.toUpperCase() })
+      .eq("id", userId);
     if (res.error) throw new Error(res.error.message);
     return { ok: true };
   });

@@ -101,8 +101,17 @@ export function HotelRoomOptions({
     staleTime: 5 * 60_000,
   });
 
-  const money = (amount: number, cur: string) =>
-    `${amount.toLocaleString(locale, { maximumFractionDigits: 0 })} ${cur}`;
+  const money = (amount: number, cur: string) => {
+    try {
+      return new Intl.NumberFormat(locale, {
+        style: "currency",
+        currency: cur,
+        maximumFractionDigits: amount >= 100 ? 0 : 2,
+      }).format(amount);
+    } catch {
+      return `${amount.toLocaleString(locale, { maximumFractionDigits: 0 })} ${cur}`;
+    }
+  };
 
   return (
     <div className="mt-3">

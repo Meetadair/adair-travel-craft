@@ -55,6 +55,7 @@ import { HotelRoomOptions } from "@/components/hotel-room-options";
 import type { StayRoomOption } from "@/lib/trip/types";
 import { VoiceInput } from "@/components/voice-input";
 import { CalendarTripHints } from "@/components/calendar-trip-hints";
+import { useCurrency } from "@/lib/currency";
 import { LoyaltyReminder } from "@/components/prefs/loyalty-reminder";
 import { getPromptSuggestions } from "@/lib/suggestions.functions";
 import { getAccount } from "@/lib/account.functions";
@@ -362,8 +363,8 @@ export function AssistantPage() {
     search.mutate({ message: sentence, party: effectiveParty, ...override });
   };
 
-  const money = (amount: number, currency: string) =>
-    `${amount.toLocaleString(locale, { maximumFractionDigits: 0 })} ${currency}`;
+  const displayCurrency = useCurrency();
+  const money = (amount: number, currency: string) => displayCurrency.format(amount, currency, locale);
 
   // Saved preferences, for the match dots. Absent when signed out, and then no
   // dots are shown — there would be nothing to score against.
@@ -1122,7 +1123,7 @@ export function AssistantPage() {
                                   checkOut={raw.request.returnDate}
                                   adults={Math.max(1, party.adults)}
                                   childAges={stayGuestAges(party)}
-                                  currency={o.currency}
+                                  currency={displayCurrency.code}
                                   locale={locale}
                                   selectedRateId={chosenRoom?.rateId ?? null}
                                   onChooseRoom={(room) => setChosenRoom(room)}

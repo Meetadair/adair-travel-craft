@@ -6,7 +6,8 @@
     "investors": "Pour les investisseurs",
     "account": "Mon compte",
     "signIn": "Se connecter",
-    "language": "Langue"
+    "language": "Langue",
+    "currency": "Devise"
   },
   "home": {
     "meta": {

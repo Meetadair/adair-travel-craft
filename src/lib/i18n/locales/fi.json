@@ -6,7 +6,8 @@
     "investors": "Sijoittajille",
     "account": "Oma tili",
     "signIn": "Kirjaudu sisään",
-    "language": "Kieli"
+    "language": "Kieli",
+    "currency": "Valuutta"
   },
   "home": {
     "meta": {

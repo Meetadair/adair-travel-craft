@@ -14,6 +14,7 @@ import appCss from "../styles.css?url";
 import { htmlLang, isLocale } from "@/lib/i18n";
 import { CookieNotice } from "@/components/cookie-notice";
 import { ThemeProvider, themeBootstrapScript } from "@/lib/theme";
+import { CurrencyProvider } from "@/lib/currency";
 
 function NotFoundComponent() {
   return (
@@ -177,10 +178,12 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
-        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-        <Outlet />
-        {/* Asked once, on whatever page they arrive at. */}
-        <CookieNotice />
+        <CurrencyProvider>
+          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+          <Outlet />
+          {/* Asked once, on whatever page they arrive at. */}
+          <CookieNotice />
+        </CurrencyProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );
