@@ -2389,6 +2389,56 @@ export type Database = {
           },
         ];
       };
+      trip_feedback: {
+        Row: {
+          booking_reference: string | null;
+          comment: string | null;
+          created_at: string;
+          id: string;
+          occasion: string | null;
+          party: string | null;
+          purpose: string | null;
+          rating: number;
+          rating_key: string;
+          trip_card_id: string | null;
+          user_id: string;
+        };
+        Insert: {
+          booking_reference?: string | null;
+          comment?: string | null;
+          created_at?: string;
+          id?: string;
+          occasion?: string | null;
+          party?: string | null;
+          purpose?: string | null;
+          rating: number;
+          rating_key: string;
+          trip_card_id?: string | null;
+          user_id: string;
+        };
+        Update: {
+          booking_reference?: string | null;
+          comment?: string | null;
+          created_at?: string;
+          id?: string;
+          occasion?: string | null;
+          party?: string | null;
+          purpose?: string | null;
+          rating?: number;
+          rating_key?: string;
+          trip_card_id?: string | null;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "trip_feedback_trip_card_id_fkey";
+            columns: ["trip_card_id"];
+            isOneToOne: false;
+            referencedRelation: "trip_cards";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       trip_items: {
         Row: {
           amount: number;

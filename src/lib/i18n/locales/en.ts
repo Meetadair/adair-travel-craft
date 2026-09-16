@@ -240,6 +240,19 @@ export const en = {
     },
 
     // The one or two things Adair asks before searching.
+    feedback: {
+      question: "How well did this trip match what you wanted?",
+      notSatisfied: "Not satisfied",
+      satisfied: "Satisfied",
+      good: "Good",
+      fantastic: "Fantastic",
+      commentPrompt: "Anything we got wrong, or right?",
+      commentPlaceholder: "The hotel was further from the office than it looked",
+      send: "Send",
+      thanks: "Thank you — this is what teaches Adair your taste.",
+      thanksPoor:
+        "Thank you for saying so. We read every one of these, and we will come back to you.",
+    },
     questions: {
       destination: "Where are you going?",
       origin: "Where are you flying from?",

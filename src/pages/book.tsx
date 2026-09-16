@@ -18,6 +18,8 @@ import { FlightExtras } from "@/components/flight-extras";
 import { ancillariesTotalEur, type AncillarySelection } from "@/lib/trip/ancillaries";
 import { getPaymentSession } from "@/lib/payment.functions";
 import { PaymentStep, type AuthorisedPayment } from "@/components/payment-step";
+import { TripFeedback } from "@/components/trip/trip-feedback";
+import { saveTripFeedback } from "@/lib/feedback.functions";
 import { eur } from "@/lib/trip/client";
 import { isSchengen } from "@/lib/trip/backwards";
 import { bedLines, categoryOn, childSeatsFor, partyOf, CATEGORY_LABEL } from "@/lib/trip/family";
@@ -114,6 +116,7 @@ export function BookPage({ cardId }: { cardId: string }) {
   const [extras, setExtras] = useState<AncillarySelection[]>([]);
   const [extrasTouched, setExtrasTouched] = useState(false);
   const [result, setResult] = useState<BookingResult | null>(null);
+  const sendFeedback = useServerFn(saveTripFeedback);
   /** "review" = traveller + invoice details, "pay" = card entry. */
   const [step, setStep] = useState<"review" | "pay">("review");
 
@@ -833,6 +836,32 @@ export function BookPage({ cardId }: { cardId: string }) {
                 events={result.calendar}
                 title={card.data?.search?.request.destinationCity ?? "Adair trip"}
                 className="mt-5"
+              />
+            )}
+
+            {/* Asked once the trip is actually booked, and never after a
+                failure: nobody owes us a rating of something that did not
+                happen. A write that fails is swallowed on purpose — the trip is
+                booked either way, and an error here would be the last thing
+                someone sees after paying. */}
+            {result.status !== "failed" && (
+              <TripFeedback
+                className="mt-6"
+                onSubmit={(answer) => {
+                  void sendFeedback({
+                    data: {
+                      rating: answer.rating,
+                      comment: answer.comment,
+                      bookingReference: result.reference ?? null,
+                      tripCardId: cardId ?? null,
+                      purpose: card.data?.search?.request.purpose ?? null,
+                      party: card.data?.search?.request.party ?? null,
+                      occasion: card.data?.search?.request.occasion ?? null,
+                    },
+                  }).catch(() => {
+                    /* already logged on the server; the booking stands */
+                  });
+                }}
               />
             )}
 

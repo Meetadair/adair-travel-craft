@@ -384,7 +384,19 @@
     "bookBusy": "Rezerwuję ofertę…",
     "speechOn": "Adair czyta odpowiedzi na głos",
     "speechOff": "Czytaj odpowiedzi na głos",
-    "speechHello": "Od teraz będę czytać odpowiedzi na głos."
+    "speechHello": "Od teraz będę czytać odpowiedzi na głos.",
+    "feedback": {
+      "question": "Na ile ten wyjazd odpowiadał temu, czego chciałeś?",
+      "notSatisfied": "Niezadowolony",
+      "satisfied": "Zadowolony",
+      "good": "Dobrze",
+      "fantastic": "Fantastycznie",
+      "commentPrompt": "Coś poszło nie tak albo wyjątkowo dobrze?",
+      "commentPlaceholder": "Hotel był dalej od biura, niż wyglądało na mapie",
+      "send": "Wyślij",
+      "thanks": "Dziękujemy — to właśnie na tym Adair uczy się Twojego gustu.",
+      "thanksPoor": "Dziękujemy, że mówisz wprost. Czytamy każdą taką odpowiedź i wrócimy do Ciebie."
+    }
   },
   "auth": {
     "meta": {

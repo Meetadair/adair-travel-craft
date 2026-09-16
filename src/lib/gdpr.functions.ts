@@ -27,6 +27,7 @@ const TABLES: Array<{ table: string; column: string }> = [
   { table: "credits", column: "user_id" },
   { table: "referrals", column: "referrer_id" },
   { table: "choice_feedback", column: "user_id" },
+  { table: "trip_feedback", column: "user_id" },
   { table: "support_requests", column: "user_id" },
   { table: "events", column: "user_id" },
   { table: "saved_cards", column: "user_id" },
