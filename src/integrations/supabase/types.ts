@@ -2653,6 +2653,7 @@ export type Database = {
           address_postcode: string | null;
           born_on_encrypted: string | null;
           created_at: string;
+          document_type: string;
           email_encrypted: string | null;
           family_name_encrypted: string;
           gender: string | null;
@@ -2679,6 +2680,7 @@ export type Database = {
           address_postcode?: string | null;
           born_on_encrypted?: string | null;
           created_at?: string;
+          document_type?: string;
           email_encrypted?: string | null;
           family_name_encrypted: string;
           gender?: string | null;
@@ -2705,6 +2707,7 @@ export type Database = {
           address_postcode?: string | null;
           born_on_encrypted?: string | null;
           created_at?: string;
+          document_type?: string;
           email_encrypted?: string | null;
           family_name_encrypted?: string;
           gender?: string | null;

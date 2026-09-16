@@ -150,10 +150,21 @@ export type PassportDetails = {
   countryCode: string;
   /** "YYYY-MM-DD". */
   expiresOn: string;
+  /**
+   * What the number is. Inside Schengen most people travel on an identity card
+   * and many own no passport at all, so Adair stores either — but an identity
+   * card must never be handed to an airline as a passport, which is a document
+   * mismatch the traveller only discovers at the gate.
+   */
+  documentType?: "passport" | "national_id";
 };
 
 function identityDocuments(passport: PassportDetails | null | undefined) {
   if (!passport?.number?.trim()) return {};
+  // Only a passport goes to the airline. An identity card is kept for the
+  // traveller and for hotel check-in; sending it as a passport would be a lie
+  // the gate catches, not us.
+  if (passport.documentType === "national_id") return {};
   return {
     identity_documents: [
       {

@@ -31,6 +31,7 @@ export type Traveller = {
   phone: string | null;
   passportLast4: string | null;
   passportNumber: string | null;
+  documentType: "passport" | "national_id";
   passportCountry: string | null;
   passportExpiry: string | null;
   addressLine1: string | null;
@@ -82,6 +83,8 @@ const travellerSchema = z.object({
     .optional()
     .or(z.literal("").transform(() => null)),
   phone: optionalText(30),
+  /** Which document the number below is. Airlines only ever get a passport. */
+  documentType: z.enum(["passport", "national_id"]).default("passport"),
   passportNumber: optionalText(40),
   passportCountry: optionalText(2),
   passportExpiry: z
@@ -110,6 +113,7 @@ type TravellerRow = {
   phone_encrypted: string | null;
   passport_number_encrypted: string | null;
   passport_last4: string | null;
+  document_type: string | null;
   passport_country: string | null;
   passport_expiry: string | null;
   address_line1: string | null;
@@ -122,7 +126,7 @@ type TravellerRow = {
 const SELECT_COLUMNS =
   "id, is_self, relationship, label, given_name_encrypted, family_name_encrypted, title, gender, " +
   "born_on_encrypted, email_encrypted, phone_encrypted, passport_number_encrypted, passport_last4, " +
-  "passport_country, passport_expiry, address_line1, address_line2, address_city, address_postcode, address_country";
+  "document_type, passport_country, passport_expiry, address_line1, address_line2, address_city, address_postcode, address_country";
 
 async function decryptRow(row: TravellerRow): Promise<Traveller | null> {
   const { decryptSecret } = await import("@/lib/loyalty/crypto.server");
@@ -143,6 +147,7 @@ async function decryptRow(row: TravellerRow): Promise<Traveller | null> {
         ? await decryptSecret(row.passport_number_encrypted)
         : null,
       passportLast4: row.passport_last4,
+      documentType: row.document_type === "national_id" ? "national_id" : "passport",
       passportCountry: row.passport_country,
       passportExpiry: row.passport_expiry,
       addressLine1: row.address_line1,
@@ -200,6 +205,7 @@ export const saveTraveller = createServerFn({ method: "POST" })
       phone_encrypted: data.phone ? await encryptSecret(data.phone) : null,
       passport_number_encrypted: passport ? await encryptSecret(passport) : null,
       passport_last4: passport ? passport.slice(-4) : null,
+      document_type: data.documentType,
       passport_country: data.passportCountry ?? null,
       passport_expiry: data.passportExpiry ?? null,
       address_line1: data.addressLine1 ?? null,
