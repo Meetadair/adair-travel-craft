@@ -199,7 +199,9 @@ export const getCardExtras = createServerFn({ method: "POST" })
 
 /**
  * "Add a reservation" on a confirmed trip. Books through the enabled
- * provider when one is connected; otherwise reports plainly that it is not.
+ * provider when one is connected; when it isn't — or it can't complete this
+ * particular booking — a human on the team takes it from there instead of
+ * leaving the traveller with a dead end. See requestHumanReservation below.
  */
 export const addTripReservation = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -218,18 +220,28 @@ export const addTripReservation = createServerFn({ method: "POST" })
     async ({
       data,
       context,
-    }): Promise<{ status: "confirmed" | "unavailable"; reason?: UnavailableReason }> => {
+    }): Promise<{
+      status: "confirmed" | "requested" | "unavailable";
+      reason?: UnavailableReason;
+    }> => {
       const { supabase, userId } = context;
 
       const tripRes = await supabase
         .from("trips")
-        .select("id, city, segments")
+        .select("id, city, segments, document_number, title")
         .eq("user_id", userId)
         .eq("id", data.tripId)
         .maybeSingle();
       if (tripRes.error) throw new Error(tripRes.error.message);
       if (!tripRes.data) throw new Error("trip-not-found");
-      const trip = tripRes.data as { id: string; city: string | null };
+      const trip = tripRes.data as {
+        id: string;
+        city: string | null;
+        document_number: string | null;
+        title: string | null;
+      };
+      const contactEmail = (context.claims as { email?: string } | null)?.email ?? null;
+      const askHuman = () => requestHumanReservation(supabase, userId, trip, data, contactEmail);
 
       const [registry, prefsRes] = await Promise.all([
         import("@/lib/suppliers/registry.server"),
@@ -240,7 +252,7 @@ export const addTripReservation = createServerFn({ method: "POST" })
           .maybeSingle(),
       ]);
       const adapter = await registry.restaurantProvider(supabase);
-      if (adapter.status !== "ok") return { status: "unavailable", reason: adapter.reason };
+      if (adapter.status !== "ok") return askHuman();
 
       const row = (prefsRes.data ?? null) as Record<string, unknown> | null;
       const criteria = {
@@ -260,23 +272,75 @@ export const addTripReservation = createServerFn({ method: "POST" })
       const offerRef = data.offerRef ?? "";
       if (!offerRef) {
         const found = await adapter.data.search(criteria);
-        if (found.status !== "ok") return { status: "unavailable", reason: found.reason };
+        if (found.status !== "ok") return askHuman();
         const first = found.data[0];
-        if (!first) return { status: "unavailable", reason: "no-availability" };
+        if (!first) return askHuman();
         const booked = await adapter.data.book(criteria, first.offerRef);
-        if (booked.status !== "ok") return { status: "unavailable", reason: booked.reason };
+        if (booked.status !== "ok") return askHuman();
         await insertReservation(supabase, userId, trip.id, first, booked.data.reference);
         return { status: "confirmed" };
       }
 
       const quoted = await adapter.data.quote(criteria, offerRef);
-      if (quoted.status !== "ok") return { status: "unavailable", reason: quoted.reason };
+      if (quoted.status !== "ok") return askHuman();
       const booked = await adapter.data.book(criteria, offerRef);
-      if (booked.status !== "ok") return { status: "unavailable", reason: booked.reason };
+      if (booked.status !== "ok") return askHuman();
       await insertReservation(supabase, userId, trip.id, quoted.data, booked.data.reference);
       return { status: "confirmed" };
     },
   );
+
+/**
+ * No automated path could complete this booking — logs it as a support
+ * request (category "reservation") so it shows up in the same admin queue as
+ * any other help request, emails the team via the existing support inbox,
+ * and tells the traveller plainly that a person is now on it.
+ */
+async function requestHumanReservation(
+  supabase: SupabaseClient,
+  userId: string,
+  trip: { id: string; city: string | null; document_number: string | null; title: string | null },
+  data: { date: string; time: string; partySize: number },
+  contactEmail: string | null,
+): Promise<{ status: "requested" }> {
+  const description = `Restaurant reservation requested — ${trip.city ?? "destination not set"}, ${data.date} ${data.time}, table for ${data.partySize}.`;
+
+  const inserted = await supabase
+    .from("support_requests")
+    .insert({
+      user_id: userId,
+      trip_id: trip.id,
+      trip_reference: trip.document_number,
+      category: "reservation",
+      urgency: "soon",
+      description,
+      contact_email: contactEmail,
+    })
+    .select("id")
+    .single();
+  if (inserted.error) throw new Error(inserted.error.message);
+  const requestId = (inserted.data as { id: string }).id;
+
+  const { notifySupport } = await import("@/lib/support-email.server");
+  await notifySupport({
+    id: requestId,
+    category: "reservation",
+    urgency: "soon",
+    description,
+    tripReference: trip.document_number,
+    tripTitle: trip.title,
+    contactEmail,
+  });
+
+  await supabase.from("audit_log").insert({
+    actor: userId,
+    action: "reservation.requested",
+    entity: `support_request:${requestId}`,
+    after: { trip_id: trip.id, date: data.date, time: data.time, party_size: data.partySize },
+  });
+
+  return { status: "requested" };
+}
 
 async function insertReservation(
   supabase: SupabaseClient,

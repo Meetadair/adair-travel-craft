@@ -7,7 +7,6 @@ import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { UtensilsCrossed } from "lucide-react";
 import { addTripReservation } from "@/lib/extras.functions";
-import type { UnavailableReason } from "@/lib/suppliers/types";
 
 const selectClass =
   "rounded-xl border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary";
@@ -24,10 +23,8 @@ function nights(start: string | null, end: string | null): string[] {
   return out;
 }
 
-const explain = (reason?: UnavailableReason): string =>
-  reason === "no-availability"
-    ? "No table at that time. Try another evening."
-    : "Restaurant booking opens at launch — our reservation partner is not live yet.";
+const REQUESTED_NOTE =
+  "We could not book that automatically — our team has it now and will confirm within a few hours.";
 
 export function AddReservation({
   tripId,
@@ -59,7 +56,9 @@ export function AddReservation({
       setNote(
         result.status === "confirmed"
           ? "Reservation confirmed — it is on your trip and in your calendar."
-          : explain(result.reason),
+          : result.status === "requested"
+            ? REQUESTED_NOTE
+            : "No table at that time. Try another evening.",
       );
     } catch {
       setNote("We could not reach the reservation partner. Please try again.");
