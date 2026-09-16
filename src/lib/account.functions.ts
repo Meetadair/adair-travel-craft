@@ -435,20 +435,40 @@ export const savePreferences = createServerFn({ method: "POST" })
   });
 
 /** The overlay schema: only the fields business may change, all optional. */
+/**
+ * The overlay schema: every field work may answer differently, all optional.
+ *
+ * It covers the questionnaire rather than a hand-picked dozen, because the
+ * answers that most need to differ — what matters inside the hotel, how you
+ * like to travel, your usual rhythm — were exactly the ones left out.
+ */
 const businessPrefsSchema = z
   .object({
     cabinClass: z.enum(["economy", "premium_economy", "business", "first"]).optional(),
+    cabinRule: z.string().trim().max(40).nullable().optional(),
     seat: z.enum(["window", "aisle", "any"]).optional(),
+    seatFront: z.boolean().optional(),
+    seatLegroom: z.boolean().optional(),
     maxConnections: z.number().int().min(0).max(3).optional(),
+    airlines: strList.optional(),
     hotelTypes: strList.optional(),
     hotelChains: strList.optional(),
     hotelStars: strList.optional(),
     hotelMinRating: z.number().min(0).max(5).optional(),
+    hotelRatingLevel: z.string().trim().max(40).nullable().optional(),
     hotelAmenities: strList.optional(),
     hotelMaxKm: z.number().int().min(1).max(50).nullable().optional(),
+    hotelRules: strList.optional(),
+    carBrands: strList.optional(),
     carClass: z.string().trim().max(40).nullable().optional(),
+    carCompanies: strList.optional(),
     carTransmission: z.enum(["automatic", "manual", "any"]).optional(),
+    carNavigation: z.boolean().optional(),
+    carChildSeat: z.boolean().optional(),
     budgetBand: z.string().trim().max(40).nullable().optional(),
+    dealbreakers: strList.optional(),
+    /** Part-two answers — travel style, rhythm, interests — merged key by key. */
+    extraAnswers: z.record(z.string().max(60), strList).optional(),
   })
   .strict();
 

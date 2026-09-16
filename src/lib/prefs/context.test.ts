@@ -109,3 +109,41 @@ describe("a stated purpose beats the wording", () => {
     ).toBe("leisure");
   });
 });
+
+describe("the overlay now covers the questionnaire", () => {
+  it("lets work want a gym where the person wants a pool", () => {
+    const merged = prefsForContext(
+      { hotelAmenities: ["pool", "allinclusive"] },
+      { hotelAmenities: ["gym", "breakfast"] },
+      "business",
+    );
+    expect(merged.hotelAmenities).toEqual(["gym", "breakfast"]);
+  });
+
+  it("merges part-two answers key by key instead of replacing them", () => {
+    const merged = prefsForContext(
+      { extraAnswers: { travelStyle: ["experience"], rhythm: ["slow"], music: ["jazz"] } },
+      { extraAnswers: { travelStyle: ["efficiency"] } },
+      "business",
+    );
+    expect(merged.extraAnswers).toEqual({
+      travelStyle: ["efficiency"],
+      rhythm: ["slow"],
+      music: ["jazz"],
+    });
+  });
+
+  it("leaves an unanswered work field on the person's own answer", () => {
+    const merged = prefsForContext(
+      { hotelAmenities: ["pool"], carBrands: ["volvo"] },
+      { hotelAmenities: ["gym"] },
+      "business",
+    );
+    expect(merged.carBrands).toEqual(["volvo"]);
+  });
+
+  it("changes nothing on a leisure trip", () => {
+    const base = { hotelAmenities: ["pool"] };
+    expect(prefsForContext(base, { hotelAmenities: ["gym"] }, "leisure")).toBe(base);
+  });
+});

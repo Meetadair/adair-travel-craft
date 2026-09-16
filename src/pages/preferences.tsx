@@ -11,10 +11,13 @@ import {
   addCompany,
   deleteCompany,
   getAccount,
+  saveBusinessPrefs,
   savePreferences,
   updateCompany,
+  type BusinessPrefsPayload,
   type Company,
 } from "@/lib/account.functions";
+import { BUSINESS_OVERRIDE_FIELDS } from "@/lib/prefs/context";
 import {
   QUESTIONS,
   answersToPrefs,
@@ -56,6 +59,7 @@ const toDraft = (company: Company): CompanyDraft => ({
 export function PreferencesPage() {
   const fetchAccount = useServerFn(getAccount);
   const persistPrefs = useServerFn(savePreferences);
+  const persistWorkPrefs = useServerFn(saveBusinessPrefs);
   const createCompany = useServerFn(addCompany);
   const editCompany = useServerFn(updateCompany);
   const removeCompany = useServerFn(deleteCompany);
@@ -69,6 +73,14 @@ export function PreferencesPage() {
   const [homeAirport, setHomeAirport] = useState("WAW");
   const [answers, setAnswers] = useState<Answers>({});
   const [toggles, setToggles] = useState<Toggles>({});
+  /**
+   * The same questionnaire, answered twice. The work set starts as a copy of
+   * the personal one, so nobody is made to fill anything in twice; only the
+   * answers they actually change are stored as work overrides.
+   */
+  const [mode, setMode] = useState<"personal" | "work">("personal");
+  const [workAnswers, setWorkAnswers] = useState<Answers>({});
+  const [workToggles, setWorkToggles] = useState<Toggles>({});
   const [companies, setCompanies] = useState<CompanyDraft[]>([]);
   const [savedNote, setSavedNote] = useState(false);
 
@@ -79,6 +91,12 @@ export function PreferencesPage() {
     setHomeAirport(account.data.homeAirport);
     setAnswers(mapped.answers);
     setToggles(mapped.toggles);
+    const work = prefsToAnswers({
+      ...account.data.preferences,
+      ...(account.data.businessPrefs as Partial<typeof account.data.preferences>),
+    });
+    setWorkAnswers(work.answers);
+    setWorkToggles(work.toggles);
     setCompanies(account.data.companies.map(toDraft));
   }, [account.data]);
 
@@ -91,6 +109,19 @@ export function PreferencesPage() {
           preferences: answersToPrefs(answers, toggles),
         },
       });
+
+      // Only what work actually answers differently is stored. A field left
+      // alone falls through to the person, which is why the work tab does not
+      // need filling in at all.
+      const mine = answersToPrefs(answers, toggles) as Record<string, unknown>;
+      const atWork = answersToPrefs(workAnswers, workToggles) as Record<string, unknown>;
+      const overlay: Record<string, unknown> = {};
+      for (const field of BUSINESS_OVERRIDE_FIELDS) {
+        if (JSON.stringify(atWork[field]) !== JSON.stringify(mine[field])) {
+          overlay[field] = atWork[field];
+        }
+      }
+      await persistWorkPrefs({ data: { overlay: overlay as BusinessPrefsPayload } });
 
       const existing = account.data?.companies ?? [];
       for (const [index, draft] of companies.entries()) {
@@ -112,6 +143,14 @@ export function PreferencesPage() {
   });
 
   const completion = part2Completion(answersToPrefs(answers, toggles), companies.length);
+
+  // Which set of answers the questionnaire below is editing right now.
+  const active = mode === "work" ? workAnswers : answers;
+  const setActive = mode === "work" ? setWorkAnswers : setAnswers;
+  const activeToggles = mode === "work" ? workToggles : toggles;
+  const setActiveToggles = mode === "work" ? setWorkToggles : setToggles;
+  const differsAtWork = (field: string) =>
+    JSON.stringify(workAnswers[field] ?? []) !== JSON.stringify(answers[field] ?? []);
 
   return (
     <div className="min-h-screen bg-background">
@@ -143,6 +182,43 @@ export function PreferencesPage() {
               </div>
             </section>
 
+            <div className="hairline-card p-5 sm:p-6">
+              <p className="text-sm font-medium">Who is this trip for?</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                The same person travels twice over. A gym in Frankfurt and a pool in Crete are not
+                the same preference, and shortest-door-to-door on a Tuesday is not how you want
+                August to go. Answer once as yourself, then change only what work does differently
+                — everything you leave alone stays the same on both.
+              </p>
+              <div className="mt-3 inline-flex rounded-xl border border-border p-1">
+                {(
+                  [
+                    ["personal", "My own trips"],
+                    ["work", "Work trips"],
+                  ] as const
+                ).map(([value, name]) => (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => setMode(value)}
+                    className={`rounded-lg px-4 py-2 text-sm font-medium ${
+                      mode === value
+                        ? "bg-primary text-primary-foreground"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {name}
+                  </button>
+                ))}
+              </div>
+              {mode === "work" && (
+                <p className="mt-3 text-xs text-muted-foreground">
+                  Editing your work answers. Adair uses these when you say a trip is for work, when
+                  the invoice goes to a company, or when the sentence reads like a meeting.
+                </p>
+              )}
+            </div>
+
             {QUESTIONS.filter((q) => q.kind === "fields")
               .slice()
               .sort((a, b) => a.part - b.part)
@@ -171,21 +247,35 @@ export function PreferencesPage() {
                     </div>
                   )}
                   <section className="hairline-card space-y-4 p-5 sm:p-6">
-                    <h2 className="font-display text-lg font-semibold">{q.title}</h2>
+                    <div className="flex items-baseline justify-between gap-3">
+                      <h2 className="font-display text-lg font-semibold">{q.title}</h2>
+                      {mode === "personal" &&
+                        [...(q.singles ?? []), ...(q.multis ?? [])].some((d) =>
+                          differsAtWork(d.field),
+                        ) && (
+                          <button
+                            type="button"
+                            onClick={() => setMode("work")}
+                            className="shrink-0 text-xs font-medium text-primary underline-offset-4 hover:underline"
+                          >
+                            different at work
+                          </button>
+                        )}
+                    </div>
                     {q.singles?.map((def) => (
                       <SingleField
                         key={def.field}
                         def={def}
-                        value={answers[def.field] ?? []}
-                        onChange={(next) => setAnswers((p) => ({ ...p, [def.field]: next }))}
+                        value={active[def.field] ?? []}
+                        onChange={(next) => setActive((p) => ({ ...p, [def.field]: next }))}
                       />
                     ))}
                     {q.multis?.map((def) => (
                       <MultiField
                         key={def.field}
                         def={def}
-                        value={answers[def.field] ?? []}
-                        onChange={(next) => setAnswers((p) => ({ ...p, [def.field]: next }))}
+                        value={active[def.field] ?? []}
+                        onChange={(next) => setActive((p) => ({ ...p, [def.field]: next }))}
                         homeAirport={homeAirport}
                         fullList
                       />
@@ -194,9 +284,9 @@ export function PreferencesPage() {
                       <TextField
                         key={def.field}
                         def={def}
-                        value={answers[def.field]?.[0] ?? ""}
+                        value={active[def.field]?.[0] ?? ""}
                         onChange={(next) =>
-                          setAnswers((p) => ({ ...p, [def.field]: next.trim() ? [next] : [] }))
+                          setActive((p) => ({ ...p, [def.field]: next.trim() ? [next] : [] }))
                         }
                       />
                     ))}
@@ -206,8 +296,8 @@ export function PreferencesPage() {
                           <ToggleRow
                             key={t.field}
                             label={t.label}
-                            checked={Boolean(toggles[t.field])}
-                            onChange={(next) => setToggles((p) => ({ ...p, [t.field]: next }))}
+                            checked={Boolean(activeToggles[t.field])}
+                            onChange={(next) => setActiveToggles((p) => ({ ...p, [t.field]: next }))}
                           />
                         ))}
                       </div>

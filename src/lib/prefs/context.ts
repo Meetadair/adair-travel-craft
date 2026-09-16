@@ -14,20 +14,49 @@
 
 export type TripContext = "business" | "leisure";
 
-/** The fields the overlay may change. Everything else is the person. */
+/**
+ * The fields the overlay may change.
+ *
+ * This list used to be twelve hand-picked fields, and every question outside it
+ * was the same answer for both lives: one hotel standard, one travel style, one
+ * rhythm. That is wrong in an obvious way — a gym in Frankfurt and a pool in
+ * Crete, shortest-door-to-door on Tuesday and the place itself in August — and
+ * it quietly made both searches worse, because whichever answer was given had
+ * to serve the other trip too.
+ *
+ * So the overlay now covers the questionnaire. Nothing here is required: a
+ * field nobody answered for work still falls through to the person.
+ */
 export const BUSINESS_OVERRIDE_FIELDS = [
   "cabinClass",
+  "cabinRule",
   "seat",
+  "seatFront",
+  "seatLegroom",
   "maxConnections",
+  "airlines",
   "hotelTypes",
   "hotelChains",
   "hotelStars",
   "hotelMinRating",
+  "hotelRatingLevel",
   "hotelAmenities",
   "hotelMaxKm",
+  "hotelRules",
+  "carBrands",
   "carClass",
+  "carCompanies",
   "carTransmission",
+  "carNavigation",
+  "carChildSeat",
   "budgetBand",
+  "dealbreakers",
+  /**
+   * Everything the part-2 questionnaire stores as free answers — travel style,
+   * rhythm, interests. Merged key by key, so answering one of them for work
+   * does not wipe the others.
+   */
+  "extraAnswers",
 ] as const;
 
 export type BusinessOverrideField = (typeof BUSINESS_OVERRIDE_FIELDS)[number];
@@ -96,6 +125,22 @@ export function prefsForContext<T extends Record<string, unknown>>(
   const merged: Record<string, unknown> = { ...base };
   for (const field of BUSINESS_OVERRIDE_FIELDS) {
     const value = overlay[field];
+
+    // extraAnswers is a bag of separate answers, so it merges key by key.
+    // Replacing it wholesale would erase the rhythm because someone set a
+    // travel style for work.
+    if (field === "extraAnswers") {
+      const work = value as Record<string, string[]> | undefined;
+      if (!work || Object.keys(work).length === 0) continue;
+      const baseExtra = (base["extraAnswers"] ?? {}) as Record<string, string[]>;
+      const mergedExtra: Record<string, string[]> = { ...baseExtra };
+      for (const [key, answer] of Object.entries(work)) {
+        if (Array.isArray(answer) && answer.length > 0) mergedExtra[key] = answer;
+      }
+      merged["extraAnswers"] = mergedExtra;
+      continue;
+    }
+
     const meaningful = Array.isArray(value)
       ? value.length > 0
       : value !== null && value !== undefined && value !== "";
