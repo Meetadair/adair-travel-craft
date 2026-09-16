@@ -182,6 +182,8 @@ export function PreferencesPage() {
               </div>
             </section>
 
+            <TravellerProfiles />
+
             <div className="hairline-card p-5 sm:p-6">
               <p className="text-sm font-medium">Who is this trip for?</p>
               <p className="mt-1 text-sm text-muted-foreground">
@@ -305,8 +307,6 @@ export function PreferencesPage() {
                   </section>
                 </div>
               ))}
-
-            <TravellerProfiles />
 
             <BusinessTrips />
 
