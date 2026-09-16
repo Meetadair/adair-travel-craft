@@ -862,6 +862,68 @@ export const bookTripCard = createServerFn({ method: "POST" })
       status,
       total_eur: confirmedTotal,
     });
+
+    // The traveller has paid for this trip. Any line still sitting at
+    // "requested" — a stay or car whose supplier product is not enabled yet,
+    // a transfer with no connected ride provider — is money collected for
+    // something nobody has actually arranged. The team needs to know now,
+    // not whenever someone happens to open the trip. Never lets a failure
+    // here touch the booking result: the booking already succeeded.
+    const requestedLines = lines.filter((line) => line.status === "requested");
+    if (requestedLines.length) {
+      try {
+        const { notifySupport } = await import("@/lib/support-email.server");
+        const contactEmail = data.traveller.email ?? null;
+        const summary = requestedLines
+          .map(
+            (line) =>
+              `${line.kind}: ${line.title}${
+                line.amountEur ? ` (${line.amountEur.toFixed(2)} EUR)` : ""
+              } — ${line.note ?? "needs manual booking"}`,
+          )
+          .join("\n");
+        const description = `Trip ${documentNumber ?? tripId} has ${
+          requestedLines.length
+        } item(s) already paid for that could not be booked automatically and need manual fulfillment:\n${summary}`;
+
+        const inserted = await supabase
+          .from("support_requests")
+          .insert({
+            user_id: userId,
+            trip_id: tripId,
+            trip_reference: documentNumber,
+            category: "fulfillment",
+            urgency: "soon",
+            description,
+            contact_email: contactEmail,
+          })
+          .select("id")
+          .single();
+        if (!inserted.error) {
+          const requestId = (inserted.data as { id: string }).id;
+          await notifySupport({
+            id: requestId,
+            category: "fulfillment",
+            urgency: "soon",
+            description,
+            tripReference: documentNumber,
+            tripTitle: `${request.destinationCity} · ${request.departDate} – ${request.returnDate}`,
+            contactEmail,
+          });
+          await supabase.from("audit_log").insert({
+            actor: userId,
+            action: "fulfillment.requested",
+            entity: `support_request:${requestId}`,
+            after: {
+              trip_id: tripId,
+              items: requestedLines.map((line) => ({ kind: line.kind, title: line.title })),
+            },
+          });
+        }
+      } catch (error) {
+        console.error("fulfillment request notification failed", error);
+      }
+    }
     const insertedIds = new Map(
       ((itemsRes.data ?? []) as Array<{ id: string; position: number }>).map((r) => [
         r.position,
