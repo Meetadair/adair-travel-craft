@@ -13,6 +13,9 @@
  */
 
 export type ClarifyKind =
+  | "origin"
+  | "trip_kind"
+  | "occasion"
   | "needs_destination"
   | "child_ages"
   | "no_dates"
@@ -183,6 +186,11 @@ export function applyAnswer(sentence: string, kind: ClarifyKind, answer: string)
   if (kind === "needs_destination") return `${sentence} to ${clean}`.trim();
   if (kind === "child_ages") return `${sentence} (children aged ${clean})`;
   if (kind === "which_airport") return `${sentence} from ${clean}`;
+  // "from" is the only word the parser reads as a departure point. Without it
+  // the answer is appended as a bare word, the origin stays unstated, and the
+  // same question is asked again — for as long as the traveller keeps replying.
+  if (kind === "origin") return /\bfrom\b/i.test(clean) ? `${sentence} ${clean}` : `${sentence} from ${clean}`;
+  if (kind === "trip_kind" || kind === "occasion") return `${sentence} ${clean}`;
   if (kind === "hotel_unmatched") return `${sentence} — ${clean}`;
   if (kind === "travellers") {
     // The control sends either a bare count ("3") or an already-worded

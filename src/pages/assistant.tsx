@@ -186,8 +186,13 @@ export function AssistantPage() {
         : [...prev, question.kind as ChatQuestionKind],
     );
     say("user", given);
+    // Passed through rather than read back from state: setAnswered above has
+    // not landed yet when handleSentence runs, so without this the question
+    // that was just answered is asked again — and answering it again starts
+    // the same loop from the top.
     handleSentence(applyAnswer(asked ?? input.trim(), question.kind, given), {
       skipIntent: true,
+      justAnswered: question.kind as ChatQuestionKind,
     });
   };
 
@@ -195,7 +200,10 @@ export function AssistantPage() {
    * One entry point for everything typed or tapped. The destination comes
    * first: with no city we ask for it and never search.
    */
-  const handleSentence = (raw: string, options: { skipIntent?: boolean } = {}) => {
+  const handleSentence = (
+    raw: string,
+    options: { skipIntent?: boolean; justAnswered?: ChatQuestionKind } = {},
+  ) => {
     const sentence = raw.trim();
     if (!sentence) return;
 
@@ -227,7 +235,7 @@ export function AssistantPage() {
     const pending = parsed
       ? chatQuestions(sentence, parsed, {
           knownAirports: knownAirports(),
-          answered,
+          answered: options.justAnswered ? [...answered, options.justAnswered] : answered,
           known: knownProfile,
           copy: {
             destination: t.assistant.questions.destination,
@@ -565,6 +573,147 @@ export function AssistantPage() {
           </div>
         )}
 
+        {/* The answer belongs under the question that asked it. Rendered after
+            the composer it landed below a box that sticks to the bottom of the
+            window, so Adair asked at the top of the screen and the way to reply
+            sat underneath the thing you type in — which reads as two separate
+            conversations. */}
+        {question && (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (!answer.trim()) return;
+              answerQuestion(answer);
+            }}
+            className="hairline-card mt-6 p-5"
+          >
+            {/* Adair already asked this in the conversation just above; a card
+                that repeats the same sentence reads as a rendering bug. */}
+            {question.options.length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {question.options.map((option) => (
+                  <button
+                    key={option}
+                    type="button"
+                    onClick={() => answerQuestion(option)}
+                    className="tag-pill hover:bg-secondary"
+                  >
+                    {option}
+                  </button>
+                ))}
+              </div>
+            )}
+            {(question.kind === "dates" ||
+              question.kind === "no_dates" ||
+              question.kind === "vague_week") && (
+              <div className="mt-3">
+                <DateAnswer
+                  value={dateDraft}
+                  copy={t.assistant.strip.controls}
+                  onChange={setDateDraft}
+                  // The calendar stays up until the traveller says they are
+                  // done. Submitting the moment a range happened to be complete
+                  // took the calendar away mid-thought, with no way back to it.
+                  onConfirm={() => {
+                    if (!dateDraft || !isCompleteRange(dateDraft)) return;
+                    const sentence = rangeSentence(dateDraft);
+                    setDateDraft(null);
+                    answerQuestion(sentence);
+                  }}
+                />
+              </div>
+            )}
+
+            {question.kind === "needs_destination" && (
+              <div className="mt-3">
+                <AirportAnswer
+                  value={null}
+                  copy={t.assistant.strip.controls}
+                  onChange={(iata) => answerQuestion(iata)}
+                />
+              </div>
+            )}
+
+            {question.kind === "which_airport" && (
+              <div className="mt-3">
+                <AirportAnswer
+                  value={null}
+                  copy={t.assistant.strip.controls}
+                  onChange={(iata) => answerQuestion(iata)}
+                />
+              </div>
+            )}
+
+            {question.kind === "origin" && (
+              <div className="mt-3">
+                <AirportAnswer
+                  value={null}
+                  copy={t.assistant.strip.controls}
+                  onChange={(iata) => answerQuestion(iata)}
+                />
+              </div>
+            )}
+
+            {question.kind === "travellers" && (
+              <div className="mt-3 space-y-3">
+                <TravellersAnswer
+                  value={travellersCount}
+                  companions={savedCompanions.map((c) => ({ id: c.id, label: c.givenName }))}
+                  selected={selectedCompanions}
+                  copy={t.assistant.strip.controls}
+                  onChange={setTravellersCount}
+                  onToggleCompanion={(id) => {
+                    setSelectedCompanions((current) => {
+                      const next = current.includes(id)
+                        ? current.filter((c) => c !== id)
+                        : [...current, id];
+                      // Picking a person is picking a seat: the count follows
+                      // the chips rather than needing to be set twice.
+                      setTravellersCount((count) => Math.max(count, next.length + 1));
+                      return next;
+                    });
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => answerQuestion(`for ${travellersCount} people`)}
+                  className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+                >
+                  {t.assistant.questions.done}
+                </button>
+              </div>
+            )}
+
+            {/* The typed answer is for questions that have no better control.
+                Under the calendar it was a second, meaningless way to answer
+                the same question — an empty box and a Continue button sitting
+                right below "Search these dates". */}
+            {question.options.length === 0 &&
+              question.kind !== "dates" &&
+              question.kind !== "no_dates" &&
+              question.kind !== "vague_week" &&
+              question.kind !== "travellers" &&
+              question.kind !== "origin" &&
+              question.kind !== "needs_destination" &&
+              question.kind !== "which_airport" && (
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <input
+                    value={answer}
+                    onChange={(e) => setAnswer(e.target.value)}
+                    placeholder={question.placeholder}
+                    className="rounded-xl border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
+                  />
+                  <button
+                    type="submit"
+                    className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+                  >
+                    Continue
+                  </button>
+                </div>
+              )}
+          </form>
+        )}
+
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -638,139 +787,10 @@ export function AssistantPage() {
           ))}
         </div>
 
-        {question && (
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (!answer.trim()) return;
-              answerQuestion(answer);
-            }}
-            className="hairline-card mt-6 p-5"
-          >
-            {/* Adair already asked this in the conversation just above; a card
-                that repeats the same sentence reads as a rendering bug. */}
-            {question.options.length > 0 && (
-              <div className="mt-3 flex flex-wrap gap-2">
-                {question.options.map((option) => (
-                  <button
-                    key={option}
-                    type="button"
-                    onClick={() => answerQuestion(option)}
-                    className="tag-pill hover:bg-secondary"
-                  >
-                    {option}
-                  </button>
-                ))}
-              </div>
-            )}
-            {(question.kind === "dates" ||
-              question.kind === "no_dates" ||
-              question.kind === "vague_week") && (
-              <div className="mt-3">
-                <DateAnswer
-                  value={dateDraft}
-                  copy={t.assistant.strip.controls}
-                  onChange={setDateDraft}
-                  // The calendar stays up until the traveller says they are
-                  // done. Submitting the moment a range happened to be complete
-                  // took the calendar away mid-thought, with no way back to it.
-                  onConfirm={() => {
-                    if (!dateDraft || !isCompleteRange(dateDraft)) return;
-                    const sentence = rangeSentence(dateDraft);
-                    setDateDraft(null);
-                    answerQuestion(sentence);
-                  }}
-                />
-              </div>
-            )}
-
-            {question.kind === "needs_destination" && (
-              <div className="mt-3">
-                <AirportAnswer
-                  value={null}
-                  copy={t.assistant.strip.controls}
-                  onChange={(iata) => answerQuestion(iata)}
-                />
-              </div>
-            )}
-
-            {question.kind === "which_airport" && (
-              <div className="mt-3">
-                <AirportAnswer
-                  value={null}
-                  copy={t.assistant.strip.controls}
-                  onChange={(iata) => answerQuestion(iata)}
-                />
-              </div>
-            )}
-
-            {question.kind === "travellers" && (
-              <div className="mt-3 space-y-3">
-                <TravellersAnswer
-                  value={travellersCount}
-                  companions={savedCompanions.map((c) => ({ id: c.id, label: c.givenName }))}
-                  selected={selectedCompanions}
-                  copy={t.assistant.strip.controls}
-                  onChange={setTravellersCount}
-                  onToggleCompanion={(id) => {
-                    setSelectedCompanions((current) => {
-                      const next = current.includes(id)
-                        ? current.filter((c) => c !== id)
-                        : [...current, id];
-                      // Picking a person is picking a seat: the count follows
-                      // the chips rather than needing to be set twice.
-                      setTravellersCount((count) => Math.max(count, next.length + 1));
-                      return next;
-                    });
-                  }}
-                />
-                <button
-                  type="button"
-                  onClick={() => answerQuestion(`for ${travellersCount} people`)}
-                  className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
-                >
-                  {t.assistant.questions.done}
-                </button>
-              </div>
-            )}
-
-            {/* The typed answer is for questions that have no better control.
-                Under the calendar it was a second, meaningless way to answer
-                the same question — an empty box and a Continue button sitting
-                right below "Search these dates". */}
-            {question.kind !== "dates" &&
-              question.kind !== "no_dates" &&
-              question.kind !== "vague_week" &&
-              question.kind !== "travellers" && (
-                <div className="mt-3 flex flex-wrap items-center gap-2">
-                  <input
-                    value={answer}
-                    onChange={(e) => setAnswer(e.target.value)}
-                    placeholder={question.placeholder}
-                    className="rounded-xl border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
-                  />
-                  <button
-                    type="submit"
-                    className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
-                  >
-                    Continue
-                  </button>
-                </div>
-              )}
-          </form>
-        )}
 
         <LoyaltyReminder />
 
         <CalendarTripHints onPlan={(sentence) => setInput(sentence)} />
-
-        {asked && (
-          <div className="mt-12 flex justify-end">
-            <div className="max-w-md rounded-xl rounded-br-sm border border-border bg-card px-5 py-4">
-              <p className="text-sm leading-relaxed">{asked}</p>
-            </div>
-          </div>
-        )}
 
         {search.isError && <p className="mt-6 text-sm text-primary">{t.assistant.error}</p>}
 

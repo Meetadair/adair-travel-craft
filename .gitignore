@@ -37,3 +37,6 @@ dist-ssr
 /playwright-report/
 /e2e/shots/
 dev.log
+
+# Tokens that let Claude push and migrate. Never committed.
+.adair-secrets

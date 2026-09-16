@@ -163,8 +163,13 @@ function originOf(
   // "from Berlin", "z Warszawy" — the traveller said it in the sentence.
   const fromMatch = /\b(?:from|out of|z|ze)\s+([\p{L}\s-]{3,24})/u.exec(text);
   if (fromMatch?.[1]) {
-    const found = findCity(fromMatch[1].toLowerCase(), destination.iata);
+    const said = fromMatch[1].trim();
+    const found = findCity(said.toLowerCase(), destination.iata);
     if (found) return { entry: found, stated: true };
+    // The airport picker answers with a code rather than a city name, and
+    // "from WAW" has to mean the same thing as "from Warsaw".
+    const code = homeAirportEntry(said.slice(0, 3).toUpperCase());
+    if (code && code.iata !== destination.iata) return { entry: code, stated: true };
   }
   // On file from an earlier trip: told to us once, still true.
   const home = homeAirportEntry(homeIata);

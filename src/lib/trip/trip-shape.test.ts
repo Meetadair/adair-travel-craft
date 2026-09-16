@@ -11,6 +11,7 @@
 import { describe, expect, it } from "vitest";
 import { chatQuestions, essentialsMet } from "./questions";
 import { parseTripSentence, partyOf, occasionOf, purposeOf } from "./parse";
+import { applyAnswer } from "./clarify";
 import { stayScore, styleScore } from "./rank";
 import type { TripRequest } from "./types";
 
@@ -164,5 +165,34 @@ describe("what the answers change", () => {
 
   it("changes nothing at all until the traveller has answered", () => {
     expect(styleScore(boutique, 4.7, { purpose: null, party: null, occasion: null })).toBe(0);
+  });
+});
+
+describe("answering where the trip starts", () => {
+  it("is folded into the sentence as an origin, not as a loose word", () => {
+    // The loop this prevents: the answer was appended bare, the parser read it
+    // as more noise, the origin stayed unstated, and the same question came
+    // straight back. Typing "warsaw", then "warszawa", then anything at all.
+    const sentence = applyAnswer("I need to go to paris", "origin", "warsaw");
+    expect(sentence).toBe("I need to go to paris from warsaw");
+    expect(parseTripSentence(sentence)?.originStated).toBe(true);
+  });
+
+  it("accepts the airport code the picker sends", () => {
+    const sentence = applyAnswer("I need to go to paris", "origin", "WAW");
+    expect(parseTripSentence(sentence)?.originStated).toBe(true);
+    expect(parseTripSentence(sentence)?.originIata).toBe("WAW");
+  });
+
+  it("does not double the word when the answer already carries it", () => {
+    expect(applyAnswer("Paris in October", "origin", "from Berlin")).toBe(
+      "Paris in October from Berlin",
+    );
+  });
+
+  it("stops asking once the question is answered", () => {
+    const sentence = applyAnswer("I need to go to paris", "origin", "warsaw");
+    const parsed = parseTripSentence(sentence)!;
+    expect(chatQuestions(sentence, parsed).some((q) => q.kind === "origin")).toBe(false);
   });
 });
