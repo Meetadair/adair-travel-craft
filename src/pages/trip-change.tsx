@@ -15,11 +15,10 @@ import {
   changeQuote,
   conditionsSentences,
   differenceSentence,
+  CHANGE_STORAGE_KEY,
   type ChangeKind,
 } from "@/lib/trip/change";
 import { AppFooter } from "@/components/app-footer";
-
-export const CHANGE_STORAGE_KEY = "adair.trip-change";
 
 const inputClass =
   "mt-1 w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary";

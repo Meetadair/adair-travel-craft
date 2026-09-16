@@ -6,6 +6,21 @@
 
 export type ChangeKind = "dates" | "stay";
 
+/**
+ * Where the pending change waits between the two pages that carry it out:
+ * the change page quotes and books the new trip, then this key tells the
+ * booking confirmation to actually release the old one, once payment on the
+ * new one clears — never before.
+ */
+export const CHANGE_STORAGE_KEY = "adair.trip-change";
+
+export type PendingChange = {
+  cardId: string;
+  oldTripId: string;
+  kind: ChangeKind;
+  feeEur: number;
+};
+
 /** How the change is carried out. */
 export type ChangeMethod = "supplier-change" | "cancel-and-rebook";
 

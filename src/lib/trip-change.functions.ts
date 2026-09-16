@@ -138,6 +138,8 @@ export type FinaliseChangeResult = {
   refundEur: number;
   differenceEur: number;
   cancelled: number;
+  /** Anything the supplier did not confirm cancelled — empty when everything was. */
+  unfinished: string[];
   documentNumber: string | null;
 };
 

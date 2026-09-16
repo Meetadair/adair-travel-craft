@@ -17,6 +17,8 @@ import { getFlightAncillaries } from "@/lib/ancillaries.functions";
 import { FlightExtras } from "@/components/flight-extras";
 import { ancillariesTotalEur, type AncillarySelection } from "@/lib/trip/ancillaries";
 import { getPaymentSession } from "@/lib/payment.functions";
+import { finaliseTripChange } from "@/lib/trip-change.functions";
+import { CHANGE_STORAGE_KEY, type PendingChange } from "@/lib/trip/change";
 import { PaymentStep, type AuthorisedPayment } from "@/components/payment-step";
 import { TripFeedback } from "@/components/trip/trip-feedback";
 import { saveTripFeedback } from "@/lib/feedback.functions";
@@ -65,6 +67,7 @@ export function BookPage({ cardId }: { cardId: string }) {
   const fetchCard = useServerFn(getTripCard);
   const fetchAccount = useServerFn(getAccount);
   const book = useServerFn(bookTripCard);
+  const finaliseChange = useServerFn(finaliseTripChange);
 
   const card = useQuery({
     queryKey: ["trip-card", cardId],
@@ -116,6 +119,10 @@ export function BookPage({ cardId }: { cardId: string }) {
   const [extras, setExtras] = useState<AncillarySelection[]>([]);
   const [extrasTouched, setExtrasTouched] = useState(false);
   const [result, setResult] = useState<BookingResult | null>(null);
+  /** Set once the old trip behind a "change" has actually been released. */
+  const [changeReleased, setChangeReleased] = useState<{
+    unfinished: string[];
+  } | null>(null);
   const sendFeedback = useServerFn(saveTripFeedback);
   /** "review" = traveller + invoice details, "pay" = card entry. */
   const [step, setStep] = useState<"review" | "pay">("review");
@@ -159,7 +166,36 @@ export function BookPage({ cardId }: { cardId: string }) {
           payment: authorised,
         },
       }),
-    onSuccess: (data) => setResult(data),
+    onSuccess: (data) => {
+      setResult(data);
+      if (data.status === "failed" || !data.tripId) return;
+      let pending: PendingChange | null = null;
+      try {
+        const raw = window.localStorage.getItem(CHANGE_STORAGE_KEY);
+        pending = raw ? (JSON.parse(raw) as PendingChange) : null;
+      } catch {
+        pending = null;
+      }
+      // Only release the old trip once the new one it is replacing is the
+      // one that just got booked — never on an unrelated booking.
+      if (!pending || pending.cardId !== cardId) return;
+      window.localStorage.removeItem(CHANGE_STORAGE_KEY);
+      finaliseChange({
+        data: {
+          oldTripId: pending.oldTripId,
+          newTripId: data.tripId,
+          kind: pending.kind,
+          feeEur: pending.feeEur,
+        },
+      })
+        .then((outcome) => setChangeReleased({ unfinished: outcome.unfinished }))
+        .catch((error) => {
+          console.error("finaliseTripChange failed", error);
+          // The new trip is booked either way; the old one just needs a
+          // human to release it, so we say so rather than staying silent.
+          setChangeReleased({ unfinished: ["your previous booking — contact us to confirm it was released"] });
+        });
+    },
   });
 
   /**
@@ -761,6 +797,14 @@ export function BookPage({ cardId }: { cardId: string }) {
               <p className="mt-2 text-sm text-muted-foreground">
                 The airline price changed from {eur(result.repriced.from)} to{" "}
                 {eur(result.repriced.to)} before we booked.
+              </p>
+            )}
+            {changeReleased && (
+              <p className="mt-2 flex items-start gap-2 text-sm text-muted-foreground">
+                <Check className="mt-0.5 h-4 w-4 shrink-0" />
+                {changeReleased.unfinished.length === 0
+                  ? "Your previous booking has been released."
+                  : `Your previous booking is being released — ${changeReleased.unfinished.join("; ")}.`}
               </p>
             )}
             <ul className="mt-5 space-y-3">
