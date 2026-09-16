@@ -51,6 +51,9 @@ export const Route = createFileRoute("/api/trip/price-context")({
         try {
           const context = await buildPriceContext({
             ...parsed.data,
+            // This endpoint is called with an origin already chosen, so the
+            // chat has nothing left to ask about it.
+            originStated: true,
             stops: [],
           } as TripRequest);
           return Response.json(context, { headers: { "cache-control": "no-store" } });

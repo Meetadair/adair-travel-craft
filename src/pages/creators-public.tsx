@@ -119,7 +119,7 @@ function Calculator() {
           max={40}
           value={tripsPerMonth}
           onChange={(e) => setTripsPerMonth(Number(e.target.value))}
-          className="mt-2 w-full accent-[hsl(var(--primary))]"
+          className="mt-2 w-full accent-primary"
         />
       </label>
 

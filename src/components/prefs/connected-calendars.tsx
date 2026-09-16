@@ -164,7 +164,7 @@ export function ConnectedCalendars() {
                     readAccess.mutate({ provider, enabled: e.currentTarget.checked })
                   }
                   disabled={readAccess.isPending}
-                  className="mt-0.5 size-4 shrink-0 accent-[hsl(var(--primary))]"
+                  className="mt-0.5 size-4 shrink-0 accent-primary"
                 />
                 <span>
                   Let Adair spot trips you’ll need to book — we only look for events with a location

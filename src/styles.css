@@ -2,7 +2,11 @@
 @source "../src";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
+/* Tailwind v4 has no `darkMode` config key: the variant is declared here.
+   `:where(.dark, .dark *)` matches both the <html class="dark"> element
+   itself and everything under it, so `dark:` works on the document root
+   as well as on ordinary elements. */
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
@@ -64,6 +68,51 @@
   --ring: oklch(0.637 0.172 38.5);
   --ink-soft: oklch(0.42 0.02 58);
   --cream-deep: oklch(0.962 0.009 80);
+  color-scheme: light;
+}
+
+/**
+ * Dark ground.
+ *
+ * Derived from the light set rather than invented next to it: the same warm
+ * hue family (yellow-ish 78-86, coral 33-38) with the lightness axis flipped,
+ * so the app reads as the same brand with the lamp turned off. A blue-grey
+ * dark theme would have been quicker and would have looked like someone
+ * else's product.
+ *
+ * The coral is lifted and slightly desaturated — #F05A3C on cream becomes
+ * #F66D50 on near-black — because a saturated coral at full chroma glows on a
+ * dark ground and stops looking like ink on paper. Body text, muted text and
+ * the accent pairs all clear WCAG AA (the lowest is muted-foreground on card
+ * at 6.5:1); `--primary-foreground` becomes the near-black ink rather than
+ * cream, because cream on the lifted coral only reaches 2.9:1.
+ */
+.dark {
+  --background: oklch(0.196 0.007 78); /* #171512 warm near-black */
+  --foreground: oklch(0.944 0.016 86); /* #F1ECE1 warm off-white */
+  --card: oklch(0.235 0.008 78); /* #201E1A one step off the ground */
+  --card-foreground: oklch(0.944 0.016 86);
+  --popover: oklch(0.245 0.008 78); /* #23201C floats above cards */
+  --popover-foreground: oklch(0.944 0.016 86);
+  --primary: oklch(0.697 0.175 33.5); /* #F66D50 coral, lifted for dark */
+  --primary-foreground: oklch(0.196 0.007 78); /* #171512 ink on coral */
+  --secondary: oklch(0.275 0.009 78); /* #2A2723 */
+  --secondary-foreground: oklch(0.885 0.012 84); /* #DDD9D0 */
+  --muted: oklch(0.275 0.009 78);
+  --muted-foreground: oklch(0.715 0.016 80); /* #A8A298 — 7.2:1 on the ground */
+  --accent: oklch(0.295 0.012 60); /* #312B27 */
+  --accent-foreground: oklch(0.905 0.012 80); /* #E4DFD7 */
+  --destructive: oklch(0.665 0.185 26); /* #F05B54 — the light red is too dark here */
+  --destructive-foreground: oklch(0.196 0.007 78);
+  --border: oklch(0.305 0.009 78); /* #322F2A */
+  --input: oklch(0.325 0.009 78); /* #37342F — form edges read a shade stronger */
+  --ring: oklch(0.697 0.175 33.5);
+  --ink-soft: oklch(0.815 0.014 82); /* #C7C2B9 */
+  --cream-deep: oklch(0.225 0.008 80); /* #1E1B18 — the recessed band, still recessed */
+
+  /* Tells the browser to render scrollbars, form controls and the caret dark
+     too, which CSS custom properties alone cannot do. */
+  color-scheme: dark;
 }
 
 @layer base {

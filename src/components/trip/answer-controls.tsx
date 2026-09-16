@@ -203,6 +203,38 @@ export function TimeAnswer({
  * The airport answer: the airports Adair already knows about as chips, then a
  * searchable list of every airport it can fly from.
  */
+/**
+ * A plain set of buttons, for questions whose answers are words rather than
+ * airports: what kind of trip this is, whether a car is wanted, whether there
+ * is something to celebrate. These used to be rendered through the airport
+ * picker, which put "Yes, a car" next to a search box for airports.
+ */
+export function ChoiceAnswer({
+  value,
+  options,
+  onChange,
+}: {
+  value: string | null;
+  options: { label: string; value: string }[];
+  onChange: (value: string) => void;
+}) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      {options.map((option) => (
+        <button
+          key={option.value}
+          type="button"
+          aria-pressed={value === option.value}
+          onClick={() => onChange(option.value)}
+          className={value === option.value ? CHIP_ON : CHIP}
+        >
+          {option.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export function AirportAnswer({
   value,
   suggestions = [],

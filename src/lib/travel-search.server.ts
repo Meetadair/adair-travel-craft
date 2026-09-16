@@ -130,6 +130,7 @@ async function duffelFlightWithChoice(input: TripSearchInput): Promise<TripOffer
   const request: TripRequest = {
     originCity: input.originCity,
     originIata: input.originIata,
+    originStated: true,
     destinationCity: input.destinationCity,
     destinationIata: input.destinationIata,
     lat: 0,
@@ -298,6 +299,7 @@ async function duffelStay(input: TripSearchInput): Promise<TripOffer | null> {
   const request: TripRequest = {
     originCity: input.originCity,
     originIata: input.originIata,
+    originStated: true,
     destinationCity: input.destinationCity,
     destinationIata: input.destinationIata,
     lat: city.lat,

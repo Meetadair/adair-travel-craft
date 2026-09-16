@@ -37,6 +37,7 @@ import { WalletLoyalty } from "@/components/prefs/wallet-loyalty";
 import { NotificationChannel } from "@/components/prefs/notification-channel";
 import { AppFooter } from "@/components/app-footer";
 import { BusinessTrips } from "@/components/prefs/business-trips";
+import { Appearance } from "@/components/prefs/appearance";
 
 const toDraft = (company: Company): CompanyDraft => ({
   name: company.name,
@@ -255,6 +256,8 @@ export function PreferencesPage() {
             <WalletLoyalty />
             <PaymentCards />
             <NotificationChannel />
+
+            <Appearance />
 
             <MyData />
 

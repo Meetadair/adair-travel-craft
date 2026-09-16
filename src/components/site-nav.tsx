@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Globe, Check } from "lucide-react";
 import logoMark from "@/assets/logo-adair.png";
 import { supabase } from "@/integrations/supabase/client";
+import { ThemeNavToggle } from "@/components/theme-toggle";
 import {
   LocaleLink,
   localeHref,
@@ -162,7 +163,15 @@ export function SiteNav() {
     <header className="sticky top-0 z-30 border-b border-border bg-background/85 backdrop-blur">
       <nav className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
         <LocaleLink to="/" locale={locale} className="flex items-center gap-2">
-          <img src={logoMark} alt="Adair" className="h-6 w-auto" loading="eager" />
+          {/* The wordmark is dark ink on a transparent background, so on the dark
+              ground it would all but vanish. Flattening it to black and then
+              inverting gives us the off-white version we have no file for. */}
+          <img
+            src={logoMark}
+            alt="Adair"
+            className="h-6 w-auto dark:opacity-90 dark:brightness-0 dark:invert"
+            loading="eager"
+          />
         </LocaleLink>
         <div className="flex items-center gap-1 sm:gap-2">
           {NAV.map((l) => (
@@ -195,6 +204,7 @@ export function SiteNav() {
               {/* Settings, Invoices, Credit and Help live in the avatar menu. */}
             </>
           )}
+          <ThemeNavToggle />
           <LanguageMenu />
           {signedIn ? (
             <AccountMenu viewer={viewer} />

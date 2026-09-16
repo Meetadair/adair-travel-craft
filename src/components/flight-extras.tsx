@@ -79,9 +79,9 @@ function SeatGrid({
                           onClick={() => option && onToggle(option)}
                           className={`${cellBase} border transition-colors ${
                             isChosen
-                              ? "border-[hsl(var(--primary))] bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))]"
+                              ? "border-primary bg-primary text-primary-foreground"
                               : cell.extraLegroom
-                                ? "border-[hsl(var(--primary))]/40 bg-[hsl(var(--primary))]/5 hover:bg-[hsl(var(--primary))]/10"
+                                ? "border-primary/40 bg-primary/5 hover:bg-primary/10"
                                 : "border-border hover:bg-muted"
                           }`}
                         >

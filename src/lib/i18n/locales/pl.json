@@ -288,7 +288,18 @@
       },
       "needsCar": "Chcesz mieć tam samochód?",
       "returnTime": "O której chcesz wracać?",
-      "airportTransfer": "Zamówić transfer z lotniska?"
+      "airportTransfer": "Zamówić transfer z lotniska?",
+      "origin": "Skąd wylatujesz?",
+      "tripKind": "Co to za wyjazd?",
+      "tripKindWork": "Służbowy",
+      "tripKindSolo": "Sam",
+      "tripKindPartner": "Z partnerką lub partnerem",
+      "tripKindFamily": "Z rodziną",
+      "tripKindFriends": "Ze znajomymi",
+      "occasion": "Jest jakaś okazja?",
+      "occasionAnniversary": "Rocznica",
+      "occasionBirthday": "Urodziny",
+      "occasionNone": "Nie, zwykły wyjazd"
     },
     "advice": {
       "tightFlight": "Ten lot ląduje o {land}, a spotkanie jest o {meeting} — mało czasu. Lot o {alt} daje {spare} zapasu za dodatkowe {extra}.",

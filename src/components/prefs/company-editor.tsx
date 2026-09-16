@@ -163,7 +163,7 @@ function CompanyForm({
           type="checkbox"
           checked={draft.isDefault}
           onChange={(e) => set({ isDefault: e.target.checked })}
-          className="size-4 accent-[hsl(var(--primary))]"
+          className="size-4 accent-primary"
         />
         Default company
       </label>

@@ -286,7 +286,7 @@ export function TripDates({
                 ...(value?.flexDays === 3 ? {} : { flexDays: 3 }),
               })
             }
-            className="size-4 accent-[hsl(var(--primary))]"
+            className="size-4 accent-primary"
           />
           <span className={value?.flexDays === 3 ? "text-foreground" : "text-muted-foreground"}>
             {copy.flexible}

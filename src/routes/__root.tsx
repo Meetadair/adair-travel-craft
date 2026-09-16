@@ -13,6 +13,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { htmlLang, isLocale } from "@/lib/i18n";
 import { CookieNotice } from "@/components/cookie-notice";
+import { ThemeProvider, themeBootstrapScript } from "@/lib/theme";
 
 function NotFoundComponent() {
   return (
@@ -106,6 +107,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      // Updated in place by the theme bootstrap script and by ThemeProvider,
+      // so the mobile address bar follows the page rather than staying cream.
       { name: "theme-color", content: "#FBF8F2" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-title", content: "Adair" },
@@ -140,9 +143,16 @@ function RootShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const first = pathname.split("/")[1];
   return (
-    <html lang={htmlLang(isLocale(first) ? first : "en")}>
+    // The bootstrap script below adds `dark` to this element before React sees
+    // it, so the class it renders and the class in the DOM will differ on a
+    // dark device. That is the point of the script, not a bug to be fixed.
+    <html lang={htmlLang(isLocale(first) ? first : "en")} suppressHydrationWarning>
       <head>
         <HeadContent />
+        {/* Runs before the body is parsed, so the first painted frame is
+            already in the right theme. Anything slower than this shows the
+            cream page for a moment on every load. */}
+        <script dangerouslySetInnerHTML={{ __html: themeBootstrapScript }} />
       </head>
       <body>
         {children}
@@ -166,10 +176,12 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
-      {/* Asked once, on whatever page they arrive at. */}
-      <CookieNotice />
+      <ThemeProvider>
+        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+        <Outlet />
+        {/* Asked once, on whatever page they arrive at. */}
+        <CookieNotice />
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }

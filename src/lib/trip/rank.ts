@@ -5,6 +5,7 @@
 import { brandWords } from "@/lib/brands/catalogue";
 import type { TravelPrefs } from "@/lib/prefs/questions";
 import type { Learned } from "@/lib/trip/learning";
+import type { TripOccasion, TripParty, TripPurpose } from "@/lib/trip/types";
 
 /** Search-time subset of the preferences, safe to pass into server search. */
 export type SearchPrefs = Pick<
@@ -224,13 +225,120 @@ function avoided(text: string, kind: "flight" | "hotel" | "car", prefs?: SearchP
 }
 
 /** Higher is better. Chain and star matches outweigh a small price difference. */
+/**
+ * What the trip is for, as far as the hotel is concerned.
+ *
+ * The same two people, the same city, the same nights: a board meeting wants a
+ * predictable desk near the office and a quiet early night, an anniversary
+ * wants somewhere worth arriving at. Ranking on price and star rating alone
+ * answers both with the same hotel, and is wrong for at least one of them.
+ */
+export type TripStyle = {
+  purpose?: TripPurpose | null;
+  party?: TripParty | null;
+  occasion?: TripOccasion | null;
+};
+
+/** Words suppliers actually put in property names, grouped by what they signal. */
+const STYLE_WORDS = {
+  business: [
+    "business",
+    "executive",
+    "courtyard",
+    "express",
+    "garden inn",
+    "novotel",
+    "mercure",
+    "crowne",
+    "hyatt place",
+    "moxy",
+    "aparthotel",
+  ],
+  special: [
+    "boutique",
+    "design",
+    "relais",
+    "chateau",
+    "château",
+    "palace",
+    "small luxury",
+    "suite",
+    "spa",
+    "grand hotel",
+    "belmond",
+    "rosewood",
+    "aman",
+    "st. regis",
+    "four seasons",
+    "mandarin",
+    "bulgari",
+  ],
+  family: ["apartment", "residence", "suites", "family", "aparthotel", "resort"],
+} as const;
+
+const mentions = (name: string, words: readonly string[]) => {
+  const text = fold(name);
+  return words.some((word) => text.includes(fold(word)));
+};
+
+/**
+ * Nudges the score by what this trip is, never by more than a stated
+ * preference would: the traveller's own settings still outrank the occasion.
+ */
+export function styleScore(name: string, rating: number | null, style?: TripStyle): number {
+  if (!style?.purpose) return 0;
+  let score = 0;
+
+  if (style.purpose === "business") {
+    if (mentions(name, STYLE_WORDS.business)) score += 3;
+    // A spa resort is not where anyone wants to be at 7am before a meeting.
+    if (mentions(name, STYLE_WORDS.special)) score -= 1;
+    // Predictability is the point: a well-rated known quantity beats a find.
+    if (rating != null && rating >= 4) score += 1;
+    return score;
+  }
+
+  const celebrating =
+    style.occasion === "anniversary" ||
+    style.occasion === "birthday" ||
+    style.occasion === "honeymoon";
+
+  if (style.party === "partner") {
+    if (mentions(name, STYLE_WORDS.special)) score += celebrating ? 5 : 2;
+    if (mentions(name, STYLE_WORDS.business)) score -= celebrating ? 3 : 1;
+    // On a trip someone is marking, the best room in the city matters more
+    // than the last forty euro.
+    if (celebrating && rating != null && rating >= 4.5) score += 3;
+  }
+
+  if (style.party === "family") {
+    if (mentions(name, STYLE_WORDS.family)) score += 4;
+    if (mentions(name, STYLE_WORDS.business)) score -= 1;
+  }
+
+  if (style.party === "friends" && mentions(name, STYLE_WORDS.family)) score += 2;
+
+  return score;
+}
+
 export function stayScore(
   name: string,
   rating: number | null,
   amount: number,
   prefs?: SearchPrefs,
+  style?: TripStyle,
 ): number {
-  let score = (rating ?? 0) * 2 - (amount / 500) * (prefs?.learned?.priceWeight ?? 1);
+  // A celebration is the one case where price should push less hard: someone
+  // marking an anniversary is not shopping for the cheapest bed in the city.
+  const celebrating =
+    style?.purpose === "personal" &&
+    style.party === "partner" &&
+    (style.occasion === "anniversary" ||
+      style.occasion === "birthday" ||
+      style.occasion === "honeymoon");
+  const priceWeight = (prefs?.learned?.priceWeight ?? 1) * (celebrating ? 0.6 : 1);
+
+  let score = (rating ?? 0) * 2 - (amount / 500) * priceWeight + styleScore(name, rating, style);
   if (!prefs) return score;
   if (avoided(name, "hotel", prefs)) score -= 5;
   if (prefs.hotelChains.length && anySelected(name, prefs.hotelChains, CHAIN_WORDS)) score += 6;

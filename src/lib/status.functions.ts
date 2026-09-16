@@ -25,6 +25,7 @@ export const getSystemStatus = createServerFn({ method: "GET" })
       const probe = {
         originCity: "Warsaw",
         originIata: "WAW",
+        originStated: true,
         destinationCity: "Milan",
         destinationIata: "LIN",
         lat: 45.464,

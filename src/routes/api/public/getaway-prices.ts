@@ -73,6 +73,7 @@ async function run(request: Request): Promise<Response> {
           const result = await searchFlight({
             originCity: origin,
             originIata: origin,
+            originStated: true,
             destinationCity: dest.name,
             destinationIata: dest.nearest_airport_iata,
             lat: Number(dest.latitude),

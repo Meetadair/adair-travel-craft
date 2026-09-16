@@ -8,7 +8,8 @@
  * Pure and browser-safe; the chat and the tests read the same rules.
  */
 import { AIRPORT_COORDS } from "./airport-geo";
-import type { TripRequest } from "./types";
+import { airportByIata } from "@/lib/prefs/airports";
+import type { TripOccasion, TripParty, TripPurpose, TripRequest } from "./types";
 
 /** Which picker a field opens when tapped. */
 export type PickerKind =
@@ -136,6 +137,14 @@ export type TripOverrides = {
   cabinClass?: string | undefined;
   /** Explicitly false collapses a one-way back into a return trip. */
   oneWay?: boolean | undefined;
+  /** Work or private, as answered in the chat. */
+  purpose?: TripPurpose | undefined;
+  /** Who is coming, as answered in the chat. */
+  party?: TripParty | undefined;
+  /** A celebration, as answered in the chat. */
+  occasion?: TripOccasion | undefined;
+  /** Answered either way in the chat; false is a real answer, not silence. */
+  needsCar?: boolean | undefined;
 };
 
 /** The request as the traveller corrected it. */
@@ -150,7 +159,32 @@ export function applyOverrides(request: TripRequest, overrides: TripOverrides): 
   // Tested against undefined, not truthiness: turning a one-way back into a
   // return trip means sending false, and `if (false)` would drop it silently.
   if (overrides.oneWay !== undefined) next.oneWay = overrides.oneWay;
-  if (overrides.originIata) next.originIata = overrides.originIata.toUpperCase();
+  if (overrides.originIata) {
+    const iata = overrides.originIata.toUpperCase();
+    next.originIata = iata;
+    // Answering the question is what makes the origin real: the flag stops the
+    // chat asking again, and the city name has to follow the code or the card
+    // would still print whichever city the fallback had invented.
+    next.originStated = true;
+    const airport = airportByIata(iata);
+    if (airport) next.originCity = airport.city;
+    const coords = AIRPORT_COORDS[iata];
+    next.stops = next.stops.length
+      ? [
+          {
+            city: airport?.city ?? next.originCity,
+            iata,
+            lat: coords?.lat ?? next.stops[0]!.lat,
+            lon: coords?.lon ?? next.stops[0]!.lon,
+          },
+          ...next.stops.slice(1),
+        ]
+      : next.stops;
+  }
+  if (overrides.purpose) next.purpose = overrides.purpose;
+  if (overrides.party) next.party = overrides.party;
+  if (overrides.occasion) next.occasion = overrides.occasion;
+  if (overrides.needsCar !== undefined) next.needsCar = overrides.needsCar;
   if (overrides.destinationIata) {
     const iata = overrides.destinationIata.toUpperCase();
     next.destinationIata = iata;

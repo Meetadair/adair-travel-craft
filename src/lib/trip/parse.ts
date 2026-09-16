@@ -8,7 +8,7 @@ import { CITIES, DEFAULT_ORIGIN, findCity, type CityEntry } from "./cities";
 import { airportByIata } from "@/lib/prefs/airports";
 import { passengersFromSentence } from "./passengers";
 import { familyFromSentence } from "./family";
-import type { TripRequest, TripStop } from "./types";
+import type { TripOccasion, TripParty, TripRequest, TripStop } from "./types";
 
 /** Weekday match terms, index 0 = Monday. */
 const WEEKDAYS: string[][] = [
@@ -145,19 +145,75 @@ function homeAirportEntry(iata: string | undefined): CityEntry | null {
   return { city: airport.city, iata: airport.iata, lat: 0, lon: 0, aliases: [] };
 }
 
-function originOf(text: string, destination: CityEntry, homeIata?: string): CityEntry {
-  // "from Berlin", "z Warszawy" — otherwise the saved home airport.
+/**
+ * Where the journey starts, and whether anyone actually said so.
+ *
+ * The fallback at the bottom exists because every field downstream expects an
+ * origin to be present, not because a default is a reasonable answer. It is
+ * flagged as unstated so the chat asks before a search runs: the departure
+ * airport decides the price, the route and whether the trip is possible at all,
+ * and inventing it quietly is how someone ends up holding a ticket from a city
+ * they have never been to.
+ */
+function originOf(
+  text: string,
+  destination: CityEntry,
+  homeIata?: string,
+): { entry: CityEntry; stated: boolean } {
+  // "from Berlin", "z Warszawy" — the traveller said it in the sentence.
   const fromMatch = /\b(?:from|out of|z|ze)\s+([\p{L}\s-]{3,24})/u.exec(text);
   if (fromMatch?.[1]) {
     const found = findCity(fromMatch[1].toLowerCase(), destination.iata);
-    if (found) return found;
+    if (found) return { entry: found, stated: true };
   }
+  // On file from an earlier trip: told to us once, still true.
   const home = homeAirportEntry(homeIata);
-  if (home && home.iata !== destination.iata) return home;
+  if (home && home.iata !== destination.iata) return { entry: home, stated: true };
+
   if (destination.iata === DEFAULT_ORIGIN.iata) {
-    return CITIES.find((c) => c.iata === "BER")!;
+    return { entry: CITIES.find((c) => c.iata === "BER")!, stated: false };
   }
-  return DEFAULT_ORIGIN;
+  return { entry: DEFAULT_ORIGIN, stated: false };
+}
+
+const BUSINESS_WORDS =
+  /\b(meeting|meetings|conference|congress|client|customer|board|interview|kick-?off|workshop|trade fair|business|work trip|on business|invoice|vat)\b|spotkani|konferencj|klient|delegacj|faktur|s[łl]u[żz]bow/i;
+
+const PARTNER_WORDS =
+  /\b(my (wife|husband|partner|girlfriend|boyfriend)|with my (wife|husband|partner)|romantic|just the two of us)\b|z (żoną|zona|mężem|mezem|partnerką|partnerka|dziewczyną|narzeczoną)/i;
+
+const FAMILY_WORDS = /\b(family|kids|children|my son|my daughter)\b|rodzin|dzie[ćc]mi|z dzie[ćc]mi/i;
+
+const FRIENDS_WORDS = /\b(friends|mates|stag|hen)\b|znajomymi|przyjaci[óo][łl]mi/i;
+
+const COLLEAGUES_WORDS = /\b(colleagues|the team|coworkers)\b|zespo[łl]em|wsp[óo][łl]pracownik/i;
+
+/**
+ * The purpose only when the sentence is unambiguous about it. Silence is not
+ * an answer here: it is the reason the chat asks.
+ */
+export function purposeOf(sentence: string): "business" | "personal" | null {
+  if (BUSINESS_WORDS.test(sentence)) return "business";
+  if (PARTNER_WORDS.test(sentence) || FAMILY_WORDS.test(sentence)) return "personal";
+  return null;
+}
+
+/** Who they are going with, when the sentence names it. */
+export function partyOf(sentence: string): TripParty | null {
+  if (PARTNER_WORDS.test(sentence)) return "partner";
+  if (FAMILY_WORDS.test(sentence)) return "family";
+  if (FRIENDS_WORDS.test(sentence)) return "friends";
+  if (COLLEAGUES_WORDS.test(sentence)) return "colleagues";
+  if (/\b(solo|alone|just me|by myself)\b|sam[ao]?\b/i.test(sentence)) return "solo";
+  return null;
+}
+
+/** A celebration named outright — the one case worth changing the hotel for. */
+export function occasionOf(sentence: string): TripOccasion | null {
+  if (/anniversar|rocznic/i.test(sentence)) return "anniversary";
+  if (/birthday|urodzin/i.test(sentence)) return "birthday";
+  if (/honeymoon|miesi[ąa]c miodowy|podr[óo][żz] po[śs]lubn/i.test(sentence)) return "honeymoon";
+  return null;
 }
 
 /**
@@ -365,7 +421,8 @@ export function parseTripSentence(
   const destinations = findCitiesInOrder(text);
   const destination = destinations[0] ?? findCity(text);
   if (!destination) return null;
-  const origin = originOf(text, destination, homeAirportIata);
+  const originHit = originOf(text, destination, homeAirportIata);
+  const origin = originHit.entry;
 
   // Weekday hits, in the order they appear in the sentence.
   const hits: { index: number; at: number }[] = [];
@@ -441,6 +498,7 @@ export function parseTripSentence(
   return {
     originCity: origin.city,
     originIata: origin.iata,
+    originStated: originHit.stated,
     destinationCity: destination.city,
     destinationIata: destination.iata,
     lat: destination.lat,
@@ -465,6 +523,11 @@ export function parseTripSentence(
     mustDepartBy,
     meetingLocation: meetingLocationOf(sentence) ?? hotelWishOf(sentence),
     invoiceToCompany: /invoice|company|vat|faktur|firm|rechnung|societ|empresa/.test(text),
+    // Read from the sentence only where it is explicit. Everything still null
+    // here is a question the chat asks rather than an assumption it makes.
+    purpose: purposeOf(sentence),
+    party: partyOf(sentence),
+    occasion: occasionOf(sentence),
     stops,
   };
 }

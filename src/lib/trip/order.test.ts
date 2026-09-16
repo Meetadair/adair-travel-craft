@@ -9,6 +9,7 @@ const request = (city: string): TripRequest =>
   ({
     originCity: "Warsaw",
     originIata: "WAW",
+    originStated: true,
     destinationCity: city,
     destinationIata: city ? "LIN" : "",
     departDate: "2026-10-18",
@@ -40,10 +41,17 @@ describe("question order", () => {
     expect(questions.map((q) => q.kind)).toEqual(["destination"]);
   });
 
-  it("asks who's travelling first, then dates before the arrival time", () => {
+  it("settles what kind of trip it is, then who is coming, then the dates", () => {
     const questions = chatQuestions("Milan for a client meeting", request("Milan"));
     const kinds = questions.map((q) => q.kind);
-    expect(kinds[0]).toBe("travellers");
+    expect(kinds[0]).toBe("trip_kind");
+    expect(kinds.indexOf("travellers")).toBeLessThan(kinds.indexOf("dates"));
+  });
+
+  it("does not ask what kind of trip it is once the answer is on the request", () => {
+    const answered = { ...request("Milan"), purpose: "business" as const };
+    const kinds = chatQuestions("Milan for a client meeting", answered).map((q) => q.kind);
+    expect(kinds).not.toContain("trip_kind");
     expect(kinds.indexOf("dates")).toBeLessThan(kinds.indexOf("arrival_time"));
   });
 });

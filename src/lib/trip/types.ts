@@ -8,9 +8,37 @@ export type TripStop = {
   lon: number;
 };
 
+/**
+ * Why the trip is happening. This is not decoration: a board meeting and a
+ * wedding anniversary in the same city, on the same dates, for the same two
+ * people are different trips, and a hotel chosen for one is the wrong answer
+ * for the other.
+ */
+export type TripPurpose = "business" | "personal";
+
+/** Who the traveller is going with — it decides the room as much as the hotel. */
+export type TripParty = "solo" | "partner" | "family" | "friends" | "colleagues";
+
+/** A reason worth marking, when there is one. */
+export type TripOccasion = "anniversary" | "birthday" | "honeymoon" | "none";
+
 export type TripRequest = {
   originCity: string;
   originIata: string;
+  /**
+   * True only when the origin is something we were actually told: named in the
+   * sentence, or saved as the traveller's home airport. False means the two
+   * fields above are a fallback the code invented, and the chat has to ask
+   * before anything is searched — guessing the city someone departs from is
+   * guessing the ticket they pay for.
+   */
+  originStated: boolean;
+  /** Work or private, once the traveller has said which. Never inferred alone. */
+  purpose?: TripPurpose | null;
+  /** Who is coming, in the sense that changes the hotel, not the headcount. */
+  party?: TripParty | null;
+  /** Set only for a trip with a partner, where celebrating changes the choice. */
+  occasion?: TripOccasion | null;
   destinationCity: string;
   destinationIata: string;
   /** Destination centre coordinates, used for the stays search. */

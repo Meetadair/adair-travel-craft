@@ -46,6 +46,7 @@ import {
   stayScore,
   staysPassingDealbreakers,
   type SearchPrefs,
+  type TripStyle,
 } from "@/lib/trip/rank";
 import {
   DEFAULT_PLANNING_RULES,
@@ -473,6 +474,13 @@ export async function searchStay(
   prefs?: SearchPrefs,
 ): Promise<StaySearchOutcome> {
   const sample = usesTestInventory();
+  // What the traveller answered about this trip, carried into the ranking so a
+  // work stay and an anniversary do not come back with the same hotel.
+  const style: TripStyle = {
+    purpose: req.purpose ?? null,
+    party: req.party ?? null,
+    occasion: req.occasion ?? null,
+  };
   const json = await duffel<{ data?: { results?: DuffelStay[] } }>("/stays/search", {
     data: {
       check_in_date: req.departDate,
@@ -643,8 +651,8 @@ export async function searchStay(
     .slice()
     .sort(
       (a, b) =>
-        stayScore(b.rawName, b.result.rating, b.result.amount, prefs) -
-        stayScore(a.rawName, a.result.rating, a.result.amount, prefs),
+        stayScore(b.rawName, b.result.rating, b.result.amount, prefs, style) -
+        stayScore(a.rawName, a.result.rating, a.result.amount, prefs, style),
     )[0]!;
 
   // Keep the next best few so the traveller can swap without a new search.
@@ -653,8 +661,8 @@ export async function searchStay(
     .slice()
     .sort(
       (a, b) =>
-        stayScore(b.rawName, b.result.rating, b.result.amount, prefs) -
-        stayScore(a.rawName, a.result.rating, a.result.amount, prefs),
+        stayScore(b.rawName, b.result.rating, b.result.amount, prefs, style) -
+        stayScore(a.rawName, a.result.rating, a.result.amount, prefs, style),
     )
     .slice(0, 3)
     .map((m) => m.result);

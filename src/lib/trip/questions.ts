@@ -11,6 +11,9 @@ import type { TripRequest } from "./types";
 
 export type ChatQuestionKind =
   | "destination"
+  | "origin"
+  | "trip_kind"
+  | "occasion"
   | "dates"
   | "arrival_time"
   | "child_ages"
@@ -25,7 +28,7 @@ export type ChatQuestion = {
   /** One short question, in the chat. */
   question: string;
   /** The control shown under it. */
-  control: "calendar" | "time" | "ages" | "options" | "travellers" | "destination";
+  control: "calendar" | "time" | "ages" | "options" | "travellers" | "destination" | "airport" | "choice";
   /** Buttons, for the options control. */
   options: { label: string; value: string }[];
   /** Essential questions block the search; the others only add an assumption. */
@@ -34,6 +37,17 @@ export type ChatQuestion = {
 
 export type QuestionCopy = {
   destination: string;
+  origin: string;
+  tripKind: string;
+  tripKindWork: string;
+  tripKindSolo: string;
+  tripKindPartner: string;
+  tripKindFamily: string;
+  tripKindFriends: string;
+  occasion: string;
+  occasionAnniversary: string;
+  occasionBirthday: string;
+  occasionNone: string;
   travellers: string;
   dates: string;
   arrivalTime: string;
@@ -45,6 +59,17 @@ export type QuestionCopy = {
 
 export const QUESTION_COPY: QuestionCopy = {
   destination: "Where are you going?",
+  origin: "Where are you flying from?",
+  tripKind: "What kind of trip is this?",
+  tripKindWork: "Work",
+  tripKindSolo: "Just me",
+  tripKindPartner: "With my partner",
+  tripKindFamily: "With family",
+  tripKindFriends: "With friends",
+  occasion: "Anything to celebrate?",
+  occasionAnniversary: "An anniversary",
+  occasionBirthday: "A birthday",
+  occasionNone: "No, just a trip",
   travellers: "Flying solo, or with others?",
   dates: "Which dates?",
   arrivalTime: "What time do you need to be there?",
@@ -69,6 +94,11 @@ const BUSINESS_TERMS =
 
 /** True when the trip is for work: a business trip needs an arrival time. */
 export function isBusinessSentence(sentence: string, request?: TripRequest | null): boolean {
+  // What the traveller answered outranks anything guessed from wording: an
+  // answered "Work" is the fact, and an answered "With my partner" means the
+  // word "client" somewhere in the sentence does not make it a business trip.
+  if (request?.purpose === "business") return true;
+  if (request?.purpose === "personal") return false;
   if (request?.invoiceToCompany) return true;
   if (request?.meetingLocation) return true;
   return BUSINESS_TERMS.test(sentence);
@@ -79,7 +109,13 @@ export type QuestionContext = {
   knownAirports?: string[];
   /** Kinds already answered in this conversation. */
   answered?: ChatQuestionKind[];
-  copy?: QuestionCopy;
+  /**
+   * Locale strings. Partial on purpose: there is no fallback merging in the
+   * dictionaries, so a question added here would render as blank space in the
+   * thirteen locales that have not been translated yet. Missing keys fall back
+   * to the English above instead.
+   */
+  copy?: Partial<QuestionCopy>;
   /**
    * What we already know about this traveller, so we stop asking it.
    *
@@ -131,7 +167,7 @@ export function chatQuestions(
   request: TripRequest,
   context: QuestionContext = {},
 ): ChatQuestion[] {
-  const copy = context.copy ?? QUESTION_COPY;
+  const copy: QuestionCopy = { ...QUESTION_COPY, ...(context.copy ?? {}) };
   const answered = context.answered ?? [];
   const out: ChatQuestion[] = [];
 
@@ -148,6 +184,63 @@ export function chatQuestions(
     ];
   }
 
+  // Where they are flying from. The parse always fills an origin because a
+  // hundred fields downstream need one, but `originStated` says whether anyone
+  // ever told us — and if not, this is the first thing we ask. A guessed
+  // departure airport is a guessed price, a guessed route and, often, a trip
+  // that cannot be flown at all.
+  if (!request.originStated && !answered.includes("origin")) {
+    out.push({
+      kind: "origin",
+      question: copy.origin,
+      control: "airport",
+      options: [],
+      essential: true,
+    });
+  }
+
+  // What kind of trip it is. One answer settles two things that change the
+  // result — work or private, and who is coming — and it is asked rather than
+  // sniffed out of the wording, because "a nice option in Paris" contains no
+  // clue either way and a wrong guess picks the wrong hotel in silence.
+  if (!request.purpose && !answered.includes("trip_kind")) {
+    out.push({
+      kind: "trip_kind",
+      question: copy.tripKind,
+      control: "choice",
+      options: [
+        { label: copy.tripKindWork, value: "business trip" },
+        { label: copy.tripKindSolo, value: "solo" },
+        { label: copy.tripKindPartner, value: "with my partner" },
+        { label: copy.tripKindFamily, value: "with family" },
+        { label: copy.tripKindFriends, value: "with friends" },
+      ],
+      essential: true,
+    });
+  }
+
+  // Only for a trip with a partner, and only once. A hotel for an anniversary
+  // is a different hotel, and this is the one question that finds that out
+  // without interrogating anybody about their private life.
+  if (
+    request.purpose === "personal" &&
+    request.party === "partner" &&
+    !request.occasion &&
+    !answered.includes("occasion")
+  ) {
+    out.push({
+      kind: "occasion",
+      question: copy.occasion,
+      control: "choice",
+      options: [
+        { label: copy.occasionAnniversary, value: "for our anniversary" },
+        { label: copy.occasionBirthday, value: "for a birthday" },
+        { label: copy.occasionNone, value: "no occasion" },
+      ],
+      essential: false,
+    });
+  }
+
   const ages = ageQuestion(familyFromSentence(sentence));
   if (ages && !answered.includes("child_ages")) {
     out.push({ kind: "child_ages", question: ages, control: "ages", options: [], essential: true });
@@ -157,7 +250,11 @@ export function chatQuestions(
   // needs a second bed. Skipped only once the sentence has actually settled
   // it (a number, "solo", one named companion); "with my family" on its own
   // is exactly the vague case this question exists to resolve.
-  if (!travellersStated(sentence) && !answered.includes("travellers")) {
+  if (
+    !travellersStated(sentence) &&
+    request.party !== "solo" &&
+    !answered.includes("travellers")
+  ) {
     out.push({
       kind: "travellers",
       question: copy.travellers,
@@ -232,7 +329,7 @@ export function chatQuestions(
     out.push({
       kind: "needs_car",
       question: copy.needsCar,
-      control: "options",
+      control: "choice",
       options: [
         { label: "Yes, a car", value: "car" },
         { label: "No car", value: "no car" },
@@ -251,7 +348,7 @@ export function chatQuestions(
     out.push({
       kind: "airport_transfer",
       question: copy.airportTransfer,
-      control: "options",
+      control: "choice",
       options: [
         { label: "Yes, please", value: "with a transfer from the airport" },
         { label: "I'll sort it", value: "no transfer" },
@@ -278,14 +375,17 @@ export function chatQuestions(
   // Destination, then dates, then the arrival time, then anything else.
   const rank: Record<ChatQuestionKind, number> = {
     destination: 0,
-    travellers: 1,
-    dates: 2,
-    arrival_time: 3,
-    child_ages: 4,
-    which_airport: 5,
-    needs_car: 6,
-    return_time: 7,
-    airport_transfer: 8,
+    origin: 1,
+    trip_kind: 2,
+    travellers: 3,
+    dates: 4,
+    child_ages: 5,
+    arrival_time: 6,
+    occasion: 7,
+    which_airport: 8,
+    needs_car: 9,
+    return_time: 10,
+    airport_transfer: 11,
   };
   const profile = context.known ?? {};
 
@@ -296,9 +396,19 @@ export function chatQuestions(
     return true;
   });
 
-  return worthAsking
-    .sort((a, b) => Number(b.essential) - Number(a.essential) || rank[a.kind] - rank[b.kind])
-    .slice(0, questionBudget(profile));
+  const ordered = worthAsking.sort(
+    (a, b) => Number(b.essential) - Number(a.essential) || rank[a.kind] - rank[b.kind],
+  );
+
+  // The budget shortens the conversation; it must never shorten it past the
+  // point of correctness. Slicing the list blindly could drop an essential
+  // question off the end, and `essentialsMet` — which reads this same list —
+  // would then wave the search through without an answer it needs. So the
+  // essentials are all kept, and the budget is spent on what is left.
+  const essential = ordered.filter((question) => question.essential);
+  const optional = ordered.filter((question) => !question.essential);
+  const room = Math.max(questionBudget(profile) - essential.length, 0);
+  return [...essential, ...optional.slice(0, room)];
 }
 
 /** True when nothing essential is missing, so the search may run. */

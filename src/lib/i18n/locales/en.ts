@@ -242,6 +242,17 @@ export const en = {
     // The one or two things Adair asks before searching.
     questions: {
       destination: "Where are you going?",
+      origin: "Where are you flying from?",
+      tripKind: "What kind of trip is this?",
+      tripKindWork: "Work",
+      tripKindSolo: "Just me",
+      tripKindPartner: "With my partner",
+      tripKindFamily: "With family",
+      tripKindFriends: "With friends",
+      occasion: "Anything to celebrate?",
+      occasionAnniversary: "An anniversary",
+      occasionBirthday: "A birthday",
+      occasionNone: "No, just a trip",
       dates: "Which dates?",
       arrivalTime: "What time do you need to be there?",
       whichAirport: "{city} has more than one airport. Which one?",

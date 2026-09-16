@@ -71,6 +71,9 @@ import {
 import type { PriceContext, TripSearchResponse } from "@/lib/trip/types";
 import { AppFooter } from "@/components/app-footer";
 
+/** Where this browser remembers the traveller flies from. */
+const HOME_AIRPORT_KEY = "adair-home-airport";
+
 type Submission = { sentence: string; key: number };
 
 const ghostButton =
@@ -764,9 +767,22 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
   // ---- What Adair understood, and what it still needs to ask -------------
   const a = t.assistant;
   const pendingSentence = pending ? pending.sentence.trim() || d.userMessage : "";
+  // The departure airport is asked once and then remembered, which is the only
+  // reason asking it is acceptable at all: a question that returns on every
+  // trip is a worse experience than the guess it replaced.
+  const [homeAirport, setHomeAirport] = useState<string | undefined>(undefined);
+  useEffect(() => {
+    try {
+      const saved = window.localStorage.getItem(HOME_AIRPORT_KEY);
+      if (saved) setHomeAirport(saved.toUpperCase());
+    } catch {
+      /* private browsing — we ask again, which is safe, just not as quick */
+    }
+  }, []);
+
   const pendingRequest = useMemo(
-    () => (pendingSentence ? parseTripSentence(pendingSentence) : null),
-    [pendingSentence],
+    () => (pendingSentence ? parseTripSentence(pendingSentence, undefined, homeAirport) : null),
+    [pendingSentence, homeAirport],
   );
   const effectiveRequest = pendingRequest ? applyOverrides(pendingRequest, overrides) : null;
   const understanding =
@@ -785,6 +801,48 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
       if (kind === "which_airport" && typeof value === "string")
         return { ...prev, destinationIata: value };
       if (kind === "child_ages" && Array.isArray(value)) return { ...prev, childAges: value };
+      if (kind === "origin" && typeof value === "string") {
+        const code = value.toUpperCase();
+        try {
+          window.localStorage.setItem(HOME_AIRPORT_KEY, code);
+        } catch {
+          /* nothing to do: the answer still applies to this trip */
+        }
+        setHomeAirport(code);
+        return { ...prev, originIata: code };
+      }
+      // The headcount used to be collected and then dropped on the floor: the
+      // control reported it, the question was marked answered, and the search
+      // still ran for whatever the sentence had implied.
+      if (kind === "travellers" && typeof value === "string") {
+        const count = Number(value);
+        return Number.isFinite(count) && count > 0 ? { ...prev, passengers: count } : prev;
+      }
+      if (kind === "needs_car" && typeof value === "string")
+        return { ...prev, needsCar: value === "car" };
+      // One answer, two facts: whether this is work, and who is coming. Both
+      // change the hotel, so both are recorded rather than re-derived later.
+      if (kind === "trip_kind" && typeof value === "string") {
+        if (value.includes("business"))
+          return { ...prev, purpose: "business" as const, party: "colleagues" as const };
+        const party = value.includes("partner")
+          ? ("partner" as const)
+          : value.includes("family")
+            ? ("family" as const)
+            : value.includes("friends")
+              ? ("friends" as const)
+              : ("solo" as const);
+        return { ...prev, purpose: "personal" as const, party };
+      }
+      if (kind === "occasion" && typeof value === "string")
+        return {
+          ...prev,
+          occasion: value.includes("anniversary")
+            ? ("anniversary" as const)
+            : value.includes("birthday")
+              ? ("birthday" as const)
+              : ("none" as const),
+        };
       return prev;
     });
     setAnswered((prev) => (prev.includes(kind) ? prev : [...prev, kind]));

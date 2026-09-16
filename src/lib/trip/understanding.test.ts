@@ -69,6 +69,7 @@ describe("overrides the traveller set on the card", () => {
   const base = {
     originCity: "Warsaw",
     originIata: "WAW",
+    originStated: true,
     destinationCity: "Lisbon",
     destinationIata: "LIS",
     departDate: "2026-10-20",

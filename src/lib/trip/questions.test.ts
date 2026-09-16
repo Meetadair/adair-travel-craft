@@ -36,13 +36,20 @@ describe("chat questions", () => {
     expect(dates?.control).toBe("calendar");
   });
 
-  it("asks who's travelling before it asks the dates, on a bare sentence", () => {
+  it("asks what kind of trip it is first, then who is coming, then the dates", () => {
+    // What kind of trip it is leads, because the answer decides the rest: a
+    // work trip needs an arrival time, someone travelling alone has already
+    // answered the headcount, and a trip with a partner opens the one question
+    // about an occasion. Asking it after the dates would mean asking the other
+    // questions before knowing which of them matter.
     const sentence = "I need to get to Vienna";
     const questions = chatQuestions(sentence, req(sentence));
-    expect(questions[0]?.kind).toBe("travellers");
-    expect(questions[0]?.control).toBe("travellers");
+    const kinds = questions.map((q) => q.kind);
+    expect(questions[0]?.kind).toBe("trip_kind");
+    expect(questions[0]?.control).toBe("choice");
     expect(questions[0]?.essential).toBe(true);
-    expect(questions.some((q) => q.kind === "dates")).toBe(true);
+    expect(kinds.indexOf("travellers")).toBeLessThan(kinds.indexOf("dates"));
+    expect(kinds).toContain("dates");
   });
 
   it("does not ask who's travelling once the sentence already says", () => {
@@ -108,6 +115,7 @@ describe("questions beyond the essentials", () => {
   const request = {
     originCity: "Warsaw",
     originIata: "WAW",
+    originStated: true,
     destinationCity: "Milan",
     destinationIata: "MXP",
     lat: 45.46,
@@ -121,6 +129,10 @@ describe("questions beyond the essentials", () => {
     carNameExact: null,
     invoiceToCompany: false,
     needsCar: false,
+    // Answered already: these cases are about what Adair asks *after* the
+    // essentials, so the essentials must not still be open.
+    purpose: "personal" as const,
+    party: "friends" as const,
     stops: [],
   };
 
@@ -160,8 +172,11 @@ describe("questions beyond the essentials", () => {
   it("asks a business traveller when they want to come home — after the essentials", () => {
     // The meeting time comes first and fills the two-question budget, so the
     // return time waits its turn rather than crowding the first exchange.
+    // A work trip, answered as such — the fixture above is a private one, and
+    // the return time is a question only a business trip earns.
+    const work = { ...request, purpose: "business" as const, party: "colleagues" as const };
     const first = chatQuestions("Milan Thursday, client meeting", {
-      ...request,
+      ...work,
       needsCar: true,
     });
     expect(first.some((q) => q.kind === "arrival_time")).toBe(true);
@@ -170,7 +185,7 @@ describe("questions beyond the essentials", () => {
     // both take their turn first. The budget is two questions, never more.
     const later = chatQuestions(
       "Milan Thursday, client meeting",
-      { ...request, needsCar: true },
+      { ...work, needsCar: true },
       { answered: ["arrival_time", "which_airport", "needs_car"] },
     );
     expect(later.some((q) => q.kind === "return_time")).toBe(true);
@@ -195,6 +210,7 @@ describe("both ends of the trip", () => {
   const oneWay = {
     originCity: "Warsaw",
     originIata: "WAW",
+    originStated: true,
     destinationCity: "Paris",
     destinationIata: "CDG",
     lat: 48.85,
@@ -234,6 +250,7 @@ describe("the conversation shortens as Adair learns", () => {
   const request = {
     originCity: "Warsaw",
     originIata: "WAW",
+    originStated: true,
     destinationCity: "Milan",
     destinationIata: "MXP",
     lat: 45.46,
@@ -297,6 +314,7 @@ describe("a single named day is not a booking", () => {
   const req = {
     originCity: "Warsaw",
     originIata: "WAW",
+    originStated: true,
     destinationCity: "Berlin",
     destinationIata: "BER",
     lat: 52.5,
