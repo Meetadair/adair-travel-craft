@@ -41,3 +41,6 @@ dev.log
 # Tokens that let Claude push and migrate. Never committed.
 .adair-secrets
 .agent-probe-build
+
+# local env snapshots taken before a database switch
+.env.backup-*
