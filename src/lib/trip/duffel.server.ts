@@ -55,6 +55,8 @@ import {
   type PlanningRules,
 } from "./backwards";
 import type { CarResult, FlightResult, StayResult, TripRequest, TripSearchResponse } from "./types";
+import { applyHouseStandard } from "./house-standard";
+import { hasLiteApiKey, searchLiteApiStays } from "@/lib/suppliers/stays/liteapi";
 
 const BASE = "https://api.duffel.com";
 
@@ -476,6 +478,101 @@ export type StaySearchOutcome = {
   notFound: boolean;
 };
 
+/**
+ * liteAPI is the hotel supplier that actually works today — Duffel Stays
+ * answers 403 in both live and test mode until their sales team enables it.
+ * Same shape out (StaySearchOutcome), same house rules, same ranking, so
+ * nothing downstream of a search has to know which supplier answered.
+ */
+async function searchStayLiteApi(
+  req: TripRequest,
+  prefs: SearchPrefs | undefined,
+  style: TripStyle,
+): Promise<StaySearchOutcome> {
+  const requested = req.hotelNameExact?.trim() || null;
+  if (!hasLiteApiKey()) {
+    return { stay: null, alternatives: [], requested, notFound: false, familyNote: null };
+  }
+
+  const children = req.childAges ?? [];
+  const infants = req.infants ?? 0;
+
+  let raw: StayResult[] = [];
+  try {
+    raw = await searchLiteApiStays({
+      latitude: req.lat,
+      longitude: req.lon,
+      radiusKm: 3,
+      checkIn: req.departDate,
+      checkOut: req.returnDate,
+      adults: adultsOf(req),
+      childrenAges: children,
+      currency: "EUR",
+      limit: 30,
+    });
+  } catch (error) {
+    console.error("liteAPI stays search failed", error);
+    raw = [];
+  }
+  if (!raw.length) {
+    return { stay: null, alternatives: [], requested, notFound: Boolean(requested), familyNote: null };
+  }
+
+  const globalRules = await loadGlobalStayRules();
+  const allowed = staysPassingGlobalRules(
+    raw,
+    (s) => ({
+      text: [s.name, s.address, ...(s.amenities ?? [])].filter(Boolean).join(" · "),
+      propertyType: null,
+    }),
+    globalRules,
+  );
+  const pool0 = allowed.length ? allowed : raw;
+
+  // The house standard: never below 4 stars, unless that would empty the list.
+  const { stays: houseFiltered } = applyHouseStandard(pool0);
+
+  const mapped = staysPassingDealbreakers(houseFiltered, (s) => ({ name: s.name, rating: s.rating }), prefs);
+  const usable = mapped.length ? mapped : houseFiltered;
+  if (!usable.length) {
+    return { stay: null, alternatives: [], requested, notFound: Boolean(requested), familyNote: null };
+  }
+
+  if (requested) {
+    const hit = findByName(usable, requested, (s) => s.name);
+    if (hit) {
+      return { stay: { ...hit, exact: true }, alternatives: [], requested, notFound: false, familyNote: null };
+    }
+    const alternatives = usable
+      .slice()
+      .sort((a, b) => a.amount - b.amount)
+      .slice(0, 3);
+    return { stay: null, alternatives, requested, notFound: true, familyNote: null };
+  }
+
+  const prices = usable.map((s) => s.amount).sort((a, b) => a - b);
+  const floor = prices[Math.floor(prices.length * 0.25)] ?? prices[0]!;
+  const pool = usable.filter((s) => s.amount >= floor);
+  const scored = (pool.length ? pool : usable)
+    .slice()
+    .sort(
+      (a, b) =>
+        stayScore(b.name, b.rating, b.amount, prefs, style, b.amenities) -
+        stayScore(a.name, a.rating, a.amount, prefs, style, a.amenities),
+    );
+  const best = scored[0]!;
+  const stayOthers = scored.slice(1, 4);
+
+  // liteAPI does not publish room occupancy policy the way Duffel Stays does,
+  // so a family is told to double-check rather than given a false all-clear.
+  const familyNote =
+    children.length + infants > 0
+      ? "Double-check the room fits your family — this supplier does not publish occupancy policy."
+      : null;
+
+  return { stay: best, alternatives: stayOthers, requested: null, notFound: false, familyNote };
+}
+
 export async function searchStay(
   req: TripRequest,
   prefs?: SearchPrefs,
@@ -488,43 +585,45 @@ export async function searchStay(
     party: req.party ?? null,
     occasion: req.occasion ?? null,
   };
-  const json = await duffel<{ data?: { results?: DuffelStay[] } }>("/stays/search", {
-    data: {
-      check_in_date: req.departDate,
-      check_out_date: req.returnDate,
-      // Two share a room; three or more get doubles rather than one big room.
-      rooms: roomsFor(adultsOf(req)),
-      // Children's ages go with the occupancy, so the hotel only offers rooms
-      // that actually take this family.
-      guests: stayGuests(req),
-      location: sample
-        ? {
-            radius: TEST_LOCATION.radius,
-            geographic_coordinates: {
-              latitude: TEST_LOCATION.latitude,
-              longitude: TEST_LOCATION.longitude,
+  let json: { data?: { results?: DuffelStay[] } } | null = null;
+  try {
+    json = await duffel<{ data?: { results?: DuffelStay[] } }>("/stays/search", {
+      data: {
+        check_in_date: req.departDate,
+        check_out_date: req.returnDate,
+        // Two share a room; three or more get doubles rather than one big room.
+        rooms: roomsFor(adultsOf(req)),
+        // Children's ages go with the occupancy, so the hotel only offers rooms
+        // that actually take this family.
+        guests: stayGuests(req),
+        location: sample
+          ? {
+              radius: TEST_LOCATION.radius,
+              geographic_coordinates: {
+                latitude: TEST_LOCATION.latitude,
+                longitude: TEST_LOCATION.longitude,
+              },
+            }
+          : {
+              radius: 3,
+              geographic_coordinates: { latitude: req.lat, longitude: req.lon },
             },
-          }
-        : {
-            radius: 3,
-            geographic_coordinates: { latitude: req.lat, longitude: req.lon },
-          },
-    },
-  });
+      },
+    });
+  } catch (error) {
+    // Duffel Stays answers 403 ("contact sales") until that account is
+    // enabled. That is not an outage worth surfacing to a traveller — fall
+    // through to liteAPI below, which actually has live inventory.
+    console.error("Duffel stays search failed, falling back to liteAPI", error);
+  }
 
   const requested = req.hotelNameExact?.trim() || null;
 
-  const results = (json.data?.results ?? []).filter((r) =>
+  const results = (json?.data?.results ?? []).filter((r) =>
     Number.isFinite(Number(r.cheapest_rate_total_amount)),
   );
   if (!results.length) {
-    return {
-      stay: null,
-      alternatives: [],
-      requested,
-      notFound: Boolean(requested),
-      familyNote: null,
-    };
+    return searchStayLiteApi(req, prefs, style);
   }
 
   // Standards we apply for everyone: no hostels, dorms, shared bathrooms,
@@ -702,30 +801,40 @@ export type CarSearchOutcome = {
 
 export async function searchCar(req: TripRequest, prefs?: SearchPrefs): Promise<CarSearchOutcome> {
   const sample = usesTestInventory();
-  const location = sample
-    ? {
-        radius: TEST_LOCATION.radius,
-        geographic_coordinates: {
-          latitude: TEST_LOCATION.latitude,
-          longitude: TEST_LOCATION.longitude,
+  // The live API validates a shape different from what its own high-level docs
+  // imply: a combined `pick_up_at` and an `airport_iata_code` location are
+  // both rejected. It wants geographic coordinates and separate date/time
+  // fields on each side of the rental, confirmed against Duffel's own test
+  // coordinates.
+  const coords = sample
+    ? { latitude: TEST_LOCATION.latitude, longitude: TEST_LOCATION.longitude }
+    : { latitude: req.lat, longitude: req.lon };
+  const location = { geographic_coordinates: coords };
+  let json: { data?: { results?: DuffelCar[]; offers?: DuffelCar[] } } | null = null;
+  try {
+    json = await duffel<{ data?: { results?: DuffelCar[]; offers?: DuffelCar[] } }>(
+      "/cars/search",
+      {
+        data: {
+          pickup_location: location,
+          dropoff_location: location,
+          pickup_date: req.departDate,
+          pickup_time: "10:00:00",
+          dropoff_date: req.returnDate,
+          dropoff_time: "18:00:00",
+          // Required by the API for every search; the traveller's actual
+          // licence country is not collected today, so this is a placeholder
+          // until that question exists — search only, never used to book.
+          driver: { age: 30, residence_country_code: "US" },
         },
-      }
-    : { airport_iata_code: req.destinationIata };
-  const json = await duffel<{ data?: { results?: DuffelCar[]; offers?: DuffelCar[] } }>(
-    "/cars/search",
-    {
-      data: {
-        pick_up_location: location,
-        drop_off_location: location,
-        pick_up_at: `${req.departDate}T10:00:00`,
-        drop_off_at: `${req.returnDate}T18:00:00`,
-        driver: { age: 30 },
       },
-    },
-  );
+    );
+  } catch (error) {
+    console.error("Duffel cars search failed", error);
+  }
 
   const requested = req.carNameExact?.trim() || null;
-  const results = json.data?.results ?? json.data?.offers ?? [];
+  const results = json?.data?.results ?? json?.data?.offers ?? [];
   if (!results.length) {
     return { car: null, alternatives: [], requested, notFound: Boolean(requested) };
   }
