@@ -35,14 +35,24 @@ export function BrandPicker({
   fullList?: boolean;
 }) {
   const [query, setQuery] = useState("");
+  // The short list is fourteen names ranked for where they fly from. Everything
+  // else was reachable only by typing into the search box, and people read a
+  // short list as the whole list — so the rest is one button away now.
+  const [showAll, setShowAll] = useState(false);
   const brands = useBrands().data;
   const region = regionForAirport(homeAirport);
 
+  const expanded = fullList || showAll;
+  const total = useMemo(
+    () => brands.filter((b) => b.active && b.kind === kind).length,
+    [brands, kind],
+  );
+
   const shown = useMemo(() => {
     if (query.trim()) return searchBrands(brands, { kind, query, limit: 30 });
-    if (fullList) return searchBrands(brands, { kind, query: "", limit: 400 });
+    if (expanded) return searchBrands(brands, { kind, query: "", limit: 400 });
     return rankBrands(brands, { kind, region, limit: 14, selected: value });
-  }, [brands, kind, query, fullList, region, value]);
+  }, [brands, kind, query, expanded, region, value]);
 
   const noPreference = value.includes(noneValue);
 
@@ -70,7 +80,7 @@ export function BrandPicker({
         />
       </label>
 
-      {!fullList && !query.trim() && (
+      {!expanded && !query.trim() && (
         <p className="mt-2 text-xs text-muted-foreground">
           {REGION_NOTE[region] ?? "Ranked for where you fly from — search for any other"}
         </p>
@@ -91,7 +101,7 @@ export function BrandPicker({
         </div>
       )}
 
-      <div className={`mt-3 grid gap-2 sm:grid-cols-2 ${fullList ? "max-h-96 overflow-y-auto pr-1" : ""}`}>
+      <div className={`mt-3 grid gap-2 sm:grid-cols-2 ${expanded ? "max-h-96 overflow-y-auto pr-1" : ""}`}>
         <button
           type="button"
           onClick={() => toggle(noneValue)}
@@ -123,6 +133,16 @@ export function BrandPicker({
           <p className="text-sm text-muted-foreground">Nothing matches “{query}”.</p>
         )}
       </div>
+
+      {!fullList && !query.trim() && (showAll || total > shown.length) && (
+        <button
+          type="button"
+          onClick={() => setShowAll((v) => !v)}
+          className="mt-3 text-sm font-medium text-primary underline-offset-4 hover:underline"
+        >
+          {showAll ? "Show the usual ones" : `Show all ${total}`}
+        </button>
+      )}
     </div>
   );
 }
