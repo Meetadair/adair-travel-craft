@@ -9,7 +9,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { BedDouble, Compass, MapPin, UtensilsCrossed, Landmark } from "lucide-react";
 import { SiteNav } from "@/components/site-nav";
 import { GetawayDayImage, GetawayHero } from "@/components/getaway-image";
-import { getWeeklyGetaway, muteGetawayTheme } from "@/lib/getaway.functions";
+import { chooseGetaway, getWeeklyGetaway, muteGetawayTheme } from "@/lib/getaway.functions";
 import { AppFooter } from "@/components/app-footer";
 
 const KIND_ICON = {
@@ -26,12 +26,19 @@ const money = (minor: number | null, currency: string) =>
 export function GetawayPage() {
   const fetchGetaway = useServerFn(getWeeklyGetaway);
   const mute = useServerFn(muteGetawayTheme);
+  const choose = useServerFn(chooseGetaway);
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
   const query = useQuery({ queryKey: ["getaway"], queryFn: () => fetchGetaway({}) });
   const muteMutation = useMutation({
     mutationFn: (themeId: string) => mute({ data: { themeId } }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["getaway"] }),
+  });
+  // Swapping the week's pick rebuilds the whole card — picture, places, price —
+  // for the new place, and it stays chosen after a reload.
+  const chooseMutation = useMutation({
+    mutationFn: (pick: { destinationId: string; themeId: string }) => choose({ data: pick }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["getaway"] }),
   });
 
@@ -94,6 +101,74 @@ export function GetawayPage() {
                       </span>
                     )}
                   </div>
+
+                  {p.alternatives.length > 0 && (
+                    <div className="mt-5 border-t border-border pt-5">
+                      <div className="flex items-baseline justify-between gap-3">
+                        <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                          Also within reach this week
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            chooseMutation.mutate({
+                              destinationId: p.alternatives[0]!.destinationId,
+                              themeId: p.alternatives[0]!.themeId,
+                            })
+                          }
+                          disabled={chooseMutation.isPending}
+                          className="shrink-0 text-sm font-medium text-primary underline-offset-4 hover:underline disabled:opacity-60"
+                        >
+                          {chooseMutation.isPending ? "Swapping…" : "Next →"}
+                        </button>
+                      </div>
+                      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                        {p.alternatives.map((alt) => (
+                          <button
+                            key={alt.destinationId}
+                            type="button"
+                            onClick={() =>
+                              chooseMutation.mutate({
+                                destinationId: alt.destinationId,
+                                themeId: alt.themeId,
+                              })
+                            }
+                            disabled={chooseMutation.isPending}
+                            className="overflow-hidden rounded-xl border border-border text-left transition hover:border-primary disabled:opacity-60"
+                          >
+                            {alt.image ? (
+                              <img
+                                src={alt.image.url}
+                                alt=""
+                                loading="lazy"
+                                className="h-32 w-full object-cover"
+                                onError={(e) => {
+                                  if (alt.image?.fallbackUrl)
+                                    e.currentTarget.src = alt.image.fallbackUrl;
+                                }}
+                              />
+                            ) : (
+                              <div className="h-32 w-full bg-secondary" />
+                            )}
+                            <div className="p-3">
+                              <p className="text-sm font-medium">
+                                {alt.name}
+                                <span className="text-muted-foreground"> · {alt.country}</span>
+                              </p>
+                              {alt.reachLabel && (
+                                <p className="mt-0.5 text-xs text-muted-foreground">
+                                  {alt.reachLabel}
+                                </p>
+                              )}
+                              {alt.why && (
+                                <p className="mt-1 text-xs text-muted-foreground">{alt.why}</p>
+                              )}
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                   {p.needsMoreThanWeekend && (
                     <p className="mt-4 rounded-xl border border-border bg-secondary/50 px-4 py-3 text-xs text-muted-foreground">

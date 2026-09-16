@@ -67,6 +67,23 @@ export type GetawayProposal = {
   reach: Reach | null;
   /** Needs more than a weekend: shown plainly instead of being hidden. */
   needsMoreThanWeekend: boolean;
+  /**
+   * The next best places within the same reach, so the week is a choice rather
+   * than a single card to take or leave. One proposal meant a traveller who did
+   * not fancy it had nothing at all that week.
+   */
+  alternatives: Array<{
+    destinationId: string;
+    themeId: string;
+    name: string;
+    country: string;
+    themeName: string | null;
+    /** "1 h 40 flight from JFK" — the same honest label as the main card. */
+    reachLabel: string;
+    why: string | null;
+    /** A place is a picture before it is a paragraph. */
+    image: GetawayImage | null;
+  }>;
   places: GetawayPlace[];
   itinerary: { title: string; nights: number; summary: string | null; days: GetawayDay[] } | null;
   price: {
@@ -257,12 +274,27 @@ export const getWeeklyGetaway = createServerFn({ method: "GET" })
       .eq("week_start", weekStart)
       .maybeSingle();
 
-    let chosen = applyPriceTieBreak(pool, dealBonus)[0]!;
+    const ranked = applyPriceTieBreak(pool, dealBonus);
+    // One card per destination: the same place under three themes is one choice,
+    // not three.
+    const shortlist: ScoredCandidate[] = [];
+    for (const candidate of ranked) {
+      if (shortlist.some((c) => c.destinationId === candidate.destinationId)) continue;
+      shortlist.push(candidate);
+      if (shortlist.length === 3) break;
+    }
+
+    let chosen = shortlist[0]!;
     if (existing.data) {
       const kept = pool.find(
         (c) => c.destinationId === existing.data!.destination_id && c.themeId === existing.data!.theme_id,
       );
-      if (kept) chosen = { ...kept, reasons: (existing.data.reasons as string[]) ?? kept.reasons };
+      if (kept) {
+        // A swap stores no reasons of its own, so the freshly scored ones stand
+        // rather than leaving the card with nothing under "chosen because".
+        const stored = (existing.data.reasons as string[] | null) ?? [];
+        chosen = { ...kept, reasons: stored.length ? stored : kept.reasons };
+      }
     } else {
       await supabase.from("getaway_proposals").insert({
         user_id: userId,
@@ -344,6 +376,42 @@ export const getWeeklyGetaway = createServerFn({ method: "GET" })
       };
     }
 
+    // The other places on the shortlist, each with its own picture, so "next"
+    // shows somewhere rather than a line of text.
+    const alternativeCards: GetawayProposal["alternatives"] = [];
+    try {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { ensureDestinationImage } = await import("@/lib/getaway/images.server");
+      for (const candidate of shortlist) {
+        if (candidate.destinationId === chosen.destinationId) continue;
+        const row = rows.find((r) => r.getaway_destinations?.id === candidate.destinationId);
+        const dest = row?.getaway_destinations;
+        if (!dest) continue;
+        const theme = rows.find((r) => r.getaway_themes?.id === candidate.themeId)?.getaway_themes;
+        const stored = await ensureDestinationImage(supabaseAdmin as never, dest as never);
+        alternativeCards.push({
+          destinationId: candidate.destinationId,
+          themeId: candidate.themeId,
+          name: dest.name,
+          country: dest.country,
+          themeName: theme?.name ?? null,
+          reachLabel: reachByDestination.get(candidate.destinationId)?.label ?? "",
+          why: candidate.reasons[0] ?? null,
+          image: stored
+            ? {
+                url: stored.url,
+                fallbackUrl: stored.fallbackUrl,
+                credit: stored.credit,
+                creditUrl: stored.creditUrl,
+                source: stored.source,
+              }
+            : null,
+        });
+      }
+    } catch (error) {
+      console.error("alternative images failed", error);
+    }
+
     // Own photo wins; otherwise ask Unsplash once and remember the result.
     let heroImage: GetawayImage | null = null;
     try {
@@ -391,6 +459,7 @@ export const getWeeklyGetaway = createServerFn({ method: "GET" })
         reasons: chosen.reasons,
         reach,
         needsMoreThanWeekend: Boolean(reach && !reach.weekend),
+        alternatives: alternativeCards,
         places,
         itinerary,
         price: priceRow
@@ -422,5 +491,34 @@ export const muteGetawayTheme = createServerFn({ method: "POST" })
       .delete()
       .eq("user_id", context.userId)
       .eq("week_start", weekStartIso());
+    return { ok: true };
+  });
+
+/**
+ * Show a different one of this week's shortlist.
+ *
+ * The week used to be a single card: a traveller who did not fancy it had
+ * nothing else until Monday. Next replaces the stored choice, so the whole
+ * card — picture, places, itinerary, price — is rebuilt for the new place and
+ * stays that way if they close the tab.
+ */
+export const chooseGetaway = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) =>
+    z.object({ destinationId: z.string().uuid(), themeId: z.string().uuid() }).parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    await context.supabase
+      .from("getaway_proposals")
+      .delete()
+      .eq("user_id", context.userId)
+      .eq("week_start", weekStartIso());
+    await context.supabase.from("getaway_proposals").insert({
+      user_id: context.userId,
+      week_start: weekStartIso(),
+      destination_id: data.destinationId,
+      theme_id: data.themeId,
+      reasons: [],
+    });
     return { ok: true };
   });
