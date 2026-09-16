@@ -361,6 +361,10 @@ export const bookTripCard = createServerFn({ method: "POST" })
             travellerId: c.travellerId ?? null,
           })),
           services,
+          servicesAmount: (await import("@/lib/trip/ancillaries")).ancillariesNetEur(
+            ancillaryOptions,
+            services,
+          ),
           idempotencyKey: `${card.id}-flight`,
           cardPayment,
           loyaltyAccountsByTraveller: flightAccountsByTraveller,

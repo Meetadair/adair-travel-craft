@@ -214,6 +214,12 @@ export async function createFlightOrder(input: {
   /** Bags and seats the customer chose, as supplier service ids. */
   services?: AncillarySelection[];
   /**
+   * What those services cost at the airline, in the offer's own currency. Duffel
+   * requires the payment to equal the offer plus its services; leaving this out
+   * while sending services is how a booking with a bag was always refused.
+   */
+  servicesAmount?: number;
+  /**
    * Frequent-flyer accounts the supplier accepts on the order, grouped by
    * whose they are — the map key is a travel_companions id, or null for the
    * lead traveller (passenger 0). A companion with no matching key gets none.
@@ -244,14 +250,19 @@ export async function createFlightOrder(input: {
             }
           : {}),
         payments: [
-          input.cardPayment
-            ? {
-                type: "card",
-                amount: input.amount.toFixed(2),
-                currency: input.currency,
-                three_d_secure_session_id: input.cardPayment.threeDSecureSessionId,
-              }
-            : { type: "balance", amount: input.amount.toFixed(2), currency: input.currency },
+          (() => {
+            const payable = (
+              Math.round((input.amount + (input.servicesAmount ?? 0)) * 100) / 100
+            ).toFixed(2);
+            return input.cardPayment
+              ? {
+                  type: "card",
+                  amount: payable,
+                  currency: input.currency,
+                  three_d_secure_session_id: input.cardPayment.threeDSecureSessionId,
+                }
+              : { type: "balance", amount: payable, currency: input.currency };
+          })(),
         ],
         passengers: input.passengerIds.map((id, index) => {
           const companion = index === 0 ? null : ((input.companions ?? [])[index - 1] ?? null);
