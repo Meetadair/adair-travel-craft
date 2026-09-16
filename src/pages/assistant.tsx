@@ -3,7 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState, useEffect, useMemo, useRef } from "react";
 import { ageQuestion, familyFromSentence } from "@/lib/trip/family";
-import { applyAnswer, assumptionNote, clarify, type Clarification } from "@/lib/trip/clarify";
+import { applyAnswer, assumptionNote, clarify, hasNoDates, isVagueWeek, type Clarification } from "@/lib/trip/clarify";
 import { AirportAnswer, DateAnswer, TravellersAnswer } from "@/components/trip/answer-controls";
 import { isCompleteRange, rangeSentence, type DateRange } from "@/lib/trip/answers";
 import { CabinParty, type Cabin } from "@/components/trip/cabin-party";
@@ -37,7 +37,16 @@ import { FlightChoice } from "@/components/trip/flight-choice";
 import { replyFor, ruleIntent } from "@/lib/trip/intent";
 import { chatQuestions, type ChatQuestionKind } from "@/lib/trip/questions";
 import { track } from "@/lib/track";
-import { Plane, BedDouble, CarFront, Sparkles, ChevronRight, Send, X } from "lucide-react";
+import {
+  Plane,
+  BedDouble,
+  CarFront,
+  Sparkles,
+  ChevronRight,
+  Send,
+  X,
+  CalendarDays,
+} from "lucide-react";
 import { SiteNav } from "@/components/site-nav";
 import { HotelGallery } from "@/components/hotel-gallery";
 import { VoiceInput } from "@/components/voice-input";
@@ -104,6 +113,16 @@ export function AssistantPage() {
     }
   }, []);
   const [asked, setAsked] = useState<string | null>(null);
+  /**
+   * The calendar, openable at any point in the conversation.
+   *
+   * Adair does not always ask for dates with the structured question that
+   * carries a calendar with it — sometimes it just says "when are you
+   * travelling?" in a sentence. Without a way to open the picker on demand the
+   * only answer available is to type a date and hope it is understood, which
+   * is exactly the guessing this product is supposed to remove.
+   */
+  const [calendarOpen, setCalendarOpen] = useState(false);
   const [saved, setSaved] = useState<string | null>(null);
   const [hotelRef, setHotelRef] = useState<string | null>(null);
   const [showAlts, setShowAlts] = useState(false);
@@ -400,6 +419,14 @@ export function AssistantPage() {
           : (replyFor(ruleIntent(message, false), t.assistant.intent) ??
             t.assistant.intent.unclear);
       say("adair", written);
+
+      // Adair sometimes asks for the dates in a sentence of its own rather than
+      // through the structured question that carries a calendar. When that
+      // happens and we still do not know when the trip is, open the calendar
+      // ourselves: the alternative is a traveller typing a date into a chat box
+      // and hoping it was read the way they meant it.
+      const trip = parseTripSentence(message);
+      if (trip && (hasNoDates(message) || isVagueWeek(message))) setCalendarOpen(true);
     },
     onError: () => say("adair", t.assistant.intent.unclear),
   });
@@ -714,6 +741,29 @@ export function AssistantPage() {
           </form>
         )}
 
+        {calendarOpen && (
+          <div className="hairline-card mt-4 p-5">
+            <p className="text-sm text-foreground">{t.assistant.questions.dates}</p>
+            <div className="mt-3">
+              <DateAnswer
+                value={dateDraft}
+                copy={t.assistant.strip.controls}
+                onChange={setDateDraft}
+                onConfirm={() => {
+                  if (!dateDraft || !isCompleteRange(dateDraft)) return;
+                  const chosen = rangeSentence(dateDraft);
+                  setDateDraft(null);
+                  setCalendarOpen(false);
+                  // Answering the open question when there is one, and otherwise
+                  // saying the dates as a sentence of their own.
+                  if (question) answerQuestion(chosen);
+                  else handleSentence(applyAnswer(asked ?? input.trim(), "dates", chosen));
+                }}
+              />
+            </div>
+          </div>
+        )}
+
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -763,6 +813,20 @@ export function AssistantPage() {
               labelOn={t.assistant.speechOn}
               labelOff={t.assistant.speechOff}
             />
+            <button
+              type="button"
+              onClick={() => setCalendarOpen((open) => !open)}
+              aria-pressed={calendarOpen}
+              aria-label={t.assistant.questions.dates}
+              title={t.assistant.questions.dates}
+              className={
+                calendarOpen
+                  ? "flex size-9 items-center justify-center rounded-full bg-primary text-primary-foreground"
+                  : "flex size-9 items-center justify-center rounded-full text-muted-foreground hover:text-foreground"
+              }
+            >
+              <CalendarDays className="size-4" />
+            </button>
           </div>
           <button
             type="submit"
