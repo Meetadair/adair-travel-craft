@@ -58,6 +58,13 @@ export const BUSINESS_OVERRIDE_FIELDS = [
    */
   "extraAnswers",
 ] as const;
+/**
+ * Deliberately absent: cuisines, diets, interests, music, accessibilityNote,
+ * avoidNote. Taste and personal needs are the traveller, not the trip — see
+ * the "never touches fields outside the overlay's remit" test below. The
+ * Preferences page keeps these questions locked to the personal profile even
+ * while editing the work tab, so nothing is silently discarded on save.
+ */
 
 export type BusinessOverrideField = (typeof BUSINESS_OVERRIDE_FIELDS)[number];
 

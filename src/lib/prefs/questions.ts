@@ -160,25 +160,24 @@ export const QUESTIONS: QuestionDef[] = [
     part: 1,
     kind: "fields",
     skippable: true,
-    title: "Hotels outside these star ratings won't be shown",
+    title: "Star rating",
+    hint: "Pick specific classes to stick to, a floor to never go below, or both — they work together, not against each other.",
     multis: [
-      { field: "hotelStars", options: opts(["2", "2 stars"], ["3", "3 stars"], ["4", "4 stars"], ["5", "5 stars"]) },
+      {
+        field: "hotelStars",
+        label: "Only show these classes",
+        options: opts(["2", "2 stars"], ["3", "3 stars"], ["4", "4 stars"], ["5", "5 stars"]),
+      },
     ],
-  },
-  {
-    id: "hotelRating",
-    part: 1,
-    kind: "fields",
-    skippable: true,
-    title: "Hotels below this rating won't be shown",
     singles: [
       {
         field: "hotelRatingLevel",
+        label: "Never go below",
         options: opts(
-          ["exceptional", "Exceptional"],
-          ["very_good", "Very good"],
-          ["good", "Good"],
-          ["pleasant", "Pleasant"],
+          ["exceptional", "Exceptional (5 stars)"],
+          ["very_good", "Very good (4 stars)"],
+          ["good", "Good (3 stars)"],
+          ["pleasant", "Pleasant (2 stars)"],
         ),
       },
     ],
@@ -463,33 +462,10 @@ export const QUESTIONS: QuestionDef[] = [
     part: 2,
     kind: "fields",
     skippable: true,
-    title: "Your usual rhythm",
-    singles: [
-      {
-        field: "tripLength",
-        label: "Typical trip length",
-        options: opts(
-          ["1", "A day"],
-          ["2_3", "2 – 3 nights"],
-          ["4_7", "4 – 7 nights"],
-          ["8plus", "Longer than a week"],
-        ),
-      },
-      {
-        field: "leadTime",
-        label: "How far ahead you usually book",
-        options: opts(
-          ["last_minute", "Last minute"],
-          ["1_2w", "1 – 2 weeks"],
-          ["1m", "About a month"],
-          ["3m_plus", "Three months or more"],
-        ),
-      },
-    ],
+    title: "Who you usually travel with",
     multis: [
       {
         field: "companions",
-        label: "Who you usually travel with",
         options: opts(
           ["alone", "Alone"],
           ["partner", "Partner"],
@@ -515,31 +491,6 @@ export const QUESTIONS: QuestionDef[] = [
           ["yes", "Yes — I'll add the numbers in Settings"],
           ["no", "No"],
         ),
-      },
-    ],
-  },
-  {
-    id: "tradeoffs",
-    part: 2,
-    kind: "fields",
-    skippable: true,
-    title: "Three quick trade-offs",
-    hint: "These predict your real choices better than anything else we ask.",
-    singles: [
-      {
-        field: "tradeConnection",
-        label: "Pay about €50 more to avoid a connection?",
-        options: opts(["yes", "Yes"], ["no", "No"], ["depends", "Depends on the trip"]),
-      },
-      {
-        field: "tradeCloser",
-        label: "Pay about €50 more for a hotel 10 minutes closer?",
-        options: opts(["yes", "Yes"], ["no", "No"], ["depends", "Depends on the trip"]),
-      },
-      {
-        field: "tradeMorning",
-        label: "Pay about €50 more for a direct morning departure?",
-        options: opts(["yes", "Yes"], ["no", "No"], ["depends", "Depends on the trip"]),
       },
     ],
   },
@@ -684,16 +635,7 @@ export const DEALBREAKER_FIELDS = [
 ] as const;
 
 /** Part 2 answer fields stored in the open `extraAnswers` map. */
-export const EXTRA_ANSWER_FIELDS = [
-  "travelStyle",
-  "tripLength",
-  "leadTime",
-  "companions",
-  "loyalty",
-  "tradeConnection",
-  "tradeCloser",
-  "tradeMorning",
-] as const;
+export const EXTRA_ANSWER_FIELDS = ["travelStyle", "companions", "loyalty"] as const;
 
 export const DEFAULT_PREFS: TravelPrefs = {
   seat: "any",

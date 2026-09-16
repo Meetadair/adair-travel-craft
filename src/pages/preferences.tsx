@@ -19,11 +19,13 @@ import {
 } from "@/lib/account.functions";
 import { BUSINESS_OVERRIDE_FIELDS } from "@/lib/prefs/context";
 import {
+  EXTRA_ANSWER_FIELDS,
   QUESTIONS,
   answersToPrefs,
   part2Completion,
   prefsToAnswers,
   type Answers,
+  type QuestionDef,
   type Toggles,
 } from "@/lib/prefs/questions";
 import { AirportPicker } from "@/components/prefs/airport-picker";
@@ -152,6 +154,21 @@ export function PreferencesPage() {
   const differsAtWork = (field: string) =>
     JSON.stringify(workAnswers[field] ?? []) !== JSON.stringify(answers[field] ?? []);
 
+  // Some questions (food, interests, music, "anything else") are the
+  // traveller, not the trip — see the note on BUSINESS_OVERRIDE_FIELDS. They
+  // stay locked to the personal profile even on the work tab, so editing
+  // them there can never look saved and then quietly not be.
+  const overridableAtWork = new Set<string>([
+    ...BUSINESS_OVERRIDE_FIELDS,
+    ...EXTRA_ANSWER_FIELDS,
+  ]);
+  const isPersonOnly = (q: QuestionDef) => {
+    const fields = [...(q.singles ?? []), ...(q.multis ?? []), ...(q.texts ?? [])].map(
+      (d) => d.field,
+    );
+    return fields.length > 0 && fields.every((f) => !overridableAtWork.has(f));
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <SiteNav />
@@ -224,7 +241,13 @@ export function PreferencesPage() {
             {QUESTIONS.filter((q) => q.kind === "fields")
               .slice()
               .sort((a, b) => a.part - b.part)
-              .map((q, index, list) => (
+              .map((q, index, list) => {
+                const personOnly = isPersonOnly(q);
+                const qActive = personOnly ? answers : active;
+                const qSetActive = personOnly ? setAnswers : setActive;
+                const qActiveToggles = personOnly ? toggles : activeToggles;
+                const qSetActiveToggles = personOnly ? setToggles : setActiveToggles;
+                return (
                 <div key={q.id}>
                   {(index === 0 || list[index - 1]!.part !== q.part) && (
                     <div className="mb-2 mt-2" id={q.part === 2 ? "refine" : undefined}>
@@ -264,20 +287,26 @@ export function PreferencesPage() {
                           </button>
                         )}
                     </div>
+                    {q.hint && <p className="text-sm text-muted-foreground">{q.hint}</p>}
+                    {mode === "work" && personOnly && (
+                      <p className="text-xs text-muted-foreground">
+                        Same whether it&apos;s work or personal — this is about you, not the trip.
+                      </p>
+                    )}
                     {q.singles?.map((def) => (
                       <SingleField
                         key={def.field}
                         def={def}
-                        value={active[def.field] ?? []}
-                        onChange={(next) => setActive((p) => ({ ...p, [def.field]: next }))}
+                        value={qActive[def.field] ?? []}
+                        onChange={(next) => qSetActive((p) => ({ ...p, [def.field]: next }))}
                       />
                     ))}
                     {q.multis?.map((def) => (
                       <MultiField
                         key={def.field}
                         def={def}
-                        value={active[def.field] ?? []}
-                        onChange={(next) => setActive((p) => ({ ...p, [def.field]: next }))}
+                        value={qActive[def.field] ?? []}
+                        onChange={(next) => qSetActive((p) => ({ ...p, [def.field]: next }))}
                         homeAirport={homeAirport}
                         fullList
                       />
@@ -286,9 +315,9 @@ export function PreferencesPage() {
                       <TextField
                         key={def.field}
                         def={def}
-                        value={active[def.field]?.[0] ?? ""}
+                        value={qActive[def.field]?.[0] ?? ""}
                         onChange={(next) =>
-                          setActive((p) => ({ ...p, [def.field]: next.trim() ? [next] : [] }))
+                          qSetActive((p) => ({ ...p, [def.field]: next.trim() ? [next] : [] }))
                         }
                       />
                     ))}
@@ -298,15 +327,16 @@ export function PreferencesPage() {
                           <ToggleRow
                             key={t.field}
                             label={t.label}
-                            checked={Boolean(activeToggles[t.field])}
-                            onChange={(next) => setActiveToggles((p) => ({ ...p, [t.field]: next }))}
+                            checked={Boolean(qActiveToggles[t.field])}
+                            onChange={(next) => qSetActiveToggles((p) => ({ ...p, [t.field]: next }))}
                           />
                         ))}
                       </div>
                     ) : null}
                   </section>
                 </div>
-              ))}
+                );
+              })}
 
             <BusinessTrips />
 
