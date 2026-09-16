@@ -281,10 +281,20 @@ export function BookPage({ cardId }: { cardId: string }) {
     : 0;
   const saved = useQuery({ queryKey: ["companions"], queryFn: () => fetchCompanions({}) });
   const selfTraveller = saved.data?.find((t) => t.isSelf) ?? null;
-  const companionSuggestions = useMemo(
-    () => saved.data?.filter((t) => !t.isSelf) ?? [],
-    [saved.data],
-  );
+  const notSelf = useMemo(() => saved.data?.filter((t) => !t.isSelf) ?? [], [saved.data]);
+  /**
+   * The traveller picked specific people while planning this trip — fill
+   * their forms with THOSE people, in the order picked. Nobody was picked
+   * (an older card, or the count came from the number field, not chips): fall
+   * back to the saved list in order, exactly as before.
+   */
+  const pickedIds = card.data?.companionIds ?? [];
+  const companionSuggestions = useMemo(() => {
+    if (!pickedIds.length) return notSelf;
+    const byId = new Map(notSelf.map((t) => [t.id, t]));
+    const picked = pickedIds.map((id) => byId.get(id)).filter((t): t is (typeof notSelf)[number] => !!t);
+    return picked.length ? picked : notSelf;
+  }, [notSelf, pickedIds]);
 
   // The account holder's own saved profile fills the lead traveller once,
   // the moment it arrives — the whole point of saving it in Settings is to

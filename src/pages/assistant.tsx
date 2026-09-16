@@ -592,6 +592,9 @@ export function AssistantPage() {
             cabinClass: cabin,
             passengers: headCount(party),
             ...(stayGuestAges(party).length ? { childAges: stayGuestAges(party) } : {}),
+            // Which saved people these seats actually are, so checkout can
+            // fill their forms in by name instead of guessing an order.
+            ...(selectedCompanions.length ? { companionIds: selectedCompanions } : {}),
           },
         },
       });

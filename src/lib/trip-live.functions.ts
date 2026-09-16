@@ -62,6 +62,8 @@ const overridesSchema = z.object({
   childAges: z.array(z.number().int().min(0).max(17)).max(8).optional(),
   cabinClass: z.enum(["economy", "premium_economy", "business", "first"]).optional(),
   oneWay: z.boolean().optional(),
+  /** Saved travel_companions rows picked as "who's coming", self excluded. */
+  companionIds: z.array(z.string().uuid()).max(8).optional(),
 });
 
 const sentenceSchema = z.object({
@@ -398,6 +400,7 @@ export async function runLiveSearch(
         insurance,
         match,
         budget,
+        companionIds: data.overrides?.companionIds ?? [],
         earlyBooking,
       },
     })
@@ -475,6 +478,7 @@ export const getTripCard = createServerFn({ method: "POST" })
         insurance?: InsuranceQuote | null;
         match?: MatchSummary | null;
         budget?: BudgetStatus | null;
+        companionIds?: string[];
       };
       total_minor: number;
       saved_minor: number;
@@ -488,6 +492,7 @@ export const getTripCard = createServerFn({ method: "POST" })
       insurance: row.items.insurance ?? null,
       match: row.items.match ?? null,
       budget: row.items.budget ?? null,
+      companionIds: row.items.companionIds ?? [],
       totalEur: row.total_minor / 100,
       savedEur: row.saved_minor / 100,
       expiresAt: row.expires_at,
@@ -553,6 +558,7 @@ export async function swapCardLine(
       match?: MatchSummary | null;
       budget?: BudgetStatus | null;
       earlyBooking?: LiveTripResult["earlyBooking"];
+      companionIds?: string[];
     };
     saved_minor: number;
     expires_at: string | null;
@@ -731,12 +737,13 @@ export async function swapCardLine(
       car: cheapestAlt(search.carAlternatives, "car"),
     },
   );
+  const companionIds = row.items.companionIds ?? [];
   const update = await supabase
     .from("trip_cards")
     .update({
       total_minor: pricing.toMinor(total),
       markup_minor: pricing.toMinor(Math.max(0, total - netTotal)),
-      items: { search, priced, insurance, match, budget, earlyBooking },
+      items: { search, priced, insurance, match, budget, earlyBooking, companionIds },
     })
     .eq("user_id", userId)
     .eq("id", data.cardId);
