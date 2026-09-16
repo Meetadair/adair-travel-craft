@@ -90,9 +90,16 @@ function duffelKey(): string | null {
   return process.env["DUFFEL_API_KEY"] ?? null;
 }
 
+/**
+ * True only for a Duffel test key. Duffel prefixes its keys `duffel_test_` and
+ * `duffel_live_`, so the prefix is the whole answer — matching "test" anywhere
+ * in the string was how a live key ended up displayed as test mode. No key at
+ * all also counts as test: nothing can be bought, so nothing can be charged.
+ */
 export function isTestKey(): boolean {
   const key = duffelKey();
-  return !key || key.includes("test");
+  if (!key) return true;
+  return key.trim().toLowerCase().startsWith("duffel_test");
 }
 
 /**

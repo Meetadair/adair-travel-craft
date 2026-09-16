@@ -492,6 +492,9 @@ export const getTripCard = createServerFn({ method: "POST" })
       expiresAt: row.expires_at,
       status: row.status,
       expired: row.expires_at ? new Date(row.expires_at).getTime() < Date.now() : false,
+      // The confirm screen must never claim "no card is charged" while a live
+      // supplier key is in use, so it reads the mode instead of assuming it.
+      testMode: (await import("@/lib/trip/duffel.server")).isTestKey(),
     };
   });
 

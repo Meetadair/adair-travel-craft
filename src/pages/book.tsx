@@ -314,9 +314,13 @@ export function BookPage({ cardId }: { cardId: string }) {
       <SiteNav />
       <main className="mx-auto max-w-2xl px-6 py-16">
         <h1 className="font-display text-3xl font-semibold tracking-tight">Confirm your trip</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Test mode — no card is charged and no real ticket is issued.
-        </p>
+        {card.data && (
+          <p className="mt-2 text-sm text-muted-foreground">
+            {card.data.testMode
+              ? "Test mode — no card is charged and no real ticket is issued."
+              : "Live booking — your card is charged and a real ticket is issued."}
+          </p>
+        )}
 
         {card.isLoading && <p className="mt-10 text-sm text-muted-foreground">Loading…</p>}
         {card.isError && (
