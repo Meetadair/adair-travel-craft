@@ -50,8 +50,19 @@ const LEISURE_WORDS =
  */
 export function detectTripContext(
   sentence: string,
-  request?: { invoiceToCompany?: boolean; mustArriveBy?: string | null } | null,
+  request?: {
+    invoiceToCompany?: boolean;
+    mustArriveBy?: string | null;
+    /** What the traveller answered when asked outright. Nothing beats this. */
+    purpose?: "business" | "personal" | null;
+  } | null,
 ): TripContext {
+  // Adair now asks whether a trip is for work, and a stated answer settles it.
+  // Guessing from the wording after the person has already told us was how an
+  // anniversary in Vienna got booked on the work profile because it mentioned
+  // a conference centre nearby.
+  if (request?.purpose === "business") return "business";
+  if (request?.purpose === "personal") return "leisure";
   if (request?.invoiceToCompany) return "business";
   if (LEISURE_WORDS.test(sentence)) return "leisure";
   if (WORK_WORDS.test(sentence)) return "business";

@@ -211,6 +211,7 @@ export async function runLiveSearch(
   const tripContext = detectTripContext(data.sentence, {
     invoiceToCompany: request.invoiceToCompany,
     mustArriveBy: request.mustArriveBy ?? null,
+    purpose: request.purpose ?? null,
   });
   const businessOverlay = ((row?.["business_prefs"] as Record<string, unknown> | null) ??
     {}) as Parameters<typeof prefsForContext>[1];

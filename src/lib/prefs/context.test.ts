@@ -82,3 +82,30 @@ describe("hasBusinessOverrides", () => {
     expect(hasBusinessOverrides({ cabinClass: "business" })).toBe(true);
   });
 });
+
+describe("a stated purpose beats the wording", () => {
+  it("treats a trip the traveller called personal as leisure, conference or not", () => {
+    expect(
+      detectTripContext("Vienna for the weekend, near the conference centre", {
+        purpose: "personal",
+      }),
+    ).toBe("leisure");
+  });
+
+  it("treats a stated business trip as business even when it sounds like a holiday", () => {
+    expect(detectTripContext("a few days by the beach in Nice", { purpose: "business" })).toBe(
+      "business",
+    );
+  });
+
+  it("still guesses when nothing was stated", () => {
+    expect(detectTripContext("Milan for a client meeting")).toBe("business");
+    expect(detectTripContext("a week in Crete")).toBe("leisure");
+  });
+
+  it("lets a stated personal purpose override an invoice to the company", () => {
+    expect(
+      detectTripContext("Berlin Thursday", { purpose: "personal", invoiceToCompany: true }),
+    ).toBe("leisure");
+  });
+});
