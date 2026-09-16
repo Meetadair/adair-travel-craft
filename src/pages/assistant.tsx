@@ -51,6 +51,8 @@ import {
 import { countryForTimeZone } from "@/lib/prefs/airports";
 import { SiteNav } from "@/components/site-nav";
 import { HotelGallery } from "@/components/hotel-gallery";
+import { HotelRoomOptions } from "@/components/hotel-room-options";
+import type { StayRoomOption } from "@/lib/trip/types";
 import { VoiceInput } from "@/components/voice-input";
 import { CalendarTripHints } from "@/components/calendar-trip-hints";
 import { LoyaltyReminder } from "@/components/prefs/loyalty-reminder";
@@ -127,6 +129,7 @@ export function AssistantPage() {
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [saved, setSaved] = useState<string | null>(null);
   const [hotelRef, setHotelRef] = useState<string | null>(null);
+  const [chosenRoom, setChosenRoom] = useState<StayRoomOption | null>(null);
   const [showAlts, setShowAlts] = useState(false);
   const [removed, setRemoved] = useState<string[]>([]);
   /** The question on screen now. Only ever one at a time. */
@@ -343,6 +346,7 @@ export function AssistantPage() {
     setAsked(sentence);
     setSaved(null);
     setHotelRef(null);
+    setChosenRoom(null);
     setShowAlts(false);
     setRemoved([]);
     setQuestion(null);
@@ -499,9 +503,23 @@ export function AssistantPage() {
   const offers = (raw?.offers ?? [])
     .filter((o) => !removed.includes(o.kind))
     .map((o) => {
-      if (o.kind === "hotel" && hotelRef) {
-        const alt = o.alternatives?.find((a) => a.offerReference === hotelRef);
-        return alt ? { ...alt, ...(o.alternatives ? { alternatives: o.alternatives } : {}) } : o;
+      if (o.kind === "hotel") {
+        const alt = hotelRef ? o.alternatives?.find((a) => a.offerReference === hotelRef) : null;
+        const base = alt ? { ...alt, ...(o.alternatives ? { alternatives: o.alternatives } : {}) } : o;
+        // Picking a specific room+rate off the room-options panel replaces the
+        // line's price and reference the same way a picked flight does below —
+        // the card shows the room the traveller actually chose, not the
+        // property's cheapest one.
+        if (chosenRoom) {
+          return {
+            ...base,
+            title: `${base.title} \u2014 ${chosenRoom.roomName}`,
+            offerReference: chosenRoom.rateId,
+            amount: chosenRoom.amount,
+            currency: chosenRoom.currency,
+          };
+        }
+        return base;
       }
       // A picked flight replaces the line's price and reference, and the
       // choice stays attached so the traveller can change their mind.
@@ -520,6 +538,10 @@ export function AssistantPage() {
       return o;
     });
   const total = Math.round(offers.reduce((sum, o) => sum + o.amount, 0) * 100) / 100;
+  // The property name as chosen on the card, ignoring any room-level suffix —
+  // this is what pins the live booking search to the same hotel rather than
+  // whatever it would otherwise rank first.
+  const currentHotelName = offers.find((o) => o.kind === "hotel")?.title.split(" — ")[0] ?? null;
 
   const store = useMutation({
     mutationFn: async () => {
@@ -595,6 +617,9 @@ export function AssistantPage() {
             // Which saved people these seats actually are, so checkout can
             // fill their forms in by name instead of guessing an order.
             ...(selectedCompanions.length ? { companionIds: selectedCompanions } : {}),
+            // The hotel on the card, so a swapped-in alternative is the one
+            // actually booked instead of whichever the live search ranks first.
+            ...(currentHotelName ? { hotelNameExact: currentHotelName } : {}),
           },
         },
       });
@@ -1090,6 +1115,19 @@ export function AssistantPage() {
                                 {...(o.images ? { images: o.images } : {})}
                                 alt={o.title}
                               />
+                              {o.hotelId && raw && (
+                                <HotelRoomOptions
+                                  hotelId={o.hotelId}
+                                  checkIn={raw.request.departDate}
+                                  checkOut={raw.request.returnDate}
+                                  adults={Math.max(1, party.adults)}
+                                  childAges={stayGuestAges(party)}
+                                  currency={o.currency}
+                                  locale={locale}
+                                  selectedRateId={chosenRoom?.rateId ?? null}
+                                  onChooseRoom={(room) => setChosenRoom(room)}
+                                />
+                              )}
                               {o.alternatives && o.alternatives.length > 0 && (
                                 <div className="mt-3">
                                   <button
@@ -1110,7 +1148,7 @@ export function AssistantPage() {
                                       ).map((a) => (
                                         <button
                                           key={a.offerReference}
-                                          onClick={() => setHotelRef(a.offerReference)}
+                                          onClick={() => { setHotelRef(a.offerReference); setChosenRoom(null); }}
                                           className="flex w-full items-center justify-between gap-3 rounded-xl border border-border bg-background px-4 py-3 text-left transition-colors hover:bg-secondary"
                                         >
                                           <span className="min-w-0">
@@ -1128,7 +1166,7 @@ export function AssistantPage() {
                                       ))}
                                       {hotelRef && (
                                         <button
-                                          onClick={() => setHotelRef(null)}
+                                          onClick={() => { setHotelRef(null); setChosenRoom(null); }}
                                           className="text-xs text-muted-foreground underline underline-offset-4"
                                         >
                                           {t.assistant.backToRecommendation}

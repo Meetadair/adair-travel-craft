@@ -145,6 +145,9 @@ export type TripOverrides = {
   occasion?: TripOccasion | undefined;
   /** Answered either way in the chat; false is a real answer, not silence. */
   needsCar?: boolean | undefined;
+  /** The hotel actually shown on the card — pins live search to that property
+   *  instead of letting it re-rank and possibly land on a different one. */
+  hotelNameExact?: string | undefined;
 };
 
 /** The request as the traveller corrected it. */
@@ -185,6 +188,7 @@ export function applyOverrides(request: TripRequest, overrides: TripOverrides): 
   if (overrides.party) next.party = overrides.party;
   if (overrides.occasion) next.occasion = overrides.occasion;
   if (overrides.needsCar !== undefined) next.needsCar = overrides.needsCar;
+  if (overrides.hotelNameExact) next.hotelNameExact = overrides.hotelNameExact;
   if (overrides.destinationIata) {
     const iata = overrides.destinationIata.toUpperCase();
     next.destinationIata = iata;

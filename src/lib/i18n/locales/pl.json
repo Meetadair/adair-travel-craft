@@ -396,7 +396,32 @@
       "send": "Wyślij",
       "thanks": "Dziękujemy — to właśnie na tym Adair uczy się Twojego gustu.",
       "thanksPoor": "Dziękujemy, że mówisz wprost. Czytamy każdą taką odpowiedź i wrócimy do Ciebie."
-    }
+    },
+    "roomOptionsShow": "Zobacz opcje pokoi i opinie",
+    "roomOptionsHide": "Ukryj opcje pokoi",
+    "roomOptionsLoading": "Ładowanie opcji pokoi…",
+    "roomOptionsEmpty": "Brak szczegółów dotyczących tego obiektu.",
+    "roomOptionsChoose": "Wybierz ten pokój",
+    "roomOptionsChosen": "Wybrany",
+    "roomOptionsBreakfastIncluded": "Śniadanie wliczone",
+    "roomOptionsRoomOnly": "Tylko pokój",
+    "roomOptionsFreeCancellationUntil": "Bezpłatna anulacja do",
+    "roomOptionsNonRefundable": "Brak zwrotu kosztów",
+    "roomOptionsCheckIn": "Zameldowanie od",
+    "roomOptionsCheckOut": "Wymeldowanie do",
+    "roomOptionsEarlyCheckIn": "Wcześniejsze zameldowanie",
+    "roomOptionsEarlyCheckInNote": "Jeśli przyjedziesz wcześniej",
+    "roomOptionsLateCheckOut": "Późne wymeldowanie",
+    "roomOptionsLateCheckOutNote": "Jeśli chcesz dłużej pospać",
+    "roomOptionsOnRequest": "Na życzenie",
+    "roomOptionsReviewsTitle": "Opinie gości",
+    "roomOptionsReviewCount": "opinie",
+    "roomOptionsBandExceptional": "Wyjątkowy",
+    "roomOptionsBandExcellent": "Doskonały",
+    "roomOptionsBandVeryGood": "Bardzo dobry",
+    "roomOptionsBandGood": "Dobry",
+    "roomOptionsBandFair": "Zadowalający",
+    "roomOptionsSeparateBeds": "Oddzielne łóżka"
   },
   "auth": {
     "meta": {

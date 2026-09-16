@@ -64,6 +64,8 @@ const overridesSchema = z.object({
   oneWay: z.boolean().optional(),
   /** Saved travel_companions rows picked as "who's coming", self excluded. */
   companionIds: z.array(z.string().uuid()).max(8).optional(),
+  /** The hotel actually on the preview card, so live search pins to it. */
+  hotelNameExact: z.string().trim().min(1).max(140).optional(),
 });
 
 const sentenceSchema = z.object({

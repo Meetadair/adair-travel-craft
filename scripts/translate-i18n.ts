@@ -50,7 +50,7 @@ async function translate(code: string, language: string) {
     },
     body: JSON.stringify({
       model: "claude-sonnet-4-5",
-      max_tokens: 8192,
+      max_tokens: 16000,
       system:
             `You localize marketing and product UI copy for a premium AI travel assistant called Adair. ` +
             `Translate every string value of the given JSON into ${language}. ` +
@@ -65,7 +65,13 @@ async function translate(code: string, language: string) {
   });
   if (!res.ok) throw new Error(`${code}: anthropic ${res.status} ${await res.text()}`);
   const json = (await res.json()) as { content?: Array<{ text?: string }> };
-  const parsed = JSON.parse(json.content?.[0]?.text ?? "{}");
+  const raw = (json.content?.[0]?.text ?? "{}").trim();
+  // Claude sometimes wraps the JSON in a ```json fence despite being asked
+  // not to; stripping it here is cheaper than a retry loop.
+  const unfenced = raw.startsWith("```")
+    ? raw.replace(/^```[a-z]*\n/i, "").replace(/```\s*$/, "")
+    : raw;
+  const parsed = JSON.parse(unfenced);
   const problems = sameShape(en, parsed);
   if (problems.length) throw new Error(`${code}: ${problems.join(", ")}`);
   await writeFile(

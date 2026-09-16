@@ -26,6 +26,8 @@ export type TripOffer = {
   live: boolean;
   /** Optional provider photos (empty when the provider exposes none). */
   images?: string[];
+  /** liteAPI's hotel id (hotels only) — lets the card fetch room options and reviews. */
+  hotelId?: string | null;
   /** Optional swap-in options (hotels): shown only on demand. */
   alternatives?: Array<Omit<TripOffer, "alternatives">>;
   /**
@@ -335,6 +337,7 @@ async function duffelStay(input: TripSearchInput): Promise<TripOffer | null> {
     currency: stay.currency,
     live: true,
     ...(stay.photoUrl ? { images: [stay.photoUrl] } : {}),
+    ...(stay.hotelId ? { hotelId: stay.hotelId } : {}),
   });
 
   try {

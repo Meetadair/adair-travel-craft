@@ -128,6 +128,10 @@ export type StayResult = {
   approx: boolean;
   photoUrl: string | null;
   rateId: string | null;
+  /** liteAPI's own id for the property. Set only when liteAPI answered the
+   *  search — it is what lets the card ask for the full room list, amenities
+   *  and reviews later. Null for a Duffel Stays result, or a sample one. */
+  hotelId?: string | null;
   /** True when this property is the exact one the traveller named. */
   exact?: boolean;
   /** Property coordinates, when the supplier gives them. */
@@ -139,6 +143,64 @@ export type StayResult = {
   breakfastIncluded?: boolean | null;
   /** What the same stay with breakfast costs extra, in the rate currency. */
   breakfastExtra?: number | null;
+};
+
+/** One bed group a room actually has — "2x Twin bed" is two entries deep, one wide. */
+export type StayBedType = {
+  bedType: string;
+  quantity: number;
+};
+
+/**
+ * One bookable room+rate combination at a property, exactly as liteAPI
+ * quoted it — this is what a traveller picks, not the property as a whole.
+ * Size, bed layout and the room's own amenities come from liteAPI's static
+ * catalogue and are matched onto the live rate by name; a rate with no
+ * confident match still shows fine; it just carries no size or bed layout.
+ */
+export type StayRoomOption = {
+  rateId: string;
+  roomName: string;
+  boardName: string | null;
+  breakfastIncluded: boolean | null;
+  refundable: boolean;
+  /** ISO date the free-cancellation window closes, when the rate has one. */
+  freeCancellationUntil: string | null;
+  amount: number;
+  currency: string;
+  sizeSqm: number | null;
+  bedTypes: StayBedType[];
+  /** Room-level amenities, lower-cased; empty when no static match was found. */
+  amenities: string[];
+};
+
+/** One guest review, as liteAPI's aggregation returns it. */
+export type StayReview = {
+  reviewerName: string;
+  country: string | null;
+  score: number;
+  date: string | null;
+  pros: string | null;
+  cons: string | null;
+};
+
+/**
+ * Everything about one property beyond the shortlist card: fetched on demand
+ * when a traveller opens "room options", never as part of the search itself
+ * — a shortlist of ten hotels does not need ten room lists and ten review
+ * pulls before it can render.
+ */
+export type StayDetail = {
+  hotelId: string;
+  starRating: number | null;
+  reviewScore: number | null;
+  reviewCount: number | null;
+  /** e.g. "03:00 PM"; null when the property does not state one. */
+  checkinFrom: string | null;
+  checkoutUntil: string | null;
+  roomOptions: StayRoomOption[];
+  reviews: StayReview[];
+  currency: string;
 };
 
 export type CarResult = {

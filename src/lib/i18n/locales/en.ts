@@ -165,6 +165,35 @@ export const en = {
     removedNote: "Removed from this trip",
     restoreAll: "Add everything back",
 
+    // Room-by-room detail on a hotel card: real rates, amenities, board,
+    // cancellation terms, the property's check-in window and a few reviews —
+    // fetched only once a traveller asks to see it.
+    roomOptionsShow: "See room options & reviews",
+    roomOptionsHide: "Hide room options",
+    roomOptionsLoading: "Loading room options…",
+    roomOptionsEmpty: "No room details available for this property right now.",
+    roomOptionsChoose: "Choose this room",
+    roomOptionsChosen: "Selected",
+    roomOptionsBreakfastIncluded: "Breakfast included",
+    roomOptionsRoomOnly: "Room only",
+    roomOptionsFreeCancellationUntil: "Free cancellation until",
+    roomOptionsNonRefundable: "Non-refundable",
+    roomOptionsCheckIn: "Check-in from",
+    roomOptionsCheckOut: "Check-out until",
+    roomOptionsEarlyCheckIn: "Early check-in",
+    roomOptionsEarlyCheckInNote: "If you arrive earlier",
+    roomOptionsLateCheckOut: "Late check-out",
+    roomOptionsLateCheckOutNote: "If you'd like to sleep in",
+    roomOptionsOnRequest: "On request",
+    roomOptionsReviewsTitle: "What guests say",
+    roomOptionsReviewCount: "reviews",
+    roomOptionsBandExceptional: "Exceptional",
+    roomOptionsBandExcellent: "Excellent",
+    roomOptionsBandVeryGood: "Very good",
+    roomOptionsBandGood: "Good",
+    roomOptionsBandFair: "Fair",
+    roomOptionsSeparateBeds: "Separate beds",
+
     // What Adair understood, shown before anything is searched.
     intent: {
       greeting: "Hi. Where are you going?",
