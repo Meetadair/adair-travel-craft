@@ -14,8 +14,6 @@ import { noticedSentences } from "@/lib/trip/learning";
 import { BRAND_SEED } from "@/lib/brands/catalogue";
 
 export type MemoryView = {
-  /** Stated preferences, in plain sentences. */
-  stated: string[];
   lines: { id: string; text: string; group: "pattern" | "place" | "ranking" }[];
   /** The one habit worth asking about, if any. */
   ask: { patternKind: string; value: string; question: string } | null;
@@ -53,14 +51,11 @@ export const getMyMemory = createServerFn({ method: "GET" })
       loadLearned(supabase, userId, stated),
     ]);
 
-    const statedLines = [
-      ...stated.airlines.map((id) => `you asked for ${nameOf(id)}`),
-      ...stated.hotelChains.map((id) => `you asked for ${nameOf(id)}`),
-      ...stated.carBrands.map((id) => `you asked for a ${nameOf(id)}`),
-    ];
+    // Explicit preference selections (airlines/hotel chains/car brands) are
+    // already shown as editable chips on the Preferences page itself, so they
+    // are not re-echoed here — only genuine behavioural inference is.
     const ask = patternToAsk(patterns);
     return {
-      stated: statedLines,
       lines: knowsSentences(patterns, place, noticedSentences(learned, nameOf)),
       ask: ask
         ? {

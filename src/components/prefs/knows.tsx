@@ -40,8 +40,7 @@ export function Knows() {
 
   const data = memory.data;
   const lines = data?.lines ?? [];
-  const stated = data?.stated ?? [];
-  if (!data || (!lines.length && !stated.length && !data.ask)) return null;
+  if (!data || (!lines.length && !data.ask)) return null;
 
   const group = (name: "pattern" | "place" | "ranking") =>
     lines.filter((line) => line.group === name);
@@ -79,7 +78,7 @@ export function Knows() {
           What Adair knows about you
         </h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Worked out from your own bookings. Anything you have told me yourself always comes first.
+          Worked out from your own bookings — separate from the preferences you set above.
         </p>
       </div>
 
@@ -116,21 +115,6 @@ export function Knows() {
               {copy.askNo}
             </button>
           </div>
-        </div>
-      ) : null}
-
-      {stated.length ? (
-        <div className="space-y-2">
-          <p className="text-xs uppercase tracking-wide text-muted-foreground">
-            What you told me
-          </p>
-          <ul className="space-y-2">
-            {stated.map((line) => (
-              <li key={line} className="rounded-xl border border-border px-4 py-3 text-sm">
-                {line}
-              </li>
-            ))}
-          </ul>
         </div>
       ) : null}
 

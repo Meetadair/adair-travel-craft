@@ -405,15 +405,21 @@ export const QUESTIONS: QuestionDef[] = [
     part: 1,
     kind: "fields",
     skippable: true,
-    title: "Typical budget per trip?",
+    // Asked per night, not per trip: "typical budget per trip" has no single
+    // right answer when one traveller means a Tuesday overnight and another
+    // means a week away — the total scales with length, the nightly rate
+    // does not. A hotel is quoted per night everywhere else in this app too
+    // (StayResult.nightlyAmount), so this is the unit that actually compares.
+    title: "What do you usually spend per night?",
+    hint: "On the room. A weekend and a two-week trip cost different totals — this is the part that stays the same.",
     singles: [
       {
         field: "budgetBand",
         options: opts(
-          ["u500", "Under €500"],
-          ["500_1500", "€500 – 1,500"],
-          ["1500_3000", "€1,500 – 3,000"],
-          ["3000plus", "€3,000+"],
+          ["u100", "Under €100 / night"],
+          ["100_200", "€100 – 200 / night"],
+          ["200_400", "€200 – 400 / night"],
+          ["400plus", "€400+ / night"],
           ["nolimit", "No limit"],
         ),
       },
