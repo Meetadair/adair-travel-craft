@@ -27,7 +27,11 @@ describe("route modules", () => {
 
   for (const file of files) {
     const name = relative(process.cwd(), file);
-    it(`loads ${name}`, async () => {
+    // Transforming a heavy route for the first time can take several seconds on a
+    // cold machine, and the assistant route is the heaviest of them. A timeout
+    // here says the laptop was busy, not that the route is broken — and a suite
+    // that fails for that reason stops being believed.
+    it(`loads ${name}`, { timeout: 30_000 }, async () => {
       const mod = (await import(/* @vite-ignore */ file)) as Record<string, unknown>;
       const route = mod["Route"] as
         | { options?: { component?: unknown; server?: unknown; loader?: unknown } }
