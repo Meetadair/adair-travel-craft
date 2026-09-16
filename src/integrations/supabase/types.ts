@@ -1081,6 +1081,21 @@ export type Database = {
           },
         ];
       };
+      document_number_counters: {
+        Row: {
+          next_value: number;
+          year: number;
+        };
+        Insert: {
+          next_value?: number;
+          year: number;
+        };
+        Update: {
+          next_value?: number;
+          year?: number;
+        };
+        Relationships: [];
+      };
       error_log: {
         Row: {
           created_at: string;
@@ -3406,6 +3421,7 @@ export type Database = {
       members_i_oversee: { Args: never; Returns: string[] };
       my_company_id: { Args: never; Returns: string };
       my_member_id: { Args: never; Returns: string };
+      next_document_number: { Args: { prefix?: string }; Returns: string };
       owns_creator: { Args: { _creator_id: string }; Returns: boolean };
     };
     Enums: {

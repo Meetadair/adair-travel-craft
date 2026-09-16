@@ -794,6 +794,14 @@ export const bookTripCard = createServerFn({ method: "POST" })
       };
     }
 
+    // The invoice number is ours to assign and must never repeat or go
+    // missing — the airline's own PNR (flightReference) is neither: a
+    // hotel-only trip has none, and it is the airline's identifier, not an
+    // accounting document series. next_document_number() hands out one
+    // gapless number per year, atomically, from the database.
+    const documentNumberRes = await supabase.rpc("next_document_number", { prefix: "ADR" });
+    const documentNumber = (documentNumberRes.data as string | null) ?? flightReference ?? null;
+
     const tripRow = await supabase
       .from("trips")
       .insert({
@@ -808,7 +816,7 @@ export const bookTripCard = createServerFn({ method: "POST" })
         card_id: card.id,
         company_id: data.companyId,
         booked_at: new Date().toISOString(),
-        document_number: flightReference,
+        document_number: documentNumber,
         data_source: "duffel-test",
         segments: request.stops ?? [],
       })
@@ -1065,7 +1073,7 @@ export const bookTripCard = createServerFn({ method: "POST" })
         const { sendInvoiceEmail } = await import("@/lib/invoice-email.server");
         await sendInvoiceEmail({
           to: Array.from(new Set(emails)),
-          documentNumber: flightReference ?? tripId,
+          documentNumber: documentNumber ?? flightReference ?? tripId,
           companyName: [line("name"), line("legal_form")].filter(Boolean).join(" ") || null,
           companyVatId: line("vat_id"),
           companyAddress: address,
