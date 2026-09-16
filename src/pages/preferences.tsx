@@ -185,18 +185,18 @@ export function PreferencesPage() {
             <TravellerProfiles />
 
             <div className="hairline-card p-5 sm:p-6">
-              <p className="text-sm font-medium">Who is this trip for?</p>
+              <p className="text-sm font-medium">Which profile are you editing?</p>
               <p className="mt-1 text-sm text-muted-foreground">
                 The same person travels twice over. A gym in Frankfurt and a pool in Crete are not
                 the same preference, and shortest-door-to-door on a Tuesday is not how you want
-                August to go. Answer once as yourself, then change only what work does differently
-                — everything you leave alone stays the same on both.
+                August to go. Answer once as yourself, then change only what business does
+                differently — everything you leave alone stays the same on both.
               </p>
               <div className="mt-3 inline-flex rounded-xl border border-border p-1">
                 {(
                   [
-                    ["personal", "My own trips"],
-                    ["work", "Work trips"],
+                    ["personal", "Private trips"],
+                    ["work", "Business trips"],
                   ] as const
                 ).map(([value, name]) => (
                   <button
@@ -215,8 +215,8 @@ export function PreferencesPage() {
               </div>
               {mode === "work" && (
                 <p className="mt-3 text-xs text-muted-foreground">
-                  Editing your work answers. Adair uses these when you say a trip is for work, when
-                  the invoice goes to a company, or when the sentence reads like a meeting.
+                  Editing your business answers. Adair uses these when you say a trip is for work,
+                  when the invoice goes to a company, or when the sentence reads like a meeting.
                 </p>
               )}
             </div>

@@ -65,14 +65,12 @@ export const QUESTIONS: QuestionDef[] = [
     title: "Which airport do you fly from?",
     hint: "This becomes the departure point for every trip you ask for.",
   },
-  {
-    id: "purpose",
-    part: 1,
-    kind: "fields",
-    skippable: true,
-    title: "What do you travel for?",
-    multis: [{ field: "tripPurpose", options: opts(["business", "Business"], ["leisure", "Leisure"], ["both", "Both"]) }],
-  },
+  // "What do you travel for?" used to live here as its own question, asked
+  // identically in both the personal and the work tab. It duplicated the
+  // Private/Business toggle above it — and in the work tab it silently did
+  // nothing at all, since tripPurpose was never part of the work overlay
+  // (see BUSINESS_OVERRIDE_FIELDS in prefs/context.ts). Removed rather than
+  // fixed in place: the toggle already says which of the two this profile is.
   {
     id: "airlines",
     part: 2,
