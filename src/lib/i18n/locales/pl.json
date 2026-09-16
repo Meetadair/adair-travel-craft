@@ -361,7 +361,13 @@
       "failed": "Płatność nie powiodła się, nie pobrano żadnych środków. Możemy dokończyć na bezpiecznej stronie.",
       "finishSecure": "Dokończ na bezpiecznej stronie",
       "companyFailed": "Nie udało się zapisać danych firmy. Spróbuj ponownie.",
-      "detailsFailed": "Dane nie zostały zaakceptowane. Sprawdź ich poprawność."
+      "detailsFailed": "Dane nie zostały zaakceptowane. Sprawdź ich poprawność.",
+      "companionsNeeded": "Kto jeszcze z Tobą leci / podróżuje?",
+      "addSomeone": "+ Dodaj nową osobę",
+      "gender": "Płeć",
+      "genderFemale": "Kobieta",
+      "genderMale": "Mężczyzna",
+      "rememberPerson": "Zapamiętaj tę osobę na przyszłość"
     },
     "bookIdle": "Rezerwuj",
     "bookBusy": "Rezerwuję ofertę…",

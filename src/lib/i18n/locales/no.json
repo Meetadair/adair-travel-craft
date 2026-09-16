@@ -358,7 +358,13 @@
       "failed": "Det gikk dessverre ikke gjennom, og ingenting ble belastet. Vi kan fullføre på den sikre siden.",
       "finishSecure": "Fullfør på den sikre siden",
       "companyFailed": "Vi klarte ikke å lagre selskapet. Prøv igjen.",
-      "detailsFailed": "Opplysningene ble ikke godkjent. Vennligst sjekk dem."
+      "detailsFailed": "Opplysningene ble ikke godkjent. Vennligst sjekk dem.",
+      "companionsNeeded": "Who else is travelling with you?",
+      "addSomeone": "+ Add someone new",
+      "gender": "Gender",
+      "genderFemale": "Female",
+      "genderMale": "Male",
+      "rememberPerson": "Remember them for next time"
     },
     "bookIdle": "Bestill",
     "bookBusy": "Holder tilbudet…",

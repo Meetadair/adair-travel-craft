@@ -358,7 +358,13 @@
       "failed": "Plaćanje nije uspelo i ništa nije naplaćeno. Možemo završiti na bezbednoj stranici.",
       "finishSecure": "Završi na bezbednoj stranici",
       "companyFailed": "Nismo uspeli da sačuvamo tu kompaniju. Pokušajte ponovo.",
-      "detailsFailed": "Podaci nisu prihvaćeni. Molimo proverite ih."
+      "detailsFailed": "Podaci nisu prihvaćeni. Molimo proverite ih.",
+      "companionsNeeded": "Who else is travelling with you?",
+      "addSomeone": "+ Add someone new",
+      "gender": "Gender",
+      "genderFemale": "Female",
+      "genderMale": "Male",
+      "rememberPerson": "Remember them for next time"
     },
     "bookIdle": "Rezerviši",
     "bookBusy": "Držimo ponudu…",

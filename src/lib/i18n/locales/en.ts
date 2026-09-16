@@ -379,6 +379,12 @@ export const en = {
       booked: "Booked. Taking you to My trips — test mode, nothing was charged.",
       testMode: "Test mode — no real charge is made and no ticket is issued.",
       passport: "This route needs passport details, so we finish on the secure page.",
+      companionsNeeded: "Who else is travelling with you?",
+      addSomeone: "+ Add someone new",
+      gender: "Gender",
+      genderFemale: "Female",
+      genderMale: "Male",
+      rememberPerson: "Remember them for next time",
       continueSecure: "Continue",
       failed:
         "That did not go through, and nothing was charged. We can finish it on the secure page.",

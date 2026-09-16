@@ -358,7 +358,13 @@
       "failed": "未能完成支付，未产生任何扣款。你可以前往安全页面完成预订。",
       "finishSecure": "在安全页面完成预订",
       "companyFailed": "无法保存该公司信息，请重试。",
-      "detailsFailed": "乘机人信息未通过核验，请检查后重试。"
+      "detailsFailed": "乘机人信息未通过核验，请检查后重试。",
+      "companionsNeeded": "Who else is travelling with you?",
+      "addSomeone": "+ Add someone new",
+      "gender": "Gender",
+      "genderFemale": "Female",
+      "genderMale": "Male",
+      "rememberPerson": "Remember them for next time"
     },
     "bookIdle": "立即预订",
     "bookBusy": "正在锁定报价…",

@@ -358,7 +358,13 @@
       "failed": "Das hat nicht geklappt, es wurde nichts berechnet. Der Abschluss ist auf der gesicherten Seite möglich.",
       "finishSecure": "Auf gesicherter Seite abschließen",
       "companyFailed": "Unternehmen konnte nicht gespeichert werden. Bitte erneut versuchen.",
-      "detailsFailed": "Diese Angaben wurden nicht akzeptiert. Bitte überprüfen."
+      "detailsFailed": "Diese Angaben wurden nicht akzeptiert. Bitte überprüfen.",
+      "companionsNeeded": "Who else is travelling with you?",
+      "addSomeone": "+ Add someone new",
+      "gender": "Gender",
+      "genderFemale": "Female",
+      "genderMale": "Male",
+      "rememberPerson": "Remember them for next time"
     },
     "bookIdle": "Jetzt buchen",
     "bookBusy": "Angebot wird gehalten…",

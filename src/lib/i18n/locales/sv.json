@@ -358,7 +358,13 @@
       "failed": "Det gick inte igenom, och inget har debiterats. Vi kan slutföra på den säkra sidan.",
       "finishSecure": "Slutför på den säkra sidan",
       "companyFailed": "Vi kunde inte spara företaget. Försök igen.",
-      "detailsFailed": "Uppgifterna godkändes inte. Kontrollera och försök igen."
+      "detailsFailed": "Uppgifterna godkändes inte. Kontrollera och försök igen.",
+      "companionsNeeded": "Who else is travelling with you?",
+      "addSomeone": "+ Add someone new",
+      "gender": "Gender",
+      "genderFemale": "Female",
+      "genderMale": "Male",
+      "rememberPerson": "Remember them for next time"
     },
     "bookIdle": "Boka",
     "bookBusy": "Håller erbjudandet…",

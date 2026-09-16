@@ -2,8 +2,10 @@
  * Closing the booking in the conversation.
  *
  * Adair asks only what it does not already know, confirms the extras from the
- * sentence in one line, then offers a single summary line and one button.
- * Passport routes and payment recovery still finish on the /book page.
+ * sentence in one line, then offers a single summary line and one button. A
+ * party of more than one is filled in from saved travellers as tappable
+ * chips, or a short name-only form for someone new — never the full /book
+ * form, unless a passport is required (that still finishes on /book).
  */
 import { useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
@@ -18,6 +20,7 @@ import {
   type ClosingExtra,
 } from "@/lib/trip/closing";
 import { getAccount } from "@/lib/account.functions";
+import { listCompanions, type Traveller } from "@/lib/companions.functions";
 import {
   getBookingIdentity,
   saveBookingIdentity,
@@ -34,6 +37,47 @@ const fieldClass =
 const chipClass =
   "rounded-full border border-border px-3 py-1.5 text-xs font-medium hover:border-primary";
 
+type SelectedCompanion = {
+  givenName: string;
+  familyName: string;
+  bornOn: string;
+  gender: "m" | "f";
+  title: "mr" | "ms" | "mrs";
+  passport: { number: string; countryCode: string; expiresOn: string } | null;
+  remember: boolean;
+  travellerId: string | null;
+};
+
+/** The booking schema only knows two genders; a saved "x" (or unset) defaults to "m". */
+function bookingGender(gender: Traveller["gender"]): "m" | "f" {
+  return gender === "f" ? "f" : "m";
+}
+
+function bookingTitle(title: Traveller["title"], gender: "m" | "f"): "mr" | "ms" | "mrs" {
+  if (title === "mr" || title === "ms" || title === "mrs") return title;
+  return gender === "f" ? "ms" : "mr";
+}
+
+/** All three parts or none — a half passport fails at the airline, not here. */
+function savedPassport(t: Traveller): SelectedCompanion["passport"] {
+  if (!t.passportNumber || !t.passportCountry || !t.passportExpiry) return null;
+  return { number: t.passportNumber, countryCode: t.passportCountry, expiresOn: t.passportExpiry };
+}
+
+function fromSavedTraveller(t: Traveller): SelectedCompanion {
+  const gender = bookingGender(t.gender);
+  return {
+    givenName: t.givenName,
+    familyName: t.familyName,
+    bornOn: t.bornOn ?? "",
+    gender,
+    title: bookingTitle(t.title, gender),
+    passport: savedPassport(t),
+    remember: false,
+    travellerId: t.id,
+  };
+}
+
 export function ClosingChat({
   cardId,
   summaryParts,
@@ -45,6 +89,7 @@ export function ClosingChat({
   invoiceMentioned,
   passportRequired,
   ancillaries,
+  partySize,
 }: {
   cardId: string;
   /** "Milan", "Thu–Fri", "LOT 6:55", "Park Hyatt" … */
@@ -58,12 +103,15 @@ export function ClosingChat({
   invoiceMentioned: boolean;
   passportRequired: boolean;
   ancillaries?: Array<{ serviceId: string; quantity: number }>;
+  /** Seats this trip needs, lead traveller included — from the search itself. */
+  partySize: number;
 }) {
   const navigate = useNavigate();
   const c = useT().assistant.closing;
   const fetchAccount = useServerFn(getAccount);
   const fetchIdentity = useServerFn(getBookingIdentity);
   const fetchPayment = useServerFn(getPaymentSession);
+  const fetchCompanions = useServerFn(listCompanions);
   const persistIdentity = useServerFn(saveBookingIdentity);
   const persistCompany = useServerFn(saveInvoiceCompany);
   const book = useServerFn(bookTripCard);
@@ -78,6 +126,10 @@ export function ClosingChat({
     queryFn: () => fetchPayment({ data: { cardId } }),
     staleTime: 10 * 60 * 1000,
   });
+  const savedTravellers = useQuery({
+    queryKey: ["companions"],
+    queryFn: () => fetchCompanions({}),
+  });
 
   const [companyChoice, setCompanyChoice] = useState<string | null>(null);
   const [companyName, setCompanyName] = useState("");
@@ -91,6 +143,15 @@ export function ClosingChat({
     bornOn: "",
   });
   const [detailsSaved, setDetailsSaved] = useState(false);
+  const [selectedCompanions, setSelectedCompanions] = useState<SelectedCompanion[]>([]);
+  const [addingCompanion, setAddingCompanion] = useState(false);
+  const [newCompanion, setNewCompanion] = useState({
+    givenName: "",
+    familyName: "",
+    bornOn: "",
+    gender: "f" as "m" | "f",
+    remember: true,
+  });
   const [payNow, setPayNow] = useState(false);
   const [result, setResult] = useState<BookingResult | null>(null);
   const [problem, setProblem] = useState<string | null>(null);
@@ -117,6 +178,8 @@ export function ClosingChat({
         extras: keptExtras,
         passportRequired,
         travellerComplete: (identity.data?.complete ?? false) || detailsSaved,
+        partySize,
+        companionsChosen: selectedCompanions.length,
       }),
     [
       companies,
@@ -126,6 +189,8 @@ export function ClosingChat({
       passportRequired,
       identity.data?.complete,
       detailsSaved,
+      partySize,
+      selectedCompanions,
     ],
   );
 
@@ -135,9 +200,7 @@ export function ClosingChat({
   if (closing.fallback === "passport") {
     return (
       <div className="mt-4 space-y-2 text-sm">
-        <p className="text-muted-foreground">
-          {c.passport}
-        </p>
+        <p className="text-muted-foreground">{c.passport}</p>
         <button
           type="button"
           onClick={() => navigate({ to: "/book/$cardId", params: { cardId } })}
@@ -149,8 +212,7 @@ export function ClosingChat({
     );
   }
 
-  const chosenCompanyId =
-    companyChoice === "none" ? null : (companyChoice ?? closing.companyId);
+  const chosenCompanyId = companyChoice === "none" ? null : (companyChoice ?? closing.companyId);
   const chosenCompanyName =
     companies.find((company) => company.id === chosenCompanyId)?.name ?? null;
   const chosenCardId = cardChoice === "new" ? null : (cardChoice ?? closing.cardId);
@@ -158,6 +220,11 @@ export function ClosingChat({
   const needsCompanyName =
     closing.questions.some((q) => q.kind === "invoice_company_name") && !chosenCompanyName;
   const needsDetails = closing.questions.some((q) => q.kind === "traveller_details");
+  const needsCompanions = closing.questions.some((q) => q.kind === "companions_choose");
+  const companionsNeeded = Math.max(0, partySize - 1);
+  const savedCompanionOptions = (savedTravellers.data ?? []).filter(
+    (t) => !t.isSelf && !selectedCompanions.some((sc) => sc.travellerId === t.id),
+  );
   const needsCardChoice =
     closing.questions.some((q) => q.kind === "card_choose") && cardChoice === null;
 
@@ -177,7 +244,16 @@ export function ClosingChat({
             gender: identity.data?.gender ?? "m",
             title: identity.data?.title ?? "mr",
           },
-          companions: [],
+          companions: selectedCompanions.map((companion) => ({
+            givenName: companion.givenName,
+            familyName: companion.familyName,
+            bornOn: companion.bornOn,
+            gender: companion.gender,
+            title: companion.title,
+            passport: companion.passport,
+            remember: companion.remember,
+            travellerId: companion.travellerId,
+          })),
           ancillaries: ancillaries ?? [],
           payment: authorised,
         },
@@ -189,8 +265,7 @@ export function ClosingChat({
         window.setTimeout(() => navigate({ to: "/trips" }), 2500);
       }
     },
-    onError: () =>
-      setProblem(c.failed),
+    onError: () => setProblem(c.failed),
   });
 
   if (loading) {
@@ -198,11 +273,7 @@ export function ClosingChat({
   }
 
   if (result && result.status !== "failed") {
-    return (
-      <p className="mt-4 text-sm font-medium text-primary">
-        {c.booked}
-      </p>
-    );
+    return <p className="mt-4 text-sm font-medium text-primary">{c.booked}</p>;
   }
 
   return (
@@ -341,6 +412,157 @@ export function ClosingChat({
         </div>
       )}
 
+      {/* who else is travelling: saved people as chips, or a short new-person form */}
+      {needsCompanions && (
+        <div className="space-y-2">
+          <p>
+            {c.companionsNeeded} ({companionsNeeded - selectedCompanions.length})
+          </p>
+
+          {selectedCompanions.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {selectedCompanions.map((companion, index) => (
+                <button
+                  key={`${companion.givenName}-${companion.familyName}-${index}`}
+                  type="button"
+                  onClick={() =>
+                    setSelectedCompanions((current) => current.filter((_, i) => i !== index))
+                  }
+                  className={`${chipClass} inline-flex items-center gap-1 border-primary text-primary`}
+                >
+                  <X className="size-3" />
+                  {companion.givenName} {companion.familyName}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {selectedCompanions.length < companionsNeeded && (
+            <>
+              {savedCompanionOptions.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {savedCompanionOptions.map((traveller) => (
+                    <button
+                      key={traveller.id}
+                      type="button"
+                      onClick={() =>
+                        setSelectedCompanions((current) => [
+                          ...current,
+                          fromSavedTraveller(traveller),
+                        ])
+                      }
+                      className={chipClass}
+                    >
+                      {traveller.givenName} {traveller.familyName}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {!addingCompanion ? (
+                <button
+                  type="button"
+                  onClick={() => setAddingCompanion(true)}
+                  className={chipClass}
+                >
+                  {c.addSomeone}
+                </button>
+              ) : (
+                <div className="space-y-2 rounded-xl border border-border p-3">
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    <input
+                      value={newCompanion.givenName}
+                      onChange={(event) =>
+                        setNewCompanion((n) => ({ ...n, givenName: event.target.value }))
+                      }
+                      placeholder={c.firstName}
+                      aria-label={c.firstName}
+                      className={fieldClass}
+                    />
+                    <input
+                      value={newCompanion.familyName}
+                      onChange={(event) =>
+                        setNewCompanion((n) => ({ ...n, familyName: event.target.value }))
+                      }
+                      placeholder={c.lastName}
+                      aria-label={c.lastName}
+                      className={fieldClass}
+                    />
+                    <input
+                      type="date"
+                      value={newCompanion.bornOn}
+                      onChange={(event) =>
+                        setNewCompanion((n) => ({ ...n, bornOn: event.target.value }))
+                      }
+                      aria-label={c.bornOn}
+                      className={fieldClass}
+                    />
+                    <select
+                      value={newCompanion.gender}
+                      onChange={(event) =>
+                        setNewCompanion((n) => ({
+                          ...n,
+                          gender: event.target.value === "m" ? "m" : "f",
+                        }))
+                      }
+                      aria-label={c.gender}
+                      className={fieldClass}
+                    >
+                      <option value="f">{c.genderFemale}</option>
+                      <option value="m">{c.genderMale}</option>
+                    </select>
+                  </div>
+                  <label className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <input
+                      type="checkbox"
+                      checked={newCompanion.remember}
+                      onChange={(event) =>
+                        setNewCompanion((n) => ({ ...n, remember: event.target.checked }))
+                      }
+                    />
+                    {c.rememberPerson}
+                  </label>
+                  <button
+                    type="button"
+                    disabled={
+                      newCompanion.givenName.trim().length === 0 ||
+                      newCompanion.familyName.trim().length === 0 ||
+                      !/^\d{4}-\d{2}-\d{2}$/.test(newCompanion.bornOn)
+                    }
+                    onClick={() => {
+                      setSelectedCompanions((current) => [
+                        ...current,
+                        {
+                          givenName: newCompanion.givenName.trim(),
+                          familyName: newCompanion.familyName.trim(),
+                          bornOn: newCompanion.bornOn,
+                          gender: newCompanion.gender,
+                          title: newCompanion.gender === "f" ? "ms" : "mr",
+                          passport: null,
+                          remember: newCompanion.remember,
+                          travellerId: null,
+                        },
+                      ]);
+                      setNewCompanion({
+                        givenName: "",
+                        familyName: "",
+                        bornOn: "",
+                        gender: "f",
+                        remember: true,
+                      });
+                      setAddingCompanion(false);
+                    }}
+                    className="rounded-xl border border-border px-3 py-2 text-sm font-medium hover:border-primary disabled:opacity-60"
+                  >
+                    {c.save}
+                  </button>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      )}
+
       {/* payment: which card, when there is a choice */}
       {closing.questions
         .filter((q) => q.kind === "card_choose")
@@ -391,7 +613,7 @@ export function ClosingChat({
         <div className="flex flex-wrap gap-2">
           <button
             type="button"
-            disabled={needsDetails || needsCardChoice}
+            disabled={needsDetails || needsCompanions || needsCardChoice}
             onClick={() => {
               setPayNow(true);
               track("closing_confirmed", { cardId, questions: closing.questions.length });
@@ -424,9 +646,7 @@ export function ClosingChat({
       )}
 
       {nothingToAsk(closing) && !payNow && (
-        <p className="text-xs text-muted-foreground">
-          {c.testMode}
-        </p>
+        <p className="text-xs text-muted-foreground">{c.testMode}</p>
       )}
     </div>
   );

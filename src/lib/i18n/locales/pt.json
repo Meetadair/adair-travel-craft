@@ -358,7 +358,13 @@
       "failed": "Ocorreu um erro no processamento e nada foi cobrado. Podemos concluir na página segura.",
       "finishSecure": "Concluir na página segura",
       "companyFailed": "Não foi possível guardar essa empresa. Tente novamente.",
-      "detailsFailed": "Os dados inseridos não foram aceites. Por favor, verifique-os."
+      "detailsFailed": "Os dados inseridos não foram aceites. Por favor, verifique-os.",
+      "companionsNeeded": "Who else is travelling with you?",
+      "addSomeone": "+ Add someone new",
+      "gender": "Gender",
+      "genderFemale": "Female",
+      "genderMale": "Male",
+      "rememberPerson": "Remember them for next time"
     },
     "bookIdle": "Reservar",
     "bookBusy": "A reservar a oferta…",

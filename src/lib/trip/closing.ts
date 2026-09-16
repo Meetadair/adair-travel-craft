@@ -24,7 +24,8 @@ export type ClosingQuestionKind =
   | "card_confirm"
   | "card_choose"
   | "card_new"
-  | "traveller_details";
+  | "traveller_details"
+  | "companions_choose";
 
 export type ClosingOption = { value: string; label: string };
 
@@ -46,6 +47,10 @@ export type ClosingInput = {
   passportRequired: boolean;
   /** Lead traveller name, email, phone and date of birth are all on file. */
   travellerComplete: boolean;
+  /** Seats requested for this trip, lead traveller included. */
+  partySize: number;
+  /** Companions already picked (from saved people or typed in) this session. */
+  companionsChosen: number;
 };
 
 export type Closing = {
@@ -84,8 +89,7 @@ export function buildClosing(input: ClosingInput): Closing {
 
   // ---- invoice ----
   // One company saved: take it, and say so in the summary. Nothing to ask.
-  const companyId: string | null =
-    input.companies.length === 1 ? (input.companies[0]!.id) : null;
+  const companyId: string | null = input.companies.length === 1 ? input.companies[0]!.id : null;
   if (input.companies.length > 1) {
     questions.push({
       kind: "invoice_choose",
@@ -111,6 +115,17 @@ export function buildClosing(input: ClosingInput): Closing {
     questions.push({
       kind: "traveller_details",
       question: "I need your details for the ticket, once.",
+      options: [],
+      essential: true,
+    });
+  }
+
+  // ---- who else is travelling (party of more than one) ----
+  const companionsNeeded = Math.max(0, input.partySize - 1);
+  if (companionsNeeded > 0 && input.companionsChosen < companionsNeeded) {
+    questions.push({
+      kind: "companions_choose",
+      question: "Who else is travelling?",
       options: [],
       essential: true,
     });

@@ -358,7 +358,13 @@
       "failed": "No se ha podido procesar y no se ha cobrado nada. Podemos terminarlo en la página segura.",
       "finishSecure": "Terminar en la página segura",
       "companyFailed": "No hemos podido guardar esa empresa. Inténtalo de nuevo.",
-      "detailsFailed": "No se han aceptado esos datos. Por favor, revísalos."
+      "detailsFailed": "No se han aceptado esos datos. Por favor, revísalos.",
+      "companionsNeeded": "Who else is travelling with you?",
+      "addSomeone": "+ Add someone new",
+      "gender": "Gender",
+      "genderFemale": "Female",
+      "genderMale": "Male",
+      "rememberPerson": "Remember them for next time"
     },
     "bookIdle": "Reservar",
     "bookBusy": "Reservando la oferta…",

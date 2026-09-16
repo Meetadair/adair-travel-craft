@@ -358,7 +358,13 @@
       "failed": "Оплату не проведено, кошти не списувалися. Ми можемо завершити на захищеній сторінці.",
       "finishSecure": "Завершити на захищеній сторінці",
       "companyFailed": "Не вдалося зберегти компанію. Спробуйте ще раз.",
-      "detailsFailed": "Ці дані не прийнято. Будь ласка, перевірте їх."
+      "detailsFailed": "Ці дані не прийнято. Будь ласка, перевірте їх.",
+      "companionsNeeded": "Who else is travelling with you?",
+      "addSomeone": "+ Add someone new",
+      "gender": "Gender",
+      "genderFemale": "Female",
+      "genderMale": "Male",
+      "rememberPerson": "Remember them for next time"
     },
     "bookIdle": "Забронювати",
     "bookBusy": "Тримаємо пропозицію…",

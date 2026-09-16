@@ -358,7 +358,13 @@
       "failed": "L'opération n'a pas abouti, aucun débit n'a été effectué. Nous pouvons finaliser sur la page sécurisée.",
       "finishSecure": "Finaliser sur la page sécurisée",
       "companyFailed": "Impossible d'enregistrer cette entreprise. Veuillez réessayer.",
-      "detailsFailed": "Ces informations n'ont pas été acceptées. Veuillez les vérifier."
+      "detailsFailed": "Ces informations n'ont pas été acceptées. Veuillez les vérifier.",
+      "companionsNeeded": "Who else is travelling with you?",
+      "addSomeone": "+ Add someone new",
+      "gender": "Gender",
+      "genderFemale": "Female",
+      "genderMale": "Male",
+      "rememberPerson": "Remember them for next time"
     },
     "bookIdle": "Réserver",
     "bookBusy": "Offre en cours de blocage…",

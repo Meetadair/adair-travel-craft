@@ -358,7 +358,13 @@
       "failed": "Varaus ei mennyt läpi, eikä veloitusta tehty. Voimme viimeistellä sen suojatulla sivulla.",
       "finishSecure": "Viimeistele suojatulla sivulla",
       "companyFailed": "Yrityksen tallentaminen ei onnistunut. Yritä uudelleen.",
-      "detailsFailed": "Tietoja ei hyväksytty. Tarkista ne."
+      "detailsFailed": "Tietoja ei hyväksytty. Tarkista ne.",
+      "companionsNeeded": "Who else is travelling with you?",
+      "addSomeone": "+ Add someone new",
+      "gender": "Gender",
+      "genderFemale": "Female",
+      "genderMale": "Male",
+      "rememberPerson": "Remember them for next time"
     },
     "bookIdle": "Varaa",
     "bookBusy": "Varataan tarjousta…",

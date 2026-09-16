@@ -1499,6 +1499,7 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
                         passportRequired={
                           !!req?.destinationIata && !isSchengen(req.destinationIata)
                         }
+                        partySize={req?.passengers ?? 1}
                       />
                     )}
                   </div>

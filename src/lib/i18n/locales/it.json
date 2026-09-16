@@ -358,7 +358,13 @@
       "failed": "La richiesta non è andata a buon fine e non c'è stato alcun addebito. Possiamo completarla sulla pagina protetta.",
       "finishSecure": "Completa sulla pagina sicura",
       "companyFailed": "Non è stato possibile salvare l'azienda. Riprova.",
-      "detailsFailed": "I dati inseriti non sono stati accettati. Ti chiediamo di verificarli."
+      "detailsFailed": "I dati inseriti non sono stati accettati. Ti chiediamo di verificarli.",
+      "companionsNeeded": "Who else is travelling with you?",
+      "addSomeone": "+ Add someone new",
+      "gender": "Gender",
+      "genderFemale": "Female",
+      "genderMale": "Male",
+      "rememberPerson": "Remember them for next time"
     },
     "bookIdle": "Prenota",
     "bookBusy": "Blocco l'offerta…",

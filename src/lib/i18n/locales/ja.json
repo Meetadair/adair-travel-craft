@@ -358,7 +358,13 @@
       "failed": "処理を完了できませんでした。料金の請求は発生していません。安全な専用ページでお手続きを継続できます。",
       "finishSecure": "専用ページで手続きを完了する",
       "companyFailed": "会社情報を保存できませんでした。もう一度お試しください。",
-      "detailsFailed": "入力情報を受け付けられませんでした。内容をご確認ください。"
+      "detailsFailed": "入力情報を受け付けられませんでした。内容をご確認ください。",
+      "companionsNeeded": "Who else is travelling with you?",
+      "addSomeone": "+ Add someone new",
+      "gender": "Gender",
+      "genderFemale": "Female",
+      "genderMale": "Male",
+      "rememberPerson": "Remember them for next time"
     },
     "bookIdle": "予約する",
     "bookBusy": "オファーを確保中…",

@@ -8,6 +8,8 @@ const base = {
   extras: [],
   passportRequired: false,
   travellerComplete: true,
+  partySize: 1,
+  companionsChosen: 0,
 };
 
 const company = (id: string, name: string) => ({ id, name, isDefault: true });
@@ -84,6 +86,47 @@ describe("buildClosing", () => {
     expect(closing.fallback).toBe("passport");
   });
 
+  it("asks who else is travelling when the party is more than one", () => {
+    const closing = buildClosing({
+      ...base,
+      partySize: 2,
+      companionsChosen: 0,
+      cards: [card("k1", "4417")],
+    });
+    expect(closing.questions.map((q) => q.kind)).toEqual(["companions_choose"]);
+    expect(closing.questions[0]!.essential).toBe(true);
+  });
+
+  it("keeps asking until enough companions are picked", () => {
+    const closing = buildClosing({
+      ...base,
+      partySize: 3,
+      companionsChosen: 1,
+      cards: [card("k1", "4417")],
+    });
+    expect(closing.questions.map((q) => q.kind)).toEqual(["companions_choose"]);
+  });
+
+  it("stops asking once every seat has a name on it", () => {
+    const closing = buildClosing({
+      ...base,
+      partySize: 2,
+      companionsChosen: 1,
+      cards: [card("k1", "4417")],
+    });
+    expect(closing.questions).toHaveLength(0);
+  });
+
+  it("asks nothing extra for a solo trip", () => {
+    const closing = buildClosing({
+      ...base,
+      partySize: 1,
+      companionsChosen: 0,
+      cards: [card("k1", "4417")],
+    });
+    expect(closing.questions).toHaveLength(0);
+  });
+
   it("confirms extras in one line instead of asking", () => {
     const closing = buildClosing({
       ...base,
@@ -124,7 +167,12 @@ describe("summaryLine", () => {
 
   it("leaves out what does not apply", () => {
     expect(
-      summaryLine({ parts: ["Milan", "Thu–Fri"], companyName: null, cardLabel: null, totalLabel: "€300" }),
+      summaryLine({
+        parts: ["Milan", "Thu–Fri"],
+        companyName: null,
+        cardLabel: null,
+        totalLabel: "€300",
+      }),
     ).toBe("Milan, Thu–Fri — €300. Book it?");
   });
 });
