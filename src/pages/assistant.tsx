@@ -47,6 +47,7 @@ import {
   X,
   CalendarDays,
 } from "lucide-react";
+import { countryForTimeZone } from "@/lib/prefs/airports";
 import { SiteNav } from "@/components/site-nav";
 import { HotelGallery } from "@/components/hotel-gallery";
 import { VoiceInput } from "@/components/voice-input";
@@ -254,6 +255,9 @@ export function AssistantPage() {
     const pending = parsed
       ? chatQuestions(sentence, parsed, {
           knownAirports: knownAirports(),
+          homeCountry: countryForTimeZone(
+            typeof Intl === "undefined" ? null : Intl.DateTimeFormat().resolvedOptions().timeZone,
+          ),
           answered: options.justAnswered ? [...answered, options.justAnswered] : answered,
           known: knownProfile,
           copy: {

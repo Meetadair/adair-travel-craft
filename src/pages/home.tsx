@@ -1,3 +1,4 @@
+import { countryForTimeZone } from "@/lib/prefs/airports";
 import { HotelGallery } from "@/components/hotel-gallery";
 import {
   Plane,
@@ -790,7 +791,14 @@ function ChatDemo({ t, submission }: { t: Dict; submission: Submission | null })
       ? understand(pendingSentence, effectiveRequest, a.strip)
       : null;
   const openQuestions = effectiveRequest
-    ? chatQuestions(pendingSentence, effectiveRequest, { answered, copy: a.questions })
+    ? chatQuestions(pendingSentence, effectiveRequest, {
+        answered,
+        copy: a.questions,
+        ...(homeAirport ? { knownAirports: [homeAirport] } : {}),
+        homeCountry: countryForTimeZone(
+          typeof Intl === "undefined" ? null : Intl.DateTimeFormat().resolvedOptions().timeZone,
+        ),
+      })
     : [];
 
   const answerQuestion = (kind: ChatQuestionKind, value: string | number[]) => {

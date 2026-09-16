@@ -99,3 +99,82 @@ export function airportByIata(iata: string): AirportEntry | null {
   const code = iata.trim().toUpperCase();
   return AIRPORTS.find((a) => a.iata === code) ?? null;
 }
+
+/**
+ * Where the traveller most likely departs from, before they have told us
+ * anything.
+ *
+ * The browser's time zone is a real signal, not a guess: someone in
+ * Europe/Warsaw departs from a Polish airport far more often than from a
+ * Spanish one, and offering the five airports of their own country is the
+ * difference between a chip they tap and an empty search box they have to
+ * think about. Anything unrecognised returns nothing rather than a default —
+ * an empty box beats a box full of the wrong country.
+ */
+const ZONE_COUNTRY: Record<string, string> = {
+  "Europe/Warsaw": "Poland",
+  "Europe/Berlin": "Germany",
+  "Europe/Vienna": "Austria",
+  "Europe/Zurich": "Switzerland",
+  "Europe/Paris": "France",
+  "Europe/Brussels": "Belgium",
+  "Europe/Amsterdam": "Netherlands",
+  "Europe/London": "United Kingdom",
+  "Europe/Dublin": "Ireland",
+  "Europe/Madrid": "Spain",
+  "Europe/Lisbon": "Portugal",
+  "Europe/Rome": "Italy",
+  "Europe/Prague": "Czechia",
+  "Europe/Budapest": "Hungary",
+  "Europe/Bratislava": "Slovakia",
+  "Europe/Ljubljana": "Slovenia",
+  "Europe/Zagreb": "Croatia",
+  "Europe/Bucharest": "Romania",
+  "Europe/Sofia": "Bulgaria",
+  "Europe/Athens": "Greece",
+  "Europe/Stockholm": "Sweden",
+  "Europe/Oslo": "Norway",
+  "Europe/Copenhagen": "Denmark",
+  "Europe/Helsinki": "Finland",
+  "Europe/Vilnius": "Lithuania",
+  "Europe/Riga": "Latvia",
+  "Europe/Tallinn": "Estonia",
+  "Europe/Istanbul": "Turkey",
+};
+
+export function countryForTimeZone(timeZone: string | null | undefined): string | null {
+  if (!timeZone) return null;
+  return ZONE_COUNTRY[timeZone] ?? null;
+}
+
+/** The airports we know in one country, biggest first — the list is ordered. */
+export function airportsInCountry(country: string | null, limit = 5): AirportEntry[] {
+  if (!country) return [];
+  return AIRPORTS.filter((airport) => airport.country === country).slice(0, limit);
+}
+
+/**
+ * The chips to show under "where are you flying from": airports this traveller
+ * has chosen before, then their own country's, never the destination, never
+ * the same airport twice.
+ */
+export function likelyOrigins(
+  { used = [], country = null, exclude = [] }: {
+    used?: string[];
+    country?: string | null;
+    exclude?: string[];
+  },
+  limit = 5,
+): AirportEntry[] {
+  const barred = new Set(exclude.map((code) => code.toUpperCase()));
+  const out: AirportEntry[] = [];
+  const seen = new Set<string>();
+  const add = (entry: AirportEntry | null) => {
+    if (!entry || barred.has(entry.iata) || seen.has(entry.iata) || out.length >= limit) return;
+    seen.add(entry.iata);
+    out.push(entry);
+  };
+  for (const code of used) add(airportByIata(code));
+  for (const entry of airportsInCountry(country, limit)) add(entry);
+  return out;
+}

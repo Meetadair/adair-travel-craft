@@ -219,3 +219,39 @@ describe("the departure airport cannot be the destination", () => {
     expect(parsed?.originIata).toBe("WAW");
   });
 });
+
+describe("what the departure picker offers before anything is known", () => {
+  it("offers the traveller's own country, not the world", () => {
+    const asked = chatQuestions(
+      "I need to go to paris",
+      base({ originStated: false }),
+      { homeCountry: "Poland" },
+    );
+    const origin = asked.find((q) => q.kind === "origin");
+    expect(origin?.options.map((o) => o.value)).toEqual(["WAW", "KRK", "GDN", "WRO", "KTW"]);
+  });
+
+  it("leads with airports this traveller has used before", () => {
+    const asked = chatQuestions(
+      "I need to go to paris",
+      base({ originStated: false }),
+      { homeCountry: "Poland", knownAirports: ["BER"] },
+    );
+    expect(asked.find((q) => q.kind === "origin")?.options[0]?.value).toBe("BER");
+  });
+
+  it("never offers the airport they are flying to", () => {
+    const asked = chatQuestions(
+      "I need to go to paris",
+      base({ originStated: false, destinationIata: "CDG" }),
+      { homeCountry: "France" },
+    );
+    const offered = asked.find((q) => q.kind === "origin")?.options.map((o) => o.value) ?? [];
+    expect(offered).not.toContain("CDG");
+  });
+
+  it("offers nothing rather than the wrong country when the region is unknown", () => {
+    const asked = chatQuestions("I need to go to paris", base({ originStated: false }));
+    expect(asked.find((q) => q.kind === "origin")?.options).toEqual([]);
+  });
+});

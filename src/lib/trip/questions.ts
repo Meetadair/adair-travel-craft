@@ -4,6 +4,7 @@
  * ignored and the assumption is then printed on the card.
  */
 import { MULTI_AIRPORT, hasNoDates, isVagueWeek, mentionsAirport } from "./clarify";
+import { airportLabel, likelyOrigins } from "@/lib/prefs/airports";
 import { calendarDates } from "./parse";
 import { ageQuestion, familyFromSentence } from "./family";
 import { travellersStated } from "./passengers";
@@ -115,6 +116,11 @@ export function isBusinessSentence(sentence: string, request?: TripRequest | nul
 export type QuestionContext = {
   /** Airport codes the traveller has already chosen before. */
   knownAirports?: string[];
+  /**
+   * The country the traveller appears to be in, from their browser's time zone.
+   * Used to suggest departure airports before they have told us anything.
+   */
+  homeCountry?: string | null;
   /** Kinds already answered in this conversation. */
   answered?: ChatQuestionKind[];
   /**
@@ -202,7 +208,14 @@ export function chatQuestions(
       kind: "origin",
       question: copy.origin,
       control: "airport",
-      options: [],
+      // Chips before the search box: the airports they have used before, then
+      // the ones in their own country. An empty search field asks someone to
+      // remember an airport code; a row of chips asks them to tap.
+      options: likelyOrigins({
+        used: context.knownAirports ?? [],
+        country: context.homeCountry ?? null,
+        exclude: request.destinationIata ? [request.destinationIata] : [],
+      }).map((airport) => ({ label: airportLabel(airport), value: airport.iata })),
       excludeIata: request.destinationIata ? [request.destinationIata] : [],
       essential: true,
     });
