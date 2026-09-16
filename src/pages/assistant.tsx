@@ -275,6 +275,7 @@ export function AssistantPage() {
           kind: next.kind as Clarification["kind"],
           question: next.question,
           options: next.options.map((option) => option.label),
+          excludeIata: next.excludeIata ?? [],
           placeholder: "",
         }
       : clarify(sentence, {
@@ -675,6 +676,7 @@ export function AssistantPage() {
               <div className="mt-3">
                 <AirportAnswer
                   value={null}
+                  exclude={question.excludeIata ?? []}
                   copy={t.assistant.strip.controls}
                   onChange={(iata) => answerQuestion(iata)}
                 />

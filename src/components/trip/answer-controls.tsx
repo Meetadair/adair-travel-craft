@@ -238,27 +238,34 @@ export function ChoiceAnswer({
 export function AirportAnswer({
   value,
   suggestions = [],
+  exclude = [],
   copy,
   onChange,
 }: {
   value: string | null;
   suggestions?: { iata: string; label: string }[];
+  /** Codes this question cannot accept — the destination, when asking the origin. */
+  exclude?: string[];
   copy: AnswerControlsCopy;
   onChange: (iata: string) => void;
 }) {
   const [query, setQuery] = useState("");
   const typed = query.trim().length > 0;
+  const barred = new Set(exclude.map((code) => code.toUpperCase()));
   // An empty box used to list the world's airports alphabetically underneath
   // chips that already answered the question. Amsterdam is not a useful reply
   // to "which New York airport?" — the list appears once someone actually asks
   // for it.
-  const matches = typed ? searchAirports(query) : [];
+  const matches = (typed ? searchAirports(query) : []).filter(
+    (airport) => !barred.has(airport.iata.toUpperCase()),
+  );
+  const offered = suggestions.filter((option) => !barred.has(option.iata.toUpperCase()));
 
   return (
     <div className="w-full">
-      {suggestions.length > 0 && (
+      {offered.length > 0 && (
         <div className="flex flex-wrap gap-2">
-          {suggestions.map((option) => (
+          {offered.map((option) => (
             <button
               key={option.iata}
               type="button"
@@ -273,9 +280,9 @@ export function AirportAnswer({
       <input
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        placeholder={suggestions.length > 0 ? copy.airportOther : copy.airportSearch}
+        placeholder={offered.length > 0 ? copy.airportOther : copy.airportSearch}
         aria-label={copy.airportSearch}
-        className={`${suggestions.length > 0 ? "mt-3" : ""} w-full rounded-lg border border-border bg-background px-3 py-2 text-xs outline-none`}
+        className={`${offered.length > 0 ? "mt-3" : ""} w-full rounded-lg border border-border bg-background px-3 py-2 text-xs outline-none`}
       />
       {typed && (
       <ul className="mt-1 max-h-44 overflow-auto rounded-lg border border-border">

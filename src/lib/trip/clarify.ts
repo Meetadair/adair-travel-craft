@@ -32,6 +32,11 @@ export type ClarifyKind =
   | "airport_transfer";
 
 export type Clarification = {
+  /**
+   * Airports this question cannot accept. Set when asking where a trip starts,
+   * so the destination is not offered as the departure airport.
+   */
+  excludeIata?: string[];
   kind: ClarifyKind;
   /** One short question, in the traveller's chat. */
   question: string;

@@ -116,6 +116,7 @@ export function ChatQuestions({
             {question.control === "airport" && (
               <AirportAnswer
                 value={chosen[question.kind] ?? null}
+                exclude={question.excludeIata ?? []}
                 suggestions={question.options.map((option) => ({
                   iata: option.value,
                   label: option.label,

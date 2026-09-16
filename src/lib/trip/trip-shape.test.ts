@@ -196,3 +196,26 @@ describe("answering where the trip starts", () => {
     expect(chatQuestions(sentence, parsed).some((q) => q.kind === "origin")).toBe(false);
   });
 });
+
+describe("the departure airport cannot be the destination", () => {
+  it("names the destination as barred on the origin question", () => {
+    // What went wrong: asked where the trip started, the picker offered CDG on a
+    // trip to Paris. It was taken, and the conversation moved on to dates with a
+    // Paris-to-Paris trip behind it.
+    const asked = chatQuestions("I need to go to paris", base({ originStated: false }));
+    const origin = asked.find((q) => q.kind === "origin");
+    expect(origin?.excludeIata).toEqual(["CDG"]);
+  });
+
+  it("refuses it in the parse as well, not only in the picker", () => {
+    const parsed = parseTripSentence("I need to go to paris from CDG");
+    expect(parsed?.originStated).toBe(false);
+    expect(parsed?.originIata).not.toBe(parsed?.destinationIata);
+  });
+
+  it("accepts any other airport as the start", () => {
+    const parsed = parseTripSentence("I need to go to paris from WAW");
+    expect(parsed?.originStated).toBe(true);
+    expect(parsed?.originIata).toBe("WAW");
+  });
+});

@@ -31,6 +31,14 @@ export type ChatQuestion = {
   control: "calendar" | "time" | "ages" | "options" | "travellers" | "destination" | "airport" | "choice";
   /** Buttons, for the options control. */
   options: { label: string; value: string }[];
+  /**
+   * Airports this question must not accept as an answer.
+   *
+   * Set on the origin question to the destination: a picker that offers CDG as
+   * the departure airport for a trip to Paris is offering a trip from Paris to
+   * Paris, and someone will take it.
+   */
+  excludeIata?: string[];
   /** Essential questions block the search; the others only add an assumption. */
   essential: boolean;
 };
@@ -195,6 +203,7 @@ export function chatQuestions(
       question: copy.origin,
       control: "airport",
       options: [],
+      excludeIata: request.destinationIata ? [request.destinationIata] : [],
       essential: true,
     });
   }
