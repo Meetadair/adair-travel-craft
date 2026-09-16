@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState, useEffect, useMemo, useRef } from "react";
 import { ageQuestion, familyFromSentence } from "@/lib/trip/family";
+import { passengersFromSentence } from "@/lib/trip/passengers";
 import { applyAnswer, assumptionNote, clarify, hasNoDates, isVagueWeek, type Clarification } from "@/lib/trip/clarify";
 import { AirportAnswer, DateAnswer, TravellersAnswer } from "@/components/trip/answer-controls";
 import { isCompleteRange, rangeSentence, type DateRange } from "@/lib/trip/answers";
@@ -172,6 +173,13 @@ export function AssistantPage() {
   const [partyOpen, setPartyOpen] = useState(false);
   const [cabin, setCabin] = useState<Cabin>("economy");
   const [party, setParty] = useState<PartyCounts>(EMPTY_PARTY);
+  /**
+   * True only once the traveller has actually opened the party widget and
+   * touched it. Until then, `party` is a display default, not a decision —
+   * booking must read the headcount the chat already settled, never this
+   * default silently mailing 1 adult over a family of four.
+   */
+  const [partyTouched, setPartyTouched] = useState(false);
 
   // Airport choices are remembered locally, so the same question is not asked
   // twice for a city they have already answered for.
@@ -206,11 +214,25 @@ export function AssistantPage() {
         : [...prev, question.kind as ChatQuestionKind],
     );
     say("user", given);
+    const updatedSentence = applyAnswer(asked ?? input.trim(), question.kind, given);
+    // "Travellers" and "child ages" are the two answers that settle who is
+    // actually coming. Neither one reaches the search on its own — composeTrip
+    // never reads passenger counts back out of the sentence, only out of this
+    // `party` state — so without this the chat happily says "for 4 people,
+    // ages 4 and 7" and then books a single adult anyway.
+    if (question.kind === "travellers" || question.kind === "child_ages") {
+      const family = familyFromSentence(updatedSentence);
+      const children = family.children;
+      const infantsOnLap = family.infants;
+      const adults = Math.max(1, travellersCount - children - infantsOnLap);
+      setParty((current) => ({ ...current, adults, children, infantsOnLap }));
+      setPartyTouched(true);
+    }
     // Passed through rather than read back from state: setAnswered above has
     // not landed yet when handleSentence runs, so without this the question
     // that was just answered is asked again — and answering it again starts
     // the same loop from the top.
-    handleSentence(applyAnswer(asked ?? input.trim(), question.kind, given), {
+    handleSentence(updatedSentence, {
       skipIntent: true,
       justAnswered: question.kind as ChatQuestionKind,
     });
@@ -303,6 +325,21 @@ export function AssistantPage() {
   };
 
   const runSearch = (sentence: string, override?: Omit<SearchArgs, "message">) => {
+    // A baseline for a sentence that already said everything up front
+    // ("for 4, with family, ages 4 and 7") without ever hitting the
+    // travellers/child-ages questions that answerQuestion hooks into — those
+    // set `party` and mark it touched themselves. Read fresh here rather than
+    // from state: setParty below would not land until the next render, and
+    // this same call needs the number a few lines down.
+    let effectiveParty = party;
+    if (!partyTouched) {
+      const family = familyFromSentence(sentence);
+      const children = family.children;
+      const infantsOnLap = family.infants;
+      const adults = Math.max(1, passengersFromSentence(sentence) - children - infantsOnLap);
+      effectiveParty = { adults, teenagers: 0, children, infantsWithSeat: 0, infantsOnLap };
+      setParty(effectiveParty);
+    }
     setAsked(sentence);
     setSaved(null);
     setHotelRef(null);
@@ -315,7 +352,10 @@ export function AssistantPage() {
         ? assumptionNote(sentence, parsed.destinationCity, parsed.destinationIata ?? "")
         : null,
     );
-    search.mutate(override ? { message: sentence, ...override } : sentence);
+    // Every search carries who is actually coming. An explicit override
+    // (the party widget's own "Done") still wins over the state it was
+    // built from.
+    search.mutate({ message: sentence, party: effectiveParty, ...override });
   };
 
   const money = (amount: number, currency: string) =>
@@ -958,7 +998,10 @@ export function AssistantPage() {
                         party={party}
                         copy={t.assistant.strip.controls}
                         onCabin={setCabin}
-                        onParty={setParty}
+                        onParty={(next) => {
+                          setParty(next);
+                          setPartyTouched(true);
+                        }}
                         onDone={() => {
                           if (!isBookableParty(party)) return;
                           setPartyOpen(false);
