@@ -171,17 +171,21 @@ export const finaliseTripChange = createServerFn({ method: "POST" })
     const oldItems = activeItems((itemsRes.data ?? []) as ItemRow[]);
 
     const { removeItemFromCalendars } = await import("@/lib/calendar/sync.server");
+    const { cancelAtSupplier, cancelNote, needsFollowUp } = await import(
+      "@/lib/trip/supplier-cancel"
+    );
     let cancelled = 0;
+    /** Lines the supplier did not confirm, so the traveller is told rather than assured. */
+    const unfinished: string[] = [];
     for (const item of oldItems) {
-      let status = "cancelled";
-      if (item.kind === "flight" && item.supplier_order_id) {
-        try {
-          const { cancelFlightOrder } = await import("@/lib/trip/duffel-book.server");
-          const result = await cancelFlightOrder(item.supplier_order_id);
-          status = result.status;
-        } catch {
-          status = "cancel-requested";
-        }
+      const outcome = await cancelAtSupplier({
+        kind: item.kind,
+        supplierOrderId: item.supplier_order_id,
+      });
+      const status = outcome === "released" || outcome === "unsupported" ? "cancelled" : outcome;
+      if (needsFollowUp(outcome)) {
+        const note = cancelNote(item.kind, outcome);
+        if (note) unfinished.push(note);
       }
       await supabase
         .from("trip_items")
@@ -328,6 +332,12 @@ export const finaliseTripChange = createServerFn({ method: "POST" })
       refundEur: quote.refundEur,
       differenceEur: quote.differenceEur,
       cancelled,
+      /**
+       * Anything the supplier did not confirm. Empty means every line really is
+       * released; a line here is a job somebody still has to finish, and the
+       * traveller is told rather than assured.
+       */
+      unfinished,
       documentNumber: (newTrip["document_number"] as string | null) ?? null,
     };
   });

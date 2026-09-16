@@ -1372,25 +1372,14 @@ export const cancelTripItem = createServerFn({ method: "POST" })
     };
     if (item.status === "cancelled") return { status: "cancelled" as const };
 
-    let status = "cancelled";
-    if (item.kind === "flight" && item.supplier_order_id) {
-      const { cancelFlightOrder } = await import("@/lib/trip/duffel-book.server");
-      try {
-        const result = await cancelFlightOrder(item.supplier_order_id);
-        status = result.status;
-      } catch {
-        status = "cancel-requested";
-      }
-    }
-    if (item.kind === "stay" && item.supplier_order_id) {
-      const { cancelStayBooking } = await import("@/lib/trip/duffel-stays.server");
-      try {
-        const result = await cancelStayBooking(item.supplier_order_id);
-        status = result.status;
-      } catch {
-        status = "cancel-requested";
-      }
-    }
+    // Flight, hotel and car all go back to the supplier who holds them. The car
+    // was missing here entirely, so removing one from a trip released nothing.
+    const { cancelAtSupplier } = await import("@/lib/trip/supplier-cancel");
+    const outcome = await cancelAtSupplier({
+      kind: item.kind,
+      supplierOrderId: item.supplier_order_id,
+    });
+    const status = outcome === "released" || outcome === "unsupported" ? "cancelled" : outcome;
 
     await supabase.from("trip_items").update({ status }).eq("id", item.id).eq("user_id", userId);
 
