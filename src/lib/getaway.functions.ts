@@ -21,7 +21,16 @@ import {
 
 export type GetawayPlace = {
   id: string;
-  kind: "hotel" | "restaurant" | "sight";
+  kind:
+    | "hotel"
+    | "restaurant"
+    | "cafe"
+    | "bar"
+    | "wine_bar"
+    | "cocktail_bar"
+    | "rooftop"
+    | "club"
+    | "sight";
   name: string;
   address: string | null;
   editorialNote: string | null;
@@ -32,6 +41,10 @@ export type GetawayPlace = {
   lon: number | null;
   /** Present when a creator partner recommended this place. */
   recommendedBy: { name: string; handle: string; avatarUrl: string | null } | null;
+  /** Our own tip, written by the team rather than submitted. */
+  ours: boolean;
+  /** When we were there, when we are willing to say. */
+  visitedOn: string | null;
 };
 
 export type GetawayDay = {
@@ -312,7 +325,7 @@ export const getWeeklyGetaway = createServerFn({ method: "GET" })
     const placesRes = await supabase
       .from("getaway_places")
       .select(
-        "id, kind, name, address, latitude, longitude, editorial_note, why_this_one, price_band, family_friendly, review_status, creators(display_name, handle, status, avatar_url)",
+        "id, kind, name, address, latitude, longitude, editorial_note, why_this_one, price_band, family_friendly, review_status, visited_on, creators(display_name, handle, status, avatar_url)",
       )
       .eq("destination_id", destRow.id)
       .eq("active", true)
@@ -327,6 +340,8 @@ export const getWeeklyGetaway = createServerFn({ method: "GET" })
       whyThisOne: (p['why_this_one'] as string | null) ?? null,
       priceBand: (p['price_band'] as string | null) ?? null,
       familyFriendly: Boolean(p['family_friendly']),
+      ours: p['review_status'] === "editorial",
+      visitedOn: (p['visited_on'] as string | null) ?? null,
       lat: p['latitude'] === null ? null : Number(p['latitude']),
       lon: p['longitude'] === null ? null : Number(p['longitude']),
       recommendedBy: (() => {

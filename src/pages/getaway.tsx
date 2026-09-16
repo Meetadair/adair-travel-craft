@@ -6,17 +6,24 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { BedDouble, Compass, MapPin, UtensilsCrossed, Landmark } from "lucide-react";
+import { BedDouble, Coffee, Compass, Landmark, MapPin, Martini, UtensilsCrossed, Wine } from "lucide-react";
+import type { ReactNode } from "react";
 import { SiteNav } from "@/components/site-nav";
 import { GetawayDayImage, GetawayHero } from "@/components/getaway-image";
 import { chooseGetaway, getWeeklyGetaway, muteGetawayTheme } from "@/lib/getaway.functions";
 import { AppFooter } from "@/components/app-footer";
 
-const KIND_ICON = {
+const KIND_ICON: Record<string, ReactNode> = {
   hotel: <BedDouble className="size-4" />,
   restaurant: <UtensilsCrossed className="size-4" />,
+  cafe: <Coffee className="size-4" />,
+  bar: <Martini className="size-4" />,
+  wine_bar: <Wine className="size-4" />,
+  cocktail_bar: <Martini className="size-4" />,
+  rooftop: <Martini className="size-4" />,
+  club: <Martini className="size-4" />,
   sight: <Landmark className="size-4" />,
-} as const;
+};
 
 const money = (minor: number | null, currency: string) =>
   minor === null
@@ -273,6 +280,20 @@ export function GetawayPage() {
                           )}
                           {place.whyThisOne && (
                             <p className="mt-2 text-sm text-muted-foreground">{place.whyThisOne}</p>
+                          )}
+                          {place.editorialNote && (
+                            <p className="mt-2 text-sm leading-relaxed">{place.editorialNote}</p>
+                          )}
+                          {place.ours && !place.recommendedBy && (
+                            <p className="mt-2 text-xs font-medium text-primary">
+                              From our own trip
+                              {place.visitedOn
+                                ? ` · ${new Date(place.visitedOn).toLocaleDateString("en", {
+                                    month: "long",
+                                    year: "numeric",
+                                  })}`
+                                : ""}
+                            </p>
                           )}
                           {place.recommendedBy && (
                             <p className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">

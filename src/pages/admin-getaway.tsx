@@ -327,7 +327,18 @@ function DestinationEditor({
     typical_nights: dest.typical_nights,
     active: dest.active,
   };
-  const [place, setPlace] = useState({ kind: "hotel", name: "", address: "", why: "" });
+  const [place, setPlace] = useState({
+    kind: "hotel",
+    name: "",
+    address: "",
+    why: "",
+    // The longer note and the date are what make a tip ours rather than a
+    // listing: "we stayed here in May, ask for a room on the courtyard side".
+    note: "",
+    priceBand: "",
+    visitedOn: "",
+    familyFriendly: false,
+  });
   const [itin, setItin] = useState({ title: "", nights: "2", summary: "" });
 
   return (
@@ -557,7 +568,49 @@ function DestinationEditor({
           <Field label="Name" value={place.name} onChange={(v) => setPlace({ ...place, name: v })} />
           <Field label="Address" value={place.address} onChange={(v) => setPlace({ ...place, address: v })} />
           <Field label="Why this one" value={place.why} onChange={(v) => setPlace({ ...place, why: v })} />
+          <label className="block">
+            <span className="text-xs font-medium text-muted-foreground">Price band</span>
+            <select
+              value={place.priceBand}
+              onChange={(e) => setPlace({ ...place, priceBand: e.target.value })}
+              className={inputClass}
+            >
+              <option value="">Not saying</option>
+              <option value="€">€ — everyday</option>
+              <option value="€€">€€ — a proper dinner</option>
+              <option value="€€€">€€€ — an occasion</option>
+              <option value="€€€€">€€€€ — the splurge</option>
+            </select>
+          </label>
+          <label className="block">
+            <span className="text-xs font-medium text-muted-foreground">When we were there</span>
+            <input
+              type="date"
+              value={place.visitedOn}
+              onChange={(e) => setPlace({ ...place, visitedOn: e.target.value })}
+              className={inputClass}
+            />
+          </label>
         </div>
+        <label className="mt-3 block">
+          <span className="text-xs font-medium text-muted-foreground">
+            From our own experience
+          </span>
+          <textarea
+            value={place.note}
+            onChange={(e) => setPlace({ ...place, note: e.target.value })}
+            placeholder="What you would tell a friend: the table to ask for, the room to avoid, the hour to arrive."
+            className={`${inputClass} min-h-24`}
+          />
+        </label>
+        <label className="mt-2 inline-flex items-center gap-2 text-xs text-muted-foreground">
+          <input
+            type="checkbox"
+            checked={place.familyFriendly}
+            onChange={(e) => setPlace({ ...place, familyFriendly: e.target.checked })}
+          />
+          Works with children
+        </label>
         <button
           type="button"
           disabled={place.name.length < 2}
@@ -569,13 +622,25 @@ function DestinationEditor({
               address: place.address || null,
               latitude: null,
               longitude: null,
-              editorial_note: null,
+              editorial_note: place.note || null,
               why_this_one: place.why || null,
-              price_band: null,
-              family_friendly: false,
+              price_band: place.priceBand || null,
+              visited_on: place.visitedOn || null,
+              // Ours, not a submission waiting to be reviewed.
+              review_status: "editorial" as const,
+              family_friendly: place.familyFriendly,
               active: true,
             });
-            setPlace({ kind: "hotel", name: "", address: "", why: "" });
+            setPlace({
+              kind: "hotel",
+              name: "",
+              address: "",
+              why: "",
+              note: "",
+              priceBand: "",
+              visitedOn: "",
+              familyFriendly: false,
+            });
           }}
           className="mt-3 min-h-11 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground disabled:opacity-50"
         >

@@ -235,7 +235,7 @@ export const saveGetawayPlace = createServerFn({ method: "POST" })
       .object({
         id: z.string().uuid().optional(),
         destination_id: z.string().uuid(),
-        kind: z.enum(["hotel", "restaurant", "sight"]),
+        kind: z.enum(["hotel", "restaurant", "cafe", "bar", "wine_bar", "cocktail_bar", "rooftop", "club", "sight"]),
         name: z.string().trim().min(2).max(160),
         address: z.string().trim().max(300).nullable(),
         latitude: z.number().min(-90).max(90).nullable(),
@@ -243,6 +243,14 @@ export const saveGetawayPlace = createServerFn({ method: "POST" })
         editorial_note: z.string().trim().max(4000).nullable(),
         why_this_one: z.string().trim().max(1000).nullable(),
         price_band: z.string().trim().max(20).nullable(),
+        /** When we were there — what turns a listing into a recommendation. */
+        visited_on: z
+          .string()
+          .regex(/^\d{4}-\d{2}-\d{2}$/)
+          .nullable()
+          .optional(),
+        /** Our own tip, rather than a creator submission awaiting review. */
+        review_status: z.enum(["pending", "approved", "rejected", "editorial"]).optional(),
         family_friendly: z.boolean(),
         active: z.boolean(),
         remove: z.boolean().optional(),
@@ -251,12 +259,19 @@ export const saveGetawayPlace = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
-    const { id, remove, ...fields } = data;
+    const { id, remove, visited_on, review_status, ...rest } = data;
     if (remove && id) {
       const res = await context.supabase.from("getaway_places").delete().eq("id", id);
       if (res.error) throw new Error(res.error.message);
       return { ok: true };
     }
+    // The two optional columns are written explicitly rather than left off the
+    // object, so clearing a visit date actually clears it.
+    const fields = {
+      ...rest,
+      visited_on: visited_on ?? null,
+      review_status: review_status ?? "editorial",
+    };
     const res = id
       ? await context.supabase.from("getaway_places").update(fields).eq("id", id)
       : await context.supabase.from("getaway_places").insert(fields);
