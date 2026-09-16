@@ -318,6 +318,10 @@ export const bookTripCard = createServerFn({ method: "POST" })
     let flightReference: string | null = null;
     let flightGross = 0;
     let flightNet = 0;
+    // What a supplier charged this card directly. Duffel takes the airline's own
+    // price straight off the traveller's card, so that part must not be charged
+    // a second time when we capture the rest of the trip.
+    let paidAtSupplierEur = 0;
     let failed = false;
     let reason: string | null = null;
 
@@ -372,6 +376,7 @@ export const bookTripCard = createServerFn({ method: "POST" })
         flightOrderId = order.id;
         flightReference = order.bookingReference;
         flightNet = search.flight.amountEur;
+        if (cardPayment) paidAtSupplierEur += flightNet;
         // The card already holds the traveller price; only recompute if missing.
         flightGross =
           priced.flight ?? pricing.fromMinor(pricing.grossMinor(flightNet, table.flight));
@@ -752,6 +757,15 @@ export const bookTripCard = createServerFn({ method: "POST" })
         },
         { onConflict: "user_id,idempotency_key" },
       );
+      // Nothing was bought, so the hold on the card is released now rather than
+      // left to expire on its own days later with the money still out of reach.
+      if (adapter && cardPayment && adapter.settlementModel === "merchant-of-record") {
+        try {
+          await adapter.cancel(cardPayment.threeDSecureSessionId);
+        } catch (error) {
+          console.error("releasing the authorisation failed", error);
+        }
+      }
       await audit("booking_failed", { cardId: card.id, reason });
       void recordEvent(userId, "booking_failed", { cause: reason ?? "unknown", card_id: card.id });
       return {
@@ -956,13 +970,52 @@ export const bookTripCard = createServerFn({ method: "POST" })
       console.error("creator commission step failed", error);
     }
 
+    // Take the money. Everything above this point booked a trip; without this
+    // the traveller was invoiced for a total nobody ever collected, because the
+    // authorisation was never captured and quietly expired.
+    let settlement = { captureMinor: 0, note: "no card authorisation to capture" };
+    let captureFailed: string | null = null;
+    if (adapter && cardPayment) {
+      const { settlementFor } = await import("@/lib/payments/settle");
+      settlement = settlementFor({
+        confirmedTotalEur: confirmedTotal,
+        creditAppliedMinor,
+        paidAtSupplierEur,
+        settlementModel: adapter.settlementModel,
+      });
+      try {
+        const outcome =
+          settlement.captureMinor > 0
+            ? await adapter.capture(cardPayment.threeDSecureSessionId, settlement.captureMinor)
+            : await adapter.cancel(cardPayment.threeDSecureSessionId);
+        if (outcome.status !== "ok") {
+          captureFailed = outcome.status;
+          console.error("capture failed", outcome);
+        }
+      } catch (error) {
+        captureFailed = "capture-threw";
+        console.error("capture threw", error);
+      }
+      // A capture that does not go through is money we are owed on a trip that
+      // is already booked, so it is recorded as such rather than swallowed.
+      await audit(captureFailed ? "payment_capture_failed" : "payment_captured", {
+        tripId,
+        amountMinor: settlement.captureMinor,
+        note: settlement.note,
+        provider: adapter.id,
+        error: captureFailed,
+      });
+    }
+
     await supabase.from("payments").upsert(
       {
         user_id: userId,
         trip_id: tripId,
         provider_ref: flightOrderId,
         amount_minor: Math.max(0, Math.round(confirmedTotal * 100) - creditAppliedMinor),
-        status: settledStatus,
+        captured_minor: captureFailed ? 0 : settlement.captureMinor,
+        capture_note: captureFailed ? `${settlement.note} — ${captureFailed}` : settlement.note,
+        status: captureFailed ? "capture_failed" : settledStatus,
         idempotency_key: idempotencyKey,
         failure_note: status === "partial" ? reason : null,
         ...paymentDetails,

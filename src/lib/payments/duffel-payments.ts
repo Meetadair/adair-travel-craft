@@ -109,7 +109,7 @@ export const duffelPayments: PaymentAdapter = {
   async confirm(intentRef) {
     return paymentUnavailable("not-supported", `confirmed with the order (${intentRef})`);
   },
-  async capture(intentRef) {
+  async capture(intentRef, _amountMinor) {
     return paymentUnavailable("not-supported", `captured with the order (${intentRef})`);
   },
   async cancel(intentRef) {

@@ -125,7 +125,12 @@ export type PaymentAdapter = {
     metadata?: IntentMetadata,
   ): Promise<PaymentResult<PaymentIntent>>;
   confirm(intentRef: string): Promise<PaymentResult<PaymentOutcome>>;
-  capture(intentRef: string): Promise<PaymentResult<PaymentOutcome>>;
+  /**
+   * Takes the money. `amountMinor` captures part of the authorisation — the
+   * trip total less whatever a supplier already charged this card — and the
+   * rest of the hold is released. Omitted, it takes the whole authorisation.
+   */
+  capture(intentRef: string, amountMinor?: number): Promise<PaymentResult<PaymentOutcome>>;
   cancel(intentRef: string): Promise<PaymentResult<PaymentOutcome>>;
   refund(
     intentRef: string,

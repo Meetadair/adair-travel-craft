@@ -8,6 +8,21 @@ export type Database = {
   };
   public: {
     Tables: {
+      applied_migrations: {
+        Row: {
+          applied_at: string;
+          name: string;
+        };
+        Insert: {
+          applied_at?: string;
+          name: string;
+        };
+        Update: {
+          applied_at?: string;
+          name?: string;
+        };
+        Relationships: [];
+      };
       audit_log: {
         Row: {
           action: string;
@@ -37,6 +52,52 @@ export type Database = {
           id?: string;
         };
         Relationships: [];
+      };
+      booking_delegations: {
+        Row: {
+          assistant_id: string;
+          company_id: string;
+          created_at: string;
+          id: string;
+          traveller_id: string;
+        };
+        Insert: {
+          assistant_id: string;
+          company_id: string;
+          created_at?: string;
+          id?: string;
+          traveller_id: string;
+        };
+        Update: {
+          assistant_id?: string;
+          company_id?: string;
+          created_at?: string;
+          id?: string;
+          traveller_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "booking_delegations_assistant_id_fkey";
+            columns: ["assistant_id"];
+            isOneToOne: false;
+            referencedRelation: "company_members";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "booking_delegations_company_id_fkey";
+            columns: ["company_id"];
+            isOneToOne: false;
+            referencedRelation: "companies";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "booking_delegations_traveller_id_fkey";
+            columns: ["traveller_id"];
+            isOneToOne: false;
+            referencedRelation: "company_members";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       brands: {
         Row: {
@@ -76,6 +137,138 @@ export type Database = {
           updated_at?: string;
         };
         Relationships: [];
+      };
+      budget_entries: {
+        Row: {
+          amount_minor: number;
+          budget_id: string;
+          company_id: string;
+          created_at: string;
+          currency: string;
+          id: string;
+          kind: string;
+          member_id: string | null;
+          note: string | null;
+          trip_id: string | null;
+        };
+        Insert: {
+          amount_minor: number;
+          budget_id: string;
+          company_id: string;
+          created_at?: string;
+          currency?: string;
+          id?: string;
+          kind: string;
+          member_id?: string | null;
+          note?: string | null;
+          trip_id?: string | null;
+        };
+        Update: {
+          amount_minor?: number;
+          budget_id?: string;
+          company_id?: string;
+          created_at?: string;
+          currency?: string;
+          id?: string;
+          kind?: string;
+          member_id?: string | null;
+          note?: string | null;
+          trip_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "budget_entries_budget_id_fkey";
+            columns: ["budget_id"];
+            isOneToOne: false;
+            referencedRelation: "travel_budgets";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "budget_entries_company_id_fkey";
+            columns: ["company_id"];
+            isOneToOne: false;
+            referencedRelation: "companies";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "budget_entries_member_id_fkey";
+            columns: ["member_id"];
+            isOneToOne: false;
+            referencedRelation: "company_members";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      budget_releases: {
+        Row: {
+          amount_minor: number;
+          budget_id: string;
+          company_id: string;
+          created_at: string;
+          currency: string;
+          id: string;
+          kind: string;
+          reason: string;
+          released_by: string;
+          requested_by: string | null;
+          trip_id: string | null;
+        };
+        Insert: {
+          amount_minor: number;
+          budget_id: string;
+          company_id: string;
+          created_at?: string;
+          currency?: string;
+          id?: string;
+          kind?: string;
+          reason: string;
+          released_by: string;
+          requested_by?: string | null;
+          trip_id?: string | null;
+        };
+        Update: {
+          amount_minor?: number;
+          budget_id?: string;
+          company_id?: string;
+          created_at?: string;
+          currency?: string;
+          id?: string;
+          kind?: string;
+          reason?: string;
+          released_by?: string;
+          requested_by?: string | null;
+          trip_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "budget_releases_budget_id_fkey";
+            columns: ["budget_id"];
+            isOneToOne: false;
+            referencedRelation: "travel_budgets";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "budget_releases_company_id_fkey";
+            columns: ["company_id"];
+            isOneToOne: false;
+            referencedRelation: "companies";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "budget_releases_released_by_fkey";
+            columns: ["released_by"];
+            isOneToOne: false;
+            referencedRelation: "company_members";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "budget_releases_requested_by_fkey";
+            columns: ["requested_by"];
+            isOneToOne: false;
+            referencedRelation: "company_members";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       calendar_connections: {
         Row: {
@@ -327,6 +520,195 @@ export type Database = {
           vat_id?: string | null;
         };
         Relationships: [];
+      };
+      company_audit: {
+        Row: {
+          action: string;
+          actor_id: string | null;
+          company_id: string;
+          created_at: string;
+          detail: Json;
+          id: string;
+          target: string | null;
+        };
+        Insert: {
+          action: string;
+          actor_id?: string | null;
+          company_id: string;
+          created_at?: string;
+          detail?: Json;
+          id?: string;
+          target?: string | null;
+        };
+        Update: {
+          action?: string;
+          actor_id?: string | null;
+          company_id?: string;
+          created_at?: string;
+          detail?: Json;
+          id?: string;
+          target?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "company_audit_actor_id_fkey";
+            columns: ["actor_id"];
+            isOneToOne: false;
+            referencedRelation: "company_members";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "company_audit_company_id_fkey";
+            columns: ["company_id"];
+            isOneToOne: false;
+            referencedRelation: "companies";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      company_domains: {
+        Row: {
+          company_id: string;
+          created_at: string;
+          domain: string;
+          id: string;
+          verification_token: string;
+          verified_at: string | null;
+        };
+        Insert: {
+          company_id: string;
+          created_at?: string;
+          domain: string;
+          id?: string;
+          verification_token: string;
+          verified_at?: string | null;
+        };
+        Update: {
+          company_id?: string;
+          created_at?: string;
+          domain?: string;
+          id?: string;
+          verification_token?: string;
+          verified_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "company_domains_company_id_fkey";
+            columns: ["company_id"];
+            isOneToOne: false;
+            referencedRelation: "companies";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      company_members: {
+        Row: {
+          approver_id: string | null;
+          company_id: string;
+          cost_centre_id: string | null;
+          created_at: string;
+          employee_number: string | null;
+          grade_id: string | null;
+          id: string;
+          left_on: string | null;
+          role: string;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          approver_id?: string | null;
+          company_id: string;
+          cost_centre_id?: string | null;
+          created_at?: string;
+          employee_number?: string | null;
+          grade_id?: string | null;
+          id?: string;
+          left_on?: string | null;
+          role?: string;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          approver_id?: string | null;
+          company_id?: string;
+          cost_centre_id?: string | null;
+          created_at?: string;
+          employee_number?: string | null;
+          grade_id?: string | null;
+          id?: string;
+          left_on?: string | null;
+          role?: string;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "company_members_approver_id_fkey";
+            columns: ["approver_id"];
+            isOneToOne: false;
+            referencedRelation: "company_members";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "company_members_company_id_fkey";
+            columns: ["company_id"];
+            isOneToOne: false;
+            referencedRelation: "companies";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "company_members_cost_centre_id_fkey";
+            columns: ["cost_centre_id"];
+            isOneToOne: false;
+            referencedRelation: "cost_centres";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "company_members_grade_id_fkey";
+            columns: ["grade_id"];
+            isOneToOne: false;
+            referencedRelation: "travel_grades";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      cost_centres: {
+        Row: {
+          active: boolean;
+          code: string;
+          company_id: string;
+          created_at: string;
+          id: string;
+          ledger_account: string | null;
+          name: string;
+        };
+        Insert: {
+          active?: boolean;
+          code: string;
+          company_id: string;
+          created_at?: string;
+          id?: string;
+          ledger_account?: string | null;
+          name: string;
+        };
+        Update: {
+          active?: boolean;
+          code?: string;
+          company_id?: string;
+          created_at?: string;
+          id?: string;
+          ledger_account?: string | null;
+          name?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "cost_centres_company_id_fkey";
+            columns: ["company_id"];
+            isOneToOne: false;
+            referencedRelation: "companies";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       creator_attributions: {
         Row: {
@@ -870,31 +1252,58 @@ export type Database = {
       getaway_itineraries: {
         Row: {
           active: boolean;
+          countries: string[];
           created_at: string;
-          destination_id: string;
+          destination_id: string | null;
+          featured: boolean;
+          hero_image_credit: string | null;
+          hero_image_credit_url: string | null;
+          hero_image_url: string | null;
           id: string;
           nights: number;
+          season: string | null;
+          slug: string | null;
+          stops_count: number;
           summary: string | null;
+          themes: string[];
           title: string;
           updated_at: string;
         };
         Insert: {
           active?: boolean;
+          countries?: string[];
           created_at?: string;
-          destination_id: string;
+          destination_id?: string | null;
+          featured?: boolean;
+          hero_image_credit?: string | null;
+          hero_image_credit_url?: string | null;
+          hero_image_url?: string | null;
           id?: string;
           nights?: number;
+          season?: string | null;
+          slug?: string | null;
+          stops_count?: number;
           summary?: string | null;
+          themes?: string[];
           title: string;
           updated_at?: string;
         };
         Update: {
           active?: boolean;
+          countries?: string[];
           created_at?: string;
-          destination_id?: string;
+          destination_id?: string | null;
+          featured?: boolean;
+          hero_image_credit?: string | null;
+          hero_image_credit_url?: string | null;
+          hero_image_url?: string | null;
           id?: string;
           nights?: number;
+          season?: string | null;
+          slug?: string | null;
+          stops_count?: number;
           summary?: string | null;
+          themes?: string[];
           title?: string;
           updated_at?: string;
         };
@@ -911,8 +1320,11 @@ export type Database = {
       getaway_itinerary_days: {
         Row: {
           afternoon: string | null;
+          city: string | null;
+          country: string | null;
           created_at: string;
           day_number: number;
+          drive_minutes: number | null;
           evening: string | null;
           id: string;
           image_credit: string | null;
@@ -921,14 +1333,20 @@ export type Database = {
           image_source: string | null;
           image_url: string | null;
           itinerary_id: string;
+          latitude: number | null;
+          longitude: number | null;
           meal_place_ids: string[];
           morning: string | null;
           sleep_place_id: string | null;
+          travel_note: string | null;
         };
         Insert: {
           afternoon?: string | null;
+          city?: string | null;
+          country?: string | null;
           created_at?: string;
           day_number: number;
+          drive_minutes?: number | null;
           evening?: string | null;
           id?: string;
           image_credit?: string | null;
@@ -937,14 +1355,20 @@ export type Database = {
           image_source?: string | null;
           image_url?: string | null;
           itinerary_id: string;
+          latitude?: number | null;
+          longitude?: number | null;
           meal_place_ids?: string[];
           morning?: string | null;
           sleep_place_id?: string | null;
+          travel_note?: string | null;
         };
         Update: {
           afternoon?: string | null;
+          city?: string | null;
+          country?: string | null;
           created_at?: string;
           day_number?: number;
+          drive_minutes?: number | null;
           evening?: string | null;
           id?: string;
           image_credit?: string | null;
@@ -953,9 +1377,12 @@ export type Database = {
           image_source?: string | null;
           image_url?: string | null;
           itinerary_id?: string;
+          latitude?: number | null;
+          longitude?: number | null;
           meal_place_ids?: string[];
           morning?: string | null;
           sleep_place_id?: string | null;
+          travel_note?: string | null;
         };
         Relationships: [
           {
@@ -1496,6 +1923,8 @@ export type Database = {
       payments: {
         Row: {
           amount_minor: number;
+          capture_note: string | null;
+          captured_minor: number;
           card_brand: string | null;
           card_last4: string | null;
           created_at: string;
@@ -1515,6 +1944,8 @@ export type Database = {
         };
         Insert: {
           amount_minor?: number;
+          capture_note?: string | null;
+          captured_minor?: number;
           card_brand?: string | null;
           card_last4?: string | null;
           created_at?: string;
@@ -1534,6 +1965,8 @@ export type Database = {
         };
         Update: {
           amount_minor?: number;
+          capture_note?: string | null;
+          captured_minor?: number;
           card_brand?: string | null;
           card_last4?: string | null;
           created_at?: string;
@@ -2109,6 +2542,108 @@ export type Database = {
           },
         ];
       };
+      travel_budgets: {
+        Row: {
+          active: boolean;
+          company_id: string;
+          cost_centre_id: string | null;
+          created_at: string;
+          currency: string;
+          deputy_after_hours: number | null;
+          deputy_id: string | null;
+          id: string;
+          limit_minor: number;
+          member_id: string | null;
+          name: string;
+          period: string;
+          period_start: string;
+          project_code: string | null;
+          rebillable: boolean;
+          release_authority_id: string;
+          rolls_over: boolean;
+          scope: string;
+          updated_at: string;
+        };
+        Insert: {
+          active?: boolean;
+          company_id: string;
+          cost_centre_id?: string | null;
+          created_at?: string;
+          currency?: string;
+          deputy_after_hours?: number | null;
+          deputy_id?: string | null;
+          id?: string;
+          limit_minor: number;
+          member_id?: string | null;
+          name: string;
+          period?: string;
+          period_start: string;
+          project_code?: string | null;
+          rebillable?: boolean;
+          release_authority_id: string;
+          rolls_over?: boolean;
+          scope: string;
+          updated_at?: string;
+        };
+        Update: {
+          active?: boolean;
+          company_id?: string;
+          cost_centre_id?: string | null;
+          created_at?: string;
+          currency?: string;
+          deputy_after_hours?: number | null;
+          deputy_id?: string | null;
+          id?: string;
+          limit_minor?: number;
+          member_id?: string | null;
+          name?: string;
+          period?: string;
+          period_start?: string;
+          project_code?: string | null;
+          rebillable?: boolean;
+          release_authority_id?: string;
+          rolls_over?: boolean;
+          scope?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "travel_budgets_company_id_fkey";
+            columns: ["company_id"];
+            isOneToOne: false;
+            referencedRelation: "companies";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "travel_budgets_cost_centre_id_fkey";
+            columns: ["cost_centre_id"];
+            isOneToOne: false;
+            referencedRelation: "cost_centres";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "travel_budgets_deputy_id_fkey";
+            columns: ["deputy_id"];
+            isOneToOne: false;
+            referencedRelation: "company_members";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "travel_budgets_member_id_fkey";
+            columns: ["member_id"];
+            isOneToOne: false;
+            referencedRelation: "company_members";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "travel_budgets_release_authority_id_fkey";
+            columns: ["release_authority_id"];
+            isOneToOne: false;
+            referencedRelation: "company_members";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       travel_companions: {
         Row: {
           address_city: string | null;
@@ -2189,6 +2724,68 @@ export type Database = {
           user_id?: string;
         };
         Relationships: [];
+      };
+      travel_grades: {
+        Row: {
+          cabin: string;
+          cabin_from_hours: number;
+          car_class: string;
+          company_id: string;
+          created_at: string;
+          hotel_cap_minor: number;
+          id: string;
+          key: string;
+          lounge: string;
+          name: string;
+          notice_days: number;
+          per_diem_minor: number;
+          rail_class: string;
+          sort_order: number;
+          updated_at: string;
+        };
+        Insert: {
+          cabin?: string;
+          cabin_from_hours?: number;
+          car_class?: string;
+          company_id: string;
+          created_at?: string;
+          hotel_cap_minor?: number;
+          id?: string;
+          key: string;
+          lounge?: string;
+          name: string;
+          notice_days?: number;
+          per_diem_minor?: number;
+          rail_class?: string;
+          sort_order?: number;
+          updated_at?: string;
+        };
+        Update: {
+          cabin?: string;
+          cabin_from_hours?: number;
+          car_class?: string;
+          company_id?: string;
+          created_at?: string;
+          hotel_cap_minor?: number;
+          id?: string;
+          key?: string;
+          lounge?: string;
+          name?: string;
+          notice_days?: number;
+          per_diem_minor?: number;
+          rail_class?: string;
+          sort_order?: number;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "travel_grades_company_id_fkey";
+            columns: ["company_id"];
+            isOneToOne: false;
+            referencedRelation: "companies";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       traveller_patterns: {
         Row: {
@@ -2276,6 +2873,79 @@ export type Database = {
           user_id?: string;
         };
         Relationships: [];
+      };
+      trip_approvals: {
+        Row: {
+          amount_minor: number;
+          company_id: string;
+          created_at: string;
+          currency: string;
+          decided_at: string | null;
+          decided_note: string | null;
+          decider_id: string;
+          detail: Json;
+          escalate_after: string | null;
+          id: string;
+          member_id: string;
+          reason: string;
+          status: string;
+          trip_id: string | null;
+        };
+        Insert: {
+          amount_minor?: number;
+          company_id: string;
+          created_at?: string;
+          currency?: string;
+          decided_at?: string | null;
+          decided_note?: string | null;
+          decider_id: string;
+          detail?: Json;
+          escalate_after?: string | null;
+          id?: string;
+          member_id: string;
+          reason: string;
+          status?: string;
+          trip_id?: string | null;
+        };
+        Update: {
+          amount_minor?: number;
+          company_id?: string;
+          created_at?: string;
+          currency?: string;
+          decided_at?: string | null;
+          decided_note?: string | null;
+          decider_id?: string;
+          detail?: Json;
+          escalate_after?: string | null;
+          id?: string;
+          member_id?: string;
+          reason?: string;
+          status?: string;
+          trip_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "trip_approvals_company_id_fkey";
+            columns: ["company_id"];
+            isOneToOne: false;
+            referencedRelation: "companies";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "trip_approvals_decider_id_fkey";
+            columns: ["decider_id"];
+            isOneToOne: false;
+            referencedRelation: "company_members";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "trip_approvals_member_id_fkey";
+            columns: ["member_id"];
+            isOneToOne: false;
+            referencedRelation: "company_members";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       trip_cards: {
         Row: {
@@ -2729,6 +3399,10 @@ export type Database = {
     Functions: {
       admin_analytics: { Args: never; Returns: Json };
       is_admin: { Args: { _user_id: string }; Returns: boolean };
+      is_company_admin: { Args: { _company_id: string }; Returns: boolean };
+      members_i_oversee: { Args: never; Returns: string[] };
+      my_company_id: { Args: never; Returns: string };
+      my_member_id: { Args: never; Returns: string };
       owns_creator: { Args: { _creator_id: string }; Returns: boolean };
     };
     Enums: {

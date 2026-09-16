@@ -203,8 +203,14 @@ export const stripePayments: PaymentAdapter = {
     return res.status === "ok" ? paymentOk(toOutcome(res.data, intentRef)) : res;
   },
 
-  async capture(intentRef) {
-    const res = await call(`/payment_intents/${intentRef}/capture`, form({}));
+  async capture(intentRef, amountMinor) {
+    // Capturing less than the authorisation releases the difference, which is
+    // what a trip costing less than the hold should do to the traveller's card.
+    const res = await call(
+      `/payment_intents/${intentRef}/capture`,
+      form(amountMinor === undefined ? {} : { amount_to_capture: amountMinor }),
+      `${intentRef}-capture-${amountMinor ?? "full"}`,
+    );
     return res.status === "ok" ? paymentOk(toOutcome(res.data, intentRef)) : res;
   },
 
