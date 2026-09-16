@@ -14,7 +14,7 @@ if curl -fsS -o /dev/null --max-time 3 "http://localhost:${PORT}/" 2>/dev/null; 
 fi
 
 echo "starting dev server on ${PORT}…"
-setsid nohup npm run dev > /tmp/adair-dev.log 2>&1 < /dev/null &
+nohup npm run dev > "$PWD/dev.log" 2>&1 < /dev/null &
 disown || true
 
 for _ in $(seq 1 40); do
@@ -25,5 +25,5 @@ for _ in $(seq 1 40); do
   fi
 done
 
-echo "dev server did not come up within 80s — see /tmp/adair-dev.log" >&2
+echo "dev server did not come up within 80s — see dev.log w katalogu projektu" >&2
 exit 1
