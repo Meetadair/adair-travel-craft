@@ -1,4 +1,5 @@
 import { useNavigate } from "@tanstack/react-router";
+import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -306,6 +307,19 @@ export function BookPage({ cardId }: { cardId: string }) {
       passportExpiry: current.passportExpiry || selfTraveller.passportExpiry || "",
     }));
   }, [selfTraveller]);
+
+  // The account's own sign-in email, not a saved traveller field — nobody
+  // should have to retype the address they are signed in with.
+  const accountEmailApplied = useRef(false);
+  useEffect(() => {
+    if (accountEmailApplied.current) return;
+    supabase.auth.getUser().then(({ data }) => {
+      const email = data.user?.email;
+      if (!email || accountEmailApplied.current) return;
+      accountEmailApplied.current = true;
+      setTraveller((current) => (current.email ? current : { ...current, email }));
+    });
+  }, []);
 
   // Match the number of forms to the seats booked, pre-filling saved people —
   // full details, not just the name, so a returning family member's passport
