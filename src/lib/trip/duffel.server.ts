@@ -57,33 +57,17 @@ import {
 import type { CarResult, FlightResult, StayResult, TripRequest, TripSearchResponse } from "./types";
 import { applyHouseStandard } from "./house-standard";
 import { hasLiteApiKey, searchLiteApiStays } from "@/lib/suppliers/stays/liteapi";
+import { fxRate } from "@/lib/fx.server";
 
 const BASE = "https://api.duffel.com";
 
-/** Fixed demo conversion table — labelled "approx." wherever it is applied. */
-const FX_TO_EUR: Record<string, number> = {
-  EUR: 1,
-  USD: 0.92,
-  GBP: 1.17,
-  PLN: 0.23,
-  CHF: 1.05,
-  SEK: 0.088,
-  NOK: 0.086,
-  DKK: 0.134,
-  CZK: 0.04,
-  HUF: 0.0026,
-  RON: 0.2,
-  JPY: 0.0061,
-  AED: 0.25,
-  TRY: 0.027,
-};
-
 const round = (n: number) => Math.round(n * 100) / 100;
 
+/** Labelled "approx." wherever it is applied — see fx.server.ts for the source. */
 function toEur(amount: number, currency: string): { amountEur: number; approx: boolean } {
   const code = currency.toUpperCase();
-  const rate = FX_TO_EUR[code];
   if (code === "EUR") return { amountEur: round(amount), approx: false };
+  const rate = fxRate(code);
   if (!rate) return { amountEur: round(amount), approx: true };
   return { amountEur: round(amount * rate), approx: true };
 }

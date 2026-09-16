@@ -16,8 +16,8 @@
  *   book   → POST https://api.uber.com/v1/guests/trips
  *   cancel → DELETE https://api.uber.com/v1/guests/trips/{request_id}
  *
- * Pricing uses the same fixed demo FX table the rest of the app already uses
- * for approximate conversion (see duffel.server.ts) — and only on a fare
+ * Pricing uses the shared live FX source (see fx.server.ts) for approximate
+ * conversion — and only on a fare
  * Uber actually returned. When Uber has no exact upfront price for a route
  * (only a "$13-16" style range), that product is left out rather than
  * turning a range into an invented single number.
@@ -32,6 +32,7 @@ import {
   type RidePlan,
   type RideQuote,
 } from "@/lib/suppliers/types";
+import { fxRate } from "@/lib/fx.server";
 
 const AUTH_BASE = "https://auth.uber.com";
 const API_BASE = "https://api.uber.com";
@@ -41,25 +42,9 @@ const clientSecret = () => process.env["UBER_CLIENT_SECRET"] ?? "";
 const orgUuid = () => process.env["UBER_ORG_UUID"] ?? "";
 const configured = () => Boolean(clientId() && clientSecret() && orgUuid());
 
-/** Same fixed demo conversion table used elsewhere — approximate throughout. */
-const FX_TO_EUR: Record<string, number> = {
-  EUR: 1,
-  USD: 0.92,
-  GBP: 1.17,
-  PLN: 0.23,
-  CHF: 1.05,
-  SEK: 0.088,
-  NOK: 0.086,
-  DKK: 0.134,
-  CZK: 0.04,
-  HUF: 0.0026,
-  RON: 0.2,
-  JPY: 0.0061,
-  AED: 0.25,
-  TRY: 0.027,
-};
+/** Live rate from the shared fx module — approximate throughout. */
 const toEurAmount = (amount: number, currency: string): number => {
-  const rate = FX_TO_EUR[currency.toUpperCase()] ?? 1;
+  const rate = fxRate(currency.toUpperCase()) ?? 1;
   return Math.round(amount * rate * 100) / 100;
 };
 
