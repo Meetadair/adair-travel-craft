@@ -14,6 +14,8 @@ import { AlertTriangle, Lock } from "lucide-react";
 import type { PaymentSession } from "@/lib/payment.functions";
 import type { AuthorisedPayment } from "./card-payment";
 import { eur } from "@/lib/trip/client";
+import { stripeAppearance } from "./stripe-appearance";
+import { useTheme } from "@/lib/theme";
 
 function Inner({
   session,
@@ -109,6 +111,7 @@ export default function StripePayment(props: {
   onAuthorised: (payment: AuthorisedPayment) => void;
 }) {
   const { session } = props;
+  const { resolved } = useTheme();
   const stripePromise = useMemo(
     () => (session.publishableKey ? loadStripe(session.publishableKey) : null),
     [session.publishableKey],
@@ -123,7 +126,10 @@ export default function StripePayment(props: {
   }
 
   return (
-    <Elements stripe={stripePromise} options={{ clientSecret: session.clientSecret }}>
+    <Elements
+      stripe={stripePromise}
+      options={{ clientSecret: session.clientSecret, appearance: stripeAppearance(resolved) }}
+    >
       <Inner {...props} />
     </Elements>
   );

@@ -12,6 +12,8 @@ import { useServerFn } from "@tanstack/react-start";
 import { Lock, AlertTriangle } from "lucide-react";
 import { saveCardToken, type PaymentSession } from "@/lib/payment.functions";
 import { eur } from "@/lib/trip/client";
+import { cardFormStyles } from "./prefs/card-form-styles";
+import { useTheme } from "@/lib/theme";
 
 export type AuthorisedPayment = {
   providerCardId: string;
@@ -22,38 +24,6 @@ export type AuthorisedPayment = {
 };
 
 type Stage = "idle" | "tokenising" | "authorising" | "challenge" | "declined" | "authorised";
-
-const formStyles = {
-  input: {
-    default: {
-      "background-color": "#FFFFFF",
-      border: "1px solid rgba(0,0,0,0.12)",
-      "border-radius": "12px",
-      padding: "10px 14px",
-      "font-family": "'Plus Jakarta Sans', sans-serif",
-      "font-size": "14px",
-      color: "#1B1A17",
-    },
-    focus: { border: "1px solid #E8623F", outline: "none" },
-  },
-  select: {
-    default: {
-      "background-color": "#FFFFFF",
-      border: "1px solid rgba(0,0,0,0.12)",
-      "border-radius": "12px",
-      padding: "10px 14px",
-      "font-family": "'Plus Jakarta Sans', sans-serif",
-      "font-size": "14px",
-    },
-  },
-  label: {
-    "font-family": "'Plus Jakarta Sans', sans-serif",
-    "font-size": "12px",
-    color: "rgba(27,26,23,0.62)",
-  },
-  inputErrorMessage: { "font-size": "12px", color: "#E8623F" },
-  sectionTitle: { "font-family": "'Bricolage Grotesque', sans-serif", "font-size": "15px" },
-};
 
 export default function CardPayment({
   session,
@@ -72,6 +42,7 @@ export default function CardPayment({
 }) {
   const { ref, saveCard, createCardForTemporaryUse } = useDuffelCardFormActions();
   const persistCard = useServerFn(saveCardToken);
+  const { resolved } = useTheme();
 
   // The default saved card is pre-selected; "Use a different card" is always there.
   const [selected, setSelected] = useState<string>(
@@ -198,7 +169,7 @@ export default function CardPayment({
         ref={ref}
         clientKey={session.clientKey}
         intent={intent}
-        styles={formStyles}
+        styles={cardFormStyles(resolved)}
         {...(savedCard
           ? { savedCardData: { id: savedCard.providerCardId, brand: savedCard.brand ?? "visa" } }
           : {})}

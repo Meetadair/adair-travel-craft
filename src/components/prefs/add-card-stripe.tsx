@@ -7,6 +7,8 @@ import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-
 import { loadStripe } from "@stripe/stripe-js";
 import { useServerFn } from "@tanstack/react-start";
 import { saveCardToken } from "@/lib/payment.functions";
+import { stripeAppearance } from "../stripe-appearance";
+import { useTheme } from "@/lib/theme";
 
 function Inner({ clientSecret, onSaved }: { clientSecret: string; onSaved: () => void }) {
   const stripe = useStripe();
@@ -66,9 +68,10 @@ export default function AddCardStripe({
   clientSecret: string;
   onSaved: () => void;
 }) {
+  const { resolved } = useTheme();
   const promise = useMemo(() => loadStripe(publishableKey), [publishableKey]);
   return (
-    <Elements stripe={promise} options={{ clientSecret }}>
+    <Elements stripe={promise} options={{ clientSecret, appearance: stripeAppearance(resolved) }}>
       <Inner clientSecret={clientSecret} onSaved={onSaved} />
     </Elements>
   );

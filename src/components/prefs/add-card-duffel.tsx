@@ -7,6 +7,7 @@ import { DuffelCardForm, useDuffelCardFormActions } from "@duffel/components";
 import { useServerFn } from "@tanstack/react-start";
 import { saveCardToken } from "@/lib/payment.functions";
 import { cardFormStyles } from "./card-form-styles";
+import { useTheme } from "@/lib/theme";
 
 export default function AddCardDuffel({
   clientKey,
@@ -17,6 +18,7 @@ export default function AddCardDuffel({
 }) {
   const { ref, saveCard } = useDuffelCardFormActions();
   const persist = useServerFn(saveCardToken);
+  const { resolved } = useTheme();
   const [valid, setValid] = useState(false);
   const [busy, setBusy] = useState(false);
   const [problem, setProblem] = useState<string | null>(null);
@@ -27,7 +29,7 @@ export default function AddCardDuffel({
         ref={ref}
         clientKey={clientKey}
         intent="to-save-card"
-        styles={cardFormStyles}
+        styles={cardFormStyles(resolved)}
         onValidateSuccess={() => {
           setValid(true);
           setProblem(null);
