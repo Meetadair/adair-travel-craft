@@ -138,6 +138,7 @@
     "title": "Dinos dónde necesitas estar.",
     "lead": "Adair entiende el lenguaje natural, consulta la disponibilidad de los proveedores y reúne vuelo, hotel y coche en una sola tarjeta lista para reservar.",
     "placeholder": "p. ej. Tengo que estar en Milán el jueves por la mañana, vuelta el viernes por la tarde…",
+    "placeholderFollowUp": "Añade más detalles o pregunta lo que quieras…",
     "submitIdle": "Diseñar viaje",
     "submitBusy": "Buscando…",
     "examples": [

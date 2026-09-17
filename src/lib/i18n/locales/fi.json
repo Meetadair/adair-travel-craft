@@ -138,6 +138,7 @@
     "title": "Kerro, minne sinun täytyy mennä.",
     "lead": "Adair ymmärtää arkikieltä, tarkistaa saatavuuden palveluntarjoajilta ja yhdistää lennon, hotellin ja auton yhdeksi varattavaksi kortiksi.",
     "placeholder": "esim. Minun pitää olla Milanossa torstaiaamuna, paluu perjantai-iltana…",
+    "placeholderFollowUp": "Lisää yksityiskohtia tai kysy mitä vain…",
     "submitIdle": "Kokoa matka",
     "submitBusy": "Etsitään…",
     "examples": [

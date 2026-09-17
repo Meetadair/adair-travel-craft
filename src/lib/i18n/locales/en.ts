@@ -135,6 +135,7 @@ export const en = {
     title: "Tell us where you need to be.",
     lead: "Adair understands everyday language, checks availability with providers, and composes a flight, hotel and car into one bookable card.",
     placeholder: "e.g. I need to be in Milan Thursday morning, back Friday evening…",
+    placeholderFollowUp: "Add more detail, or ask anything…",
     submitIdle: "Compose trip",
     submitBusy: "Searching…",
     examples: [

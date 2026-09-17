@@ -892,7 +892,7 @@ export function AssistantPage() {
               handleSentence(input);
             }}
             rows={2}
-            placeholder={t.assistant.placeholder}
+            placeholder={started ? t.assistant.placeholderFollowUp : t.assistant.placeholder}
             className="min-h-[56px] w-full resize-none bg-transparent px-2 py-2 text-sm outline-none"
           />
           {/* Listening and speaking are one idea, so they share one pill:

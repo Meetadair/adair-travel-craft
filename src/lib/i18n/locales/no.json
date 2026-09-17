@@ -138,6 +138,7 @@
     "title": "Fortell oss hvor du må være.",
     "lead": "Adair forstår vanlig språk, sjekker tilgjengelighet hos leverandørene, og setter sammen fly, hotell og leiebil i ett bestillbart kort.",
     "placeholder": "f.eks. Jeg må være i Milano torsdag morgen, tilbake fredag kveld…",
+    "placeholderFollowUp": "Legg til flere detaljer, eller spør om hva som helst…",
     "submitIdle": "Sett sammen reise",
     "submitBusy": "Søker…",
     "examples": [

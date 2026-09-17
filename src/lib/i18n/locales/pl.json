@@ -138,6 +138,7 @@
     "title": "Powiedz, dokąd chcesz się udać.",
     "lead": "Adair rozumie naturalny język, sprawdza dostępność u dostawców i łączy lot, hotel oraz samochód w jedną kartę do rezerwacji.",
     "placeholder": "np. Muszę być w Mediolanie w czwartek rano, powrót w piątek wieczorem…",
+    "placeholderFollowUp": "Dodaj więcej szczegółów lub zapytaj o cokolwiek…",
     "submitIdle": "Ułóż podróż",
     "submitBusy": "Szukam…",
     "examples": [

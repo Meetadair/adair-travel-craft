@@ -138,6 +138,7 @@
     "title": "Diga-nos onde precisa de estar.",
     "lead": "A Adair compreende linguagem quotidiana, consulta a disponibilidade dos fornecedores e combina voo, hotel e carro num único cartão pronto a reservar.",
     "placeholder": "ex.: Preciso de estar em Milão na quinta de manhã, regresso na sexta ao fim da tarde…",
+    "placeholderFollowUp": "Adicione mais detalhes ou pergunte o que quiser…",
     "submitIdle": "Planear viagem",
     "submitBusy": "A pesquisar…",
     "examples": [

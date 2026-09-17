@@ -138,6 +138,7 @@
     "title": "Sagen Sie uns, wohin Sie reisen möchten.",
     "lead": "Adair versteht natürliche Sprache, prüft die Verfügbarkeit bei Anbietern und fasst Flug, Hotel und Mietwagen auf einer Karte zusammen.",
     "placeholder": "z. B. Ich muss am Donnerstagmorgen in Mailand sein, Rückreise Freitagabend…",
+    "placeholderFollowUp": "Mehr Details hinzufügen oder frag einfach…",
     "submitIdle": "Reise zusammenstellen",
     "submitBusy": "Suche läuft…",
     "examples": [

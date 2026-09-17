@@ -138,6 +138,7 @@
     "title": "Dicci dove devi essere.",
     "lead": "Adair comprende il linguaggio naturale, verifica la disponibilità con i fornitori e raccoglie volo, hotel e auto in un'unica scheda pronta da prenotare.",
     "placeholder": "es. Devo essere a Milano giovedì mattina, rientro venerdì sera…",
+    "placeholderFollowUp": "Aggiungi più dettagli o chiedi pure…",
     "submitIdle": "Componi viaggio",
     "submitBusy": "Ricerca in corso…",
     "examples": [

@@ -138,6 +138,7 @@
     "title": "告诉我你想去哪里。",
     "lead": "Adair 能理解日常语言，实时向供应商查询房态与票价，将机票、酒店和租车整合为一张可直接预订的卡片。",
     "placeholder": "例如：我周四早上需要到米兰，周五晚上回…",
+    "placeholderFollowUp": "添加更多细节，或随便问…",
     "submitIdle": "生成行程",
     "submitBusy": "正在搜索…",
     "examples": [

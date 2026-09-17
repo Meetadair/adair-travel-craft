@@ -138,6 +138,7 @@
     "title": "Recite nam gde treba da budete.",
     "lead": "Adair razume svakodnevni jezik, proverava dostupnost kod pružalaca usluga i spaja let, hotel i automobil u jednu karticu spremnu za rezervaciju.",
     "placeholder": "npr. Treba da budem u Milanu u četvrtak ujutru, povratak u petak uveče…",
+    "placeholderFollowUp": "Dodaj više detalja ili pitaj bilo šta…",
     "submitIdle": "Sastavi putovanje",
     "submitBusy": "Pretraga u toku…",
     "examples": [
