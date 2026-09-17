@@ -12,14 +12,14 @@
   "home": {
     "meta": {
       "title": "Adair Travel — Jedna rečenica. Celo putovanje.",
-      "description": "Let, hotel, automobil i večera — rezervisani iz jedne rečenice.",
+      "description": "Let, hotel i automobil — rezervisani iz jedne rečenice.",
       "ogTitle": "Adair Travel — Jedna rečenica. Celo putovanje.",
-      "ogDescription": "Let, hotel, automobil i večera — rezervisani iz jedne rečenice."
+      "ogDescription": "Let, hotel i automobil — rezervisani iz jedne rečenice."
     },
     "hero": {
       "titleLine1": "Jedna rečenica.",
       "titleLine2": "Celo putovanje.",
-      "lead": "Let, hotel, automobil i večera — rezervisani iz jedne rečenice.",
+      "lead": "Let, hotel i automobil — rezervisani iz jedne rečenice.",
       "ctaPrimary": "Pogledajte kako funkcioniše",
       "inputLabel": "Opišite svoje putovanje u jednoj rečenici",
       "inputPlaceholder": "npr. Rim, od petka do nedelje, hotel sa terasom, račun na firmu",

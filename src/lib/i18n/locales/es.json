@@ -12,14 +12,14 @@
   "home": {
     "meta": {
       "title": "Adair Travel — Una frase. Todo el viaje.",
-      "description": "Vuelo, hotel, coche y cena — reservados a partir de una sola frase.",
+      "description": "Vuelo, hotel y coche — reservados a partir de una sola frase.",
       "ogTitle": "Adair Travel — Una frase. Todo el viaje.",
-      "ogDescription": "Vuelo, hotel, coche y cena — reservados a partir de una sola frase."
+      "ogDescription": "Vuelo, hotel y coche — reservados a partir de una sola frase."
     },
     "hero": {
       "titleLine1": "Una frase.",
       "titleLine2": "Todo el viaje.",
-      "lead": "Vuelo, hotel, coche y cena — reservados a partir de una sola frase.",
+      "lead": "Vuelo, hotel y coche — reservados a partir de una sola frase.",
       "ctaPrimary": "Descubre cómo funciona",
       "inputLabel": "Describe tu viaje en una frase",
       "inputPlaceholder": "p. ej. Roma, de viernes a domingo, hotel con terraza, factura a mi empresa",

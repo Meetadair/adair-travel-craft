@@ -12,14 +12,14 @@
   "home": {
     "meta": {
       "title": "Adair Travel — Ein Satz. Die ganze Reise.",
-      "description": "Flug, Hotel, Mietwagen und Abendessen — gebucht aus einem einzigen Satz.",
+      "description": "Flug, Hotel und Mietwagen — gebucht aus einem einzigen Satz.",
       "ogTitle": "Adair Travel — Ein Satz. Die ganze Reise.",
-      "ogDescription": "Flug, Hotel, Mietwagen und Abendessen — gebucht aus einem einzigen Satz."
+      "ogDescription": "Flug, Hotel und Mietwagen — gebucht aus einem einzigen Satz."
     },
     "hero": {
       "titleLine1": "Ein Satz.",
       "titleLine2": "Die ganze Reise.",
-      "lead": "Flug, Hotel, Mietwagen und Abendessen — gebucht aus einem einzigen Satz.",
+      "lead": "Flug, Hotel und Mietwagen — gebucht aus einem einzigen Satz.",
       "ctaPrimary": "So funktioniert es",
       "inputLabel": "Beschreiben Sie Ihre Reise in einem Satz",
       "inputPlaceholder": "z. B. Rom, Freitag bis Sonntag, Hotel mit Terrasse, Rechnung an meine Firma",

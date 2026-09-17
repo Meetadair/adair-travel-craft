@@ -12,14 +12,14 @@
   "home": {
     "meta": {
       "title": "Adair Travel — Yksi lause. Koko matka.",
-      "description": "Lento, hotelli, auto ja illallinen — varattuna yhdellä lauseella.",
+      "description": "Lento, hotelli ja auto — varattuna yhdellä lauseella.",
       "ogTitle": "Adair Travel — Yksi lause. Koko matka.",
-      "ogDescription": "Lento, hotelli, auto ja illallinen — varattuna yhdellä lauseella."
+      "ogDescription": "Lento, hotelli ja auto — varattuna yhdellä lauseella."
     },
     "hero": {
       "titleLine1": "Yksi lause.",
       "titleLine2": "Koko matka.",
-      "lead": "Lento, hotelli, auto ja illallinen — varattuna yhdellä lauseella.",
+      "lead": "Lento, hotelli ja auto — varattuna yhdellä lauseella.",
       "ctaPrimary": "Katso miten se toimii",
       "inputLabel": "Kuvaile matkasi yhdellä lauseella",
       "inputPlaceholder": "esim. Rooma, perjantaista sunnuntaihin, terassillinen hotelli, lasku yritykselleni",

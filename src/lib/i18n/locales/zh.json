@@ -12,14 +12,14 @@
   "home": {
     "meta": {
       "title": "Adair Travel — 一句话，包揽整趟行程。",
-      "description": "机票、酒店、用车与晚餐——一句话轻松预订。",
+      "description": "机票、酒店与用车——一句话轻松预订。",
       "ogTitle": "Adair Travel — 一句话，包揽整趟行程。",
-      "ogDescription": "机票、酒店、用车与晚餐——一句话轻松预订。"
+      "ogDescription": "机票、酒店与用车——一句话轻松预订。"
     },
     "hero": {
       "titleLine1": "一句话。",
       "titleLine2": "包揽整趟行程。",
-      "lead": "机票、酒店、用车与晚餐——一句话轻松预订。",
+      "lead": "机票、酒店与用车——一句话轻松预订。",
       "ctaPrimary": "了解运作方式",
       "inputLabel": "用一句话描述你的行程",
       "inputPlaceholder": "例如：罗马，周五去周日回，带露台的酒店，发票开给公司",

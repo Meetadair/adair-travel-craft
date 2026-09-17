@@ -12,14 +12,14 @@
   "home": {
     "meta": {
       "title": "Adair Travel — Én setning. Hele reisen.",
-      "description": "Fly, hotell, bil og middag — bestilt fra én enkelt setning.",
+      "description": "Fly, hotell og bil — bestilt fra én enkelt setning.",
       "ogTitle": "Adair Travel — Én setning. Hele reisen.",
-      "ogDescription": "Fly, hotell, bil og middag — bestilt fra én enkelt setning."
+      "ogDescription": "Fly, hotell og bil — bestilt fra én enkelt setning."
     },
     "hero": {
       "titleLine1": "Én setning.",
       "titleLine2": "Hele reisen.",
-      "lead": "Fly, hotell, bil og middag — bestilt fra én enkelt setning.",
+      "lead": "Fly, hotell og bil — bestilt fra én enkelt setning.",
       "ctaPrimary": "Se hvordan det fungerer",
       "inputLabel": "Beskriv reisen din med én setning",
       "inputPlaceholder": "f.eks. Roma, fredag til søndag, hotell med terrasse, faktura til firmaet mitt",

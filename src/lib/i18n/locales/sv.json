@@ -12,14 +12,14 @@
   "home": {
     "meta": {
       "title": "Adair Travel — En mening. Hela resan.",
-      "description": "Flyg, hotell, bil och middag — bokat från en enda mening.",
+      "description": "Flyg, hotell och bil — bokat från en enda mening.",
       "ogTitle": "Adair Travel — En mening. Hela resan.",
-      "ogDescription": "Flyg, hotell, bil och middag — bokat från en enda mening."
+      "ogDescription": "Flyg, hotell och bil — bokat från en enda mening."
     },
     "hero": {
       "titleLine1": "En mening.",
       "titleLine2": "Hela resan.",
-      "lead": "Flyg, hotell, bil och middag — bokat från en enda mening.",
+      "lead": "Flyg, hotell och bil — bokat från en enda mening.",
       "ctaPrimary": "Se hur det fungerar",
       "inputLabel": "Beskriv din resa i en mening",
       "inputPlaceholder": "t.ex. Rom, fredag till söndag, hotell med terrass, faktura till företaget",

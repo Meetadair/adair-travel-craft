@@ -30,7 +30,7 @@ const WAYS = [
   },
   {
     title: "Places you actually went",
-    body: "Submit a hotel, a restaurant, a road. When a traveller books it on your recommendation you earn on that line, even if they came to Adair on their own.",
+    body: "Submit a hotel, a restaurant, a road. When a traveller books their trip on your recommendation you earn on that line, even if they came to Adair on their own.",
   },
   {
     title: "Travellers who take a plan",

@@ -12,14 +12,14 @@
   "home": {
     "meta": {
       "title": "Adair Travel — Jedno zdanie. Cała podróż.",
-      "description": "Lot, hotel, samochód i kolacja — zarezerwowane jednym zdaniem.",
+      "description": "Lot, hotel i samochód — zarezerwowane jednym zdaniem.",
       "ogTitle": "Adair Travel — Jedno zdanie. Cała podróż.",
-      "ogDescription": "Lot, hotel, samochód i kolacja — zarezerwowane jednym zdaniem."
+      "ogDescription": "Lot, hotel i samochód — zarezerwowane jednym zdaniem."
     },
     "hero": {
       "titleLine1": "Jedno zdanie.",
       "titleLine2": "Cała podróż.",
-      "lead": "Lot, hotel, samochód i kolacja — zarezerwowane jednym zdaniem.",
+      "lead": "Lot, hotel i samochód — zarezerwowane jednym zdaniem.",
       "ctaPrimary": "Zobacz, jak to działa",
       "inputLabel": "Opisz swoją podróż w jednym zdaniu",
       "inputPlaceholder": "np. Rzym, od piątku do niedzieli, hotel z tarasem, faktura na firmę",

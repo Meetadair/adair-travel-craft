@@ -18,14 +18,14 @@ export const en = {
   home: {
     meta: {
       title: "Adair Travel — One sentence. The whole trip.",
-      description: "Flight, hotel, car and dinner — booked from a single sentence.",
+      description: "Flight, hotel and car — booked from a single sentence.",
       ogTitle: "Adair Travel — One sentence. The whole trip.",
-      ogDescription: "Flight, hotel, car and dinner — booked from a single sentence.",
+      ogDescription: "Flight, hotel and car — booked from a single sentence.",
     },
     hero: {
       titleLine1: "One sentence.",
       titleLine2: "The whole trip.",
-      lead: "Flight, hotel, car and dinner — booked from a single sentence.",
+      lead: "Flight, hotel and car — booked from a single sentence.",
       ctaPrimary: "See how it works",
       inputLabel: "Describe your trip in one sentence",
       inputPlaceholder: "e.g. Rome, Friday to Sunday, hotel with a terrace, invoice to my company",

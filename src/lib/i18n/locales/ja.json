@@ -12,14 +12,14 @@
   "home": {
     "meta": {
       "title": "Adair Travel — ひとことで、旅のすべてを。",
-      "description": "フライト、ホテル、車、ディナーまで — ひとことで予約完了。",
+      "description": "フライト、ホテル、車まで — ひとことで予約完了。",
       "ogTitle": "Adair Travel — ひとことで、旅のすべてを。",
-      "ogDescription": "フライト、ホテル、車、ディナーまで — ひとことで予約完了。"
+      "ogDescription": "フライト、ホテル、車まで — ひとことで予約完了。"
     },
     "hero": {
       "titleLine1": "ひとことで、",
       "titleLine2": "旅のすべてを。",
-      "lead": "フライト、ホテル、車、ディナーまで — ひとことで予約完了。",
+      "lead": "フライト、ホテル、車まで — ひとことで予約完了。",
       "ctaPrimary": "仕組みを見る",
       "inputLabel": "旅の予定をひとことで教えてください",
       "inputPlaceholder": "例：金曜から日曜までローマ、テラス付きホテル、領収書は会社宛て",

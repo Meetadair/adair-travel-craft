@@ -99,7 +99,7 @@ export function CooperationPage() {
       <div>
         <h2 className={h2}>Writers and creators</h2>
         <p className="mt-2 text-muted-foreground">
-          Recommend places you have actually stayed at or eaten in, and earn when people book them.{" "}
+          Recommend places you have actually stayed at or eaten in, and earn when people book their trip.{" "}
           <Link to="/creators" className="underline decoration-border underline-offset-4">
             The creator programme
           </Link>
