@@ -196,38 +196,6 @@ export function ClosingChat({
 
   const loading = account.isLoading || identity.isLoading || payment.isLoading;
 
-  // Passport capture stays on the booking page — it is a document, not a chat.
-  if (closing.fallback === "passport") {
-    return (
-      <div className="mt-4 space-y-2 text-sm">
-        <p className="text-muted-foreground">{c.passport}</p>
-        <button
-          type="button"
-          onClick={() => navigate({ to: "/book/$cardId", params: { cardId } })}
-          className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground"
-        >
-          {c.continueSecure}
-        </button>
-      </div>
-    );
-  }
-
-  const chosenCompanyId = companyChoice === "none" ? null : (companyChoice ?? closing.companyId);
-  const chosenCompanyName =
-    companies.find((company) => company.id === chosenCompanyId)?.name ?? null;
-  const chosenCardId = cardChoice === "new" ? null : (cardChoice ?? closing.cardId);
-  const chosenCard = cards.find((card) => card.id === chosenCardId) ?? null;
-  const needsCompanyName =
-    closing.questions.some((q) => q.kind === "invoice_company_name") && !chosenCompanyName;
-  const needsDetails = closing.questions.some((q) => q.kind === "traveller_details");
-  const needsCompanions = closing.questions.some((q) => q.kind === "companions_choose");
-  const companionsNeeded = Math.max(0, partySize - 1);
-  const savedCompanionOptions = (savedTravellers.data ?? []).filter(
-    (t) => !t.isSelf && !selectedCompanions.some((sc) => sc.travellerId === t.id),
-  );
-  const needsCardChoice =
-    closing.questions.some((q) => q.kind === "card_choose") && cardChoice === null;
-
   const mutation = useMutation({
     mutationFn: (authorised: AuthorisedPayment | null) =>
       book({
@@ -267,6 +235,38 @@ export function ClosingChat({
     },
     onError: () => setProblem(c.failed),
   });
+
+  // Passport capture stays on the booking page — it is a document, not a chat.
+  if (closing.fallback === "passport") {
+    return (
+      <div className="mt-4 space-y-2 text-sm">
+        <p className="text-muted-foreground">{c.passport}</p>
+        <button
+          type="button"
+          onClick={() => navigate({ to: "/book/$cardId", params: { cardId } })}
+          className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground"
+        >
+          {c.continueSecure}
+        </button>
+      </div>
+    );
+  }
+
+  const chosenCompanyId = companyChoice === "none" ? null : (companyChoice ?? closing.companyId);
+  const chosenCompanyName =
+    companies.find((company) => company.id === chosenCompanyId)?.name ?? null;
+  const chosenCardId = cardChoice === "new" ? null : (cardChoice ?? closing.cardId);
+  const chosenCard = cards.find((card) => card.id === chosenCardId) ?? null;
+  const needsCompanyName =
+    closing.questions.some((q) => q.kind === "invoice_company_name") && !chosenCompanyName;
+  const needsDetails = closing.questions.some((q) => q.kind === "traveller_details");
+  const needsCompanions = closing.questions.some((q) => q.kind === "companions_choose");
+  const companionsNeeded = Math.max(0, partySize - 1);
+  const savedCompanionOptions = (savedTravellers.data ?? []).filter(
+    (t) => !t.isSelf && !selectedCompanions.some((sc) => sc.travellerId === t.id),
+  );
+  const needsCardChoice =
+    closing.questions.some((q) => q.kind === "card_choose") && cardChoice === null;
 
   if (loading) {
     return <p className="mt-4 text-sm text-muted-foreground">{c.moment}</p>;
