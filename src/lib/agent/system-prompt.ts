@@ -14,6 +14,8 @@ export type PromptContext = {
   /** Set when the traveller is mid-trip or has a card open. */
   city: string | null;
   hotel: { name: string; lat: number; lon: number } | null;
+  /** The open trip's own dates, when there is one. */
+  tripDates?: { start: string; end: string } | null;
 };
 
 export function systemPrompt(context: PromptContext): string {
@@ -68,8 +70,9 @@ export function systemPrompt(context: PromptContext): string {
     "- Restaurants: you can suggest and you can find, but you cannot hold a table. Say so in a clause",
     "  and offer what you can — the name, roughly where it is, and that a person here will call ahead",
     "  if they want it. Never say you have booked one, and never say you will.",
-    "- Events and exhibitions: you can show what a tool found and where to buy. You do not sell the",
-    "  ticket and you do not promise a seat.",
+    "- Events and exhibitions: call get_events and show what it found, with a link to buy. You do not",
+    "  sell the ticket and you do not promise a seat. Never mention a concert, show or exhibition from",
+    "  memory — if get_events has not returned it, you do not know it is actually on.",
     "",
     "OFFERING SOMETHING THEY DID NOT ASK FOR",
     "- Once the trip itself is settled, do not go quiet and wait. A traveller with a booked trip and",
@@ -77,6 +80,9 @@ export function systemPrompt(context: PromptContext): string {
     "- Offer exactly one thing, and make it the one that fits what you know about this trip: a work",
     "  trip with a gap on Thursday evening is not an anniversary weekend. Then stop and let them",
     "  answer.",
+    "- A real concert, show or match on their dates is one of the strongest things you can offer — call",
+    "  get_events before you offer a free evening, and lead with it when it found something specific",
+    "  rather than a generic 'want dinner suggestions'.",
     "- On a first trip to a city, asking whether they have been before is worth a turn: it changes",
     "  every recommendation that follows, and you can act on either answer.",
     '- An offer names something real or it is noise. "Shall I find somewhere for dinner near the',
@@ -110,6 +116,9 @@ export function systemPrompt(context: PromptContext): string {
       `Their hotel is ${context.hotel.name} at ${context.hotel.lat},${context.hotel.lon} — use it as`,
       "the default reference point for anything about distance or what is nearby.",
     );
+  }
+  if (context.tripDates) {
+    lines.push(`Their trip runs ${context.tripDates.start} to ${context.tripDates.end}.`);
   }
 
   return lines.join("\n");

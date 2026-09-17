@@ -36,6 +36,10 @@ export type TripOffer = {
    * server-side, where the bags and fare conditions live.
    */
   flightChoice?: FlightOptions;
+  /** Property coordinates (hotels only), when the supplier gave them — the
+   *  chat agent's reference point for "how far is X from the hotel". */
+  lat?: number | null;
+  lon?: number | null;
 };
 
 export type TripSearchInput = {
@@ -336,6 +340,7 @@ async function duffelStay(input: TripSearchInput): Promise<TripOffer | null> {
     live: true,
     ...(stay.photoUrl ? { images: [stay.photoUrl] } : {}),
     ...(stay.hotelId ? { hotelId: stay.hotelId } : {}),
+    ...(stay.lat != null && stay.lon != null ? { lat: stay.lat, lon: stay.lon } : {}),
   });
 
   try {

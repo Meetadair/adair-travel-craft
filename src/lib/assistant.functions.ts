@@ -47,6 +47,14 @@ const inputSchema = z.object({
     .object({ lat: z.number().min(-90).max(90), lon: z.number().min(-180).max(180) })
     .nullable()
     .default(null),
+  /** The open trip's own dates, when there is one — the default event window. */
+  tripDates: z
+    .object({
+      start: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+      end: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+    })
+    .nullable()
+    .default(null),
 });
 
 export type AskAdairInput = z.infer<typeof inputSchema>;
@@ -94,18 +102,22 @@ export const askAdair = createServerFn({ method: "POST" })
     const fullName = (profile.data as { full_name?: string | null } | null)?.full_name ?? "";
     const firstName = fullName.trim().split(/\s+/)[0] || null;
 
+    const today = new Date().toISOString().slice(0, 10);
     const result = await runAgent(
       history,
       {
-        today: new Date().toISOString().slice(0, 10),
+        today,
         locale: data.locale,
         firstName,
         city: data.city,
         hotel: data.hotel,
+        tripDates: data.tripDates,
       },
       {
         supabase,
         userId,
+        today,
+        tripDates: data.tripDates,
         location: {
           device: consent === "granted" ? data.device : null,
           consent,

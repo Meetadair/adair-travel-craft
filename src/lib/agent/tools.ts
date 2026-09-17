@@ -13,6 +13,7 @@ import { PLACE_CATEGORIES } from "@/lib/places/types";
 export type ToolName =
   | "find_places"
   | "get_curated"
+  | "get_events"
   | "distance_and_time"
   | "get_traveller_context"
   | "get_current_location";
@@ -47,6 +48,26 @@ export const getCuratedInput = z.object({
   limit: z.number().int().min(1).max(8).default(4),
 });
 
+export const getEventsInput = z.object({
+  city: z.string().min(1).max(60),
+  near: z
+    .object({ lat: z.number().min(-90).max(90), lon: z.number().min(-180).max(180) })
+    .nullable()
+    .default(null),
+  /** "YYYY-MM-DD". Null defaults to the trip's own dates, then today. */
+  dateFrom: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .nullable()
+    .default(null),
+  dateTo: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .nullable()
+    .default(null),
+  limit: z.number().int().min(1).max(8).default(4),
+});
+
 export const distanceAndTimeInput = z.object({
   from: z.object({
     label: z.string().max(120).default(""),
@@ -71,6 +92,7 @@ export const currentLocationInput = z.object({
 
 export type FindPlacesInput = z.infer<typeof findPlacesInput>;
 export type GetCuratedInput = z.infer<typeof getCuratedInput>;
+export type GetEventsInput = z.infer<typeof getEventsInput>;
 export type DistanceAndTimeInput = z.infer<typeof distanceAndTimeInput>;
 export type TravellerContextInput = z.infer<typeof travellerContextInput>;
 export type CurrentLocationInput = z.infer<typeof currentLocationInput>;
@@ -78,6 +100,7 @@ export type CurrentLocationInput = z.infer<typeof currentLocationInput>;
 export const TOOL_INPUT_SCHEMAS = {
   find_places: findPlacesInput,
   get_curated: getCuratedInput,
+  get_events: getEventsInput,
   distance_and_time: distanceAndTimeInput,
   get_traveller_context: travellerContextInput,
   get_current_location: currentLocationInput,
@@ -131,6 +154,37 @@ export const TOOLS: ToolSpec[] = [
         familyFriendly: {
           type: ["boolean", "null"],
           description: "True to return only entries suitable with children.",
+        },
+        limit: { type: "integer", minimum: 1, maximum: 8, default: 4 },
+      },
+      required: ["city"],
+    },
+  },
+  {
+    name: "get_events",
+    description:
+      "Real concerts, shows and sport happening near the traveller, from Ticketmaster's own listings — not " +
+      "something to remember or guess. Use for 'what's on', 'anything good happening while I'm there', or to " +
+      "offer something unprompted once a trip is settled. Every result links to Ticketmaster's own page to " +
+      "buy — you never sell or hold a ticket. Null dates default to the trip's own dates; returns an empty " +
+      "list rather than an invented one when nothing is on.",
+    input_schema: {
+      type: "object",
+      properties: {
+        city: { type: "string", description: "City the traveller is asking about." },
+        near: {
+          type: ["object", "null"],
+          description: "Reference point, normally the hotel. Null to use the trip's own point.",
+          properties: { lat: { type: "number" }, lon: { type: "number" } },
+          required: ["lat", "lon"],
+        },
+        dateFrom: {
+          type: ["string", "null"],
+          description: "YYYY-MM-DD. Null defaults to the trip's own start date, then today.",
+        },
+        dateTo: {
+          type: ["string", "null"],
+          description: "YYYY-MM-DD. Null defaults to the trip's own end date, then 30 days out.",
         },
         limit: { type: "integer", minimum: 1, maximum: 8, default: 4 },
       },

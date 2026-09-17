@@ -466,7 +466,24 @@ export function AssistantPage() {
         })),
         { role: "user" as const, content: message },
       ].slice(-20);
-      return converse({ data: { messages: history, locale, city: null, hotel: null } });
+      // The open trip, when there is one — the agent's reference point for
+      // "how far is this from the hotel" and its default window for "what's on".
+      const hotelOffer = offers.find((o) => o.kind === "hotel");
+      const chatHotel =
+        hotelOffer?.lat != null && hotelOffer?.lon != null
+          ? { name: currentHotelName ?? hotelOffer.title, lat: hotelOffer.lat, lon: hotelOffer.lon }
+          : null;
+      return converse({
+        data: {
+          messages: history,
+          locale,
+          city: raw?.request.destinationCity ?? null,
+          hotel: chatHotel,
+          tripDates: raw
+            ? { start: raw.request.departDate, end: raw.request.returnDate }
+            : null,
+        },
+      });
     },
     onSuccess: (result, message) => {
       // Without a key the agent stays silent rather than guessing, so we fall

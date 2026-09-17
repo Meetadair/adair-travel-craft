@@ -13,11 +13,13 @@ import { MAP_ATTRIBUTION, type Place, type PlaceCategory } from "@/lib/places/ty
 import { findCity } from "@/lib/trip/cities";
 import { originClause, resolveLocation, type LocationInputs } from "./location";
 import { loadPatterns, loadPlaceMemory } from "@/lib/trip/memory.server";
+import { eventsNear, ticketmasterConfigured } from "@/lib/events/ticketmaster.server";
 import {
   currentLocationInput,
   distanceAndTimeInput,
   findPlacesInput,
   getCuratedInput,
+  getEventsInput,
   travelMinutes,
   travellerContextInput,
   toolFailure,
@@ -43,6 +45,10 @@ export type ToolContext = {
   userId: string;
   /** Where the traveller is, resolved per request and never stored. */
   location?: LocationInputs;
+  /** The open trip's own dates, when there is one — the default event window. */
+  tripDates?: { start: string; end: string } | null;
+  /** "YYYY-MM-DD", used when a tool needs "today" and the trip has no dates. */
+  today?: string;
 };
 
 /* ------------------------------------------------------------ find_places */
@@ -170,6 +176,54 @@ async function getCurated(input: unknown, ctx: ToolContext): Promise<string> {
   return JSON.stringify({ tool: "get_curated", ok: true, city, results });
 }
 
+/* -------------------------------------------------------------- get_events */
+
+async function getEvents(input: unknown, ctx: ToolContext): Promise<string> {
+  const parsed = getEventsInput.safeParse(input);
+  if (!parsed.success) return toolFailure("get_events", "bad-input");
+  const { city, near, dateFrom, dateTo, limit } = parsed.data;
+
+  if (!ticketmasterConfigured()) return toolFailure("get_events", "events lookup not configured");
+
+  const point = near ?? ctx.location?.hotel ?? ctx.location?.city ?? cityPoint(city);
+  if (!point) return toolFailure("get_events", `no coordinates on file for ${city}`);
+
+  const today = ctx.today ?? new Date().toISOString().slice(0, 10);
+  const from = dateFrom ?? ctx.tripDates?.start ?? today;
+  const to =
+    dateTo ??
+    ctx.tripDates?.end ??
+    new Date(new Date(from).getTime() + 30 * 86_400_000).toISOString().slice(0, 10);
+
+  let events;
+  try {
+    events = await eventsNear(ctx.supabase, point, from, to);
+  } catch {
+    return toolFailure("get_events", "events lookup unavailable");
+  }
+
+  return JSON.stringify({
+    tool: "get_events",
+    ok: true,
+    city,
+    dateFrom: from,
+    dateTo: to,
+    note: "Ticketmaster's own listing. Every result links to their page to buy — never say you booked or held one.",
+    results: events.slice(0, limit).map((e) => ({
+      name: e.name,
+      date: e.date,
+      time: e.time,
+      venueName: e.venueName,
+      category: e.category,
+      priceFrom: e.priceFrom,
+      priceTo: e.priceTo,
+      currency: e.currency,
+      distanceKm: e.distanceKm,
+      url: e.url,
+    })),
+  });
+}
+
 /* ------------------------------------------------------ distance_and_time */
 
 function distanceAndTime(input: unknown): string {
@@ -288,6 +342,8 @@ export async function runTool(name: ToolName, input: unknown, ctx: ToolContext):
         return await findPlaces(input, ctx);
       case "get_curated":
         return await getCurated(input, ctx);
+      case "get_events":
+        return await getEvents(input, ctx);
       case "distance_and_time":
         return distanceAndTime(input);
       case "get_traveller_context":

@@ -2,7 +2,14 @@ import { describe, expect, it } from "vitest";
 
 import { runAgent, textOf, toolCallsOf } from "./loop.server";
 import { systemPrompt } from "./system-prompt";
-import { TOOLS, distanceAndTimeInput, findPlacesInput, travelMinutes, toolFailure } from "./tools";
+import {
+  TOOLS,
+  distanceAndTimeInput,
+  findPlacesInput,
+  getEventsInput,
+  travelMinutes,
+  toolFailure,
+} from "./tools";
 
 const promptContext = {
   today: "2026-09-13",
@@ -22,6 +29,7 @@ describe("tool definitions", () => {
     expect(TOOLS.map((t) => t.name)).toEqual([
       "find_places",
       "get_curated",
+      "get_events",
       "distance_and_time",
       "get_traveller_context",
       "get_current_location",
@@ -39,6 +47,19 @@ describe("tool definitions", () => {
 
   it("requires coordinates on both ends of a distance", () => {
     expect(distanceAndTimeInput.safeParse({ from: { lat: 1, lon: 2 } }).success).toBe(false);
+  });
+
+  it("lets get_events dates default to the trip's own window", () => {
+    const parsed = getEventsInput.safeParse({ city: "Paris" });
+    expect(parsed.success).toBe(true);
+    if (parsed.success) {
+      expect(parsed.data.dateFrom).toBeNull();
+      expect(parsed.data.dateTo).toBeNull();
+    }
+  });
+
+  it("rejects a malformed date on get_events", () => {
+    expect(getEventsInput.safeParse({ city: "Paris", dateFrom: "13 Sept" }).success).toBe(false);
   });
 });
 
@@ -68,6 +89,18 @@ describe("systemPrompt", () => {
 
   it("forbids calling itself an AI", () => {
     expect(systemPrompt(promptContext)).toMatch(/never say AI/i);
+  });
+
+  it("tells the model to check get_events rather than remember what is on", () => {
+    expect(systemPrompt(promptContext)).toMatch(/call get_events/i);
+  });
+
+  it("states the trip's own dates when it has them", () => {
+    const withDates = systemPrompt({
+      ...promptContext,
+      tripDates: { start: "2026-10-01", end: "2026-10-04" },
+    });
+    expect(withDates).toMatch(/2026-10-01 to 2026-10-04/);
   });
 
   it("greets by first name when we know it, without overusing it", () => {
