@@ -148,7 +148,13 @@ type JoinRow = {
   season_months: number[];
   editorial_angle: string | null;
   getaway_destinations: DestRow | null;
-  getaway_themes: { id: string; slug: string; name: string; interest_tags: string[] | null; active: boolean } | null;
+  getaway_themes: {
+    id: string;
+    slug: string;
+    name: string;
+    interest_tags: string[] | null;
+    active: boolean;
+  } | null;
 };
 
 export const getWeeklyGetaway = createServerFn({ method: "GET" })
@@ -183,7 +189,9 @@ export const getWeeklyGetaway = createServerFn({ method: "GET" })
       .from("getaway_theme_optouts")
       .select("theme_id")
       .eq("user_id", userId);
-    const optedOut = new Set(((optOutRes.data ?? []) as Array<{ theme_id: string }>).map((r) => r.theme_id));
+    const optedOut = new Set(
+      ((optOutRes.data ?? []) as Array<{ theme_id: string }>).map((r) => r.theme_id),
+    );
 
     // SEASON is enforced in the query itself.
     const joinRes = await supabase
@@ -218,7 +226,12 @@ export const getWeeklyGetaway = createServerFn({ method: "GET" })
       reachByDestination.set(dest.id, reach);
 
       const scored = interestScore(
-        { id: theme.id, slug: theme.slug, name: theme.name, interestTags: theme.interest_tags ?? [] },
+        {
+          id: theme.id,
+          slug: theme.slug,
+          name: theme.name,
+          interestTags: theme.interest_tags ?? [],
+        },
         profile,
         dest.name,
         false,
@@ -250,9 +263,14 @@ export const getWeeklyGetaway = createServerFn({ method: "GET" })
     // PRICE last: only a tie-break between equally well-matched candidates.
     const priceRes = await supabase
       .from("getaway_prices")
-      .select("destination_id, depart_date, return_date, flight_minor, stay_minor, currency, checked_at")
+      .select(
+        "destination_id, depart_date, return_date, flight_minor, stay_minor, currency, checked_at",
+      )
       .eq("origin_iata", homeAirport)
-      .in("destination_id", pool.map((c) => c.destinationId))
+      .in(
+        "destination_id",
+        pool.map((c) => c.destinationId),
+      )
       .order("checked_at", { ascending: false })
       .limit(400);
     const prices = (priceRes.data ?? []) as Array<{
@@ -269,7 +287,10 @@ export const getWeeklyGetaway = createServerFn({ method: "GET" })
     for (const row of prices) {
       if (!latest.has(row.destination_id)) latest.set(row.destination_id, row);
       if (row.flight_minor !== null) {
-        history.set(row.destination_id, [...(history.get(row.destination_id) ?? []), row.flight_minor]);
+        history.set(row.destination_id, [
+          ...(history.get(row.destination_id) ?? []),
+          row.flight_minor,
+        ]);
       }
     }
     const dealBonus: Record<string, number> = {};
@@ -300,7 +321,9 @@ export const getWeeklyGetaway = createServerFn({ method: "GET" })
     let chosen = shortlist[0]!;
     if (existing.data) {
       const kept = pool.find(
-        (c) => c.destinationId === existing.data!.destination_id && c.themeId === existing.data!.theme_id,
+        (c) =>
+          c.destinationId === existing.data!.destination_id &&
+          c.themeId === existing.data!.theme_id,
       );
       if (kept) {
         // A swap stores no reasons of its own, so the freshly scored ones stand
@@ -318,9 +341,11 @@ export const getWeeklyGetaway = createServerFn({ method: "GET" })
       });
     }
 
-    const destRow = rows.find((r) => r.getaway_destinations?.id === chosen.destinationId)!
-      .getaway_destinations!;
-    const themeRow = rows.find((r) => r.getaway_themes?.id === chosen.themeId)?.getaway_themes ?? null;
+    const destRow = rows.find(
+      (r) => r.getaway_destinations?.id === chosen.destinationId,
+    )!.getaway_destinations!;
+    const themeRow =
+      rows.find((r) => r.getaway_themes?.id === chosen.themeId)?.getaway_themes ?? null;
 
     const placesRes = await supabase
       .from("getaway_places")
@@ -331,31 +356,36 @@ export const getWeeklyGetaway = createServerFn({ method: "GET" })
       .eq("active", true)
       .in("review_status", ["approved", "editorial"])
       .order("kind");
-    const places: GetawayPlace[] = ((placesRes.data ?? []) as Array<Record<string, unknown>>).map((p) => ({
-      id: String(p['id']),
-      kind: p['kind'] as GetawayPlace["kind"],
-      name: String(p['name']),
-      address: (p['address'] as string | null) ?? null,
-      editorialNote: (p['editorial_note'] as string | null) ?? null,
-      whyThisOne: (p['why_this_one'] as string | null) ?? null,
-      priceBand: (p['price_band'] as string | null) ?? null,
-      familyFriendly: Boolean(p['family_friendly']),
-      ours: p['review_status'] === "editorial",
-      visitedOn: (p['visited_on'] as string | null) ?? null,
-      lat: p['latitude'] === null ? null : Number(p['latitude']),
-      lon: p['longitude'] === null ? null : Number(p['longitude']),
-      recommendedBy: (() => {
-        const creator = p['creators'] as
-          | { display_name?: string; handle?: string; status?: string; avatar_url?: string | null }
-          | null;
-        if (!creator?.handle || creator.status !== "approved") return null;
-        return {
-          name: String(creator.display_name ?? creator.handle),
-          handle: creator.handle,
-          avatarUrl: creator.avatar_url ?? null,
-        };
-      })(),
-    }));
+    const places: GetawayPlace[] = ((placesRes.data ?? []) as Array<Record<string, unknown>>).map(
+      (p) => ({
+        id: String(p["id"]),
+        kind: p["kind"] as GetawayPlace["kind"],
+        name: String(p["name"]),
+        address: (p["address"] as string | null) ?? null,
+        editorialNote: (p["editorial_note"] as string | null) ?? null,
+        whyThisOne: (p["why_this_one"] as string | null) ?? null,
+        priceBand: (p["price_band"] as string | null) ?? null,
+        familyFriendly: Boolean(p["family_friendly"]),
+        ours: p["review_status"] === "editorial",
+        visitedOn: (p["visited_on"] as string | null) ?? null,
+        lat: p["latitude"] === null ? null : Number(p["latitude"]),
+        lon: p["longitude"] === null ? null : Number(p["longitude"]),
+        recommendedBy: (() => {
+          const creator = p["creators"] as {
+            display_name?: string;
+            handle?: string;
+            status?: string;
+            avatar_url?: string | null;
+          } | null;
+          if (!creator?.handle || creator.status !== "approved") return null;
+          return {
+            name: String(creator.display_name ?? creator.handle),
+            handle: creator.handle,
+            avatarUrl: creator.avatar_url ?? null,
+          };
+        })(),
+      }),
+    );
 
     const itinRes = await supabase
       .from("getaway_itineraries")
@@ -369,7 +399,9 @@ export const getWeeklyGetaway = createServerFn({ method: "GET" })
     if (itinRes.data) {
       const daysRes = await supabase
         .from("getaway_itinerary_days")
-        .select("day_number, morning, afternoon, evening, sleep_place_id, meal_place_ids, image_url, image_fallback_url, image_credit, image_credit_url, image_source")
+        .select(
+          "day_number, morning, afternoon, evening, sleep_place_id, meal_place_ids, image_url, image_fallback_url, image_credit, image_credit_url, image_source",
+        )
         .eq("itinerary_id", itinRes.data.id)
         .order("day_number");
       const nameOf = (id: string | null) => places.find((p) => p.id === id)?.name ?? null;
@@ -378,13 +410,13 @@ export const getWeeklyGetaway = createServerFn({ method: "GET" })
         nights: itinRes.data.nights,
         summary: itinRes.data.summary ?? null,
         days: ((daysRes.data ?? []) as Array<Record<string, unknown>>).map((d) => ({
-          dayNumber: Number(d['day_number']),
+          dayNumber: Number(d["day_number"]),
           image: toDayImage(d as never),
-          morning: (d['morning'] as string | null) ?? null,
-          afternoon: (d['afternoon'] as string | null) ?? null,
-          evening: (d['evening'] as string | null) ?? null,
-          sleepPlace: nameOf((d['sleep_place_id'] as string | null) ?? null),
-          mealPlaces: ((d['meal_place_ids'] as string[] | null) ?? [])
+          morning: (d["morning"] as string | null) ?? null,
+          afternoon: (d["afternoon"] as string | null) ?? null,
+          evening: (d["evening"] as string | null) ?? null,
+          sleepPlace: nameOf((d["sleep_place_id"] as string | null) ?? null),
+          mealPlaces: ((d["meal_place_ids"] as string[] | null) ?? [])
             .map((id) => nameOf(id))
             .filter((n): n is string => Boolean(n)),
         })),
@@ -500,7 +532,10 @@ export const muteGetawayTheme = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await context.supabase
       .from("getaway_theme_optouts")
-      .upsert({ user_id: context.userId, theme_id: data.themeId }, { onConflict: "user_id,theme_id" });
+      .upsert(
+        { user_id: context.userId, theme_id: data.themeId },
+        { onConflict: "user_id,theme_id" },
+      );
     await context.supabase
       .from("getaway_proposals")
       .delete()

@@ -194,7 +194,8 @@ export function applyAnswer(sentence: string, kind: ClarifyKind, answer: string)
   // "from" is the only word the parser reads as a departure point. Without it
   // the answer is appended as a bare word, the origin stays unstated, and the
   // same question is asked again — for as long as the traveller keeps replying.
-  if (kind === "origin") return /\bfrom\b/i.test(clean) ? `${sentence} ${clean}` : `${sentence} from ${clean}`;
+  if (kind === "origin")
+    return /\bfrom\b/i.test(clean) ? `${sentence} ${clean}` : `${sentence} from ${clean}`;
   if (kind === "trip_kind" || kind === "occasion") return `${sentence} ${clean}`;
   if (kind === "hotel_unmatched") return `${sentence} — ${clean}`;
   if (kind === "travellers") {

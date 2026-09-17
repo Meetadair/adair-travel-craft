@@ -21,7 +21,10 @@ describe("creator offer", () => {
   it("never promises more than the ledger would pay on the same line", () => {
     for (const rate of OFFER_RATES) {
       const gross = 100_000;
-      const ledger = commissionMinor(marginMinor(gross, null, rate.typicalMarkupBps), rate.shareBps);
+      const ledger = commissionMinor(
+        marginMinor(gross, null, rate.typicalMarkupBps),
+        rate.shareBps,
+      );
       expect(earningOnLineMinor(rate, gross)).toBe(ledger);
     }
   });
@@ -34,7 +37,10 @@ describe("creator offer", () => {
     // The whole promise: a creator's cut comes out of our margin, so it must
     // stay far below the price the traveller paid.
     const total =
-      SAMPLE_TRIP.flightMinor + SAMPLE_TRIP.stayMinor + SAMPLE_TRIP.carMinor + SAMPLE_TRIP.extrasMinor;
+      SAMPLE_TRIP.flightMinor +
+      SAMPLE_TRIP.stayMinor +
+      SAMPLE_TRIP.carMinor +
+      SAMPLE_TRIP.extrasMinor;
     const earned = earningOnTripMinor(SAMPLE_TRIP);
     expect(earned).toBeGreaterThan(0);
     expect(earned).toBeLessThan(total * 0.1);

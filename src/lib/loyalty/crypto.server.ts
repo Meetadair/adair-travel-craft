@@ -9,10 +9,7 @@ async function key(): Promise<CryptoKey> {
   const secret = process.env["TRAVELLER_DATA_KEY"];
   if (!secret) throw new Error("traveller-key-missing");
   const digest = await crypto.subtle.digest("SHA-256", enc.encode(secret));
-  return crypto.subtle.importKey("raw", digest, { name: "AES-GCM" }, false, [
-    "encrypt",
-    "decrypt",
-  ]);
+  return crypto.subtle.importKey("raw", digest, { name: "AES-GCM" }, false, ["encrypt", "decrypt"]);
 }
 
 const toBase64 = (bytes: Uint8Array): string => {

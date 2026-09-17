@@ -64,7 +64,10 @@ export const exportMyData = createServerFn({ method: "POST" })
     const data: Record<string, unknown> = {};
 
     for (const { table, column } of TABLES) {
-      const res = await supabase.from(table as never).select("*").eq(column, userId);
+      const res = await supabase
+        .from(table as never)
+        .select("*")
+        .eq(column, userId);
       data[table] = res.error ? { error: res.error.message } : scrub(res.data);
     }
 
@@ -128,7 +131,10 @@ export const deleteMyAccount = createServerFn({ method: "POST" })
       "events",
     ];
     for (const table of wipe) {
-      await supabaseAdmin.from(table as never).delete().eq("user_id", userId);
+      await supabaseAdmin
+        .from(table as never)
+        .delete()
+        .eq("user_id", userId);
     }
 
     // Records kept for tax and supplier reasons: keep the amounts, remove the person.

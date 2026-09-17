@@ -144,7 +144,11 @@ export function applyPrecedence(
 export function noticedSentences(learned: Learned, nameOf: (id: string) => string): string[] {
   const lines = learned.avoid.map((entry) => {
     const what =
-      entry.kind === "flight" ? "flying with" : entry.kind === "hotel" ? "staying at" : "renting from";
+      entry.kind === "flight"
+        ? "flying with"
+        : entry.kind === "hotel"
+          ? "staying at"
+          : "renting from";
     return `you tend to avoid ${what} ${nameOf(entry.brandId)} — swapped ${entry.times} times`;
   });
   if (learned.distanceWeight > 1) lines.push("you tend to prefer hotels closer to the centre");

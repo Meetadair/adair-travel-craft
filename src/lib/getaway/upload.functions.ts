@@ -18,7 +18,10 @@ async function assertAdmin(supabase: SupabaseClient, userId: string): Promise<vo
   if (!data?.["is_admin"]) throw new Error("Admins only");
 }
 
-const dataUrl = z.string().max(9_000_000).regex(/^data:image\/(webp|jpeg);base64,/);
+const dataUrl = z
+  .string()
+  .max(9_000_000)
+  .regex(/^data:image\/(webp|jpeg);base64,/);
 
 function bytesOf(value: string): Uint8Array {
   const base64 = value.slice(value.indexOf(",") + 1);
@@ -50,7 +53,8 @@ export const uploadGetawayImage = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { putStoredImage, publicUrlFor, storagePath } = await import("@/lib/getaway/images.server");
+    const { putStoredImage, publicUrlFor, storagePath } =
+      await import("@/lib/getaway/images.server");
 
     const stamp = Date.now().toString(36);
     const paths = {
@@ -61,7 +65,12 @@ export const uploadGetawayImage = createServerFn({ method: "POST" })
 
     await putStoredImage(supabaseAdmin as never, paths.webp, bytesOf(data.webp), "image/webp");
     await putStoredImage(supabaseAdmin as never, paths.jpeg, bytesOf(data.jpeg), "image/jpeg");
-    await putStoredImage(supabaseAdmin as never, paths.email, bytesOf(data.emailJpeg), "image/jpeg");
+    await putStoredImage(
+      supabaseAdmin as never,
+      paths.email,
+      bytesOf(data.emailJpeg),
+      "image/jpeg",
+    );
 
     if (data.target.kind === "destination") {
       const res = await context.supabase
@@ -95,7 +104,9 @@ export const uploadGetawayImage = createServerFn({ method: "POST" })
 /** Asks Unsplash for a picture. Only ever used where we have no own photo. */
 export const fetchGetawayStockImage = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data) => z.object({ target, query: z.string().trim().min(2).max(120) }).parse(data))
+  .inputValidator((data) =>
+    z.object({ target, query: z.string().trim().min(2).max(120) }).parse(data),
+  )
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
     const { findUnsplashImage } = await import("@/lib/getaway/images.server");

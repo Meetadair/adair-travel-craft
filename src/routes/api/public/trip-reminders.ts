@@ -19,12 +19,7 @@ function itineraryLines(items: ItemRow[]): string {
     .map((item) => {
       const p = item.payload ?? {};
       const when =
-        p['departAt'] ??
-        p['pickupAt'] ??
-        p['reservationAt'] ??
-        p['checkin'] ??
-        p['pickup'] ??
-        null;
+        p["departAt"] ?? p["pickupAt"] ?? p["reservationAt"] ?? p["checkin"] ?? p["pickup"] ?? null;
       const label =
         item.kind === "flight"
           ? "Flight"
@@ -39,9 +34,9 @@ function itineraryLines(items: ItemRow[]): string {
                   : "Hotel";
       const where =
         item.kind === "ride"
-          ? [p['pickupAddress'], p['dropoffAddress']].filter(Boolean).join(" → ")
-          : item.kind === "restaurant" && p['partySize']
-            ? `table for ${String(p['partySize'])}`
+          ? [p["pickupAddress"], p["dropoffAddress"]].filter(Boolean).join(" → ")
+          : item.kind === "restaurant" && p["partySize"]
+            ? `table for ${String(p["partySize"])}`
             : "";
       return `<li>${label}: ${item.title}${when ? ` — ${String(when).replace("T", " ").slice(0, 16)}` : ""}${where ? ` (${where})` : ""}</li>`;
     })
@@ -50,7 +45,7 @@ function itineraryLines(items: ItemRow[]): string {
 
 async function run(): Promise<Response> {
   const { hasWhatsAppKeys } = await import("@/lib/notifications/whatsapp");
-  if (!process.env['RESEND_API_KEY'] && !hasWhatsAppKeys()) {
+  if (!process.env["RESEND_API_KEY"] && !hasWhatsAppKeys()) {
     return Response.json({ ok: true, skipped: "no-message-channel", sent: 0 });
   }
 
@@ -68,7 +63,8 @@ async function run(): Promise<Response> {
     .select("id, user_id, title, city, start_date, status")
     .in("start_date", [today, tomorrow])
     .eq("status", "booked");
-  if (tripsRes.error) return Response.json({ ok: false, error: tripsRes.error.message }, { status: 500 });
+  if (tripsRes.error)
+    return Response.json({ ok: false, error: tripsRes.error.message }, { status: 500 });
   const trips = (tripsRes.data ?? []) as Array<{
     id: string;
     user_id: string;
@@ -81,13 +77,19 @@ async function run(): Promise<Response> {
   const itemsRes = await supabaseAdmin
     .from("trip_items")
     .select("trip_id, kind, title, status, payload")
-    .in("trip_id", trips.map((t) => t.id));
+    .in(
+      "trip_id",
+      trips.map((t) => t.id),
+    );
   const items = (itemsRes.data ?? []) as ItemRow[];
 
   const sentRes = await supabaseAdmin
     .from("trip_reminders")
     .select("trip_id, kind")
-    .in("trip_id", trips.map((t) => t.id));
+    .in(
+      "trip_id",
+      trips.map((t) => t.id),
+    );
   const alreadySent = new Set(
     ((sentRes.data ?? []) as Array<{ trip_id: string; kind: string }>).map(
       (r) => `${r.trip_id}:${r.kind}`,

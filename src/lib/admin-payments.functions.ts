@@ -32,13 +32,16 @@ export type PaymentRow = {
   createdAt: string;
 };
 
-async function assertAdmin(supabase: {
-  from: (t: string) => {
-    select: (c: string) => {
-      eq: (c: string, v: string) => { maybeSingle: () => Promise<{ data: unknown }> };
+async function assertAdmin(
+  supabase: {
+    from: (t: string) => {
+      select: (c: string) => {
+        eq: (c: string, v: string) => { maybeSingle: () => Promise<{ data: unknown }> };
+      };
     };
-  };
-}, userId: string): Promise<void> {
+  },
+  userId: string,
+): Promise<void> {
   const res = await supabase.from("profiles").select("is_admin").eq("id", userId).maybeSingle();
   if (!(res.data as { is_admin?: boolean } | null)?.is_admin) throw new Error("forbidden");
 }

@@ -69,7 +69,10 @@ export function makeCreatorCode(): string {
 }
 
 export function normaliseCreatorCode(value: string): string {
-  const cleaned = value.trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
+  const cleaned = value
+    .trim()
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, "");
   if (!cleaned) return "";
   return cleaned.startsWith("CR") ? `CR-${cleaned.slice(2)}` : `CR-${cleaned}`;
 }

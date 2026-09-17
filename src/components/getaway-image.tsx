@@ -42,7 +42,12 @@ function Credit({ image, className }: { image: GetawayImage; className: string }
   return (
     <p className={className}>
       {image.creditUrl ? (
-        <a href={image.creditUrl} target="_blank" rel="noreferrer noopener" className="hover:underline">
+        <a
+          href={image.creditUrl}
+          target="_blank"
+          rel="noreferrer noopener"
+          className="hover:underline"
+        >
           {image.credit}
         </a>
       ) : (
@@ -69,7 +74,9 @@ export function GetawayHero({
     return (
       <header className="border-b border-border bg-secondary/40 px-6 py-14 sm:py-20">
         <div className="mx-auto max-w-3xl">
-          <h1 className="font-display text-4xl font-semibold tracking-tight sm:text-6xl">{title}</h1>
+          <h1 className="font-display text-4xl font-semibold tracking-tight sm:text-6xl">
+            {title}
+          </h1>
           <p className="mt-3 text-sm text-muted-foreground">{subtitle}</p>
         </div>
       </header>

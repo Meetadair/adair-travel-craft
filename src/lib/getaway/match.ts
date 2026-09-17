@@ -17,8 +17,7 @@ export function distanceKm(a: GeoPoint, b: GeoPoint): number {
   const dLat = rad(b.lat - a.lat);
   const dLon = rad(b.lon - a.lon);
   const h =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(rad(a.lat)) * Math.cos(rad(b.lat)) * Math.sin(dLon / 2) ** 2;
+    Math.sin(dLat / 2) ** 2 + Math.cos(rad(a.lat)) * Math.cos(rad(b.lat)) * Math.sin(dLon / 2) ** 2;
   return Math.round(2 * R * Math.asin(Math.min(1, Math.sqrt(h))));
 }
 
@@ -152,7 +151,8 @@ export function interestScore(
     (INTEREST_TAGS[interest] ?? [interest]).some((tag) => tags.has(tag)),
   );
   score += matchedInterests.length * 20;
-  if (matchedInterests.length) reasons.push(`it matches ${theme.name.toLowerCase()} on your profile`);
+  if (matchedInterests.length)
+    reasons.push(`it matches ${theme.name.toLowerCase()} on your profile`);
 
   if (theme.slug === "wine" && profile.cuisines.length) {
     score += 8;
@@ -219,14 +219,20 @@ export function weekStartIso(now = new Date()): string {
 }
 
 /** The next `count` Friday→Sunday pairs, used by the nightly price check. */
-export function comingWeekends(count = 4, now = new Date()): Array<{ depart: string; return: string }> {
+export function comingWeekends(
+  count = 4,
+  now = new Date(),
+): Array<{ depart: string; return: string }> {
   const out: Array<{ depart: string; return: string }> = [];
   const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
   while (d.getUTCDay() !== 5) d.setUTCDate(d.getUTCDate() + 1);
   for (let i = 0; i < count; i += 1) {
     const depart = new Date(d.getTime() + i * 7 * 86_400_000);
     const back = new Date(depart.getTime() + 2 * 86_400_000);
-    out.push({ depart: depart.toISOString().slice(0, 10), return: back.toISOString().slice(0, 10) });
+    out.push({
+      depart: depart.toISOString().slice(0, 10),
+      return: back.toISOString().slice(0, 10),
+    });
   }
   return out;
 }

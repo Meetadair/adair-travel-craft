@@ -87,7 +87,9 @@ describe("the card, said out loud", () => {
 
   it("says where, when and how much, in that order", () => {
     const said = speakableCard(card);
-    expect(said).toBe("Warsaw to Lisbon, 20 October to 24 October. Flying Lufthansa. 226 euros in total.");
+    expect(said).toBe(
+      "Warsaw to Lisbon, 20 October to 24 October. Flying Lufthansa. 226 euros in total.",
+    );
   });
 
   it("does not invent a return date for a one-way", () => {

@@ -49,10 +49,7 @@ export function headCount(party: PartyCounts): number {
 }
 
 export type PartyProblem =
-  | "no_adult"
-  | "too_many_seats"
-  | "too_many_lap_infants"
-  | "unaccompanied_minor";
+  "no_adult" | "too_many_seats" | "too_many_lap_infants" | "unaccompanied_minor";
 
 /**
  * Why this party cannot be searched for, in the order worth telling somebody.

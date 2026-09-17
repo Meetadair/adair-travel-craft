@@ -13,12 +13,7 @@ import type { TripOccasion, TripParty, TripPurpose, TripRequest } from "./types"
 
 /** Which picker a field opens when tapped. */
 export type PickerKind =
-  | "origin"
-  | "destination"
-  | "departDate"
-  | "returnDate"
-  | "arriveBy"
-  | "travellers";
+  "origin" | "destination" | "departDate" | "returnDate" | "arriveBy" | "travellers";
 
 export type UnderstoodField = {
   key: PickerKind;
@@ -81,7 +76,11 @@ export function wishesFromSentence(sentence: string): string[] {
 }
 
 const time = (iso: string) =>
-  new Date(iso).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "UTC" });
+  new Date(iso).toLocaleTimeString("en-GB", {
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "UTC",
+  });
 
 const fill = (template: string, values: Record<string, string>) =>
   template.replace(/\{(\w+)\}/g, (_, key: string) => values[key] ?? "");
@@ -118,7 +117,10 @@ export function understand(
   if (request.hotelNameExact && !wishes.some((w) => w.includes(request.hotelNameExact!))) {
     wishes.unshift(request.hotelNameExact);
   }
-  if (request.hotelWish && !wishes.some((w) => w.toLowerCase() === request.hotelWish!.toLowerCase()))
+  if (
+    request.hotelWish &&
+    !wishes.some((w) => w.toLowerCase() === request.hotelWish!.toLowerCase())
+  )
     wishes.push(request.hotelWish);
   if (request.carNameExact) wishes.push(request.carNameExact);
 

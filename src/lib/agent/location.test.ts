@@ -34,9 +34,9 @@ describe("resolveLocation", () => {
   });
 
   it("never asks again after a refusal", () => {
-    expect(
-      resolveLocation({ device: null, consent: "denied", hotel, city }, true).askConsent,
-    ).toBe(false);
+    expect(resolveLocation({ device: null, consent: "denied", hotel, city }, true).askConsent).toBe(
+      false,
+    );
   });
 
   it("asks only when the question needs exact position", () => {
@@ -85,28 +85,40 @@ describe("get_current_location tool", () => {
 
   it("always reports the source it used", async () => {
     const device = JSON.parse(
-      await runTool("get_current_location", { precise: true }, {
-        ...ctx,
-        location: { device: { lat: 48.86, lon: 2.34 }, consent: "granted", hotel, city },
-      }),
+      await runTool(
+        "get_current_location",
+        { precise: true },
+        {
+          ...ctx,
+          location: { device: { lat: 48.86, lon: 2.34 }, consent: "granted", hotel, city },
+        },
+      ),
     );
     expect(device.source).toBe("device");
 
     const denied = JSON.parse(
-      await runTool("get_current_location", { precise: true }, {
-        ...ctx,
-        location: { device: null, consent: "denied", hotel, city },
-      }),
+      await runTool(
+        "get_current_location",
+        { precise: true },
+        {
+          ...ctx,
+          location: { device: null, consent: "denied", hotel, city },
+        },
+      ),
     );
     expect(denied.source).toBe("hotel");
     expect(denied.say).toContain("your hotel");
     expect(denied.askConsent).toBe(false);
 
     const none = JSON.parse(
-      await runTool("get_current_location", {}, {
-        ...ctx,
-        location: { device: null, consent: "not_asked", hotel: null, city: null },
-      }),
+      await runTool(
+        "get_current_location",
+        {},
+        {
+          ...ctx,
+          location: { device: null, consent: "not_asked", hotel: null, city: null },
+        },
+      ),
     );
     expect(none.ok).toBe(false);
     expect(none.source).toBe("none");

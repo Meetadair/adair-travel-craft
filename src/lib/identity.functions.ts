@@ -55,11 +55,12 @@ export const getBookingIdentity = createServerFn({ method: "GET" })
 
     const identity = {
       givenName: ((row?.["traveller_given_name"] as string | null) ?? firstFromName) || "",
-      familyName:
-        ((row?.["traveller_family_name"] as string | null) ?? restOfName.join(" ")) || "",
+      familyName: ((row?.["traveller_family_name"] as string | null) ?? restOfName.join(" ")) || "",
       email:
         ((row?.["traveller_email"] as string | null) ??
-          ((claims as { email?: string } | null)?.email ?? "")) || "",
+          (claims as { email?: string } | null)?.email ??
+          "") ||
+        "",
       phone: (row?.["traveller_phone"] as string | null) ?? "",
       bornOn: (row?.["traveller_born_on"] as string | null) ?? "",
       gender: ((row?.["traveller_gender"] as string | null) ?? "m") as "m" | "f",

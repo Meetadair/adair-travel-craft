@@ -231,7 +231,12 @@ export async function upsertEvent(
     const base = googleEventsUrl(opts.calendarId);
     const body = googleBody(opts.event, tz);
     if (opts.eventId) {
-      const patched = await callApi(`${base}/${encodeURIComponent(opts.eventId)}`, opts.accessToken, "PATCH", body);
+      const patched = await callApi(
+        `${base}/${encodeURIComponent(opts.eventId)}`,
+        opts.accessToken,
+        "PATCH",
+        body,
+      );
       if (patched) return opts.eventId;
     }
     const created = await callApi(base, opts.accessToken, "POST", body);
@@ -240,7 +245,12 @@ export async function upsertEvent(
   const base = "https://graph.microsoft.com/v1.0/me/events";
   const body = graphBody(opts.event, tz);
   if (opts.eventId) {
-    const patched = await callApi(`${base}/${encodeURIComponent(opts.eventId)}`, opts.accessToken, "PATCH", body);
+    const patched = await callApi(
+      `${base}/${encodeURIComponent(opts.eventId)}`,
+      opts.accessToken,
+      "PATCH",
+      body,
+    );
     if (patched) return opts.eventId;
   }
   const created = await callApi(base, opts.accessToken, "POST", body);

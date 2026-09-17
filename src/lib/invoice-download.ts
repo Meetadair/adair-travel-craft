@@ -2,11 +2,7 @@
 import { downloadTripInvoice } from "@/lib/trip-pdf";
 import type { InvoiceTrip } from "@/lib/invoices.functions";
 
-export function downloadInvoiceFor(
-  trip: InvoiceTrip,
-  variant: "receipt" | "vat",
-  locale: string,
-) {
+export function downloadInvoiceFor(trip: InvoiceTrip, variant: "receipt" | "vat", locale: string) {
   void downloadTripInvoice({
     documentNumber: trip.documentNumber,
     issueDate: trip.issueDate,

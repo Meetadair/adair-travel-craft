@@ -114,7 +114,9 @@ export function TripMonthCalendar({ trips }: { trips: TripMark[] }) {
       {marks.size > 0 && (
         <ul className="mt-5 space-y-1 text-xs text-muted-foreground sm:hidden">
           {Array.from(marks.entries())
-            .filter(([day]) => day.startsWith(`${cursor.year}-${String(cursor.month + 1).padStart(2, "0")}`))
+            .filter(([day]) =>
+              day.startsWith(`${cursor.year}-${String(cursor.month + 1).padStart(2, "0")}`),
+            )
             .sort(([a], [b]) => a.localeCompare(b))
             .map(([day, list]) => (
               <li key={day}>

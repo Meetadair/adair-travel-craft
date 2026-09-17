@@ -127,8 +127,8 @@ export function BusinessTrips() {
       <div>
         <h2 className="font-display text-lg font-semibold">Business trips</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          When a trip is for work — you said so when Adair asked, the invoice goes to a company,
-          or the sentence reads like a meeting — these take over. Anything left on &quot;same as my
+          When a trip is for work — you said so when Adair asked, the invoice goes to a company, or
+          the sentence reads like a meeting — these take over. Anything left on &quot;same as my
           usual&quot; simply uses your normal preferences.
         </p>
       </div>
@@ -162,8 +162,8 @@ export function BusinessTrips() {
       <div>
         <span className={label}>What matters inside the hotel on a work trip</span>
         <p className="mt-1 text-xs text-muted-foreground">
-          A gym on a Tuesday in Frankfurt and a pool in Crete are not the same holiday. Pick
-          nothing and your usual answers apply.
+          A gym on a Tuesday in Frankfurt and a pool in Crete are not the same holiday. Pick nothing
+          and your usual answers apply.
         </p>
         <div className="mt-2 flex flex-wrap gap-2">
           {AMENITIES.map(([value, name]) => {

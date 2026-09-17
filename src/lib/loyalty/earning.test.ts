@@ -37,19 +37,41 @@ describe("earnsOn — hotels and cars", () => {
 describe("earnsOnWithGroup — brand table widens the mapping", () => {
   it("credits a hotel programme across its whole group", () => {
     expect(
-      earnsOnWithGroup(DEFAULT_EARNING_RULES, BRAND_SEED, "hotel", "marriott_bonvoy", "The Westin Warsaw"),
+      earnsOnWithGroup(
+        DEFAULT_EARNING_RULES,
+        BRAND_SEED,
+        "hotel",
+        "marriott_bonvoy",
+        "The Westin Warsaw",
+      ),
     ).toBe(true);
     expect(
-      earnsOnWithGroup(DEFAULT_EARNING_RULES, BRAND_SEED, "hotel", "marriott_bonvoy", "Hotel Bristol"),
+      earnsOnWithGroup(
+        DEFAULT_EARNING_RULES,
+        BRAND_SEED,
+        "hotel",
+        "marriott_bonvoy",
+        "Hotel Bristol",
+      ),
     ).toBe(false);
   });
   it("credits an alliance card on any alliance member", () => {
-    expect(earnsOnWithGroup(DEFAULT_EARNING_RULES, BRAND_SEED, "airline", "lot_miles", "UA")).toBe(true);
-    expect(earnsOnWithGroup(DEFAULT_EARNING_RULES, BRAND_SEED, "airline", "lot_miles", "DL")).toBe(false);
+    expect(earnsOnWithGroup(DEFAULT_EARNING_RULES, BRAND_SEED, "airline", "lot_miles", "UA")).toBe(
+      true,
+    );
+    expect(earnsOnWithGroup(DEFAULT_EARNING_RULES, BRAND_SEED, "airline", "lot_miles", "DL")).toBe(
+      false,
+    );
   });
   it("credits a car programme across its owning group", () => {
     expect(
-      earnsOnWithGroup(DEFAULT_EARNING_RULES, BRAND_SEED, "car", "avis_preferred", "Budget · Estate"),
+      earnsOnWithGroup(
+        DEFAULT_EARNING_RULES,
+        BRAND_SEED,
+        "car",
+        "avis_preferred",
+        "Budget · Estate",
+      ),
     ).toBe(true);
   });
 });

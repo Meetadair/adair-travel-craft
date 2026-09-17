@@ -111,7 +111,8 @@ function Calculator() {
 
       <label className="mt-5 block text-sm">
         <span className="text-muted-foreground">
-          Trips your readers book in a month: <span className="text-foreground">{tripsPerMonth}</span>
+          Trips your readers book in a month:{" "}
+          <span className="text-foreground">{tripsPerMonth}</span>
         </span>
         <input
           type="range"
@@ -125,7 +126,9 @@ function Calculator() {
 
       <div className="mt-5 flex flex-wrap items-end gap-x-8 gap-y-3 border-t border-border pt-4">
         <div>
-          <div className="text-[0.7rem] uppercase tracking-wide text-muted-foreground">Per trip</div>
+          <div className="text-[0.7rem] uppercase tracking-wide text-muted-foreground">
+            Per trip
+          </div>
           <div className="font-display text-2xl font-semibold">{formatMinor(perTrip)}</div>
         </div>
         <div>
@@ -256,9 +259,7 @@ export function CreatorsPublicPage() {
         </section>
 
         <section className="mt-16 rounded-2xl border border-border p-6 sm:p-8">
-          <h2 className="font-display text-xl font-semibold tracking-tight">
-            Ready when you are
-          </h2>
+          <h2 className="font-display text-xl font-semibold tracking-tight">Ready when you are</h2>
           <p className="mt-2 max-w-lg text-sm text-muted-foreground">
             Apply with your handle and where you publish. Approved creators get a link, a code, a
             public profile page and a dashboard showing every click, signup and booking.

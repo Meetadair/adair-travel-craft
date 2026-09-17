@@ -41,7 +41,16 @@ const air = (
   group: string | null,
   regions: Region[],
   aliases?: string[],
-): Brand => ({ id, kind: "airline", name, group, regions, rank: ++seq, active: true, ...(aliases ? { aliases } : {}) });
+): Brand => ({
+  id,
+  kind: "airline",
+  name,
+  group,
+  regions,
+  rank: ++seq,
+  active: true,
+  ...(aliases ? { aliases } : {}),
+});
 
 let hSeq = 0;
 const hotel = (
@@ -50,7 +59,16 @@ const hotel = (
   group: string | null,
   regions: Region[],
   aliases?: string[],
-): Brand => ({ id, kind: "hotel_chain", name, group, regions, rank: ++hSeq, active: true, ...(aliases ? { aliases } : {}) });
+): Brand => ({
+  id,
+  kind: "hotel_chain",
+  name,
+  group,
+  regions,
+  rank: ++hSeq,
+  active: true,
+  ...(aliases ? { aliases } : {}),
+});
 
 let cSeq = 0;
 const car = (
@@ -59,7 +77,16 @@ const car = (
   group: string | null,
   regions: Region[],
   aliases?: string[],
-): Brand => ({ id, kind: "car_rental", name, group, regions, rank: ++cSeq, active: true, ...(aliases ? { aliases } : {}) });
+): Brand => ({
+  id,
+  kind: "car_rental",
+  name,
+  group,
+  regions,
+  rank: ++cSeq,
+  active: true,
+  ...(aliases ? { aliases } : {}),
+});
 
 const AIRLINES: Brand[] = [
   // European network carriers

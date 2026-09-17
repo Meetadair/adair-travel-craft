@@ -10,100 +10,102 @@ export type CapabilityStatus = {
 
 export const getSystemStatus = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }): Promise<{ capabilities: CapabilityStatus[]; checkedAt: string }> => {
-    const { hasDuffelKey, isTestKey, searchFlight, searchStay, searchCar } = await import(
-      "@/lib/trip/duffel.server"
-    );
+  .handler(
+    async ({ context }): Promise<{ capabilities: CapabilityStatus[]; checkedAt: string }> => {
+      const { hasDuffelKey, isTestKey, searchFlight, searchStay, searchCar } =
+        await import("@/lib/trip/duffel.server");
 
-    const capabilities: CapabilityStatus[] = [];
+      const capabilities: CapabilityStatus[] = [];
 
-    if (!hasDuffelKey()) {
-      capabilities.push({ name: "Flights", state: "off", note: "No supplier key configured" });
-      capabilities.push({ name: "Hotels", state: "off", note: "No supplier key configured" });
-      capabilities.push({ name: "Cars", state: "off", note: "No supplier key configured" });
-    } else {
-      const probe = {
-        originCity: "Warsaw",
-        originIata: "WAW",
-        originStated: true,
-        destinationCity: "Milan",
-        destinationIata: "LIN",
-        lat: 45.464,
-        lon: 9.19,
-        departDate: isoInDays(21),
-        returnDate: isoInDays(23),
-        cabinClass: "economy" as const,
-        passengers: 1,
-        hotelWish: null,
-        hotelNameExact: null,
-        carNameExact: null,
-        needsCar: true,
-        invoiceToCompany: false,
-        stops: [
-          { city: "Warsaw", iata: "WAW", lat: 52.23, lon: 21.01 },
-          { city: "Milan", iata: "LIN", lat: 45.464, lon: 9.19 },
-        ],
-      };
+      if (!hasDuffelKey()) {
+        capabilities.push({ name: "Flights", state: "off", note: "No supplier key configured" });
+        capabilities.push({ name: "Hotels", state: "off", note: "No supplier key configured" });
+        capabilities.push({ name: "Cars", state: "off", note: "No supplier key configured" });
+      } else {
+        const probe = {
+          originCity: "Warsaw",
+          originIata: "WAW",
+          originStated: true,
+          destinationCity: "Milan",
+          destinationIata: "LIN",
+          lat: 45.464,
+          lon: 9.19,
+          departDate: isoInDays(21),
+          returnDate: isoInDays(23),
+          cabinClass: "economy" as const,
+          passengers: 1,
+          hotelWish: null,
+          hotelNameExact: null,
+          carNameExact: null,
+          needsCar: true,
+          invoiceToCompany: false,
+          stops: [
+            { city: "Warsaw", iata: "WAW", lat: 52.23, lon: 21.01 },
+            { city: "Milan", iata: "LIN", lat: 45.464, lon: 9.19 },
+          ],
+        };
 
-      const [flight, stay, car] = await Promise.allSettled([
-        searchFlight(probe),
-        searchStay(probe).then((r) => r.stay),
-        searchCar(probe).then((r) => r.car),
-      ]);
+        const [flight, stay, car] = await Promise.allSettled([
+          searchFlight(probe),
+          searchStay(probe).then((r) => r.stay),
+          searchCar(probe).then((r) => r.car),
+        ]);
 
-
-      const describe = (name: string, result: PromiseSettledResult<unknown>): CapabilityStatus => {
-        if (result.status === "fulfilled") {
+        const describe = (
+          name: string,
+          result: PromiseSettledResult<unknown>,
+        ): CapabilityStatus => {
+          if (result.status === "fulfilled") {
+            return {
+              name,
+              state: result.value ? "ok" : "error",
+              note: result.value ? "Live results returned" : "No availability returned",
+            };
+          }
+          const message = result.reason instanceof Error ? result.reason.message : "unknown";
           return {
             name,
-            state: result.value ? "ok" : "error",
-            note: result.value ? "Live results returned" : "No availability returned",
+            state: "error",
+            note:
+              message === "duffel-401" || message === "duffel-403"
+                ? "Not enabled on the supplier account"
+                : `Supplier error (${message})`,
           };
-        }
-        const message = result.reason instanceof Error ? result.reason.message : "unknown";
-        return {
-          name,
-          state: "error",
-          note:
-            message === "duffel-401" || message === "duffel-403"
-              ? "Not enabled on the supplier account"
-              : `Supplier error (${message})`,
         };
-      };
 
-      capabilities.push(describe("Flights", flight));
-      capabilities.push(describe("Hotels", stay));
-      capabilities.push(describe("Cars", car));
+        capabilities.push(describe("Flights", flight));
+        capabilities.push(describe("Hotels", stay));
+        capabilities.push(describe("Cars", car));
+        capabilities.push({
+          name: "Supplier mode",
+          state: "ok",
+          note: isTestKey() ? "Test mode — no real money" : "Live mode",
+        });
+      }
+
       capabilities.push({
-        name: "Supplier mode",
-        state: "ok",
-        note: isTestKey() ? "Test mode — no real money" : "Live mode",
+        name: "Sentence understanding",
+        state: process.env["ANTHROPIC_API_KEY"] ? "ok" : "off",
+        note: process.env["ANTHROPIC_API_KEY"]
+          ? "AI understanding available"
+          : "Falling back to rules only",
       });
-    }
+      capabilities.push({
+        name: "Getaway pictures (UNSPLASH_ACCESS_KEY)",
+        state: process.env["UNSPLASH_ACCESS_KEY"] ? "ok" : "off",
+        note: process.env["UNSPLASH_ACCESS_KEY"]
+          ? "Stock fallback available when no own photo is uploaded"
+          : "Own uploads only — destinations without a photo show a typographic header",
+      });
+      capabilities.push({
+        name: "Booking & payment",
+        state: "ok",
+        note: "Test-mode booking live — supplier test payment, no real charge",
+      });
 
-    capabilities.push({
-      name: "Sentence understanding",
-      state: process.env["ANTHROPIC_API_KEY"] ? "ok" : "off",
-      note: process.env["ANTHROPIC_API_KEY"]
-        ? "AI understanding available"
-        : "Falling back to rules only",
-    });
-    capabilities.push({
-      name: "Getaway pictures (UNSPLASH_ACCESS_KEY)",
-      state: process.env["UNSPLASH_ACCESS_KEY"] ? "ok" : "off",
-      note: process.env["UNSPLASH_ACCESS_KEY"]
-        ? "Stock fallback available when no own photo is uploaded"
-        : "Own uploads only — destinations without a photo show a typographic header",
-    });
-    capabilities.push({
-      name: "Booking & payment",
-      state: "ok",
-      note: "Test-mode booking live — supplier test payment, no real charge",
-    });
-
-
-    return { capabilities, checkedAt: new Date().toISOString() };
-  });
+      return { capabilities, checkedAt: new Date().toISOString() };
+    },
+  );
 
 function isoInDays(days: number): string {
   const date = new Date(Date.now() + days * 86_400_000);

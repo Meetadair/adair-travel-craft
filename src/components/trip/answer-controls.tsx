@@ -144,19 +144,19 @@ export function DateAnswer({
       )}
 
       {value && (
-      <p
-        className={
-          !isCompleteRange(value)
-            ? "mt-2 text-[11px] text-primary"
-            : "mt-2 text-[11px] text-muted-foreground"
-        }
-      >
-        {value.oneWay
+        <p
+          className={
+            !isCompleteRange(value)
+              ? "mt-2 text-[11px] text-primary"
+              : "mt-2 text-[11px] text-muted-foreground"
+          }
+        >
+          {value.oneWay
             ? `${copy.outbound} ${value.departDate} · ${copy.oneWay}`
             : isCompleteRange(value)
               ? `${copy.outbound} ${value.departDate} · ${copy.returnDay} ${value.returnDate} · ${nightsBetween(value.departDate, value.returnDate ?? value.departDate)} ${copy.nightsWord}`
               : copy.pickReturn}
-      </p>
+        </p>
       )}
     </div>
   );
@@ -285,24 +285,24 @@ export function AirportAnswer({
         className={`${offered.length > 0 ? "mt-3" : ""} w-full rounded-lg border border-border bg-background px-3 py-2 text-xs outline-none`}
       />
       {typed && (
-      <ul className="mt-1 max-h-44 overflow-auto rounded-lg border border-border">
-        {matches.length === 0 && (
-          <li className="px-3 py-2 text-xs text-muted-foreground">{copy.airportEmpty}</li>
-        )}
-        {matches.map((match) => (
-          <li key={match.iata}>
-            <button
-              type="button"
-              onClick={() => onChange(match.iata)}
-              className={`w-full px-3 py-1.5 text-left text-xs hover:bg-muted ${
-                value === match.iata ? "font-semibold text-foreground" : "text-foreground"
-              }`}
-            >
-              {match.label}
-            </button>
-          </li>
-        ))}
-      </ul>
+        <ul className="mt-1 max-h-44 overflow-auto rounded-lg border border-border">
+          {matches.length === 0 && (
+            <li className="px-3 py-2 text-xs text-muted-foreground">{copy.airportEmpty}</li>
+          )}
+          {matches.map((match) => (
+            <li key={match.iata}>
+              <button
+                type="button"
+                onClick={() => onChange(match.iata)}
+                className={`w-full px-3 py-1.5 text-left text-xs hover:bg-muted ${
+                  value === match.iata ? "font-semibold text-foreground" : "text-foreground"
+                }`}
+              >
+                {match.label}
+              </button>
+            </li>
+          ))}
+        </ul>
       )}
     </div>
   );

@@ -50,9 +50,12 @@ describe("Duffel request shape", () => {
   });
 
   const base = {
-    originCity: "Warsaw", originIata: "WAW",
-    destinationCity: "New York", destinationIata: "JFK",
-    departDate: "2026-10-01", returnDate: "2026-10-08",
+    originCity: "Warsaw",
+    originIata: "WAW",
+    destinationCity: "New York",
+    destinationIata: "JFK",
+    departDate: "2026-10-01",
+    returnDate: "2026-10-08",
   };
 
   it("sends two slices for a round trip and one for a one-way", async () => {

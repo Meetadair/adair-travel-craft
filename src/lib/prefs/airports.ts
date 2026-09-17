@@ -159,7 +159,11 @@ export function airportsInCountry(country: string | null, limit = 5): AirportEnt
  * the same airport twice.
  */
 export function likelyOrigins(
-  { used = [], country = null, exclude = [] }: {
+  {
+    used = [],
+    country = null,
+    exclude = [],
+  }: {
     used?: string[];
     country?: string | null;
     exclude?: string[];

@@ -77,11 +77,7 @@ export type ChangeQuote = {
   refundEur: number;
 };
 
-export function changeQuote(
-  oldTotalEur: number,
-  newTotalEur: number,
-  feeEur: number,
-): ChangeQuote {
+export function changeQuote(oldTotalEur: number, newTotalEur: number, feeEur: number): ChangeQuote {
   const round = (n: number) => Math.round(n * 100) / 100;
   const refund = Math.max(0, round(oldTotalEur - feeEur));
   return {
@@ -96,14 +92,19 @@ export function changeQuote(
 
 /** Plain words for the difference, shown before the traveller confirms. */
 export function differenceSentence(quote: ChangeQuote): string {
-  if (quote.differenceEur > 0) return `This change costs ${quote.differenceEur.toFixed(2)} EUR more.`;
+  if (quote.differenceEur > 0)
+    return `This change costs ${quote.differenceEur.toFixed(2)} EUR more.`;
   if (quote.differenceEur < 0)
     return `This change is ${Math.abs(quote.differenceEur).toFixed(2)} EUR cheaper.`;
   return "This change costs the same as your current booking.";
 }
 
 /** The conditions, in plain words, for the method actually available. */
-export function conditionsSentences(kind: ChangeKind, method: ChangeMethod, quote: ChangeQuote): string[] {
+export function conditionsSentences(
+  kind: ChangeKind,
+  method: ChangeMethod,
+  quote: ChangeQuote,
+): string[] {
   const what = kind === "dates" ? "dates" : "hotel";
   const lines: string[] = [];
 

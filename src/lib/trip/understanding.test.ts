@@ -6,7 +6,8 @@ const parseTripSentence = (sentence: string, today?: Date, home?: string) =>
   parseOrNull(sentence, today, home)!;
 import { applyOverrides, understand, wishesFromSentence } from "./understanding";
 
-const req = (sentence: string) => parseTripSentence(sentence, new Date("2026-09-13T09:00:00Z"), "WAW");
+const req = (sentence: string) =>
+  parseTripSentence(sentence, new Date("2026-09-13T09:00:00Z"), "WAW");
 
 describe("understanding strip", () => {
   it("renders the parsed fields", () => {
@@ -60,7 +61,10 @@ describe("strip edits", () => {
 
   it("never returns before it departs", () => {
     const sentence = "Trip to Paris on Monday, back Wednesday";
-    const next = applyOverrides(req(sentence), { departDate: "2026-10-10", returnDate: "2026-10-01" });
+    const next = applyOverrides(req(sentence), {
+      departDate: "2026-10-10",
+      returnDate: "2026-10-01",
+    });
     expect(next.returnDate).toBe("2026-10-10");
   });
 });

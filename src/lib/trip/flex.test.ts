@@ -33,8 +33,16 @@ describe("flexible dates", () => {
 
   it("picks the biggest real saving", () => {
     const priced: FlexPrice[] = [
-      { window: { departDate: "2026-10-09", returnDate: "2026-10-16", offset: -1 }, amount: 380, currency: "EUR" },
-      { window: { departDate: "2026-10-12", returnDate: "2026-10-19", offset: 2 }, amount: 290, currency: "EUR" },
+      {
+        window: { departDate: "2026-10-09", returnDate: "2026-10-16", offset: -1 },
+        amount: 380,
+        currency: "EUR",
+      },
+      {
+        window: { departDate: "2026-10-12", returnDate: "2026-10-19", offset: 2 },
+        amount: 290,
+        currency: "EUR",
+      },
     ];
     expect(bestSaving(420, "EUR", priced)?.saveAmount).toBe(130);
     expect(bestSaving(420, "EUR", priced)?.departDate).toBe("2026-10-12");
@@ -42,14 +50,22 @@ describe("flexible dates", () => {
 
   it("stays quiet about a saving too small to be worth moving a trip for", () => {
     const priced: FlexPrice[] = [
-      { window: { departDate: "2026-10-09", returnDate: "2026-10-16", offset: -1 }, amount: 416, currency: "EUR" },
+      {
+        window: { departDate: "2026-10-09", returnDate: "2026-10-16", offset: -1 },
+        amount: 416,
+        currency: "EUR",
+      },
     ];
     expect(bestSaving(420, "EUR", priced)).toBeNull();
   });
 
   it("never compares across currencies", () => {
     const priced: FlexPrice[] = [
-      { window: { departDate: "2026-10-09", returnDate: "2026-10-16", offset: -1 }, amount: 100, currency: "PLN" },
+      {
+        window: { departDate: "2026-10-09", returnDate: "2026-10-16", offset: -1 },
+        amount: 100,
+        currency: "PLN",
+      },
     ];
     expect(bestSaving(420, "EUR", priced)).toBeNull();
   });

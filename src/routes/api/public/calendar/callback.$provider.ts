@@ -33,7 +33,8 @@ export const Route = createFileRoute("/api/public/calendar/callback/$provider")(
           const row = stateRes.data;
           if (!row || row.provider !== provider) return backTo(origin, "expired");
           await supabaseAdmin.from("calendar_oauth_states").delete().eq("state", state);
-          if (Date.now() - Date.parse(row.created_at) > 15 * 60_000) return backTo(origin, "expired");
+          if (Date.now() - Date.parse(row.created_at) > 15 * 60_000)
+            return backTo(origin, "expired");
 
           const { exchangeCode } = await import("@/lib/calendar/providers.server");
           const { encryptToken } = await import("@/lib/calendar/crypto.server");

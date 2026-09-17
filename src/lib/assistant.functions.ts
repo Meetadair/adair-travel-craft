@@ -110,9 +110,10 @@ export const askAdair = createServerFn({ method: "POST" })
           device: consent === "granted" ? data.device : null,
           consent,
           hotel: data.hotel,
-          city: data.cityCentre && data.city
-            ? { name: data.city, lat: data.cityCentre.lat, lon: data.cityCentre.lon }
-            : null,
+          city:
+            data.cityCentre && data.city
+              ? { name: data.city, lat: data.cityCentre.lat, lon: data.cityCentre.lon }
+              : null,
         },
       },
     );

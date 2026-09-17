@@ -22,9 +22,7 @@ export async function searchTrip(request: TripRequest): Promise<TripSearchRespon
 }
 
 /** Nearby-date comparison for the same trip; safe to call after the card renders. */
-export async function fetchPriceContext(
-  request: TripRequest,
-): Promise<PriceContext | null> {
+export async function fetchPriceContext(request: TripRequest): Promise<PriceContext | null> {
   try {
     const res = await fetch("/api/trip/price-context", {
       method: "POST",
@@ -62,7 +60,9 @@ export function timeLabel(iso: string, locale: string): string {
 export function dayLabel(isoDate: string, locale: string): string {
   const date = new Date(`${isoDate}T12:00:00`);
   if (Number.isNaN(date.getTime())) return isoDate;
-  return new Intl.DateTimeFormat(locale, { weekday: "short", day: "numeric", month: "short" }).format(
-    date,
-  );
+  return new Intl.DateTimeFormat(locale, {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+  }).format(date);
 }

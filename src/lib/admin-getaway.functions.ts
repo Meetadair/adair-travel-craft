@@ -49,9 +49,26 @@ export type AdminDestination = {
   hero_image_credit: string | null;
   hero_image_source: string | null;
   /** Theme assignments, each with its own season window. */
-  themes: Array<{ id: string; theme_id: string; season_months: number[]; editorial_angle: string | null }>;
-  places: Array<{ id: string; kind: string; name: string; active: boolean; why_this_one: string | null }>;
-  itineraries: Array<{ id: string; title: string; nights: number; summary: string | null; active: boolean }>;
+  themes: Array<{
+    id: string;
+    theme_id: string;
+    season_months: number[];
+    editorial_angle: string | null;
+  }>;
+  places: Array<{
+    id: string;
+    kind: string;
+    name: string;
+    active: boolean;
+    why_this_one: string | null;
+  }>;
+  itineraries: Array<{
+    id: string;
+    title: string;
+    nights: number;
+    summary: string | null;
+    active: boolean;
+  }>;
 };
 
 export const getGetawayContent = createServerFn({ method: "GET" })
@@ -62,57 +79,65 @@ export const getGetawayContent = createServerFn({ method: "GET" })
     const [themes, dests, joins, places, itins] = await Promise.all([
       s.from("getaway_themes").select("*").order("sort_order"),
       s.from("getaway_destinations").select("*").order("name"),
-      s.from("getaway_destination_themes").select("id, destination_id, theme_id, season_months, editorial_angle"),
-      s.from("getaway_places").select("id, destination_id, kind, name, active, why_this_one").order("name"),
-      s.from("getaway_itineraries").select("id, destination_id, title, nights, summary, active").order("nights"),
+      s
+        .from("getaway_destination_themes")
+        .select("id, destination_id, theme_id, season_months, editorial_angle"),
+      s
+        .from("getaway_places")
+        .select("id, destination_id, kind, name, active, why_this_one")
+        .order("name"),
+      s
+        .from("getaway_itineraries")
+        .select("id, destination_id, title, nights, summary, active")
+        .order("nights"),
     ]);
 
-    const destinations: AdminDestination[] = ((dests.data ?? []) as Array<Record<string, unknown>>).map(
-      (d) => ({
-        id: String(d['id']),
-        name: String(d['name']),
-        country: String(d['country']),
-        nearest_airport_iata: String(d['nearest_airport_iata']),
-        latitude: Number(d['latitude']),
-        longitude: Number(d['longitude']),
-        drivable_from: (d['drivable_from'] as string[] | null) ?? [],
-        editorial_note: (d['editorial_note'] as string | null) ?? null,
-        best_for: (d['best_for'] as string | null) ?? null,
-        avoid_when: (d['avoid_when'] as string | null) ?? null,
-        travel_tips: parseTravelTips(d['travel_tips']),
-        hero_image_url: (d['hero_image_url'] as string | null) ?? null,
-        hero_image_credit: (d['hero_image_credit'] as string | null) ?? null,
-        hero_image_source: (d['hero_image_source'] as string | null) ?? null,
-        typical_nights: Number(d['typical_nights']),
-        active: Boolean(d['active']),
-        themes: ((joins.data ?? []) as Array<Record<string, unknown>>)
-          .filter((j) => j['destination_id'] === d['id'])
-          .map((j) => ({
-            id: String(j['id']),
-            theme_id: String(j['theme_id']),
-            season_months: (j['season_months'] as number[] | null) ?? [],
-            editorial_angle: (j['editorial_angle'] as string | null) ?? null,
-          })),
-        places: ((places.data ?? []) as Array<Record<string, unknown>>)
-          .filter((p) => p['destination_id'] === d['id'])
-          .map((p) => ({
-            id: String(p['id']),
-            kind: String(p['kind']),
-            name: String(p['name']),
-            active: Boolean(p['active']),
-            why_this_one: (p['why_this_one'] as string | null) ?? null,
-          })),
-        itineraries: ((itins.data ?? []) as Array<Record<string, unknown>>)
-          .filter((i) => i['destination_id'] === d['id'])
-          .map((i) => ({
-            id: String(i['id']),
-            title: String(i['title']),
-            nights: Number(i['nights']),
-            summary: (i['summary'] as string | null) ?? null,
-            active: Boolean(i['active']),
-          })),
-      }),
-    );
+    const destinations: AdminDestination[] = (
+      (dests.data ?? []) as Array<Record<string, unknown>>
+    ).map((d) => ({
+      id: String(d["id"]),
+      name: String(d["name"]),
+      country: String(d["country"]),
+      nearest_airport_iata: String(d["nearest_airport_iata"]),
+      latitude: Number(d["latitude"]),
+      longitude: Number(d["longitude"]),
+      drivable_from: (d["drivable_from"] as string[] | null) ?? [],
+      editorial_note: (d["editorial_note"] as string | null) ?? null,
+      best_for: (d["best_for"] as string | null) ?? null,
+      avoid_when: (d["avoid_when"] as string | null) ?? null,
+      travel_tips: parseTravelTips(d["travel_tips"]),
+      hero_image_url: (d["hero_image_url"] as string | null) ?? null,
+      hero_image_credit: (d["hero_image_credit"] as string | null) ?? null,
+      hero_image_source: (d["hero_image_source"] as string | null) ?? null,
+      typical_nights: Number(d["typical_nights"]),
+      active: Boolean(d["active"]),
+      themes: ((joins.data ?? []) as Array<Record<string, unknown>>)
+        .filter((j) => j["destination_id"] === d["id"])
+        .map((j) => ({
+          id: String(j["id"]),
+          theme_id: String(j["theme_id"]),
+          season_months: (j["season_months"] as number[] | null) ?? [],
+          editorial_angle: (j["editorial_angle"] as string | null) ?? null,
+        })),
+      places: ((places.data ?? []) as Array<Record<string, unknown>>)
+        .filter((p) => p["destination_id"] === d["id"])
+        .map((p) => ({
+          id: String(p["id"]),
+          kind: String(p["kind"]),
+          name: String(p["name"]),
+          active: Boolean(p["active"]),
+          why_this_one: (p["why_this_one"] as string | null) ?? null,
+        })),
+      itineraries: ((itins.data ?? []) as Array<Record<string, unknown>>)
+        .filter((i) => i["destination_id"] === d["id"])
+        .map((i) => ({
+          id: String(i["id"]),
+          title: String(i["title"]),
+          nights: Number(i["nights"]),
+          summary: (i["summary"] as string | null) ?? null,
+          active: Boolean(i["active"]),
+        })),
+    }));
 
     return {
       themes: ((themes.data ?? []) as unknown as AdminTheme[]).map((t) => ({
@@ -235,7 +260,17 @@ export const saveGetawayPlace = createServerFn({ method: "POST" })
       .object({
         id: z.string().uuid().optional(),
         destination_id: z.string().uuid(),
-        kind: z.enum(["hotel", "restaurant", "cafe", "bar", "wine_bar", "cocktail_bar", "rooftop", "club", "sight"]),
+        kind: z.enum([
+          "hotel",
+          "restaurant",
+          "cafe",
+          "bar",
+          "wine_bar",
+          "cocktail_bar",
+          "rooftop",
+          "club",
+          "sight",
+        ]),
         name: z.string().trim().min(2).max(160),
         address: z.string().trim().max(300).nullable(),
         latitude: z.number().min(-90).max(90).nullable(),

@@ -151,7 +151,7 @@ export function cabinFor(grade: Grade, flightHours: number): Cabin {
   return flightHours >= grade.cabinFromHours ? grade.cabin : "economy";
 }
 
-const rank = <T,>(order: T[], value: T): number => order.indexOf(value);
+const rank = <T>(order: T[], value: T): number => order.indexOf(value);
 
 export function cabinAllowed(grade: Grade, flightHours: number, cabin: Cabin): boolean {
   return rank(CABIN_ORDER, cabin) <= rank(CABIN_ORDER, cabinFor(grade, flightHours));

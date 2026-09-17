@@ -26,9 +26,7 @@ import { convertAmount } from "@/lib/trip/currency-math";
 export const CURRENCY_STORAGE_KEY = "adair-currency";
 
 /** Shown until the live table loads — same fallback fx.server.ts starts from. */
-const FALLBACK_CURRENCIES = [
-  "EUR", "USD", "GBP", "PLN", "CHF", "SEK", "NOK", "DKK", "CZK", "JPY",
-];
+const FALLBACK_CURRENCIES = ["EUR", "USD", "GBP", "PLN", "CHF", "SEK", "NOK", "DKK", "CZK", "JPY"];
 
 function readStoredCurrency(): string | null {
   try {

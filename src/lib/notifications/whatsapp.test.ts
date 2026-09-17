@@ -7,8 +7,8 @@ import {
 } from "./whatsapp";
 
 afterEach(() => {
-  delete process.env['WHATSAPP_API_TOKEN'];
-  delete process.env['WHATSAPP_PHONE_NUMBER_ID'];
+  delete process.env["WHATSAPP_API_TOKEN"];
+  delete process.env["WHATSAPP_PHONE_NUMBER_ID"];
   vi.unstubAllGlobals();
 });
 
@@ -24,9 +24,9 @@ describe("normalisePhone", () => {
 
 describe("hasWhatsAppKeys", () => {
   it("is false without both credentials", () => {
-    process.env['WHATSAPP_API_TOKEN'] = "t";
+    process.env["WHATSAPP_API_TOKEN"] = "t";
     expect(hasWhatsAppKeys()).toBe(false);
-    process.env['WHATSAPP_PHONE_NUMBER_ID'] = "1";
+    process.env["WHATSAPP_PHONE_NUMBER_ID"] = "1";
     expect(hasWhatsAppKeys()).toBe(true);
   });
 });
@@ -42,10 +42,10 @@ describe("sendWhatsAppTemplate", () => {
   });
 
   it("posts an approved template with ordered parameters", async () => {
-    process.env['WHATSAPP_API_TOKEN'] = "token";
-    process.env['WHATSAPP_PHONE_NUMBER_ID'] = "555";
-    const fetchMock = vi.fn(async () =>
-      new Response(JSON.stringify({ messages: [{ id: "wamid.1" }] }), { status: 200 }),
+    process.env["WHATSAPP_API_TOKEN"] = "token";
+    process.env["WHATSAPP_PHONE_NUMBER_ID"] = "555";
+    const fetchMock = vi.fn(
+      async () => new Response(JSON.stringify({ messages: [{ id: "wamid.1" }] }), { status: 200 }),
     );
     vi.stubGlobal("fetch", fetchMock);
 
@@ -59,8 +59,8 @@ describe("sendWhatsAppTemplate", () => {
     const [url, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
     expect(url).toBe("https://graph.facebook.com/v21.0/555/messages");
     const body = JSON.parse(String(init.body)) as Record<string, unknown>;
-    expect(body['to']).toBe("48601234567");
-    const template = body['template'] as {
+    expect(body["to"]).toBe("48601234567");
+    const template = body["template"] as {
       name: string;
       components: Array<{ parameters: Array<{ text: string }> }>;
     };
@@ -73,9 +73,12 @@ describe("sendWhatsAppTemplate", () => {
   });
 
   it("reports failure on an http error", async () => {
-    process.env['WHATSAPP_API_TOKEN'] = "token";
-    process.env['WHATSAPP_PHONE_NUMBER_ID'] = "555";
-    vi.stubGlobal("fetch", vi.fn(async () => new Response("nope", { status: 400 })));
+    process.env["WHATSAPP_API_TOKEN"] = "token";
+    process.env["WHATSAPP_PHONE_NUMBER_ID"] = "555";
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => new Response("nope", { status: 400 })),
+    );
     const result = await sendWhatsAppTemplate({
       to: "+48601234567",
       template: "trip_reminder",

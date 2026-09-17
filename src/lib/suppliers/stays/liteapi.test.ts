@@ -1,12 +1,35 @@
 import { describe, expect, it } from "vitest";
-import { bedTypesFrom, breakfastFrom, cheapestRate, matchStaticRoom, nightsBetween, refundableFromTag } from "./liteapi";
+import {
+  bedTypesFrom,
+  breakfastFrom,
+  cheapestRate,
+  matchStaticRoom,
+  nightsBetween,
+  refundableFromTag,
+} from "./liteapi";
 
 describe("cheapestRate", () => {
   it("takes the lowest priced rate across every room type", () => {
     const best = cheapestRate({
       roomTypes: [
-        { rates: [{ rateId: "a", boardName: "Room Only", retailRate: { total: [{ amount: 420, currency: "EUR" }] } }] },
-        { rates: [{ rateId: "b", boardName: "Breakfast", retailRate: { total: [{ amount: 380, currency: "EUR" }] } }] },
+        {
+          rates: [
+            {
+              rateId: "a",
+              boardName: "Room Only",
+              retailRate: { total: [{ amount: 420, currency: "EUR" }] },
+            },
+          ],
+        },
+        {
+          rates: [
+            {
+              rateId: "b",
+              boardName: "Breakfast",
+              retailRate: { total: [{ amount: 380, currency: "EUR" }] },
+            },
+          ],
+        },
       ],
     });
     expect(best?.rateId).toBe("b");
@@ -48,7 +71,6 @@ describe("nightsBetween", () => {
   });
 });
 
-
 describe("refundableFromTag", () => {
   it("only trusts liteAPI's own refundable tag, nothing else", () => {
     expect(refundableFromTag("RFN")).toBe(true);
@@ -82,7 +104,7 @@ describe("bedTypesFrom", () => {
 
 describe("matchStaticRoom", () => {
   const staticRooms = [
-    { roomName: "Double Queen \"Signature\" Room", roomSizeSquare: 18 },
+    { roomName: 'Double Queen "Signature" Room', roomSizeSquare: 18 },
     { roomName: "Chambre Classique", roomSizeSquare: 14 },
   ];
 

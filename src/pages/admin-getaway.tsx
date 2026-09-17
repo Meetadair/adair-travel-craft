@@ -42,7 +42,12 @@ function Field({
   return (
     <label className="block">
       <span className="text-xs font-medium text-muted-foreground">{label}</span>
-      <input type={type} value={value} onChange={(e) => onChange(e.target.value)} className={inputClass} />
+      <input
+        type={type}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className={inputClass}
+      />
     </label>
   );
 }
@@ -57,9 +62,15 @@ function MonthPicker({ value, onChange }: { value: number[]; onChange: (v: numbe
           <button
             key={month}
             type="button"
-            onClick={() => onChange(on ? value.filter((m) => m !== month) : [...value, month].sort((a, b) => a - b))}
+            onClick={() =>
+              onChange(
+                on ? value.filter((m) => m !== month) : [...value, month].sort((a, b) => a - b),
+              )
+            }
             className={`min-h-9 rounded-lg border px-2.5 py-1.5 text-xs ${
-              on ? "border-primary bg-primary/10 text-foreground" : "border-border text-muted-foreground"
+              on
+                ? "border-primary bg-primary/10 text-foreground"
+                : "border-border text-muted-foreground"
             }`}
           >
             {label}
@@ -82,8 +93,9 @@ export function AdminGetawayPage() {
   const refresh = () => queryClient.invalidateQueries({ queryKey: ["admin-getaway"] });
 
   const themeMutation = useMutation({
-    mutationFn: (data: Parameters<typeof persistTheme>[0] extends never ? never : Record<string, unknown>) =>
-      persistTheme({ data: data as never }),
+    mutationFn: (
+      data: Parameters<typeof persistTheme>[0] extends never ? never : Record<string, unknown>,
+    ) => persistTheme({ data: data as never }),
     onSuccess: refresh,
   });
   const destMutation = useMutation({
@@ -120,15 +132,15 @@ export function AdminGetawayPage() {
 
         {content.isLoading && <p className="mt-8 text-sm text-muted-foreground">Loading…</p>}
         {content.isError && (
-          <p className="mt-8 text-sm text-muted-foreground">
-            {(content.error as Error).message}
-          </p>
+          <p className="mt-8 text-sm text-muted-foreground">{(content.error as Error).message}</p>
         )}
 
         {gaps.length > 0 && (
           <section className="hairline-card mt-8 p-5">
             <h2 className="text-sm font-semibold">Destinations with no curated places yet</h2>
-            <p className="mt-2 text-sm text-muted-foreground">{gaps.map((d) => d.name).join(", ")}</p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              {gaps.map((d) => d.name).join(", ")}
+            </p>
           </section>
         )}
 
@@ -222,8 +234,16 @@ function ThemeEditor({
       <div className="hairline-card mt-4 p-5">
         <p className="text-sm font-medium">New theme</p>
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
-          <Field label="Slug" value={draft.slug} onChange={(v) => setDraft({ ...draft, slug: v })} />
-          <Field label="Name" value={draft.name} onChange={(v) => setDraft({ ...draft, name: v })} />
+          <Field
+            label="Slug"
+            value={draft.slug}
+            onChange={(v) => setDraft({ ...draft, slug: v })}
+          />
+          <Field
+            label="Name"
+            value={draft.name}
+            onChange={(v) => setDraft({ ...draft, name: v })}
+          />
         </div>
         <Field
           label="Interest tags (comma separated)"
@@ -239,7 +259,10 @@ function ThemeEditor({
               slug: draft.slug,
               name: draft.name,
               description: null,
-              interest_tags: draft.tags.split(",").map((t) => t.trim()).filter(Boolean),
+              interest_tags: draft.tags
+                .split(",")
+                .map((t) => t.trim())
+                .filter(Boolean),
               season_months: draft.months,
               sort_order: themes.length + 1,
               active: false,
@@ -263,8 +286,16 @@ function NewDestination({ onSave }: { onSave: (data: Record<string, unknown>) =>
       <div className="mt-3 grid gap-3 sm:grid-cols-2">
         <Field label="Name" value={d.name} onChange={(v) => setD({ ...d, name: v })} />
         <Field label="Country" value={d.country} onChange={(v) => setD({ ...d, country: v })} />
-        <Field label="Nearest airport (IATA)" value={d.iata} onChange={(v) => setD({ ...d, iata: v })} />
-        <Field label="Typical nights" value={d.nights} onChange={(v) => setD({ ...d, nights: v })} />
+        <Field
+          label="Nearest airport (IATA)"
+          value={d.iata}
+          onChange={(v) => setD({ ...d, iata: v })}
+        />
+        <Field
+          label="Typical nights"
+          value={d.nights}
+          onChange={(v) => setD({ ...d, nights: v })}
+        />
         <Field label="Latitude" value={d.lat} onChange={(v) => setD({ ...d, lat: v })} />
         <Field label="Longitude" value={d.lon} onChange={(v) => setD({ ...d, lon: v })} />
       </div>
@@ -356,8 +387,8 @@ function DestinationEditor({
       <div>
         <p className="text-sm font-medium">Hero picture</p>
         <p className="mt-1 text-xs text-muted-foreground">
-          Our own photo from a real trip beats stock. Shown across the page top and at the top of the
-          weekly email.
+          Our own photo from a real trip beats stock. Shown across the page top and at the top of
+          the weekly email.
         </p>
         <GetawayImageEditor
           target={{ kind: "destination", id: dest.id }}
@@ -417,7 +448,10 @@ function DestinationEditor({
             <input
               defaultValue={String(dest.typical_nights)}
               onBlur={(e) =>
-                onSaveDest({ ...base, typical_nights: Number(e.target.value) || dest.typical_nights })
+                onSaveDest({
+                  ...base,
+                  typical_nights: Number(e.target.value) || dest.typical_nights,
+                })
               }
               className={inputClass}
             />
@@ -516,7 +550,10 @@ function DestinationEditor({
         )}
         <ul className="mt-3 space-y-2">
           {dest.places.map((p) => (
-            <li key={p.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border p-3">
+            <li
+              key={p.id}
+              className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border p-3"
+            >
               <span className="text-sm">
                 {p.name} <span className="text-xs text-muted-foreground">{p.kind}</span>
               </span>
@@ -565,9 +602,21 @@ function DestinationEditor({
               <option value="sight">sight</option>
             </select>
           </label>
-          <Field label="Name" value={place.name} onChange={(v) => setPlace({ ...place, name: v })} />
-          <Field label="Address" value={place.address} onChange={(v) => setPlace({ ...place, address: v })} />
-          <Field label="Why this one" value={place.why} onChange={(v) => setPlace({ ...place, why: v })} />
+          <Field
+            label="Name"
+            value={place.name}
+            onChange={(v) => setPlace({ ...place, name: v })}
+          />
+          <Field
+            label="Address"
+            value={place.address}
+            onChange={(v) => setPlace({ ...place, address: v })}
+          />
+          <Field
+            label="Why this one"
+            value={place.why}
+            onChange={(v) => setPlace({ ...place, why: v })}
+          />
           <label className="block">
             <span className="text-xs font-medium text-muted-foreground">Price band</span>
             <select
@@ -593,9 +642,7 @@ function DestinationEditor({
           </label>
         </div>
         <label className="mt-3 block">
-          <span className="text-xs font-medium text-muted-foreground">
-            From our own experience
-          </span>
+          <span className="text-xs font-medium text-muted-foreground">From our own experience</span>
           <textarea
             value={place.note}
             onChange={(e) => setPlace({ ...place, note: e.target.value })}
@@ -701,8 +748,16 @@ function DestinationEditor({
           ))}
         </ul>
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
-          <Field label="Title" value={itin.title} onChange={(v) => setItin({ ...itin, title: v })} />
-          <Field label="Nights" value={itin.nights} onChange={(v) => setItin({ ...itin, nights: v })} />
+          <Field
+            label="Title"
+            value={itin.title}
+            onChange={(v) => setItin({ ...itin, title: v })}
+          />
+          <Field
+            label="Nights"
+            value={itin.nights}
+            onChange={(v) => setItin({ ...itin, nights: v })}
+          />
         </div>
         <button
           type="button"

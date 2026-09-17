@@ -26,7 +26,8 @@ function stubDb(fixture: Fixture) {
     let lineType = "";
     const result = () => {
       if (table === "creator_attributions") return { data: fixture.attribution ?? null };
-      if (table === "creators") return { data: { id: "c1", status: fixture.creatorStatus ?? "approved" } };
+      if (table === "creators")
+        return { data: { id: "c1", status: fixture.creatorStatus ?? "approved" } };
       if (table === "getaway_places") return { data: fixture.places ?? [] };
       if (table === "creator_commission_rules") return { data: fixture.rules ?? [] };
       if (table === "profiles") return { data: { plan: fixture.plan ?? "free" } };
@@ -100,17 +101,30 @@ describe("accrueCreatorEarnings", () => {
       status: "pending",
       currency: "EUR",
     });
-    expect(typeof inserted[0]!['confirmable_at']).toBe("string");
+    expect(typeof inserted[0]!["confirmable_at"]).toBe("string");
   });
 
   it("ignores an expired attribution", async () => {
     const { db, inserted } = stubDb({
-      attribution: { creator_id: "c1", earning_until: new Date(Date.now() - 86_400_000).toISOString() },
+      attribution: {
+        creator_id: "c1",
+        earning_until: new Date(Date.now() - 86_400_000).toISOString(),
+      },
       rules: [STAY_RULE],
     });
-    expect((await accrueCreatorEarnings(db, "u1", "t1", [
-      { tripItemId: "i1", kind: "stay", grossMinor: 50_000, netMinor: 40_000, status: "confirmed" },
-    ])).written).toBe(0);
+    expect(
+      (
+        await accrueCreatorEarnings(db, "u1", "t1", [
+          {
+            tripItemId: "i1",
+            kind: "stay",
+            grossMinor: 50_000,
+            netMinor: 40_000,
+            status: "confirmed",
+          },
+        ])
+      ).written,
+    ).toBe(0);
     expect(inserted).toHaveLength(0);
   });
 
@@ -120,9 +134,19 @@ describe("accrueCreatorEarnings", () => {
       creatorStatus: "paused",
       rules: [STAY_RULE],
     });
-    expect((await accrueCreatorEarnings(db, "u1", "t1", [
-      { tripItemId: "i1", kind: "stay", grossMinor: 50_000, netMinor: 40_000, status: "confirmed" },
-    ])).written).toBe(0);
+    expect(
+      (
+        await accrueCreatorEarnings(db, "u1", "t1", [
+          {
+            tripItemId: "i1",
+            kind: "stay",
+            grossMinor: 50_000,
+            netMinor: 40_000,
+            status: "confirmed",
+          },
+        ])
+      ).written,
+    ).toBe(0);
   });
 
   it("earns for the curator of a recommended place without any link", async () => {
@@ -142,7 +166,11 @@ describe("accrueCreatorEarnings", () => {
       },
     ]);
     expect(out.written).toBe(1);
-    expect(inserted[0]).toMatchObject({ creator_id: "c9", basis: "recommendation", amount_minor: 3_000 });
+    expect(inserted[0]).toMatchObject({
+      creator_id: "c9",
+      basis: "recommendation",
+      amount_minor: 3_000,
+    });
   });
 
   it("skips a place submission that editorial has not approved", async () => {
@@ -151,9 +179,20 @@ describe("accrueCreatorEarnings", () => {
       places: [{ id: "p1", submitted_by_creator_id: "c9", review_status: "pending" }],
       rules: [STAY_RULE],
     });
-    expect((await accrueCreatorEarnings(db, "u1", "t1", [
-      { tripItemId: "i1", kind: "stay", grossMinor: 30_000, netMinor: 20_000, status: "confirmed", getawayPlaceId: "p1" },
-    ])).written).toBe(0);
+    expect(
+      (
+        await accrueCreatorEarnings(db, "u1", "t1", [
+          {
+            tripItemId: "i1",
+            kind: "stay",
+            grossMinor: 30_000,
+            netMinor: 20_000,
+            status: "confirmed",
+            getawayPlaceId: "p1",
+          },
+        ])
+      ).written,
+    ).toBe(0);
   });
 
   it("skips failed and cancelled lines", async () => {
@@ -187,7 +226,13 @@ describe("accrueCreatorEarnings", () => {
       rules: [{ ...STAY_RULE, line_type: "extras", share_bps: 2000 }],
     });
     await accrueCreatorEarnings(db, "u1", "t1", [
-      { tripItemId: "i1", kind: "insurance", grossMinor: 10_000, netMinor: 5_000, status: "confirmed" },
+      {
+        tripItemId: "i1",
+        kind: "insurance",
+        grossMinor: 10_000,
+        netMinor: 5_000,
+        status: "confirmed",
+      },
     ]);
     expect(inserted[0]).toMatchObject({ line_type: "extras", amount_minor: 1_000 });
   });

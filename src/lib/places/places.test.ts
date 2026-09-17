@@ -1,10 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  allowedCategories,
-  bucketLabel,
-  bucketsForDay,
-  categoriesForBucket,
-} from "./buckets";
+import { allowedCategories, bucketLabel, bucketsForDay, categoriesForBucket } from "./buckets";
 import { excluded, rankPlaces, reasonFor, type PlaceProfile } from "./rank";
 import { categoriesFromTags } from "./osm.server";
 import type { Place } from "./types";
@@ -57,9 +52,9 @@ describe("time-of-day bucketing", () => {
 
   it("only offers clubs to someone interested in nightlife", () => {
     expect(categoriesForBucket("night", { withChildren: false })).toEqual([]);
-    expect(categoriesForBucket("night", { withChildren: false, interests: ["Nightlife"] })).toEqual([
-      "club",
-    ]);
+    expect(categoriesForBucket("night", { withChildren: false, interests: ["Nightlife"] })).toEqual(
+      ["club"],
+    );
     expect(bucketsForDay({ withChildren: false, interests: ["Nightlife"] })).toContain("night");
   });
 
@@ -98,7 +93,12 @@ describe("ranking", () => {
     const ranked = rankPlaces(
       [
         place({ id: "m", name: "Map place", source: "map" }),
-        place({ id: "c", name: "Creator place", source: "creator", creator: { handle: "ana", name: "Ana" } }),
+        place({
+          id: "c",
+          name: "Creator place",
+          source: "creator",
+          creator: { handle: "ana", name: "Ana" },
+        }),
         place({ id: "a", name: "Adair place", source: "adair", note: "Our team ate here" }),
       ],
       profile(),

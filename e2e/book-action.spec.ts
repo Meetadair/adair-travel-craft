@@ -7,8 +7,14 @@ async function answerUntilCard(page: Page, sentence: string) {
   const refuse = page.getByRole("button", { name: /refuse/i }).first();
   if (await refuse.isVisible().catch(() => false)) await refuse.click();
   await page.waitForTimeout(2500);
-  await page.getByPlaceholder(/e\.g\./i).first().fill(sentence);
-  await page.getByRole("button", { name: /compose trip/i }).first().click();
+  await page
+    .getByPlaceholder(/e\.g\./i)
+    .first()
+    .fill(sentence);
+  await page
+    .getByRole("button", { name: /compose trip/i })
+    .first()
+    .click();
   const changeDates = page.getByRole("button", { name: /change dates/i }).first();
   for (let step = 0; step < 6; step += 1) {
     await page.waitForTimeout(6000);
@@ -49,13 +55,14 @@ test("booking is the action on the card, and saving is the quiet one", async ({ 
 
 test("booking signed out sends you to sign in, keeping your sentence", async ({ page }) => {
   await answerUntilCard(page, "Lisbon from 20 October to 24 October");
-  await page.getByRole("button", { name: /book this trip/i }).first().click();
+  await page
+    .getByRole("button", { name: /book this trip/i })
+    .first()
+    .click();
   await page.waitForTimeout(3500);
   // An offer has to be held against somebody, so signing in is required — but
   // the traveller must come back to their sentence, not an empty box.
   await expect(page).toHaveURL(/\/auth/);
-  const stashed = await page.evaluate(() =>
-    window.localStorage.getItem("adair.assistant-prefill"),
-  );
+  const stashed = await page.evaluate(() => window.localStorage.getItem("adair.assistant-prefill"));
   expect(stashed).toContain("Lisbon");
 });

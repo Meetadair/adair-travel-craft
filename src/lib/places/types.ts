@@ -8,13 +8,7 @@
  */
 
 export type PlaceCategory =
-  | "restaurant"
-  | "cafe"
-  | "bar"
-  | "wine_bar"
-  | "cocktail_bar"
-  | "rooftop"
-  | "club";
+  "restaurant" | "cafe" | "bar" | "wine_bar" | "cocktail_bar" | "rooftop" | "club";
 
 export const PLACE_CATEGORIES: PlaceCategory[] = [
   "restaurant",

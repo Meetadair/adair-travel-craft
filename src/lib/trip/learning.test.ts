@@ -16,7 +16,11 @@ const stated: StatedPrefs = {
   dealbreakers: [],
 };
 
-const swap = (itemKind: string, rejectedTitle: string, reason: string | null = null): FeedbackRow => ({
+const swap = (
+  itemKind: string,
+  rejectedTitle: string,
+  reason: string | null = null,
+): FeedbackRow => ({
   itemKind,
   rejectedTitle,
   reason,
@@ -72,10 +76,7 @@ describe("learning from swaps", () => {
 
 describe("stated wins over learned", () => {
   it("never ranks down a chain the traveller chose", () => {
-    const learned = learnFrom([
-      swap("hotel", "Ibis Berlin"),
-      swap("hotel", "Ibis Warsaw"),
-    ]);
+    const learned = learnFrom([swap("hotel", "Ibis Berlin"), swap("hotel", "Ibis Warsaw")]);
     expect(learned.avoid).toHaveLength(1);
     const applied = applyPrecedence(learned, { ...stated, hotelChains: ["ibis"] });
     expect(applied.avoid).toHaveLength(0);

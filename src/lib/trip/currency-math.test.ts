@@ -19,7 +19,9 @@ describe("convertAmount", () => {
   });
 
   it("is case-insensitive on both sides", () => {
-    expect(convertAmount(50, "gbp", "PLN", RATES)).toBeCloseTo(convertAmount(50, "GBP", "pln", RATES));
+    expect(convertAmount(50, "gbp", "PLN", RATES)).toBeCloseTo(
+      convertAmount(50, "GBP", "pln", RATES),
+    );
   });
 
   it("leaves the amount alone rather than guessing an unknown currency", () => {

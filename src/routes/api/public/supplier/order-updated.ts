@@ -64,7 +64,7 @@ async function notify(
 }
 
 async function handle(request: Request): Promise<Response> {
-  const secret = process.env['SUPPLIER_WEBHOOK_SECRET'];
+  const secret = process.env["SUPPLIER_WEBHOOK_SECRET"];
   if (!secret) return new Response("Not configured", { status: 503 });
 
   const raw = await request.text();
@@ -125,8 +125,8 @@ async function handle(request: Request): Promise<Response> {
   for (const item of items) {
     const before = { status: item.status, payload: item.payload };
     const payload: Record<string, unknown> = { ...(item.payload ?? {}) };
-    if (first?.departAt) payload['departAt'] = first.departAt;
-    if (first?.arriveAt) payload['arriveAt'] = first.arriveAt;
+    if (first?.departAt) payload["departAt"] = first.departAt;
+    if (first?.arriveAt) payload["arriveAt"] = first.arriveAt;
     const status = cancelled ? "cancelled" : item.status;
     const detail = event.message ?? item.detail;
 
@@ -148,9 +148,8 @@ async function handle(request: Request): Promise<Response> {
 
     // Keep the customer's calendars honest about what actually happens now.
     try {
-      const { removeItemFromCalendars, syncTripToCalendars } = await import(
-        "@/lib/calendar/sync.server"
-      );
+      const { removeItemFromCalendars, syncTripToCalendars } =
+        await import("@/lib/calendar/sync.server");
       if (cancelled) {
         await removeItemFromCalendars(supabaseAdmin as never, item.user_id, item.id);
       } else {
@@ -172,13 +171,13 @@ async function handle(request: Request): Promise<Response> {
             endDate: tripRes.data.end_date,
             reference: tripRes.data.document_number,
             items: ((allItems.data ?? []) as Array<Record<string, unknown>>).map((row) => ({
-              id: String(row['id']),
-              kind: String(row['kind']),
-              title: String(row['title']),
-              status: String(row['status']),
-              reference: (row['offer_reference'] as string | null) ?? null,
-              payload: row['payload'] as never,
-              eventIds: row['calendar_event_ids'] as never,
+              id: String(row["id"]),
+              kind: String(row["kind"]),
+              title: String(row["title"]),
+              status: String(row["status"]),
+              reference: (row["offer_reference"] as string | null) ?? null,
+              payload: row["payload"] as never,
+              eventIds: row["calendar_event_ids"] as never,
             })),
           });
         }
@@ -191,10 +190,7 @@ async function handle(request: Request): Promise<Response> {
   // When every line on the trip is gone, the trip itself is cancelled.
   const tripId = items[0]!.trip_id;
   if (cancelled) {
-    const remaining = await supabaseAdmin
-      .from("trip_items")
-      .select("status")
-      .eq("trip_id", tripId);
+    const remaining = await supabaseAdmin.from("trip_items").select("status").eq("trip_id", tripId);
     const live = ((remaining.data ?? []) as Array<{ status: string }>).filter(
       (row) => row.status !== "cancelled" && row.status !== "failed",
     );

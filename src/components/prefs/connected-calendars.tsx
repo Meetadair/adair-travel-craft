@@ -60,7 +60,9 @@ export function ConnectedCalendars() {
   }, [queryClient, syncTrips, scanHints]);
 
   const connect = useMutation({
-    mutationFn: async (input: CalendarProviderName | { provider: CalendarProviderName; read: boolean }) => {
+    mutationFn: async (
+      input: CalendarProviderName | { provider: CalendarProviderName; read: boolean },
+    ) => {
       const provider = typeof input === "string" ? input : input.provider;
       const read = typeof input === "string" ? false : input.read;
       const timeZone =

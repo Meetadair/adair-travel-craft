@@ -45,7 +45,8 @@ describe("identity documents reach Duffel", () => {
 
   const passengersOf = () => {
     const order = calls.find((c) => c.url.includes("/air/orders"));
-    return (order?.body as { data: { passengers: Array<Record<string, unknown>> } }).data.passengers;
+    return (order?.body as { data: { passengers: Array<Record<string, unknown>> } }).data
+      .passengers;
   };
 
   it("sends the passport in the shape Duffel documents", async () => {

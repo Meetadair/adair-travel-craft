@@ -35,10 +35,7 @@ export async function loadPlaceMemory(
   }));
 }
 
-export async function loadPatterns(
-  supabase: SupabaseClient,
-  userId: string,
-): Promise<Pattern[]> {
+export async function loadPatterns(supabase: SupabaseClient, userId: string): Promise<Pattern[]> {
   const res = await table(supabase, "traveller_patterns")
     .select("pattern_kind, value, confidence, evidence_count, status, asked_at")
     .eq("user_id", userId)

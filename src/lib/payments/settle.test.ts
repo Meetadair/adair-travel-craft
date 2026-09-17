@@ -58,8 +58,7 @@ describe("settlementFor", () => {
 
   it("rounds to whole cents rather than carrying float error", () => {
     expect(
-      settlementFor({ ...base, confirmedTotalEur: 10.1 + 20.2, paidAtSupplierEur: 0 })
-        .captureMinor,
+      settlementFor({ ...base, confirmedTotalEur: 10.1 + 20.2, paidAtSupplierEur: 0 }).captureMinor,
     ).toBe(3030);
   });
 });

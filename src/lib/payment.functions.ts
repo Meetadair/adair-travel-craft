@@ -6,11 +6,7 @@
  */
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import {
-  bookableTotalMinor,
-  type PricedLines,
-  type SearchLines,
-} from "@/lib/trip/bookable-total";
+import { bookableTotalMinor, type PricedLines, type SearchLines } from "@/lib/trip/bookable-total";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { PaymentMethodKind, SettlementModel } from "@/lib/payments/types";
 
@@ -195,7 +191,11 @@ export const saveCardToken = createServerFn({ method: "POST" })
       .object({
         providerCardId: z.string().trim().min(3).max(120),
         brand: z.string().trim().max(40).nullable(),
-        last4: z.string().trim().regex(/^\d{4}$/).nullable(),
+        last4: z
+          .string()
+          .trim()
+          .regex(/^\d{4}$/)
+          .nullable(),
         expMonth: z.number().int().min(1).max(12).nullable().optional(),
         expYear: z.number().int().min(2000).max(2100).nullable().optional(),
         makeDefault: z.boolean().optional(),
@@ -209,11 +209,7 @@ export const saveCardToken = createServerFn({ method: "POST" })
     // The token belongs to whichever provider collected it.
     const provider = chosen.status === "ok" ? chosen.data.id : "unknown";
 
-    const existing = await supabase
-      .from("saved_cards")
-      .select("id")
-      .eq("user_id", userId)
-      .limit(1);
+    const existing = await supabase.from("saved_cards").select("id").eq("user_id", userId).limit(1);
     const first = !(existing.data ?? []).length;
 
     const res = await supabase.from("saved_cards").upsert(
@@ -247,11 +243,7 @@ export const deleteSavedCard = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }): Promise<{ ok: true }> => {
     const { supabase, userId } = context;
-    const res = await supabase
-      .from("saved_cards")
-      .delete()
-      .eq("id", data.id)
-      .eq("user_id", userId);
+    const res = await supabase.from("saved_cards").delete().eq("id", data.id).eq("user_id", userId);
     if (res.error) throw new Error(res.error.message);
     return { ok: true };
   });

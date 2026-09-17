@@ -242,8 +242,12 @@ function currentLocation(input: unknown, ctx: ToolContext): string {
   const parsed = currentLocationInput.safeParse(input);
   if (!parsed.success) return toolFailure("get_current_location", "bad-input");
 
-  const inputs: LocationInputs =
-    ctx.location ?? { device: null, consent: "not_asked", hotel: null, city: null };
+  const inputs: LocationInputs = ctx.location ?? {
+    device: null,
+    consent: "not_asked",
+    hotel: null,
+    city: null,
+  };
   const resolved = resolveLocation(inputs, parsed.data.precise);
 
   if (resolved.source === "none") {

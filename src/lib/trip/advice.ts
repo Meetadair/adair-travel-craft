@@ -7,10 +7,7 @@
  */
 
 export type AdviceActionKind =
-  | "swap_car_for_transfer"
-  | "take_earlier_flight"
-  | "show_cheaper_dates"
-  | "add_breakfast";
+  "swap_car_for_transfer" | "take_earlier_flight" | "show_cheaper_dates" | "add_breakfast";
 
 export type AdviceAction = {
   kind: AdviceActionKind;
@@ -152,7 +149,7 @@ export function buildAdvice(input: AdviceInput, copy: AdviceCopy = ADVICE_COPY):
     lines.push({
       kind: "peak_prices",
       value: 80,
-      text: `${fill(copy.peak, { ratio: price.ratio.toFixed(1).replace(/\.0$/, "") , event })}${saving}`,
+      text: `${fill(copy.peak, { ratio: price.ratio.toFixed(1).replace(/\.0$/, ""), event })}${saving}`,
       ...(price.offsetDays
         ? { action: { kind: "show_cheaper_dates" as const, label: copy.peakAction } }
         : {}),

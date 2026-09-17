@@ -96,11 +96,7 @@ export function buildSuggestions(input: SuggestionInput): Suggestion[] {
  * Rotate the candidates so the same three aren't shown forever: a stable daily
  * seed per customer, so a reload during the day doesn't reshuffle under them.
  */
-export function rotateSuggestions(
-  candidates: Suggestion[],
-  seed: string,
-  count = 3,
-): Suggestion[] {
+export function rotateSuggestions(candidates: Suggestion[], seed: string, count = 3): Suggestion[] {
   if (candidates.length <= count) return candidates;
   let hash = 2166136261;
   for (const char of seed) {

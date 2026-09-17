@@ -42,7 +42,11 @@ export function useDeviceLocation() {
               lon: position.coords.longitude,
             }),
           (error) =>
-            resolve(error.code === error.PERMISSION_DENIED ? { status: "denied" } : { status: "unavailable" }),
+            resolve(
+              error.code === error.PERMISSION_DENIED
+                ? { status: "denied" }
+                : { status: "unavailable" },
+            ),
           { enableHighAccuracy: true, timeout: 10_000, maximumAge: 0 },
         );
       });

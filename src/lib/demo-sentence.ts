@@ -13,14 +13,49 @@ type CityPreset = {
 };
 
 const CITIES: CityPreset[] = [
-  { city: "Milan", code: "LIN", hotel: "Park Hyatt Milano", match: ["milan", "mediolan", "milano", "mailand"] },
-  { city: "Rome", code: "FCO", hotel: "Hotel de la Ville Roma", match: ["rome", "roma", "rzym", "rom"] },
-  { city: "Lisbon", code: "LIS", hotel: "Bairro Alto Hotel", match: ["lisbon", "lisboa", "lizbona", "lissabon"] },
-  { city: "Vienna", code: "VIE", hotel: "Hotel Sacher Wien", match: ["vienna", "wien", "wiedeń", "wieden", "viena"] },
+  {
+    city: "Milan",
+    code: "LIN",
+    hotel: "Park Hyatt Milano",
+    match: ["milan", "mediolan", "milano", "mailand"],
+  },
+  {
+    city: "Rome",
+    code: "FCO",
+    hotel: "Hotel de la Ville Roma",
+    match: ["rome", "roma", "rzym", "rom"],
+  },
+  {
+    city: "Lisbon",
+    code: "LIS",
+    hotel: "Bairro Alto Hotel",
+    match: ["lisbon", "lisboa", "lizbona", "lissabon"],
+  },
+  {
+    city: "Vienna",
+    code: "VIE",
+    hotel: "Hotel Sacher Wien",
+    match: ["vienna", "wien", "wiedeń", "wieden", "viena"],
+  },
   { city: "Berlin", code: "BER", hotel: "Hotel de Rome", match: ["berlin", "berlino"] },
-  { city: "Paris", code: "CDG", hotel: "Hôtel Le Pigalle", match: ["paris", "paryż", "paryz", "parigi"] },
-  { city: "Barcelona", code: "BCN", hotel: "Hotel Neri", match: ["barcelona", "barcelone", "barcellona"] },
-  { city: "London", code: "LHR", hotel: "The Ned London", match: ["london", "londyn", "londres", "londra"] },
+  {
+    city: "Paris",
+    code: "CDG",
+    hotel: "Hôtel Le Pigalle",
+    match: ["paris", "paryż", "paryz", "parigi"],
+  },
+  {
+    city: "Barcelona",
+    code: "BCN",
+    hotel: "Hotel Neri",
+    match: ["barcelona", "barcelone", "barcellona"],
+  },
+  {
+    city: "London",
+    code: "LHR",
+    hotel: "The Ned London",
+    match: ["london", "londyn", "londres", "londra"],
+  },
   { city: "Tokyo", code: "HND", hotel: "Hotel Toranomon Hills", match: ["tokyo", "tokio", "東京"] },
 ];
 

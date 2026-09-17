@@ -17,8 +17,7 @@ export type NotificationSettings = {
   pendingPhoneMasked: string | null;
 };
 
-const mask = (phone: string | null): string | null =>
-  phone ? `••• ${phone.slice(-4)}` : null;
+const mask = (phone: string | null): string | null => (phone ? `••• ${phone.slice(-4)}` : null);
 
 export const getNotificationSettings = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -40,7 +39,7 @@ export const getNotificationSettings = createServerFn({ method: "GET" })
     const pending = (pendingRes.data ?? null) as { phone: string; expires_at: string } | null;
     const live = pending && Date.parse(pending.expires_at) > Date.now() ? pending : null;
     return {
-      channel: ((row?.["notify_channel"] as NotificationSettings["channel"]) ?? "email"),
+      channel: (row?.["notify_channel"] as NotificationSettings["channel"]) ?? "email",
       phoneMasked: mask((row?.["whatsapp_phone"] as string | null) ?? null),
       verified: Boolean(row?.["whatsapp_verified_at"]),
       whatsappAvailable: hasWhatsAppKeys(),
@@ -74,7 +73,7 @@ export const setNotificationChannel = createServerFn({ method: "POST" })
 
 async function hashCode(userId: string, code: string): Promise<string> {
   const { createHash } = await import("crypto");
-  const pepper = process.env['TRAVELLER_DATA_KEY'] ?? "";
+  const pepper = process.env["TRAVELLER_DATA_KEY"] ?? "";
   return createHash("sha256").update(`${userId}:${code}:${pepper}`).digest("hex");
 }
 
@@ -84,9 +83,8 @@ export const startWhatsAppVerification = createServerFn({ method: "POST" })
     z.object({ phone: z.string().trim().min(8).max(20) }).parse(input),
   )
   .handler(async ({ data, context }) => {
-    const { hasWhatsAppKeys, normalisePhone, sendWhatsAppTemplate } = await import(
-      "@/lib/notifications/whatsapp"
-    );
+    const { hasWhatsAppKeys, normalisePhone, sendWhatsAppTemplate } =
+      await import("@/lib/notifications/whatsapp");
     if (!hasWhatsAppKeys()) throw new Error("whatsapp-not-configured");
     const phone = normalisePhone(data.phone);
     if (!phone) throw new Error("invalid-phone");
@@ -124,7 +122,14 @@ export const startWhatsAppVerification = createServerFn({ method: "POST" })
 export const confirmWhatsAppVerification = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
-    z.object({ code: z.string().trim().regex(/^\d{6}$/) }).parse(input),
+    z
+      .object({
+        code: z
+          .string()
+          .trim()
+          .regex(/^\d{6}$/),
+      })
+      .parse(input),
   )
   .handler(async ({ data, context }) => {
     const { data: row, error } = await context.supabase
@@ -156,10 +161,7 @@ export const confirmWhatsAppVerification = createServerFn({ method: "POST" })
       .update({ whatsapp_phone: pending.phone, whatsapp_verified_at: new Date().toISOString() })
       .eq("id", context.userId);
     if (update.error) throw new Error(update.error.message);
-    await context.supabase
-      .from("whatsapp_verifications")
-      .delete()
-      .eq("user_id", context.userId);
+    await context.supabase.from("whatsapp_verifications").delete().eq("user_id", context.userId);
     return { ok: true };
   });
 
@@ -171,9 +173,6 @@ export const removeWhatsAppNumber = createServerFn({ method: "POST" })
       .update({ whatsapp_phone: null, whatsapp_verified_at: null, notify_channel: "email" })
       .eq("id", context.userId);
     if (res.error) throw new Error(res.error.message);
-    await context.supabase
-      .from("whatsapp_verifications")
-      .delete()
-      .eq("user_id", context.userId);
+    await context.supabase.from("whatsapp_verifications").delete().eq("user_id", context.userId);
     return { ok: true };
   });

@@ -60,14 +60,20 @@ describe("prompt suggestions", () => {
       rotateSuggestions(candidates, dailySeed("user-1", new Date("2026-09-14T21:00:00Z"))),
     );
     expect(rotateSuggestions(candidates, seed)).toHaveLength(3);
-    const other = rotateSuggestions(candidates, dailySeed("user-1", new Date("2026-09-19T08:00:00Z")));
+    const other = rotateSuggestions(
+      candidates,
+      dailySeed("user-1", new Date("2026-09-19T08:00:00Z")),
+    );
     expect(other.map((s) => s.id)).not.toEqual(
       rotateSuggestions(candidates, seed).map((s) => s.id),
     );
   });
 
   it("returns everything when there are three or fewer candidates", () => {
-    const candidates: Suggestion[] = [{ id: "a", text: "a" }, { id: "b", text: "b" }];
+    const candidates: Suggestion[] = [
+      { id: "a", text: "a" },
+      { id: "b", text: "b" },
+    ];
     expect(rotateSuggestions(candidates, "seed")).toEqual(candidates);
   });
 });

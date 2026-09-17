@@ -101,7 +101,9 @@ export function BrandPicker({
         </div>
       )}
 
-      <div className={`mt-3 grid gap-2 sm:grid-cols-2 ${expanded ? "max-h-96 overflow-y-auto pr-1" : ""}`}>
+      <div
+        className={`mt-3 grid gap-2 sm:grid-cols-2 ${expanded ? "max-h-96 overflow-y-auto pr-1" : ""}`}
+      >
         <button
           type="button"
           onClick={() => toggle(noneValue)}

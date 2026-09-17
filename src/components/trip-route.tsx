@@ -91,9 +91,7 @@ export function TripRoute({
               setDragIndex(null);
             }}
             className={`flex items-center gap-3 rounded-xl border bg-background px-3 py-2.5 transition-colors ${
-              overIndex === index && dragIndex !== null
-                ? "border-primary"
-                : "border-border"
+              overIndex === index && dragIndex !== null ? "border-primary" : "border-border"
             } ${dragIndex === index ? "opacity-60" : ""}`}
           >
             {onReorder && (
@@ -150,10 +148,8 @@ export function TripRoute({
       <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
         <MapPin className="size-3.5 text-primary" />
         <span>
-          <span className="font-medium text-foreground">
-            {distance.toLocaleString()} km
-          </span>{" "}
-          in this order
+          <span className="font-medium text-foreground">{distance.toLocaleString()} km</span> in
+          this order
         </span>
         {detour > 150 && (
           <span>

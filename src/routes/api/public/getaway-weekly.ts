@@ -12,7 +12,7 @@ async function run(request: Request): Promise<Response> {
   if (denied) return denied;
 
   const { hasWhatsAppKeys } = await import("@/lib/notifications/whatsapp");
-  if (!process.env['RESEND_API_KEY'] && !hasWhatsAppKeys()) {
+  if (!process.env["RESEND_API_KEY"] && !hasWhatsAppKeys()) {
     return Response.json({ ok: true, skipped: "no-message-channel", sent: 0 });
   }
 
@@ -38,7 +38,10 @@ async function run(request: Request): Promise<Response> {
     .select(
       "id, name, country, editorial_note, hero_image_url, hero_image_fallback_url, hero_image_email_url, hero_image_credit, hero_image_credit_url, hero_image_source",
     )
-    .in("id", proposals.map((p) => p.destination_id));
+    .in(
+      "id",
+      proposals.map((p) => p.destination_id),
+    );
   type DestRow = {
     id: string;
     name: string;
@@ -69,7 +72,9 @@ async function run(request: Request): Promise<Response> {
     // 560px wide and a small JPEG, so it stays light and shows everywhere.
     const image = await ensureDestinationImage(supabaseAdmin as never, dest).catch(() => null);
     const emailImageUrl = image
-      ? (image.emailUrl.startsWith("/") ? `${siteOrigin}${image.emailUrl}` : image.emailUrl)
+      ? image.emailUrl.startsWith("/")
+        ? `${siteOrigin}${image.emailUrl}`
+        : image.emailUrl
       : null;
     const imageBlock = emailImageUrl
       ? `<img src="${emailImageUrl}" width="560" alt="${dest.name}" style="display:block;width:100%;max-width:560px;height:auto;border-radius:12px" />${

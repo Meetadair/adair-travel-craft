@@ -7,7 +7,10 @@ const SHELL = ["/offline.html", "/icon-192.png", "/icon-512.png", "/favicon.png"
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE).then((cache) => cache.addAll(SHELL)).then(() => self.skipWaiting()),
+    caches
+      .open(CACHE)
+      .then((cache) => cache.addAll(SHELL))
+      .then(() => self.skipWaiting()),
   );
 });
 

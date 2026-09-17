@@ -113,7 +113,10 @@ export const QUESTIONS: QuestionDef[] = [
     skippable: true,
     title: "Where do you like to sit?",
     singles: [
-      { field: "seat", options: opts(["window", "Window"], ["aisle", "Aisle"], ["any", "No preference"]) },
+      {
+        field: "seat",
+        options: opts(["window", "Window"], ["aisle", "Aisle"], ["any", "No preference"]),
+      },
     ],
     toggles: [
       { field: "seatFront", label: "Front of cabin" },
@@ -221,7 +224,13 @@ export const QUESTIONS: QuestionDef[] = [
     singles: [
       {
         field: "hotelMaxKm",
-        options: opts(["1", "Within 1 km"], ["2", "Within 2 km"], ["3", "Within 3 km"], ["5", "Within 5 km"], ["10", "Within 10 km"]),
+        options: opts(
+          ["1", "Within 1 km"],
+          ["2", "Within 2 km"],
+          ["3", "Within 3 km"],
+          ["5", "Within 5 km"],
+          ["10", "Within 10 km"],
+        ),
       },
     ],
   },
@@ -487,10 +496,7 @@ export const QUESTIONS: QuestionDef[] = [
       {
         field: "loyalty",
         label: "Airline, hotel or car rental membership",
-        options: opts(
-          ["yes", "Yes — I'll add the numbers in Settings"],
-          ["no", "No"],
-        ),
+        options: opts(["yes", "Yes — I'll add the numbers in Settings"], ["no", "No"]),
       },
     ],
   },

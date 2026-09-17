@@ -60,9 +60,7 @@ describe("planning backwards from a fixed arrival", () => {
     expect(chosen?.arriveAt).toBe("2026-03-10T12:00:00Z");
     expect(plan.feasible).toBe(true);
     expect(plan.slackMin).toBeGreaterThanOrEqual(0);
-    expect(Date.parse(plan.arriveAt)).toBe(
-      Date.parse(plan.landAt) + ground.total * 60_000,
-    );
+    expect(Date.parse(plan.arriveAt)).toBe(Date.parse(plan.landAt) + ground.total * 60_000);
     expect(plan.reasoning).toContain("safety margin");
     expect(plan.shortfall).toBeNull();
   });
@@ -105,8 +103,8 @@ describe("planning backwards from a fixed arrival", () => {
   it("a non-Schengen arrival can fail where the same time inside Schengen works", () => {
     const candidates = [flight("2026-03-10T13:00:00Z", 180)];
     expect(planBackwards({ ...base, candidates }).plan.feasible).toBe(true);
-    expect(
-      planBackwards({ ...base, destinationIata: "LHR", candidates }).plan.feasible,
-    ).toBe(false);
+    expect(planBackwards({ ...base, destinationIata: "LHR", candidates }).plan.feasible).toBe(
+      false,
+    );
   });
 });

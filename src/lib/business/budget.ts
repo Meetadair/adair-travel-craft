@@ -142,11 +142,7 @@ export function decide(amountMinor: number, budgets: Budget[]): BookingDecision 
  * second authority — they may act only once the authority has been unreachable
  * for the agreed number of hours.
  */
-export function mayRelease(
-  budget: Budget,
-  personId: string,
-  hoursSinceRequested: number,
-): boolean {
+export function mayRelease(budget: Budget, personId: string, hoursSinceRequested: number): boolean {
   if (personId === budget.releaseAuthorityId) return true;
   if (!budget.deputyId || personId !== budget.deputyId) return false;
   const after = budget.deputyAfterHours ?? 0;

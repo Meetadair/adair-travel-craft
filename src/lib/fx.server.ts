@@ -81,5 +81,14 @@ export function allFxRates(): Record<string, number> {
 
 /** Currencies this app is willing to let someone pick as their display currency. */
 export const DISPLAY_CURRENCIES = [
-  "EUR", "USD", "GBP", "PLN", "CHF", "SEK", "NOK", "DKK", "CZK", "JPY",
+  "EUR",
+  "USD",
+  "GBP",
+  "PLN",
+  "CHF",
+  "SEK",
+  "NOK",
+  "DKK",
+  "CZK",
+  "JPY",
 ] as const;

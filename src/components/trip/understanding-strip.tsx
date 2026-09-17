@@ -99,7 +99,11 @@ function Picker({
   return (
     <div className="mt-2 w-[20rem] max-w-[calc(100vw-3rem)] rounded-xl border border-border bg-card p-3">
       <DateAnswer
-        value={value.departDate ? { departDate: value.departDate, returnDate: value.returnDate ?? undefined } : null}
+        value={
+          value.departDate
+            ? { departDate: value.departDate, returnDate: value.returnDate ?? undefined }
+            : null
+        }
         copy={copy.controls}
         onChange={(range) =>
           onChange({

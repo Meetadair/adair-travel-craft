@@ -31,10 +31,7 @@ export const getMyReferral = createServerFn({ method: "GET" })
 
     const code = await ensureReferralCode(supabase as never, userId);
 
-    const invitedRes = await supabase
-      .from("referrals")
-      .select("status")
-      .eq("referrer_id", userId);
+    const invitedRes = await supabase.from("referrals").select("status").eq("referrer_id", userId);
     const invited = (invitedRes.data ?? []) as Array<{ status: string }>;
 
     const creditRes = await supabase

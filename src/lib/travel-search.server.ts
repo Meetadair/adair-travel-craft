@@ -315,9 +315,7 @@ async function duffelStay(input: TripSearchInput): Promise<TripOffer | null> {
     carNameExact: null,
     needsCar: Boolean(input.needsCar),
     invoiceToCompany: false,
-    stops: [
-      { city: city.city, iata: city.iata, lat: city.lat, lon: city.lon },
-    ],
+    stops: [{ city: city.city, iata: city.iata, lat: city.lat, lon: city.lon }],
   };
 
   const nights = Math.max(

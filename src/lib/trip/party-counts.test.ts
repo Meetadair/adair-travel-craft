@@ -90,7 +90,9 @@ describe("what Duffel is sent", () => {
 
 describe("hotel guests", () => {
   it("counts both kinds of infant, because a room counts people", () => {
-    expect(stayGuestAges(party({ adults: 2, infantsWithSeat: 1, infantsOnLap: 1 }))).toEqual([1, 1]);
+    expect(stayGuestAges(party({ adults: 2, infantsWithSeat: 1, infantsOnLap: 1 }))).toEqual([
+      1, 1,
+    ]);
   });
 
   it("leaves adults out — they are counted separately by the room", () => {

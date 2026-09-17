@@ -11,7 +11,15 @@ const num = (value: unknown) => (value == null ? 0 : Number(value));
 const rows = (value: unknown): Row[] => (Array.isArray(value) ? (value as Row[]) : []);
 const obj = (value: unknown): Row => (value && typeof value === "object" ? (value as Row) : {});
 
-function Section({ title, hint, children }: { title: string; hint?: string; children: React.ReactNode }) {
+function Section({
+  title,
+  hint,
+  children,
+}: {
+  title: string;
+  hint?: string;
+  children: React.ReactNode;
+}) {
   return (
     <section className="mt-10">
       <h2 className="font-display text-xl font-semibold tracking-tight">{title}</h2>
@@ -76,7 +84,11 @@ export function AdminAnalyticsPage() {
   const bookings = obj(data?.["bookings"]);
   const errors = obj(data?.["errors"]);
 
-  const label: Record<string, string> = { today: "Today", "7d": "Last 7 days", "30d": "Last 30 days" };
+  const label: Record<string, string> = {
+    today: "Today",
+    "7d": "Last 7 days",
+    "30d": "Last 30 days",
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -98,7 +110,15 @@ export function AdminAnalyticsPage() {
           <>
             <Section title="Funnel" hint="Where people stop, step by step.">
               <Table
-                head={["Window", "Typed", "Searched", "Cards", "Booking started", "Booked", "Drop-off"]}
+                head={[
+                  "Window",
+                  "Typed",
+                  "Searched",
+                  "Cards",
+                  "Booking started",
+                  "Booked",
+                  "Drop-off",
+                ]}
                 body={funnel.map((row) => {
                   const typed = num(row["typed"]);
                   const booked = num(row["booked"]);
@@ -118,7 +138,13 @@ export function AdminAnalyticsPage() {
 
             <Section title="Onboarding">
               <Table
-                head={["Finished part 1", "Finished part 2", "Accounts", "Average completion", "Question losing most people"]}
+                head={[
+                  "Finished part 1",
+                  "Finished part 2",
+                  "Accounts",
+                  "Average completion",
+                  "Question losing most people",
+                ]}
                 body={[
                   [
                     num(onboarding["part1"]),
@@ -146,7 +172,12 @@ export function AdminAnalyticsPage() {
               />
               <div className="mt-4">
                 <Table
-                  head={["Average trip value", "Share flagged peak", "Cheaper dates accepted", "Dismissed"]}
+                  head={[
+                    "Average trip value",
+                    "Share flagged peak",
+                    "Cheaper dates accepted",
+                    "Dismissed",
+                  ]}
                   body={[
                     [
                       `€${num(obj(searches["stats"])["avg_value"])}`,
@@ -193,7 +224,10 @@ export function AdminAnalyticsPage() {
               <div className="mt-4">
                 <Table
                   head={["Preference we could not meet", "Times"]}
-                  body={rows(match["unmet"]).map((row) => [String(row["reason"]), num(row["misses"])])}
+                  body={rows(match["unmet"]).map((row) => [
+                    String(row["reason"]),
+                    num(row["misses"]),
+                  ])}
                 />
               </div>
             </Section>
@@ -233,7 +267,10 @@ export function AdminAnalyticsPage() {
             <Section title="Failures">
               <Table
                 head={["Failed search cause", "Times"]}
-                body={rows(errors["searches"]).map((row) => [String(row["cause"]), num(row["hits"])])}
+                body={rows(errors["searches"]).map((row) => [
+                  String(row["cause"]),
+                  num(row["hits"]),
+                ])}
               />
               <div className="mt-4">
                 <Table

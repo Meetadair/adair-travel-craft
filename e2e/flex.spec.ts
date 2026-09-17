@@ -12,8 +12,14 @@ async function answerUntilCard(page: Page, sentence: string) {
   const refuse = page.getByRole("button", { name: /refuse/i }).first();
   if (await refuse.isVisible().catch(() => false)) await refuse.click();
   await page.waitForTimeout(2500);
-  await page.getByPlaceholder(/e\.g\./i).first().fill(sentence);
-  await page.getByRole("button", { name: /compose trip/i }).first().click();
+  await page
+    .getByPlaceholder(/e\.g\./i)
+    .first()
+    .fill(sentence);
+  await page
+    .getByRole("button", { name: /compose trip/i })
+    .first()
+    .click();
 
   const changeDates = page.getByRole("button", { name: /change dates/i }).first();
   for (let step = 0; step < 6; step += 1) {
@@ -44,15 +50,24 @@ test("the flex option is reachable while Adair is asking for dates", async ({ pa
   const refuse = page.getByRole("button", { name: /refuse/i }).first();
   if (await refuse.isVisible().catch(() => false)) await refuse.click();
   await page.waitForTimeout(2500);
-  await page.getByPlaceholder(/e\.g\./i).first().fill("Lisbon next week");
-  await page.getByRole("button", { name: /compose trip/i }).first().click();
+  await page
+    .getByPlaceholder(/e\.g\./i)
+    .first()
+    .fill("Lisbon next week");
+  await page
+    .getByRole("button", { name: /compose trip/i })
+    .first()
+    .click();
   await page.waitForTimeout(6000);
   // "Lisbon next week" settles nothing about who's coming, so that question
   // comes first now — answer it before the dates question this test checks.
   const soloChip = page.getByRole("button", { name: "1", exact: true }).first();
   if (await soloChip.isVisible().catch(() => false)) {
     await soloChip.click();
-    await page.getByRole("button", { name: /^done$/i }).first().click();
+    await page
+      .getByRole("button", { name: /^done$/i })
+      .first()
+      .click();
     await page.waitForTimeout(2000);
   }
   await expect(flexChip(page)).toBeVisible();
@@ -64,7 +79,10 @@ test("and on the result card, when the sentence already named the dates", async 
   // to change their mind about the dates — did not exist for them at all.
   await answerUntilCard(page, "Lisbon from 20 October to 24 October");
   await expect(flexChip(page)).toBeHidden();
-  await page.getByRole("button", { name: /change dates/i }).first().click();
+  await page
+    .getByRole("button", { name: /change dates/i })
+    .first()
+    .click();
   await page.waitForTimeout(1000);
   await expect(flexChip(page)).toBeVisible();
   await expect(page.getByRole("button", { name: /search these dates/i }).first()).toBeEnabled();

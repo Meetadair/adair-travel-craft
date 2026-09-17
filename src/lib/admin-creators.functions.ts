@@ -168,19 +168,15 @@ export const getCreatorAdminOverview = createServerFn({ method: "GET" })
         name: String(row["name"]),
         kind: String(row["kind"]),
         destination: ((row["getaway_destinations"] as { name?: string } | null)?.name ?? null) as
-          | string
-          | null,
+          string | null,
         whyThisOne: (row["why_this_one"] as string | null) ?? null,
         visitedOn: (row["visited_on"] as string | null) ?? null,
         postUrl: (row["post_url"] as string | null) ?? null,
         photos: Array.isArray(row["photos"]) ? (row["photos"] as string[]) : [],
-        creatorName:
-          ((row["creators"] as { display_name?: string } | null)?.display_name ?? null) as
-            | string
-            | null,
+        creatorName: ((row["creators"] as { display_name?: string } | null)?.display_name ??
+          null) as string | null,
         creatorHandle: ((row["creators"] as { handle?: string } | null)?.handle ?? null) as
-          | string
-          | null,
+          string | null,
         reviewStatus: String(row["review_status"]),
         reviewNote: (row["review_note"] as string | null) ?? null,
         createdAt: String(row["created_at"]),
@@ -198,8 +194,7 @@ export const getCreatorAdminOverview = createServerFn({ method: "GET" })
       payouts: ((payouts.data ?? []) as Array<Record<string, unknown>>).map((row) => ({
         id: String(row["id"]),
         creatorHandle: ((row["creators"] as { handle?: string } | null)?.handle ?? null) as
-          | string
-          | null,
+          string | null,
         periodMonth: String(row["period_month"]),
         amountMinor: Number(row["amount_minor"] ?? 0),
         status: String(row["status"]),
@@ -317,11 +312,12 @@ export const reviewCreatorPlace = createServerFn({ method: "POST" })
 /** Draw a monthly payout for one creator from their confirmed, unpaid lines. */
 export const createCreatorPayout = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
-    z.object({ creatorId: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input: unknown) => z.object({ creatorId: z.string().uuid() }).parse(input))
   .handler(
-    async ({ context, data }): Promise<{ created: boolean; amountMinor: number; reason?: string }> => {
+    async ({
+      context,
+      data,
+    }): Promise<{ created: boolean; amountMinor: number; reason?: string }> => {
       await assertAdmin(context.supabase, context.userId);
       const db = await admin();
       const res = await db
@@ -365,9 +361,7 @@ export const createCreatorPayout = createServerFn({ method: "POST" })
 export const markCreatorPayoutPaid = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
-    z
-      .object({ id: z.string().uuid(), reference: z.string().trim().min(2).max(120) })
-      .parse(input),
+    z.object({ id: z.string().uuid(), reference: z.string().trim().min(2).max(120) }).parse(input),
   )
   .handler(async ({ context, data }): Promise<{ ok: true }> => {
     await assertAdmin(context.supabase, context.userId);

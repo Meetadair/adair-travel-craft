@@ -8,12 +8,7 @@
 import { findCity } from "./cities";
 
 export type IntentKind =
-  | "greeting"
-  | "trip"
-  | "amendment"
-  | "product_question"
-  | "booking_question"
-  | "unclear";
+  "greeting" | "trip" | "amendment" | "product_question" | "booking_question" | "unclear";
 
 export type Intent = {
   kind: IntentKind;

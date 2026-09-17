@@ -65,9 +65,11 @@ export const getPromptSuggestions = createServerFn({ method: "GET" })
           destinations.map((d) => d.id),
         );
       for (const join of joinRes.data ?? []) {
-        const theme = join.getaway_themes as
-          | { name: string; interest_tags: string[]; active: boolean }
-          | null;
+        const theme = join.getaway_themes as {
+          name: string;
+          interest_tags: string[];
+          active: boolean;
+        } | null;
         if (!theme?.active) continue;
         if (!inSeason(join.season_months as number[], month)) continue;
         const dest = destinations.find((d) => d.id === join.destination_id);

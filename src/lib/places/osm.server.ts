@@ -75,7 +75,9 @@ function toPlace(element: Element, from: { lat: number; lon: number }): Place | 
     lat,
     lon,
     distanceKm:
-      lat != null && lon != null ? Math.round(distance(from.lat, from.lon, lat, lon) * 100) / 100 : null,
+      lat != null && lon != null
+        ? Math.round(distance(from.lat, from.lon, lat, lon) * 100) / 100
+        : null,
     website: tags["website"] ?? tags["contact:website"] ?? null,
     phone: tags["phone"] ?? tags["contact:phone"] ?? null,
     openingHours: tags["opening_hours"] ?? null,

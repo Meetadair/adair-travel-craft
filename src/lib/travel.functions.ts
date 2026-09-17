@@ -199,9 +199,9 @@ export const composeTrip = createServerFn({ method: "POST" })
       // happened and uses ours, which can only say what is true.
       reply: safeReply(
         overridden ? null : parsed.reply,
-        (oneWay
+        oneWay
           ? `${parsed.destinationCity}: ${departDate}, one way. Your composed trip is below.`
-          : `${parsed.destinationCity}: ${departDate} – ${returnDate}. Your composed trip is below.`),
+          : `${parsed.destinationCity}: ${departDate} – ${returnDate}. Your composed trip is below.`,
       ),
       request: {
         originCity: parsed.originCity,

@@ -6,8 +6,14 @@ async function card(page: Page, sentence: string) {
   const refuse = page.getByRole("button", { name: /refuse/i }).first();
   if (await refuse.isVisible().catch(() => false)) await refuse.click();
   await page.waitForTimeout(2500);
-  await page.getByPlaceholder(/e\.g\./i).first().fill(sentence);
-  await page.getByRole("button", { name: /compose trip/i }).first().click();
+  await page
+    .getByPlaceholder(/e\.g\./i)
+    .first()
+    .fill(sentence);
+  await page
+    .getByRole("button", { name: /compose trip/i })
+    .first()
+    .click();
   const changeDates = page.getByRole("button", { name: /change dates/i }).first();
   for (let i = 0; i < 6; i += 1) {
     await page.waitForTimeout(6000);
@@ -34,7 +40,10 @@ test("one way is on the card, not two clicks inside the calendar", async ({ page
 
 test("switching to one way re-searches and offers the way back", async ({ page }) => {
   await card(page, "Lisbon from 20 October to 24 October");
-  await page.getByRole("button", { name: /^one way$/i }).first().click();
+  await page
+    .getByRole("button", { name: /^one way$/i })
+    .first()
+    .click();
   await page.waitForTimeout(12000);
   // Now it offers the return trip instead, and never invents a return date:
   // choosing it opens the calendar rather than guessing a day.

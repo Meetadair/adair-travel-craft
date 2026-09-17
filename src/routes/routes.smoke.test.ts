@@ -34,18 +34,14 @@ describe("route modules", () => {
     it(`loads ${name}`, { timeout: 30_000 }, async () => {
       const mod = (await import(/* @vite-ignore */ file)) as Record<string, unknown>;
       const route = mod["Route"] as
-        | { options?: { component?: unknown; server?: unknown; loader?: unknown } }
-        | undefined;
+        { options?: { component?: unknown; server?: unknown; loader?: unknown } } | undefined;
       expect(route, `${name} must export Route`).toBeTruthy();
       const options = route!.options ?? {};
       const isServerRoute = name.includes("/api/");
       if (isServerRoute) {
         expect(options.server, `${name} must define server handlers`).toBeTruthy();
       } else {
-        expect(
-          options.component ?? options.loader,
-          `${name} must render something`,
-        ).toBeTruthy();
+        expect(options.component ?? options.loader, `${name} must render something`).toBeTruthy();
       }
     });
   }

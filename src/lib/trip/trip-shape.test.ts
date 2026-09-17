@@ -155,7 +155,11 @@ describe("what the answers change", () => {
       party: "partner" as const,
       occasion: "anniversary" as const,
     };
-    const ordinary = { purpose: "personal" as const, party: "partner" as const, occasion: "none" as const };
+    const ordinary = {
+      purpose: "personal" as const,
+      party: "partner" as const,
+      occasion: "none" as const,
+    };
     const dearer = 900;
     // The same dear hotel is penalised less once there is something to mark.
     expect(stayScore("Hotel Lutetia", 4.6, dearer, undefined, celebrating)).toBeGreaterThan(
@@ -222,21 +226,18 @@ describe("the departure airport cannot be the destination", () => {
 
 describe("what the departure picker offers before anything is known", () => {
   it("offers the traveller's own country, not the world", () => {
-    const asked = chatQuestions(
-      "I need to go to paris",
-      base({ originStated: false }),
-      { homeCountry: "Poland" },
-    );
+    const asked = chatQuestions("I need to go to paris", base({ originStated: false }), {
+      homeCountry: "Poland",
+    });
     const origin = asked.find((q) => q.kind === "origin");
     expect(origin?.options.map((o) => o.value)).toEqual(["WAW", "KRK", "GDN", "WRO", "KTW"]);
   });
 
   it("leads with airports this traveller has used before", () => {
-    const asked = chatQuestions(
-      "I need to go to paris",
-      base({ originStated: false }),
-      { homeCountry: "Poland", knownAirports: ["BER"] },
-    );
+    const asked = chatQuestions("I need to go to paris", base({ originStated: false }), {
+      homeCountry: "Poland",
+      knownAirports: ["BER"],
+    });
     expect(asked.find((q) => q.kind === "origin")?.options[0]?.value).toBe("BER");
   });
 

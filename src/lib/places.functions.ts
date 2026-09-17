@@ -10,7 +10,12 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { bucketLabel, bucketsForDay, categoriesForBucket, type Bucket } from "@/lib/places/buckets";
 import { rankPlaces, type PlaceProfile } from "@/lib/places/rank";
-import { MAP_ATTRIBUTION, type Place, type PlaceCategory, type RankedPlace } from "@/lib/places/types";
+import {
+  MAP_ATTRIBUTION,
+  type Place,
+  type PlaceCategory,
+  type RankedPlace,
+} from "@/lib/places/types";
 import type { TripSearchResponse } from "@/lib/trip/types";
 
 export type PlaceSection = {
@@ -38,7 +43,7 @@ const isCategory = (value: string): value is PlaceCategory =>
 const days = (start: string | null, end: string | null, max = 3): string[] => {
   if (!start) return [];
   const from = Date.parse(`${start}T12:00:00Z`);
-  const to = Date.parse(`${(end ?? start)}T12:00:00Z`);
+  const to = Date.parse(`${end ?? start}T12:00:00Z`);
   if (!Number.isFinite(from) || !Number.isFinite(to) || to < from) return [start];
   const out: string[] = [];
   for (let t = from; t <= to && out.length < max; t += 86_400_000) {
@@ -103,7 +108,8 @@ export const getTripPlaces = createServerFn({ method: "POST" })
     };
 
     // The hotel is our reference point for distances and for the map search.
-    const search = (cardRes.data as { items?: { search?: TripSearchResponse } } | null)?.items?.search;
+    const search = (cardRes.data as { items?: { search?: TripSearchResponse } } | null)?.items
+      ?.search;
     const from =
       search?.request.lat != null && search?.request.lon != null
         ? { lat: search.request.lat, lon: search.request.lon }
@@ -173,7 +179,9 @@ export const getTripPlaces = createServerFn({ method: "POST" })
             source: creator ? "creator" : "adair",
             creator,
             note:
-              (r["why_this_one"] as string | null) ?? (r["editorial_note"] as string | null) ?? null,
+              (r["why_this_one"] as string | null) ??
+              (r["editorial_note"] as string | null) ??
+              null,
           });
         }
       }
@@ -192,7 +200,11 @@ export const getTripPlaces = createServerFn({ method: "POST" })
     const used = new Set<string>();
 
     for (const date of days(trip.start_date, trip.end_date)) {
-      for (const bucket of bucketsForDay(profile.withChildren ? { withChildren: true } : { withChildren: false, interests: profile.interests })) {
+      for (const bucket of bucketsForDay(
+        profile.withChildren
+          ? { withChildren: true }
+          : { withChildren: false, interests: profile.interests },
+      )) {
         const categories = categoriesForBucket(
           bucket,
           profile.withChildren
@@ -200,13 +212,17 @@ export const getTripPlaces = createServerFn({ method: "POST" })
             : { withChildren: false, interests: profile.interests },
         );
         const candidates = pool.filter(
-          (place) =>
-            !used.has(place.id) && place.categories.some((c) => categories.includes(c)),
+          (place) => !used.has(place.id) && place.categories.some((c) => categories.includes(c)),
         );
         const ranked = rankPlaces(candidates, profile, 4);
         if (!ranked.length) continue;
         ranked.forEach((place) => used.add(place.id));
-        sections.push({ date, bucket, label: bucketLabel(bucket, date, city || "town", today), places: ranked });
+        sections.push({
+          date,
+          bucket,
+          label: bucketLabel(bucket, date, city || "town", today),
+          places: ranked,
+        });
       }
     }
 

@@ -78,7 +78,9 @@ export function placeKey(city: string | null | undefined, iata?: string | null):
   return (iata ?? "").trim().toUpperCase();
 }
 
-function commonest(values: (string | null)[]): { value: string; hits: number; total: number } | null {
+function commonest(
+  values: (string | null)[],
+): { value: string; hits: number; total: number } | null {
   const present = values.filter((v): v is string => Boolean(v && v.trim()));
   if (!present.length) return null;
   const counts = new Map<string, number>();
@@ -236,10 +238,7 @@ export function resolvePreferences(
 
   const here = place
     .filter((row) => row.place === currentPlace)
-    .sort(
-      (a, b) =>
-        b.timesChosen - a.timesChosen || b.lastChosenAt.localeCompare(a.lastChosenAt),
-    );
+    .sort((a, b) => b.timesChosen - a.timesChosen || b.lastChosenAt.localeCompare(a.lastChosenAt));
   const rememberedHotels: string[] = [];
   const rememberedCarSuppliers: string[] = [];
   for (const row of here) {

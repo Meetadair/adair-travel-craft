@@ -46,10 +46,7 @@ export type ResolvedLocation = {
  * can answer ("what is near me"). Only then may we ask for permission, and only
  * when they have not already said no.
  */
-export function resolveLocation(
-  inputs: LocationInputs,
-  precise = false,
-): ResolvedLocation {
+export function resolveLocation(inputs: LocationInputs, precise = false): ResolvedLocation {
   const { device, consent, hotel, city } = inputs;
 
   if (device && consent === "granted") {

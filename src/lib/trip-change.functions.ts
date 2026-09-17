@@ -49,7 +49,9 @@ export const startTripChange = createServerFn({ method: "POST" })
 
     const tripRes = await supabase
       .from("trips")
-      .select("id, title, city, origin, start_date, end_date, status, total_amount, document_number")
+      .select(
+        "id, title, city, origin, start_date, end_date, status, total_amount, document_number",
+      )
       .eq("user_id", userId)
       .eq("id", data.tripId)
       .maybeSingle();
@@ -72,7 +74,9 @@ export const startTripChange = createServerFn({ method: "POST" })
 
     const itemsRes = await supabase
       .from("trip_items")
-      .select("id, kind, title, status, amount, detail, offer_reference, supplier_order_id, payload")
+      .select(
+        "id, kind, title, status, amount, detail, offer_reference, supplier_order_id, payload",
+      )
       .eq("user_id", userId)
       .eq("trip_id", trip.id);
     if (itemsRes.error) throw new Error(itemsRes.error.message);
@@ -167,15 +171,16 @@ export const finaliseTripChange = createServerFn({ method: "POST" })
     // 1. Release every line of the original booking with the supplier.
     const itemsRes = await supabase
       .from("trip_items")
-      .select("id, kind, title, status, amount, detail, offer_reference, supplier_order_id, payload")
+      .select(
+        "id, kind, title, status, amount, detail, offer_reference, supplier_order_id, payload",
+      )
       .eq("user_id", userId)
       .eq("trip_id", data.oldTripId);
     const oldItems = activeItems((itemsRes.data ?? []) as ItemRow[]);
 
     const { removeItemFromCalendars } = await import("@/lib/calendar/sync.server");
-    const { cancelAtSupplier, cancelNote, needsFollowUp } = await import(
-      "@/lib/trip/supplier-cancel"
-    );
+    const { cancelAtSupplier, cancelNote, needsFollowUp } =
+      await import("@/lib/trip/supplier-cancel");
     let cancelled = 0;
     /** Lines the supplier did not confirm, so the traveller is told rather than assured. */
     const unfinished: string[] = [];
@@ -189,11 +194,7 @@ export const finaliseTripChange = createServerFn({ method: "POST" })
         const note = cancelNote(item.kind, outcome);
         if (note) unfinished.push(note);
       }
-      await supabase
-        .from("trip_items")
-        .update({ status })
-        .eq("id", item.id)
-        .eq("user_id", userId);
+      await supabase.from("trip_items").update({ status }).eq("id", item.id).eq("user_id", userId);
       // Calendar entries follow the stored provider event IDs.
       try {
         await removeItemFromCalendars(supabase, userId, item.id);

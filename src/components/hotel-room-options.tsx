@@ -56,8 +56,7 @@ function capitalize(text: string): string {
 function bedSummary(bedTypes: StayBedType[]): { text: string; separate: boolean } {
   if (!bedTypes.length) return { text: "", separate: false };
   const separate =
-    bedTypes.length > 1 ||
-    (bedTypes[0]!.quantity > 1 && /single|twin/i.test(bedTypes[0]!.bedType));
+    bedTypes.length > 1 || (bedTypes[0]!.quantity > 1 && /single|twin/i.test(bedTypes[0]!.bedType));
   const text = bedTypes
     .map((b) => (b.quantity > 1 ? `${b.quantity} × ${b.bedType}` : b.bedType))
     .join(", ");
@@ -65,10 +64,7 @@ function bedSummary(bedTypes: StayBedType[]): { text: string; separate: boolean 
 }
 
 /** 9+ "exceptional", 8+ "excellent" — the same bands guests recognise from booking sites. */
-function reviewBand(
-  score: number,
-  t: ReturnType<typeof useT>,
-): string {
+function reviewBand(score: number, t: ReturnType<typeof useT>): string {
   if (score >= 9) return t.assistant.roomOptionsBandExceptional;
   if (score >= 8) return t.assistant.roomOptionsBandExcellent;
   if (score >= 7) return t.assistant.roomOptionsBandVeryGood;
@@ -130,9 +126,10 @@ export function HotelRoomOptions({
             <p className="text-xs text-muted-foreground">{t.assistant.roomOptionsLoading}</p>
           )}
 
-          {!detail.isPending && (!detail.data || (!detail.data.roomOptions.length && !detail.data.reviews.length)) && (
-            <p className="text-xs text-muted-foreground">{t.assistant.roomOptionsEmpty}</p>
-          )}
+          {!detail.isPending &&
+            (!detail.data || (!detail.data.roomOptions.length && !detail.data.reviews.length)) && (
+              <p className="text-xs text-muted-foreground">{t.assistant.roomOptionsEmpty}</p>
+            )}
 
           {detail.data && (detail.data.checkinFrom || detail.data.checkoutUntil) && (
             <div className="grid gap-3 border-b border-border pb-4 sm:grid-cols-2">
@@ -144,8 +141,8 @@ export function HotelRoomOptions({
                       {t.assistant.roomOptionsCheckIn} {detail.data.checkinFrom}
                     </p>
                     <p className="text-[11px] text-muted-foreground">
-                      {t.assistant.roomOptionsEarlyCheckIn} — {t.assistant.roomOptionsEarlyCheckInNote}:{" "}
-                      {t.assistant.roomOptionsOnRequest}
+                      {t.assistant.roomOptionsEarlyCheckIn} —{" "}
+                      {t.assistant.roomOptionsEarlyCheckInNote}: {t.assistant.roomOptionsOnRequest}
                     </p>
                   </div>
                 </div>
@@ -158,8 +155,8 @@ export function HotelRoomOptions({
                       {t.assistant.roomOptionsCheckOut} {detail.data.checkoutUntil}
                     </p>
                     <p className="text-[11px] text-muted-foreground">
-                      {t.assistant.roomOptionsLateCheckOut} — {t.assistant.roomOptionsLateCheckOutNote}:{" "}
-                      {t.assistant.roomOptionsOnRequest}
+                      {t.assistant.roomOptionsLateCheckOut} —{" "}
+                      {t.assistant.roomOptionsLateCheckOutNote}: {t.assistant.roomOptionsOnRequest}
                     </p>
                   </div>
                 </div>
@@ -193,7 +190,9 @@ export function HotelRoomOptions({
                               </span>
                             )}
                             {beds.separate && (
-                              <span className="tag-pill">{t.assistant.roomOptionsSeparateBeds}</span>
+                              <span className="tag-pill">
+                                {t.assistant.roomOptionsSeparateBeds}
+                              </span>
                             )}
                           </p>
                         )}
@@ -222,15 +221,20 @@ export function HotelRoomOptions({
                           {room.refundable && room.freeCancellationUntil ? (
                             <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
                               <ShieldCheck className="size-3.5" />
-                              {t.assistant.roomOptionsFreeCancellationUntil} {room.freeCancellationUntil}
+                              {t.assistant.roomOptionsFreeCancellationUntil}{" "}
+                              {room.freeCancellationUntil}
                             </span>
                           ) : (
-                            <span className="text-muted-foreground">{t.assistant.roomOptionsNonRefundable}</span>
+                            <span className="text-muted-foreground">
+                              {t.assistant.roomOptionsNonRefundable}
+                            </span>
                           )}
                         </div>
                       </div>
                       <div className="flex shrink-0 flex-col items-end gap-2">
-                        <p className="text-sm font-semibold text-primary">{money(room.amount, room.currency)}</p>
+                        <p className="text-sm font-semibold text-primary">
+                          {money(room.amount, room.currency)}
+                        </p>
                         <button
                           type="button"
                           onClick={() => onChooseRoom?.(room)}
@@ -261,7 +265,9 @@ export function HotelRoomOptions({
                 )}
                 <div>
                   {detail.data.reviewScore !== null && (
-                    <p className="text-xs font-semibold">{reviewBand(detail.data.reviewScore, t)}</p>
+                    <p className="text-xs font-semibold">
+                      {reviewBand(detail.data.reviewScore, t)}
+                    </p>
                   )}
                   {detail.data.reviewCount !== null && (
                     <p className="text-[11px] text-muted-foreground">
@@ -276,9 +282,13 @@ export function HotelRoomOptions({
                     <div className="flex items-center gap-1.5 text-xs font-medium">
                       <Star className="size-3 fill-current text-primary" />
                       {r.reviewerName}
-                      {r.country && <span className="text-muted-foreground">· {r.country.toUpperCase()}</span>}
+                      {r.country && (
+                        <span className="text-muted-foreground">· {r.country.toUpperCase()}</span>
+                      )}
                     </div>
-                    {r.pros && <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{r.pros}</p>}
+                    {r.pros && (
+                      <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{r.pros}</p>
+                    )}
                   </div>
                 ))}
               </div>

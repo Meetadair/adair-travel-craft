@@ -21,7 +21,7 @@ export const WHATSAPP_TEMPLATES = {
 export type WhatsAppTemplate = keyof typeof WHATSAPP_TEMPLATES;
 
 export function hasWhatsAppKeys(): boolean {
-  return Boolean(process.env['WHATSAPP_API_TOKEN'] && process.env['WHATSAPP_PHONE_NUMBER_ID']);
+  return Boolean(process.env["WHATSAPP_API_TOKEN"] && process.env["WHATSAPP_PHONE_NUMBER_ID"]);
 }
 
 /** E.164 without the plus, as the API expects. */
@@ -38,8 +38,8 @@ export async function sendWhatsAppTemplate(input: {
   params: string[];
   languageCode?: string;
 }): Promise<WhatsAppResult> {
-  const token = process.env['WHATSAPP_API_TOKEN'];
-  const phoneNumberId = process.env['WHATSAPP_PHONE_NUMBER_ID'];
+  const token = process.env["WHATSAPP_API_TOKEN"];
+  const phoneNumberId = process.env["WHATSAPP_PHONE_NUMBER_ID"];
   if (!token || !phoneNumberId) return { status: "unavailable", reason: "missing-key" };
 
   const to = normalisePhone(input.to);

@@ -4,7 +4,14 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState, useEffect, useMemo, useRef } from "react";
 import { ageQuestion, familyFromSentence } from "@/lib/trip/family";
 import { passengersFromSentence } from "@/lib/trip/passengers";
-import { applyAnswer, assumptionNote, clarify, hasNoDates, isVagueWeek, type Clarification } from "@/lib/trip/clarify";
+import {
+  applyAnswer,
+  assumptionNote,
+  clarify,
+  hasNoDates,
+  isVagueWeek,
+  type Clarification,
+} from "@/lib/trip/clarify";
 import { AirportAnswer, DateAnswer, TravellersAnswer } from "@/components/trip/answer-controls";
 import { isCompleteRange, rangeSentence, type DateRange } from "@/lib/trip/answers";
 import { CabinParty, type Cabin } from "@/components/trip/cabin-party";
@@ -364,7 +371,8 @@ export function AssistantPage() {
   };
 
   const displayCurrency = useCurrency();
-  const money = (amount: number, currency: string) => displayCurrency.format(amount, currency, locale);
+  const money = (amount: number, currency: string) =>
+    displayCurrency.format(amount, currency, locale);
 
   // Saved preferences, for the match dots. Absent when signed out, and then no
   // dots are shown — there would be nothing to score against.
@@ -506,7 +514,9 @@ export function AssistantPage() {
     .map((o) => {
       if (o.kind === "hotel") {
         const alt = hotelRef ? o.alternatives?.find((a) => a.offerReference === hotelRef) : null;
-        const base = alt ? { ...alt, ...(o.alternatives ? { alternatives: o.alternatives } : {}) } : o;
+        const base = alt
+          ? { ...alt, ...(o.alternatives ? { alternatives: o.alternatives } : {}) }
+          : o;
         // Picking a specific room+rate off the room-options panel replaces the
         // line's price and reference the same way a picked flight does below —
         // the card shows the room the traveller actually chose, not the
@@ -926,7 +936,6 @@ export function AssistantPage() {
           ))}
         </div>
 
-
         <LoyaltyReminder />
 
         <CalendarTripHints onPlan={(sentence) => setInput(sentence)} />
@@ -1149,7 +1158,10 @@ export function AssistantPage() {
                                       ).map((a) => (
                                         <button
                                           key={a.offerReference}
-                                          onClick={() => { setHotelRef(a.offerReference); setChosenRoom(null); }}
+                                          onClick={() => {
+                                            setHotelRef(a.offerReference);
+                                            setChosenRoom(null);
+                                          }}
                                           className="flex w-full items-center justify-between gap-3 rounded-xl border border-border bg-background px-4 py-3 text-left transition-colors hover:bg-secondary"
                                         >
                                           <span className="min-w-0">
@@ -1167,7 +1179,10 @@ export function AssistantPage() {
                                       ))}
                                       {hotelRef && (
                                         <button
-                                          onClick={() => { setHotelRef(null); setChosenRoom(null); }}
+                                          onClick={() => {
+                                            setHotelRef(null);
+                                            setChosenRoom(null);
+                                          }}
                                           className="text-xs text-muted-foreground underline underline-offset-4"
                                         >
                                           {t.assistant.backToRecommendation}

@@ -17,13 +17,33 @@
  */
 
 const MONTHS = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December",
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
 ];
 
 const MONTHS_PL = [
-  "stycznia", "lutego", "marca", "kwietnia", "maja", "czerwca",
-  "lipca", "sierpnia", "września", "października", "listopada", "grudnia",
+  "stycznia",
+  "lutego",
+  "marca",
+  "kwietnia",
+  "maja",
+  "czerwca",
+  "lipca",
+  "sierpnia",
+  "września",
+  "października",
+  "listopada",
+  "grudnia",
 ];
 
 /** "2026-10-20" → "20 October" (or "20 października"). */
@@ -63,16 +83,18 @@ export function spokenTime(time: string): string {
  * for eleven seconds.
  */
 export function stripScreenFurniture(text: string): string {
-  return text
-    // Supplier reference codes: off_…, rat_…, ord_…, CR-XXXX
-    .replace(/\b(?:off|rat|ord|qt|seg|pas|ans)_[A-Za-z0-9]+/g, "")
-    // Middots and arrows used as separators
-    .replace(/\s*[·•]\s*/g, ". ")
-    .replace(/\s*[→↔⇄]\s*/g, " to ")
-    // Bare IATA pairs like "WAW – LIS" keep the words around them
-    .replace(/\s+[–—]\s+/g, " to ")
-    .replace(/\s{2,}/g, " ")
-    .trim();
+  return (
+    text
+      // Supplier reference codes: off_…, rat_…, ord_…, CR-XXXX
+      .replace(/\b(?:off|rat|ord|qt|seg|pas|ans)_[A-Za-z0-9]+/g, "")
+      // Middots and arrows used as separators
+      .replace(/\s*[·•]\s*/g, ". ")
+      .replace(/\s*[→↔⇄]\s*/g, " to ")
+      // Bare IATA pairs like "WAW – LIS" keep the words around them
+      .replace(/\s+[–—]\s+/g, " to ")
+      .replace(/\s{2,}/g, " ")
+      .trim()
+  );
 }
 
 /**
@@ -112,11 +134,12 @@ export type SpokenTripCard = {
  */
 export function speakableCard(card: SpokenTripCard, locale = "en"): string {
   const pl = locale.startsWith("pl");
-  const when = card.oneWay || !card.returnDate
-    ? spokenDate(card.departDate, locale)
-    : pl
-      ? `od ${spokenDate(card.departDate, locale)} do ${spokenDate(card.returnDate, locale)}`
-      : `${spokenDate(card.departDate, locale)} to ${spokenDate(card.returnDate, locale)}`;
+  const when =
+    card.oneWay || !card.returnDate
+      ? spokenDate(card.departDate, locale)
+      : pl
+        ? `od ${spokenDate(card.departDate, locale)} do ${spokenDate(card.returnDate, locale)}`
+        : `${spokenDate(card.departDate, locale)} to ${spokenDate(card.returnDate, locale)}`;
 
   const parts: string[] = [];
   parts.push(

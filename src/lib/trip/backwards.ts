@@ -28,14 +28,92 @@ export const DEFAULT_PLANNING_RULES: PlanningRules = {
 
 /** Airports inside the Schengen area, where arrival is quick. */
 const SCHENGEN = new Set([
-  "LIN", "MXP", "BGY", "FCO", "CIA", "NAP", "VCE", "FLR", "BLQ", "TRN", "PSA", "CTA",
-  "CDG", "ORY", "NCE", "LYS", "MRS", "TLS", "BOD", "NTE",
-  "MAD", "BCN", "AGP", "VLC", "SVQ", "BIO", "PMI", "IBZ", "ALC", "LPA", "TFS",
-  "BER", "MUC", "FRA", "HAM", "CGN", "DUS", "STR", "NUE", "LEJ", "BRE", "HAJ",
-  "VIE", "SZG", "INN", "ZRH", "GVA", "BSL", "AMS", "EIN", "RTM", "BRU", "CRL",
-  "CPH", "BLL", "ARN", "BMA", "GOT", "OSL", "BGO", "TRD", "HEL", "TLL", "RIX", "VNO",
-  "WAW", "WMI", "KRK", "GDN", "WRO", "POZ", "KTW", "PRG", "BTS", "BUD", "LJU", "ZAG",
-  "LIS", "OPO", "FAO", "ATH", "SKG", "MLA", "KEF", "OTP", "SOF",
+  "LIN",
+  "MXP",
+  "BGY",
+  "FCO",
+  "CIA",
+  "NAP",
+  "VCE",
+  "FLR",
+  "BLQ",
+  "TRN",
+  "PSA",
+  "CTA",
+  "CDG",
+  "ORY",
+  "NCE",
+  "LYS",
+  "MRS",
+  "TLS",
+  "BOD",
+  "NTE",
+  "MAD",
+  "BCN",
+  "AGP",
+  "VLC",
+  "SVQ",
+  "BIO",
+  "PMI",
+  "IBZ",
+  "ALC",
+  "LPA",
+  "TFS",
+  "BER",
+  "MUC",
+  "FRA",
+  "HAM",
+  "CGN",
+  "DUS",
+  "STR",
+  "NUE",
+  "LEJ",
+  "BRE",
+  "HAJ",
+  "VIE",
+  "SZG",
+  "INN",
+  "ZRH",
+  "GVA",
+  "BSL",
+  "AMS",
+  "EIN",
+  "RTM",
+  "BRU",
+  "CRL",
+  "CPH",
+  "BLL",
+  "ARN",
+  "BMA",
+  "GOT",
+  "OSL",
+  "BGO",
+  "TRD",
+  "HEL",
+  "TLL",
+  "RIX",
+  "VNO",
+  "WAW",
+  "WMI",
+  "KRK",
+  "GDN",
+  "WRO",
+  "POZ",
+  "KTW",
+  "PRG",
+  "BTS",
+  "BUD",
+  "LJU",
+  "ZAG",
+  "LIS",
+  "OPO",
+  "FAO",
+  "ATH",
+  "SKG",
+  "MLA",
+  "KEF",
+  "OTP",
+  "SOF",
 ]);
 
 export function isSchengen(iata: string): boolean {
@@ -86,7 +164,11 @@ export type ArrivalPlan = {
 
 const MIN = 60_000;
 const hhmm = (iso: string) =>
-  new Date(iso).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "UTC" });
+  new Date(iso).toLocaleTimeString("en-GB", {
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "UTC",
+  });
 
 function durationLabel(minutes: number): string {
   const abs = Math.abs(Math.round(minutes));
@@ -150,8 +232,7 @@ export function planBackwards(input: BackwardsInput): {
   const inTime = scored.filter((row) => row.slackMin >= 0).sort((a, b) => b.land - a.land);
   const feasible = inTime.length > 0;
   // Latest one that works; otherwise the earliest arrival we can offer at all.
-  const picked =
-    inTime[0] ?? scored.slice().sort((a, b) => a.arrive - b.arrive)[0] ?? null;
+  const picked = inTime[0] ?? scored.slice().sort((a, b) => a.arrive - b.arrive)[0] ?? null;
 
   const build = (row: (typeof scored)[number] | null): ArrivalPlan => {
     const landAt = row ? row.flight.arriveAt : input.mustArriveBy;
@@ -213,5 +294,9 @@ export function planBackwards(input: BackwardsInput): {
     };
   };
 
-  return { chosen: picked?.flight ?? null, chosenIndex: picked?.index ?? -1, plan: build(picked ?? null) };
+  return {
+    chosen: picked?.flight ?? null,
+    chosenIndex: picked?.index ?? -1,
+    plan: build(picked ?? null),
+  };
 }

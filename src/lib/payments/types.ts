@@ -34,7 +34,7 @@ export type PaymentUnavailable = {
 export type PaymentOk<T> = { status: "ok"; data: T };
 export type PaymentResult<T> = PaymentOk<T> | PaymentUnavailable;
 
-export const paymentOk = <T,>(data: T): PaymentOk<T> => ({ status: "ok", data });
+export const paymentOk = <T>(data: T): PaymentOk<T> => ({ status: "ok", data });
 export const paymentUnavailable = (
   reason: PaymentUnavailableReason,
   note?: string,

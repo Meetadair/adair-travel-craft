@@ -58,20 +58,28 @@ describe("rankBrands — region relevance", () => {
 
 describe("searchBrands", () => {
   it("finds anything in the full table, not just the short list", () => {
-    expect(ids(searchBrands(BRAND_SEED, { kind: "airline", query: "hawaii" }))).toEqual(["hawaiian"]);
+    expect(ids(searchBrands(BRAND_SEED, { kind: "airline", query: "hawaii" }))).toEqual([
+      "hawaiian",
+    ]);
     expect(ids(searchBrands(BRAND_SEED, { kind: "hotel_chain", query: "raffles" }))).toContain(
       "raffles",
     );
-    expect(ids(searchBrands(BRAND_SEED, { kind: "car_rental", query: "panek" }))).toEqual(["panek"]);
+    expect(ids(searchBrands(BRAND_SEED, { kind: "car_rental", query: "panek" }))).toEqual([
+      "panek",
+    ]);
   });
   it("matches by alliance or owning group", () => {
-    const star = ids(searchBrands(BRAND_SEED, { kind: "airline", query: "star alliance", limit: 50 }));
+    const star = ids(
+      searchBrands(BRAND_SEED, { kind: "airline", query: "star alliance", limit: 50 }),
+    );
     expect(star).toContain("lot");
     expect(star).toContain("united");
     expect(star).not.toContain("delta");
   });
   it("ignores accents and punctuation", () => {
-    expect(ids(searchBrands(BRAND_SEED, { kind: "hotel_chain", query: "melia" }))).toContain("melia");
+    expect(ids(searchBrands(BRAND_SEED, { kind: "hotel_chain", query: "melia" }))).toContain(
+      "melia",
+    );
     expect(ids(searchBrands(BRAND_SEED, { kind: "hotel_chain", query: "ritz carlton" }))).toContain(
       "ritzcarlton",
     );

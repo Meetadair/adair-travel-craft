@@ -55,7 +55,11 @@ describe("calendar bounds", () => {
 describe("searchable airport list", () => {
   it("finds an airport by code, city, country or name", () => {
     expect(searchAirports("MXP")[0]!.iata).toBe("MXP");
-    expect(searchAirports("mila").map((m) => m.iata).sort()).toEqual(["LIN", "MXP"]);
+    expect(
+      searchAirports("mila")
+        .map((m) => m.iata)
+        .sort(),
+    ).toEqual(["LIN", "MXP"]);
     expect(searchAirports("malpensa")[0]!.iata).toBe("MXP");
     expect(searchAirports("poland").length).toBeGreaterThan(3);
   });

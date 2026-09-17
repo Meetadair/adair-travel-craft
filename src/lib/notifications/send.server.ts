@@ -18,14 +18,14 @@ export type NotifyOutcome = { whatsapp: boolean; email: boolean };
 type EmailPayload = { to: string; subject: string; html: string } | null;
 
 async function sendEmail(payload: EmailPayload): Promise<boolean> {
-  const apiKey = process.env['RESEND_API_KEY'];
+  const apiKey = process.env["RESEND_API_KEY"];
   if (!apiKey || !payload) return false;
   try {
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        from: process.env['RESEND_FROM'] ?? "Adair <onboarding@resend.dev>",
+        from: process.env["RESEND_FROM"] ?? "Adair <onboarding@resend.dev>",
         to: [payload.to],
         subject: payload.subject,
         html: payload.html,

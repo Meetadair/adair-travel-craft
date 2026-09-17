@@ -86,7 +86,9 @@ export function readDismissed(): NudgeKind[] {
   try {
     const raw = window.localStorage.getItem(KEY);
     const parsed = raw ? (JSON.parse(raw) as unknown) : [];
-    return Array.isArray(parsed) ? (parsed.filter((v) => typeof v === "string") as NudgeKind[]) : [];
+    return Array.isArray(parsed)
+      ? (parsed.filter((v) => typeof v === "string") as NudgeKind[])
+      : [];
   } catch {
     return [];
   }

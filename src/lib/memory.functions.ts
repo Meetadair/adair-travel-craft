@@ -155,8 +155,14 @@ export const forgetEverythingLearned = createServerFn({ method: "POST" })
       ...(learned.priceWeight > 1 ? ["price"] : []),
     ];
     await Promise.all([
-      supabase.from("traveller_patterns" as never).delete().eq("user_id", userId),
-      supabase.from("traveller_place_memory" as never).delete().eq("user_id", userId),
+      supabase
+        .from("traveller_patterns" as never)
+        .delete()
+        .eq("user_id", userId),
+      supabase
+        .from("traveller_place_memory" as never)
+        .delete()
+        .eq("user_id", userId),
       subjects.length
         ? supabase.from("learned_overrides").insert(
             subjects.map((subject) => ({

@@ -30,7 +30,10 @@ function synth(): Synth | null {
 }
 
 /** The best available voice for this language, or none and let the browser choose. */
-export function pickVoice(voices: SpeechSynthesisVoice[], locale: string): SpeechSynthesisVoice | null {
+export function pickVoice(
+  voices: SpeechSynthesisVoice[],
+  locale: string,
+): SpeechSynthesisVoice | null {
   const want = locale.startsWith("pl") ? "pl" : "en";
   const matching = voices.filter((v) => v.lang.toLowerCase().startsWith(want));
   if (matching.length === 0) return null;

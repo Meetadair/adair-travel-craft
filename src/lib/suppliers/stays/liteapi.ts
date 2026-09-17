@@ -16,7 +16,13 @@
  * blind; taking money through a second supplier is not, and it waits until the
  * capture path has been tested end to end on flights.
  */
-import type { StayResult, StayDetail, StayRoomOption, StayReview, StayBedType } from "@/lib/trip/types";
+import type {
+  StayResult,
+  StayDetail,
+  StayRoomOption,
+  StayReview,
+  StayBedType,
+} from "@/lib/trip/types";
 
 const BASE = "https://api.liteapi.travel/v3.0";
 const CREDENTIAL = "LITEAPI_KEY";
@@ -89,8 +95,11 @@ export function nightsBetween(checkIn: string, checkOut: string): number {
  * The cheapest rate per hotel, which is what a shortlist compares. A room type
  * with no price at all is dropped rather than shown at zero.
  */
-export function cheapestRate(rate: LiteRate): { rateId: string; amount: number; currency: string; board: string | null } | null {
-  let best: { rateId: string; amount: number; currency: string; board: string | null } | null = null;
+export function cheapestRate(
+  rate: LiteRate,
+): { rateId: string; amount: number; currency: string; board: string | null } | null {
+  let best: { rateId: string; amount: number; currency: string; board: string | null } | null =
+    null;
   for (const room of rate.roomTypes ?? []) {
     for (const r of room.rates ?? []) {
       const total = r.retailRate?.total?.[0];
@@ -190,7 +199,6 @@ export async function searchLiteApiStays(input: LiteStaySearch): Promise<StayRes
   }
   return results;
 }
-
 
 // --- Hotel detail: room list, amenities, review score, reviews --------------
 //
@@ -405,7 +413,9 @@ export async function getStayDetail(input: StayDetailInput): Promise<StayDetail 
         currency: total?.currency ?? input.currency,
         sizeSqm: matched?.roomSizeSquare ?? null,
         bedTypes: bedTypesFrom(matched?.bedTypes),
-        amenities: (matched?.roomAmenities ?? []).map((a) => (a.name ?? "").toLowerCase()).filter(Boolean),
+        amenities: (matched?.roomAmenities ?? [])
+          .map((a) => (a.name ?? "").toLowerCase())
+          .filter(Boolean),
       });
     }
   }

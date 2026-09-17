@@ -43,7 +43,6 @@ function cacheKey(req: TripRequest): string {
     req.hotelNameExact ?? "",
     req.carNameExact ?? "",
   ].join("|");
-
 }
 
 function clientIp(request: Request): string {

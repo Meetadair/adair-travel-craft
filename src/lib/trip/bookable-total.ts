@@ -43,10 +43,7 @@ export function bookableLines(
   if (sellable(search.stay?.rateId) && money(priced.stay)) {
     out.push({ kind: "stay", amount: money(priced.stay) });
   }
-  if (
-    (sellable(search.car?.quoteId) || sellable(search.car?.offerId)) &&
-    money(priced.car)
-  ) {
+  if ((sellable(search.car?.quoteId) || sellable(search.car?.offerId)) && money(priced.car)) {
     out.push({ kind: "car", amount: money(priced.car) });
   }
   return out;

@@ -67,7 +67,8 @@ export function PaymentCards() {
               className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border px-4 py-3"
             >
               <span className="text-sm">
-                <span className="capitalize">{card.brand ?? "Card"}</span> ···· {card.last4 ?? "····"}
+                <span className="capitalize">{card.brand ?? "Card"}</span> ····{" "}
+                {card.last4 ?? "····"}
                 {expiry(card.expMonth, card.expYear) && (
                   <span className="text-muted-foreground">
                     {" "}

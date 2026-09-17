@@ -26,8 +26,7 @@ function stubSupabase(rows: Row[] | null) {
       return {
         select() {
           const result = { data: rows, error: null };
-          const eq = () =>
-            Object.assign(Promise.resolve(result), { like: async () => result });
+          const eq = () => Object.assign(Promise.resolve(result), { like: async () => result });
           return { eq };
         },
       };
@@ -61,7 +60,9 @@ describe("gross price per line", () => {
   it("takes the plan discount off the base markup", () => {
     // select = 300 bps off, signature = 600 bps off.
     expect(grossMinor(100, { markupBps: 600, discountBps: 300, changeFeeMinor: 2000 })).toBe(10300);
-    expect(grossMinor(100, { markupBps: 1400, discountBps: 600, changeFeeMinor: 2000 })).toBe(10800);
+    expect(grossMinor(100, { markupBps: 1400, discountBps: 600, changeFeeMinor: 2000 })).toBe(
+      10800,
+    );
   });
 
   it("rounds at the minor-unit boundary", () => {
@@ -95,7 +96,9 @@ describe("loadPricing", () => {
 
   it("keeps the fallback for a line type the table does not mention", async () => {
     const table = await loadPricing(
-      stubSupabase([{ line_type: "flight", markup_bps: 900, discount_bps: 0, change_fee_minor: 500 }]),
+      stubSupabase([
+        { line_type: "flight", markup_bps: 900, discount_bps: 0, change_fee_minor: 500 },
+      ]),
       "signature",
     );
     expect(table.flight).toEqual({ markupBps: 900, discountBps: 0, changeFeeMinor: 500 });

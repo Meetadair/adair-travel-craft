@@ -28,7 +28,16 @@ export const HOUSE_MIN_RATING = 4;
 export const HOUSE_QUALITIES: Record<string, string[]> = {
   spa: ["spa", "thermal", "thermae", "terme", "wellness", "hammam", "onsen"],
   pool: ["pool", "piscine", "piscina", "swimming"],
-  boutique: ["boutique", "design hotel", "relais", "manor", "château", "chateau", "palazzo", "villa"],
+  boutique: [
+    "boutique",
+    "design hotel",
+    "relais",
+    "manor",
+    "château",
+    "chateau",
+    "palazzo",
+    "villa",
+  ],
   beach: ["beach", "beachfront", "seafront", "playa", "plage", "spiaggia", "oceanfront"],
   lake: ["lake", "lakeside", "lago", "see ", "lakefront"],
   mountains: ["mountain", "alpine", "alpen", "ski", "dolomit", "berg", "peak"],
@@ -36,11 +45,7 @@ export const HOUSE_QUALITIES: Record<string, string[]> = {
   horses: ["equestrian", "riding", "stable", "horse", "ranch"],
 };
 
-const fold = (value: string): string =>
-  value
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "");
+const fold = (value: string): string => value.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
 
 /** Which of the house qualities this property actually carries. */
 export function houseQualities(name: string, amenities?: string[]): string[] {

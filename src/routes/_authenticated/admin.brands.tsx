@@ -7,12 +7,14 @@ export const Route = createFileRoute("/_authenticated/admin/brands")({
       { title: "Brands admin · Adair" },
       {
         name: "description",
-        content: "Rank, add and retire the airlines, hotel groups and car rental brands customers pick from.",
+        content:
+          "Rank, add and retire the airlines, hotel groups and car rental brands customers pick from.",
       },
       { property: "og:title", content: "Brands admin · Adair" },
       {
         property: "og:description",
-        content: "Rank, add and retire the airlines, hotel groups and car rental brands customers pick from.",
+        content:
+          "Rank, add and retire the airlines, hotel groups and car rental brands customers pick from.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

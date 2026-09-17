@@ -94,9 +94,7 @@ function Inner({
         <Lock className="size-4" />
         {busy ? "Authorising…" : (payingLabel ?? `Pay ${eur(amountEur)}`)}
       </button>
-      <p className="text-xs text-muted-foreground">
-        Paid to Adair, which then pays each supplier.
-      </p>
+      <p className="text-xs text-muted-foreground">Paid to Adair, which then pays each supplier.</p>
     </div>
   );
 }

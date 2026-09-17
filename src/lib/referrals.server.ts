@@ -25,7 +25,10 @@ export function makeCode(): string {
 }
 
 export function normaliseCode(value: string): string {
-  const cleaned = value.trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
+  const cleaned = value
+    .trim()
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, "");
   return cleaned.startsWith("AD") ? `AD-${cleaned.slice(2)}` : cleaned;
 }
 
@@ -43,7 +46,11 @@ export async function ensureReferralCode(db: AnyDb, userId: string): Promise<str
     const code = makeCode();
     const res = await db.from("referral_codes").insert({ user_id: userId, code }).select("code");
     if (!res.error) return code;
-    const retry = await db.from("referral_codes").select("code").eq("user_id", userId).maybeSingle();
+    const retry = await db
+      .from("referral_codes")
+      .select("code")
+      .eq("user_id", userId)
+      .maybeSingle();
     const now = (retry.data as { code?: string } | null)?.code;
     if (now) return now;
   }
@@ -55,7 +62,8 @@ type LedgerRow = { kind: string; amount_minor: number };
 /** Grants minus spends, in minor units. Never negative. */
 export function balanceOf(rows: LedgerRow[]): number {
   const total = rows.reduce(
-    (sum, row) => sum + (row.kind === "spend" ? -Math.abs(row.amount_minor) : Math.abs(row.amount_minor)),
+    (sum, row) =>
+      sum + (row.kind === "spend" ? -Math.abs(row.amount_minor) : Math.abs(row.amount_minor)),
     0,
   );
   return Math.max(0, total);

@@ -74,7 +74,8 @@ export function scoreOf(place: Place, profile: PlaceProfile): number {
   return Math.round(score);
 }
 
-const metres = (km: number): string => (km < 1 ? `${Math.round(km * 100) * 10} m` : `${km.toFixed(1)} km`);
+const metres = (km: number): string =>
+  km < 1 ? `${Math.round(km * 100) * 10} m` : `${km.toFixed(1)} km`;
 
 /** One plain sentence: what it is, how far, and why it is on this list. */
 export function reasonFor(place: Place, profile: PlaceProfile): string {
@@ -95,14 +96,21 @@ export function reasonFor(place: Place, profile: PlaceProfile): string {
             ? "welcomes children"
             : null;
 
-  return [kind, where, why].filter(Boolean).join(", ").replace(/^./, (c) => c.toUpperCase());
+  return [kind, where, why]
+    .filter(Boolean)
+    .join(", ")
+    .replace(/^./, (c) => c.toUpperCase());
 }
 
 /** Rank one bucket's worth of places, dropping anything excluded. */
 export function rankPlaces(places: Place[], profile: PlaceProfile, limit = 4): RankedPlace[] {
   return places
     .filter((place) => !excluded(place, profile))
-    .map((place) => ({ ...place, score: scoreOf(place, profile), reason: reasonFor(place, profile) }))
+    .map((place) => ({
+      ...place,
+      score: scoreOf(place, profile),
+      reason: reasonFor(place, profile),
+    }))
     .sort((a, b) => b.score - a.score || a.name.localeCompare(b.name))
     .slice(0, limit);
 }

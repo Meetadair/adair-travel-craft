@@ -57,12 +57,11 @@ export type InvoiceData = {
   items: InvoiceItem[];
 };
 
-
 const money = (value: number, currency: string) =>
   `${value.toFixed(2).replace(".", ",")} ${currency}`;
 
 /** The embedded font covers Latin scripts only. */
-const LATIN_LOCALES = ["en","de","es","pt","fr","it","sr","fi","no","sv","pl"];
+const LATIN_LOCALES = ["en", "de", "es", "pt", "fr", "it", "sr", "fi", "no", "sv", "pl"];
 
 function KIND_LABEL(L: ReturnType<typeof labels>): Record<string, string> {
   return { flight: L.kindFlight, hotel: L.kindHotel, car: L.kindCar };
@@ -115,10 +114,7 @@ export async function downloadTripInvoice(data: InvoiceData) {
   y -= 34;
   const colW = (W - 16) / 2;
   const partyLines: [string, string[]][] = [
-    [
-      L.seller,
-      [SELLER.name, SELLER.address, SELLER.taxId, SELLER.contact],
-    ],
+    [L.seller, [SELLER.name, SELLER.address, SELLER.taxId, SELLER.contact]],
     [
       L.buyer,
       [
@@ -151,15 +147,15 @@ export async function downloadTripInvoice(data: InvoiceData) {
   });
   y -= partyH + 26;
 
-  page.drawText(
-    `${data.origin} → ${data.city} · ${data.startDate} – ${data.endDate}`,
-    { x: M, y, size: 13, font: bold, color: INK },
-  );
+  page.drawText(`${data.origin} → ${data.city} · ${data.startDate} – ${data.endDate}`, {
+    x: M,
+    y,
+    size: 13,
+    font: bold,
+    color: INK,
+  });
   y -= 14;
-  page.drawText(
-    data.live ? L.liveNote : L.demoNote,
-    { x: M, y, size: 9, font, color: INK_SOFT },
-  );
+  page.drawText(data.live ? L.liveNote : L.demoNote, { x: M, y, size: 9, font, color: INK_SOFT });
 
   // Table head
   y -= 26;

@@ -29,9 +29,9 @@ describe("advice from real card data", () => {
     expect(buildAdvice({ hotel: { breakfastIncluded: true, breakfastExtraEur: 18 } })).toHaveLength(
       0,
     );
-    expect(buildAdvice({ hotel: { breakfastIncluded: false, breakfastExtraEur: null } })).toHaveLength(
-      0,
-    );
+    expect(
+      buildAdvice({ hotel: { breakfastIncluded: false, breakfastExtraEur: null } }),
+    ).toHaveLength(0);
   });
 
   it("surfaces a tight arrival with the calmer flight and its cost", () => {
@@ -57,7 +57,9 @@ describe("advice from real card data", () => {
     const line = buildAdvice({
       price: { peak: true, ratio: 2.4, savingEur: 340, offsetDays: 7, eventName: "trade fair" },
     })[0];
-    expect(line?.text).toBe("Prices are 2.4× the usual — trade fair week. 7 days later saves €340.");
+    expect(line?.text).toBe(
+      "Prices are 2.4× the usual — trade fair week. 7 days later saves €340.",
+    );
     expect(line?.action?.kind).toBe("show_cheaper_dates");
   });
 

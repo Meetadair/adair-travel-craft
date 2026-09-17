@@ -51,9 +51,7 @@ async function likelyEvent(city: string, departDate: string): Promise<string | n
           "You name large recurring events (trade fairs, festivals, congresses, major sport) " +
           'that plausibly raise hotel prices. Answer with raw JSON only: {"event": string|null}. ' +
           "Use null unless a well-known event is likely in that city around that date. Never guess a generic name.",
-        messages: [
-          { role: "user", content: `City: ${city}. Dates around: ${departDate}.` },
-        ],
+        messages: [{ role: "user", content: `City: ${city}. Dates around: ${departDate}.` }],
       }),
     });
     if (!res.ok) {
@@ -112,9 +110,7 @@ export async function buildPriceContext(req: TripRequest): Promise<PriceContext>
 
   const priced = results.filter((r): r is NonNullable<typeof r> => r !== null);
   const requested = priced.find((r) => r.offset === 0) ?? null;
-  const cheapest = priced
-    .slice()
-    .sort((a, b) => a.total - b.total)[0] ?? null;
+  const cheapest = priced.slice().sort((a, b) => a.total - b.total)[0] ?? null;
 
   const empty: PriceContext = {
     peak: false,

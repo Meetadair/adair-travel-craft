@@ -14,8 +14,14 @@ async function openDates(page: Page) {
   const refuse = page.getByRole("button", { name: /refuse/i }).first();
   if (await refuse.isVisible().catch(() => false)) await refuse.click();
   await page.waitForTimeout(2500);
-  await page.getByPlaceholder(/e\.g\./i).first().fill("Manhattan");
-  await page.getByRole("button", { name: /compose trip/i }).first().click();
+  await page
+    .getByPlaceholder(/e\.g\./i)
+    .first()
+    .fill("Manhattan");
+  await page
+    .getByRole("button", { name: /compose trip/i })
+    .first()
+    .click();
   await page.waitForTimeout(6000);
   // A bare destination settles nothing about who's coming, so that question
   // comes first now — answer "1" and move on to the dates these tests exist
@@ -23,7 +29,10 @@ async function openDates(page: Page) {
   const soloChip = page.getByRole("button", { name: "1", exact: true }).first();
   if (await soloChip.isVisible().catch(() => false)) {
     await soloChip.click();
-    await page.getByRole("button", { name: /^done$/i }).first().click();
+    await page
+      .getByRole("button", { name: /^done$/i })
+      .first()
+      .click();
     await page.waitForTimeout(1500);
   }
   await expect(calendar(page)).toBeVisible();
@@ -46,7 +55,10 @@ test("switching to Return does not invent a return date or submit", async ({ pag
   await openDates(page);
   await page.getByRole("button", { name: "22", exact: true }).first().click();
   await page.waitForTimeout(600);
-  await page.getByRole("button", { name: /^Return$/i }).first().click();
+  await page
+    .getByRole("button", { name: /^Return$/i })
+    .first()
+    .click();
   await page.waitForTimeout(1500);
   await expect(calendar(page)).toBeVisible();
   await expect(searchButton(page)).toBeDisabled();
@@ -56,7 +68,10 @@ test("One way completes the range but still waits to be told to search", async (
   await openDates(page);
   await page.getByRole("button", { name: "22", exact: true }).first().click();
   await page.waitForTimeout(600);
-  await page.getByRole("button", { name: /^One way$/i }).first().click();
+  await page
+    .getByRole("button", { name: /^One way$/i })
+    .first()
+    .click();
   await page.waitForTimeout(1500);
   await expect(calendar(page)).toBeVisible();
   await expect(searchButton(page)).toBeEnabled();
@@ -66,7 +81,10 @@ test("the flex chip does not close the calendar", async ({ page }) => {
   await openDates(page);
   await page.getByRole("button", { name: "22", exact: true }).first().click();
   await page.waitForTimeout(600);
-  await page.getByRole("checkbox", { name: /3 days/i }).first().click();
+  await page
+    .getByRole("checkbox", { name: /3 days/i })
+    .first()
+    .click();
   await page.waitForTimeout(1500);
   await expect(calendar(page)).toBeVisible();
 });

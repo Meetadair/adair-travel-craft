@@ -131,8 +131,7 @@ export function roomFits(policy: RoomPolicy, party: Party): boolean {
   return true;
 }
 
-const people = (count: number, one: string, many: string) =>
-  `${count} ${count === 1 ? one : many}`;
+const people = (count: number, one: string, many: string) => `${count} ${count === 1 ? one : many}`;
 
 /** Said plainly, so a parent knows why a cheaper room is not on the list. */
 export function familyRoomReason(party: Party, hotel?: string): string {
@@ -254,7 +253,9 @@ export function familyFromSentence(sentence: string): FamilyRead {
   const ages: number[] = [];
   const ageBlock =
     /(?:aged|ages?|w\s+wieku)\s+([\d\s,adiknorz]+?)(?:\b(?:years?|lat\w*)\b|[.,;]|$)/u.exec(text) ??
-    /(?:kids?|child(?:ren)?|dzieci\w*)\s+([\d\s,adiknorz]{2,20}?)\s*(?:years?\s*old|lat\w*)/u.exec(text);
+    /(?:kids?|child(?:ren)?|dzieci\w*)\s+([\d\s,adiknorz]{2,20}?)\s*(?:years?\s*old|lat\w*)/u.exec(
+      text,
+    );
   if (ageBlock?.[1]) {
     for (const found of ageBlock[1].matchAll(/\d+/g)) {
       const age = Number(found[0]);
@@ -267,9 +268,10 @@ export function familyFromSentence(sentence: string): FamilyRead {
   if (!children) {
     const wordCount = new RegExp(`(?:${CHILD_WORD})`, "u").test(text)
       ? (NUMBER_WORDS.find(([pattern]) =>
-          new RegExp(`${pattern.source}\\s+(?:${CHILD_WORD})|(?:${CHILD_WORD})\\s+${pattern.source}`, "u").test(
-            text,
-          ),
+          new RegExp(
+            `${pattern.source}\\s+(?:${CHILD_WORD})|(?:${CHILD_WORD})\\s+${pattern.source}`,
+            "u",
+          ).test(text),
         )?.[1] ?? 0)
       : 0;
     children = wordCount;

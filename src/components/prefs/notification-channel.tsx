@@ -109,9 +109,7 @@ export function NotificationChannel() {
             <div className="mt-4 border-t border-border pt-4">
               {data.verified ? (
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <p className="text-sm">
-                    WhatsApp number confirmed: {data.phoneMasked}
-                  </p>
+                  <p className="text-sm">WhatsApp number confirmed: {data.phoneMasked}</p>
                   <button
                     type="button"
                     onClick={() => removeMutation.mutate()}

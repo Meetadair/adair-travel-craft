@@ -194,7 +194,9 @@ export function BookPage({ cardId }: { cardId: string }) {
           console.error("finaliseTripChange failed", error);
           // The new trip is booked either way; the old one just needs a
           // human to release it, so we say so rather than staying silent.
-          setChangeReleased({ unfinished: ["your previous booking — contact us to confirm it was released"] });
+          setChangeReleased({
+            unfinished: ["your previous booking — contact us to confirm it was released"],
+          });
         });
     },
   });
@@ -292,7 +294,9 @@ export function BookPage({ cardId }: { cardId: string }) {
   const companionSuggestions = useMemo(() => {
     if (!pickedIds.length) return notSelf;
     const byId = new Map(notSelf.map((t) => [t.id, t]));
-    const picked = pickedIds.map((id) => byId.get(id)).filter((t): t is (typeof notSelf)[number] => !!t);
+    const picked = pickedIds
+      .map((id) => byId.get(id))
+      .filter((t): t is (typeof notSelf)[number] => !!t);
     return picked.length ? picked : notSelf;
   }, [notSelf, pickedIds]);
 

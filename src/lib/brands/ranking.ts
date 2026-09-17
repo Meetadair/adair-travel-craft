@@ -24,15 +24,13 @@ export function rankBrands(
 ): Brand[] {
   const { kind, region, limit = 14, selected = [] } = options;
   const pool = brands.filter((b) => b.active && b.kind === kind);
-  const scored = pool
-    .slice()
-    .sort((a, b) => {
-      const inA = a.regions.includes(region) ? 0 : 1;
-      const inB = b.regions.includes(region) ? 0 : 1;
-      if (inA !== inB) return inA - inB;
-      if (a.rank !== b.rank) return a.rank - b.rank;
-      return a.name.localeCompare(b.name);
-    });
+  const scored = pool.slice().sort((a, b) => {
+    const inA = a.regions.includes(region) ? 0 : 1;
+    const inB = b.regions.includes(region) ? 0 : 1;
+    if (inA !== inB) return inA - inB;
+    if (a.rank !== b.rank) return a.rank - b.rank;
+    return a.name.localeCompare(b.name);
+  });
   const short = scored.slice(0, limit);
   const missing = selected
     .map((id) => pool.find((b) => b.id === id))
@@ -48,9 +46,15 @@ export function searchBrands(
   const { kind, query, limit = 30 } = options;
   const needle = fold(query);
   const pool = brands.filter((b) => b.active && b.kind === kind);
-  if (!needle) return pool.slice().sort((a, b) => a.rank - b.rank).slice(0, limit);
+  if (!needle)
+    return pool
+      .slice()
+      .sort((a, b) => a.rank - b.rank)
+      .slice(0, limit);
   return pool
-    .filter((b) => fold(`${b.name} ${b.group ?? ""} ${(b.aliases ?? []).join(" ")}`).includes(needle))
+    .filter((b) =>
+      fold(`${b.name} ${b.group ?? ""} ${(b.aliases ?? []).join(" ")}`).includes(needle),
+    )
     .sort((a, b) => a.rank - b.rank)
     .slice(0, limit);
 }

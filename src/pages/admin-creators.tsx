@@ -110,8 +110,8 @@ export function AdminCreatorsPage() {
                     </p>
                     <p className="mt-1 text-xs text-muted-foreground">
                       Payout: {creator.payoutEntity ?? "no entity"} ·{" "}
-                      {creator.payoutIbanLast4 ? `IBAN ••••${creator.payoutIbanLast4}` : "no IBAN"} ·{" "}
-                      {creator.payoutVatStatus ?? "VAT status unknown"}
+                      {creator.payoutIbanLast4 ? `IBAN ••••${creator.payoutIbanLast4}` : "no IBAN"}{" "}
+                      · {creator.payoutVatStatus ?? "VAT status unknown"}
                     </p>
                     {creator.platforms.length > 0 && (
                       <ul className="mt-2 flex flex-wrap gap-2">
@@ -324,7 +324,11 @@ export function AdminCreatorsPage() {
                       <span className="text-xs text-muted-foreground">{row.reference}</span>
                     ) : (
                       <>
-                        <input name="reference" placeholder="Transfer reference" className={field} />
+                        <input
+                          name="reference"
+                          placeholder="Transfer reference"
+                          className={field}
+                        />
                         <button className="rounded-lg border border-border px-3 py-1 text-xs">
                           Mark paid
                         </button>

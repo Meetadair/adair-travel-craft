@@ -62,9 +62,8 @@ export function isOneWay(sentence: string): boolean {
  * flexing a date.
  */
 export function flexDaysOf(sentence: string): number | null {
-  const match = /(?:\u00b1|\+\s*\/\s*-|\+-|plus\s*minus)\s*(\d{1,2})\s*(?:day|dni|dzien|dzień)/i.exec(
-    sentence,
-  );
+  const match =
+    /(?:\u00b1|\+\s*\/\s*-|\+-|plus\s*minus)\s*(\d{1,2})\s*(?:day|dni|dzien|dzień)/i.exec(sentence);
   if (!match) return null;
   const days = Number(match[1]);
   return days >= 1 && days <= 14 ? days : null;
@@ -187,7 +186,8 @@ const BUSINESS_WORDS =
 const PARTNER_WORDS =
   /\b(my (wife|husband|partner|girlfriend|boyfriend)|with my (wife|husband|partner)|romantic|just the two of us)\b|z (żoną|zona|mężem|mezem|partnerką|partnerka|dziewczyną|narzeczoną)/i;
 
-const FAMILY_WORDS = /\b(family|kids|children|my son|my daughter)\b|rodzin|dzie[ćc]mi|z dzie[ćc]mi/i;
+const FAMILY_WORDS =
+  /\b(family|kids|children|my son|my daughter)\b|rodzin|dzie[ćc]mi|z dzie[ćc]mi/i;
 
 const FRIENDS_WORDS = /\b(friends|mates|stag|hen)\b|znajomymi|przyjaci[óo][łl]mi/i;
 

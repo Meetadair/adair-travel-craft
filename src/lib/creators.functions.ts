@@ -260,7 +260,8 @@ export const getCreatorDashboard = createServerFn({ method: "GET" })
         name: String(row["name"]),
         kind: String(row["kind"]),
         destination:
-          ((row["getaway_destinations"] as { name?: string } | null)?.name as string | null) ?? null,
+          ((row["getaway_destinations"] as { name?: string } | null)?.name as string | null) ??
+          null,
         reviewStatus: String(row["review_status"]),
         reviewNote: (row["review_note"] as string | null) ?? null,
       })),
@@ -389,7 +390,8 @@ export const getCreatorProfile = createServerFn({ method: "GET" })
         name: String(row["name"]),
         kind: String(row["kind"]),
         destination:
-          ((row["getaway_destinations"] as { name?: string } | null)?.name as string | null) ?? null,
+          ((row["getaway_destinations"] as { name?: string } | null)?.name as string | null) ??
+          null,
         whyThisOne: (row["why_this_one"] as string | null) ?? null,
         visitedOn: (row["visited_on"] as string | null) ?? null,
         postUrl: (row["post_url"] as string | null) ?? null,
@@ -428,9 +430,7 @@ export const recordCreatorClick = createServerFn({ method: "POST" })
  */
 export const attributeCreator = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
-    z.object({ token: z.string().trim().max(60) }).parse(input),
-  )
+  .inputValidator((input: unknown) => z.object({ token: z.string().trim().max(60) }).parse(input))
   .handler(async ({ context, data }): Promise<{ attributed: boolean }> => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { ATTRIBUTION_DAYS, loadCommissionRules } = await import("@/lib/creators.server");
@@ -475,9 +475,7 @@ export const attributeCreator = createServerFn({ method: "POST" })
       creator_id: creator.id,
       code: handle || code,
       attributed_at: now.toISOString(),
-      attribution_expires_at: new Date(
-        now.getTime() + ATTRIBUTION_DAYS * 86_400_000,
-      ).toISOString(),
+      attribution_expires_at: new Date(now.getTime() + ATTRIBUTION_DAYS * 86_400_000).toISOString(),
       earning_until: new Date(
         now.getTime() + Math.round(months * 30.44) * 86_400_000,
       ).toISOString(),

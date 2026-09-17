@@ -499,7 +499,13 @@ async function searchStayLiteApi(
     raw = [];
   }
   if (!raw.length) {
-    return { stay: null, alternatives: [], requested, notFound: Boolean(requested), familyNote: null };
+    return {
+      stay: null,
+      alternatives: [],
+      requested,
+      notFound: Boolean(requested),
+      familyNote: null,
+    };
   }
 
   const globalRules = await loadGlobalStayRules();
@@ -516,16 +522,32 @@ async function searchStayLiteApi(
   // The house standard: never below 4 stars, unless that would empty the list.
   const { stays: houseFiltered } = applyHouseStandard(pool0);
 
-  const mapped = staysPassingDealbreakers(houseFiltered, (s) => ({ name: s.name, rating: s.rating }), prefs);
+  const mapped = staysPassingDealbreakers(
+    houseFiltered,
+    (s) => ({ name: s.name, rating: s.rating }),
+    prefs,
+  );
   const usable = mapped.length ? mapped : houseFiltered;
   if (!usable.length) {
-    return { stay: null, alternatives: [], requested, notFound: Boolean(requested), familyNote: null };
+    return {
+      stay: null,
+      alternatives: [],
+      requested,
+      notFound: Boolean(requested),
+      familyNote: null,
+    };
   }
 
   if (requested) {
     const hit = findByName(usable, requested, (s) => s.name);
     if (hit) {
-      return { stay: { ...hit, exact: true }, alternatives: [], requested, notFound: false, familyNote: null };
+      return {
+        stay: { ...hit, exact: true },
+        alternatives: [],
+        requested,
+        notFound: false,
+        familyNote: null,
+      };
     }
     const alternatives = usable
       .slice()

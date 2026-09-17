@@ -29,8 +29,8 @@ export function RefineProfilePrompt() {
       <div className="min-w-0">
         <p className="text-sm font-medium">Your profile is {completion}% complete</p>
         <p className="mt-1 text-sm text-muted-foreground">
-          Two more minutes of taste — airlines, hotel style, food, music — and every suggestion
-          fits you better.
+          Two more minutes of taste — airlines, hotel style, food, music — and every suggestion fits
+          you better.
         </p>
       </div>
       <div className="flex items-center gap-3">

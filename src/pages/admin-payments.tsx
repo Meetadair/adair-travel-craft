@@ -27,7 +27,8 @@ export function AdminPaymentsPage() {
       <main className="mx-auto max-w-4xl px-6 pb-24 pt-12">
         <h1 className="font-display text-3xl font-semibold tracking-tight">Payments</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          The active provider is a config row. Switching it changes nothing else in the booking flow.
+          The active provider is a config row. Switching it changes nothing else in the booking
+          flow.
         </p>
 
         {admin.isLoading && <p className="mt-8 text-sm text-muted-foreground">Loading…</p>}

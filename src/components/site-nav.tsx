@@ -185,7 +185,9 @@ export function SiteNav() {
   const [viewer, setViewer] = useState<Viewer>({ name: null, email: null, photo: null });
 
   useEffect(() => {
-    const read = (user: { email?: string | null; user_metadata?: Record<string, unknown> } | null) => {
+    const read = (
+      user: { email?: string | null; user_metadata?: Record<string, unknown> } | null,
+    ) => {
       setSignedIn(Boolean(user));
       const meta = (user?.user_metadata ?? {}) as Record<string, unknown>;
       const str = (key: string) => (typeof meta[key] === "string" ? (meta[key] as string) : null);

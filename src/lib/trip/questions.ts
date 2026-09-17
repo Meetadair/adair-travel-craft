@@ -29,7 +29,8 @@ export type ChatQuestion = {
   /** One short question, in the chat. */
   question: string;
   /** The control shown under it. */
-  control: "calendar" | "time" | "ages" | "options" | "travellers" | "destination" | "airport" | "choice";
+  control:
+    "calendar" | "time" | "ages" | "options" | "travellers" | "destination" | "airport" | "choice";
   /** Buttons, for the options control. */
   options: { label: string; value: string }[];
   /**
@@ -272,11 +273,7 @@ export function chatQuestions(
   // needs a second bed. Skipped only once the sentence has actually settled
   // it (a number, "solo", one named companion); "with my family" on its own
   // is exactly the vague case this question exists to resolve.
-  if (
-    !travellersStated(sentence) &&
-    request.party !== "solo" &&
-    !answered.includes("travellers")
-  ) {
+  if (!travellersStated(sentence) && request.party !== "solo" && !answered.includes("travellers")) {
     out.push({
       kind: "travellers",
       question: copy.travellers,

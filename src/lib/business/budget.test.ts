@@ -115,8 +115,22 @@ describe("who may release it", () => {
 describe("authorised overspend", () => {
   it("is reported on its own, never folded into ordinary spend", () => {
     const releases = [
-      { budgetId: "c", releasedById: "maria", amountMinor: 20_000, reason: "Client demanded it", kind: "once" as const, at: "2026-09-01" },
-      { budgetId: "c", releasedById: "maria", amountMinor: 5_000, reason: "Fare expired", kind: "once" as const, at: "2026-09-04" },
+      {
+        budgetId: "c",
+        releasedById: "maria",
+        amountMinor: 20_000,
+        reason: "Client demanded it",
+        kind: "once" as const,
+        at: "2026-09-01",
+      },
+      {
+        budgetId: "c",
+        releasedById: "maria",
+        amountMinor: 5_000,
+        reason: "Fare expired",
+        kind: "once" as const,
+        at: "2026-09-04",
+      },
     ];
     expect(authorisedOverspendMinor(releases)).toBe(25_000);
   });

@@ -56,7 +56,9 @@ export function flexibilityOf(conditions: FareConditions): Flexibility {
 
   const parts: string[] = [];
   if (refundable === true) {
-    parts.push(refundPenaltyEur ? `refundable, ${money(refundPenaltyEur)} fee` : "fully refundable");
+    parts.push(
+      refundPenaltyEur ? `refundable, ${money(refundPenaltyEur)} fee` : "fully refundable",
+    );
   } else if (refundable === false) {
     parts.push("non-refundable");
   }

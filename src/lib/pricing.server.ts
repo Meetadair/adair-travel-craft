@@ -21,10 +21,7 @@ const FALLBACK: PricingTable = {
   restaurant: { markupBps: 0, discountBps: 0, changeFeeMinor: 0 },
 };
 
-export async function loadPricing(
-  supabase: SupabaseClient,
-  plan: string,
-): Promise<PricingTable> {
+export async function loadPricing(supabase: SupabaseClient, plan: string): Promise<PricingTable> {
   const { data } = await supabase
     .from("pricing_rules")
     .select("line_type, markup_bps, discount_bps, change_fee_minor")

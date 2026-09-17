@@ -84,7 +84,9 @@ export function Knows() {
 
       {data.ask ? (
         <div className="space-y-3 rounded-xl border border-primary/30 bg-primary/5 px-4 py-3">
-          <p className="text-sm">{copy.askPattern.replace("{habit}", data.ask.question.split(" — ")[0] ?? "")}</p>
+          <p className="text-sm">
+            {copy.askPattern.replace("{habit}", data.ask.question.split(" — ")[0] ?? "")}
+          </p>
           <div className="flex flex-wrap gap-2">
             <button
               type="button"
